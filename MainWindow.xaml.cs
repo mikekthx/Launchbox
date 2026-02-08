@@ -27,6 +27,8 @@ namespace Launchbox
         private const int HOTKEY_ID = 9000;
         private const int SW_RESTORE = 9;
 
+        private static readonly string[] ALLOWED_EXTENSIONS = { ".lnk", ".url" };
+
         private static WndProcDelegate? _wndProcDelegate;
         private readonly IntPtr oldWndProc;
         private bool _hasPositioned = false;
@@ -356,6 +358,7 @@ namespace Launchbox
             }
 
             var files = Directory.GetFiles(ShortcutFolder)
+                .Where(f => ALLOWED_EXTENSIONS.Contains(Path.GetExtension(f).ToLowerInvariant()))
                 .OrderBy(f => Path.GetFileName(f));
 
             foreach (var file in files)
@@ -391,6 +394,13 @@ namespace Launchbox
         {
             if (e.ClickedItem is AppItem app)
             {
+                string extension = Path.GetExtension(app.Path).ToLowerInvariant();
+                if (!ALLOWED_EXTENSIONS.Contains(extension))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Blocked execution of unauthorized file: {app.Path}");
+                    return;
+                }
+
                 try
                 {
                     System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(app.Path) { UseShellExecute = true });
