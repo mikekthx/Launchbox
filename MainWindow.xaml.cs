@@ -26,7 +26,7 @@ namespace Launchbox
         private const int HOTKEY_ID = 9000;
         private const int SW_RESTORE = 9;
 
-        private static readonly string[] ALLOWED_EXTENSIONS = { ".lnk", ".url", ".exe" };
+        private static readonly string[] ALLOWED_EXTENSIONS = { ".lnk", ".url" };
 
         private static WndProcDelegate? _wndProcDelegate;
         private readonly IntPtr oldWndProc;
