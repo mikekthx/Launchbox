@@ -420,7 +420,7 @@ namespace Launchbox
                 using var icon = WinIcon.FromHandle(hIcon);
                 using var bmp = icon.ToBitmap();
                 using var ms = new MemoryStream();
-                bmp.Save(ms, ImageFormat.Png);
+                bmp.Save(ms, ImageFormat.Bmp);
                 return ms.ToArray();
             }
             catch (Exception ex)
