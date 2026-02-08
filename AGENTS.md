@@ -96,10 +96,10 @@ try
 }
 catch (Exception ex)
 {
-    System.Diagnostics.Debug.WriteLine($"Failed to {action}: {ex.Message}");
+    System.Diagnostics.Trace.WriteLine($"Failed to {action}: {ex.Message}");
 }
 ```
-- Always log errors with context
+- Always log errors with context (use `Trace.WriteLine` for production visibility)
 - Never swallow exceptions silently
 - Use `finally` for cleanup
 

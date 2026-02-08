@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace Launchbox
             AppGrid.Loaded += (s, e) =>
             {
                 FindScrollViewer(AppGrid);
-                System.Diagnostics.Debug.WriteLine($"AppGrid loaded. Scrollable height: {_internalScrollViewer?.ScrollableHeight ?? 0}");
+                Debug.WriteLine($"AppGrid loaded. Scrollable height: {_internalScrollViewer?.ScrollableHeight ?? 0}");
             };
 
             // 4. START OFF-SCREEN
@@ -79,14 +80,14 @@ namespace Launchbox
 
             if (!RegisterHotKey(hWnd, HOTKEY_ID, MOD_ALT, VK_S))
             {
-                System.Diagnostics.Debug.WriteLine("Failed to register Alt+S hotkey.");
+                Trace.WriteLine("Failed to register Alt+S hotkey.");
             }
 
             _wndProcDelegate = new WndProcDelegate(NewWndProc);
             oldWndProc = SetWindowLongPtr(hWnd, -4, _wndProcDelegate);
             if (oldWndProc == IntPtr.Zero)
             {
-                System.Diagnostics.Debug.WriteLine("Failed to set WndProc hook.");
+                Trace.WriteLine("Failed to set WndProc hook.");
             }
 
             // 6. LOAD APPS
@@ -161,7 +162,7 @@ namespace Launchbox
                     _internalScrollViewer = sv;
                     _internalScrollViewer.VerticalScrollMode = ScrollMode.Enabled;
                     _internalScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                    System.Diagnostics.Debug.WriteLine($"ScrollViewer found! Scrollable height: {sv.ScrollableHeight}");
+                    Debug.WriteLine($"ScrollViewer found! Scrollable height: {sv.ScrollableHeight}");
                     return true;
                 }
                 if (FindScrollViewer(child))
@@ -199,7 +200,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error during exit: {ex.Message}");
+                Trace.WriteLine($"Error during exit: {ex.Message}");
             }
             this.Close();
         }
@@ -217,7 +218,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to reset window position: {ex.Message}");
+                Trace.WriteLine($"Failed to reset window position: {ex.Message}");
             }
         }
 
@@ -235,7 +236,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to save window position: {ex.Message}");
+                Trace.WriteLine($"Failed to save window position: {ex.Message}");
             }
         }
 
@@ -261,7 +262,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to restore window position: {ex.Message}");
+                Trace.WriteLine($"Failed to restore window position: {ex.Message}");
             }
             return false;
         }
@@ -289,7 +290,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to toggle window visibility: {ex.Message}");
+                Trace.WriteLine($"Failed to toggle window visibility: {ex.Message}");
             }
         }
 
@@ -308,7 +309,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to center window: {ex.Message}");
+                Trace.WriteLine($"Failed to center window: {ex.Message}");
             }
         }
 
@@ -350,7 +351,7 @@ namespace Launchbox
         {
             if (!Directory.Exists(ShortcutFolder))
             {
-                System.Diagnostics.Debug.WriteLine($"Shortcut folder not found: {ShortcutFolder}");
+                Trace.WriteLine($"Shortcut folder not found: {ShortcutFolder}");
                 return;
             }
 
@@ -372,17 +373,17 @@ namespace Launchbox
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Failed to load app {file}: {ex.Message}");
+                    Trace.WriteLine($"Failed to load app {file}: {ex.Message}");
                 }
             }
 
-            System.Diagnostics.Debug.WriteLine($"Loaded {Apps.Count} apps");
+            Trace.WriteLine($"Loaded {Apps.Count} apps");
 
             await Task.Delay(100);
             if (_internalScrollViewer != null)
             {
                 _internalScrollViewer.UpdateLayout();
-                System.Diagnostics.Debug.WriteLine($"After loading - Scrollable height: {_internalScrollViewer.ScrollableHeight}");
+                Debug.WriteLine($"After loading - Scrollable height: {_internalScrollViewer.ScrollableHeight}");
             }
         }
 
@@ -397,7 +398,7 @@ namespace Launchbox
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Failed to launch {app.Path}: {ex.Message}");
+                    Trace.WriteLine($"Failed to launch {app.Path}: {ex.Message}");
                 }
             }
         }
@@ -425,7 +426,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to extract icon for {path}: {ex.Message}");
+                Trace.WriteLine($"Failed to extract icon for {path}: {ex.Message}");
                 return null;
             }
             finally
@@ -450,7 +451,7 @@ namespace Launchbox
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to create BitmapImage: {ex.Message}");
+                Trace.WriteLine($"Failed to create BitmapImage: {ex.Message}");
                 return null;
             }
         }
