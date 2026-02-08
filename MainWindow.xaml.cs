@@ -354,26 +354,38 @@ namespace Launchbox
                 return;
             }
 
-            var files = Directory.GetFiles(ShortcutFolder)
-                .OrderBy(f => Path.GetFileName(f));
-
-            foreach (var file in files)
+            var appDataItems = await Task.Run(() =>
             {
-                try
+                var files = Directory.GetFiles(ShortcutFolder)
+                    .OrderBy(f => Path.GetFileName(f))
+                    .ToList();
+
+                return files.AsParallel().AsOrdered().Select(file =>
                 {
-                    var name = Path.GetFileNameWithoutExtension(file);
-                    var iconBytes = await Task.Run(() => ExtractIconBytes(file));
-                    BitmapImage? icon = null;
-                    if (iconBytes != null)
+                    try
                     {
-                        icon = await CreateBitmapImageAsync(iconBytes);
+                        var name = Path.GetFileNameWithoutExtension(file);
+                        var iconBytes = ExtractIconBytes(file);
+                        return new { Name = name, Path = file, IconBytes = iconBytes, Success = true };
                     }
-                    Apps.Add(new AppItem { Name = name, Path = file, Icon = icon });
-                }
-                catch (Exception ex)
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Failed to load app {file}: {ex.Message}");
+                        return new { Name = string.Empty, Path = file, IconBytes = (byte[]?)null, Success = false };
+                    }
+                }).ToList();
+            });
+
+            foreach (var data in appDataItems)
+            {
+                if (!data.Success) continue;
+
+                BitmapImage? icon = null;
+                if (data.IconBytes != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Failed to load app {file}: {ex.Message}");
+                    icon = await CreateBitmapImageAsync(data.IconBytes);
                 }
+                Apps.Add(new AppItem { Name = data.Name, Path = data.Path, Icon = icon });
             }
 
             System.Diagnostics.Debug.WriteLine($"Loaded {Apps.Count} apps");
