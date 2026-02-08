@@ -1,0 +1,21 @@
+{
+  "omnisharp.useModernNet": false,
+  "omnisharp.enableRoslynAnalyzers": true,
+"omnisharp.enableEditorConfigSupport": true,
+  "omnisharp.enableMsBuildLoadProjectsOnDemand": false,
+  "csharp.suppressDotnetInstallWarning": true,
+  "omnisharp.path": "latest",
+  "omnisharp.dotNetCliPaths": {
+    "dotnet": "C:\\Program Files\\dotnet\\dotnet.exe"
+  },
+  "omnisharp.msbuild": {
+    "useLegacySdkResolver": true,
+    "toolsPath": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\MSBuild\\Current\\Bin"
+  },
+  "omnisharp.env": {
+    "DOTNET_ROOT": "C:\\Program Files\\dotnet",
+    "MSBuildSDKsPath": "C:\\Program Files\\dotnet\\sdk\\8.0.417\\Sdks"
+},
+"dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+"dotnet.formatting.organizeImportsOnFormat": true
+}

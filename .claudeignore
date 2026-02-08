@@ -1,0 +1,10 @@
+# Ignore build artifacts and dependencies
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+
+# Ignore project-wide assets
+Assets/
+node_modules/

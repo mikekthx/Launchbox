@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Launchbox (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Launchbox (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

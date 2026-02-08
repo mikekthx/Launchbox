@@ -1,0 +1,72 @@
+<Window
+    x:Class="Launchbox.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Launchbox"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:tb="using:H.NotifyIcon"
+    mc:Ignorable="d">
+
+    <Window.SystemBackdrop>
+        <DesktopAcrylicBackdrop/>
+    </Window.SystemBackdrop>
+
+    <Grid x:Name="RootGrid" Background="Transparent">
+
+        <tb:TaskbarIcon x:Name="TrayIcon"
+                        ToolTipText="Launchbox (Alt+S)"
+                        IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
+                        LeftClickCommand="{x:Bind ToggleWindowCommand}"
+                        DoubleClickCommand="{x:Bind ToggleWindowCommand}">
+            <tb:TaskbarIcon.ContextFlyout>
+                <MenuFlyout>
+                    <MenuFlyoutItem Text="Show" Command="{x:Bind ToggleWindowCommand}" />
+                    <MenuFlyoutItem Text="Reset Position" Command="{x:Bind ResetPositionCommand}" />
+                    <MenuFlyoutSeparator />
+                    <MenuFlyoutItem Text="Exit" Command="{x:Bind ExitCommand}" />
+                </MenuFlyout>
+            </tb:TaskbarIcon.ContextFlyout>
+        </tb:TaskbarIcon>
+
+        <GridView x:Name="AppGrid" 
+                  Padding="20"
+                  Background="Transparent"
+                  SelectionMode="None" 
+                  IsItemClickEnabled="True" 
+                  ItemClick="AppGrid_ItemClick"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.VerticalScrollMode="Enabled"
+                  ScrollViewer.IsVerticalRailEnabled="True">
+
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="CornerRadius" Value="8"/>
+                    <Setter Property="Margin" Value="4"/>
+                    <Setter Property="Padding" Value="4"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+                </Style>
+            </GridView.ItemContainerStyle>
+
+            <GridView.ItemTemplate>
+                <DataTemplate x:DataType="local:AppItem">
+                    <StackPanel Width="110" Height="130" Spacing="4" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center">
+
+                        <Image Source="{x:Bind Icon}" Width="56" Height="56" Margin="0,10,0,0"/>
+
+                        <TextBlock Text="{x:Bind Name}" 
+                                   TextAlignment="Center" 
+                                   TextWrapping="Wrap" 
+                                   MaxLines="3"
+                                   TextTrimming="CharacterEllipsis"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+    </Grid>
+</Window>
