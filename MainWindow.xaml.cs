@@ -338,6 +338,9 @@ namespace Launchbox
         [DllImport("user32.dll")] private static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
         [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")] private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong);
         [DllImport("user32.dll", EntryPoint = "SetWindowLong")] private static extern IntPtr SetWindowLong32(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong);
+        [DllImport("user32.dll")] private static extern uint PrivateExtractIcons(string l, int n, int cx, int cy, ref IntPtr p, IntPtr id, uint ni, uint fl);
+        [DllImport("user32.dll")] private static extern bool DestroyIcon(IntPtr hIcon);
+        [DllImport("kernel32.dll")] private static extern int GetPrivateProfileString(string s, string k, string d, System.Text.StringBuilder r, int z, string f);
 
         private static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong)
         {
@@ -454,10 +457,6 @@ namespace Launchbox
                 return null;
             }
         }
-
-        [DllImport("user32.dll")] private static extern uint PrivateExtractIcons(string l, int n, int cx, int cy, ref IntPtr p, IntPtr id, uint ni, uint fl);
-        [DllImport("user32.dll")] private static extern bool DestroyIcon(IntPtr hIcon);
-        [DllImport("kernel32.dll")] private static extern int GetPrivateProfileString(string s, string k, string d, System.Text.StringBuilder r, int z, string f);
 
         private string GetIniValue(string p, string s, string k)
         {
