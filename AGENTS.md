@@ -158,7 +158,7 @@ settings["Key"] = value;
 ## Common Tasks
 
 ### Add app item property
-1. Add to `AppItem` class in `MainWindow.xaml.cs:462`
+1. Add to `AppItem` class in `AppItem.cs`
 2. Populate in `LoadAppsAsync()` at line ~340
 3. Update XAML DataTemplate if needed
 
