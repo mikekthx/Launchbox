@@ -355,7 +355,8 @@ namespace Launchbox
             }
 
             var files = Directory.GetFiles(ShortcutFolder)
-                .OrderBy(f => Path.GetFileName(f));
+                .OrderBy(f => Path.GetFileName(f))
+                .ToArray();
 
             foreach (var file in files)
             {
