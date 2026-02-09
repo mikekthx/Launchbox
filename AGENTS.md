@@ -96,10 +96,10 @@ try
 }
 catch (Exception ex)
 {
-    System.Diagnostics.Debug.WriteLine($"Failed to {action}: {ex.Message}");
+    System.Diagnostics.Trace.WriteLine($"Failed to {action}: {ex.Message}");
 }
 ```
-- Always log errors with context
+- Always log errors with context (use `Trace.WriteLine` for production visibility)
 - Never swallow exceptions silently
 - Use `finally` for cleanup
 
@@ -158,7 +158,7 @@ settings["Key"] = value;
 ## Common Tasks
 
 ### Add app item property
-1. Add to `AppItem` class in `MainWindow.xaml.cs:462`
+1. Add to `AppItem` class in `AppItem.cs`
 2. Populate in `LoadAppsAsync()` at line ~340
 3. Update XAML DataTemplate if needed
 
