@@ -348,14 +348,19 @@ namespace Launchbox
         // --- APP LOADING ---
         private async Task LoadAppsAsync()
         {
-            if (!Directory.Exists(ShortcutFolder))
+            var files = await Task.Run(() =>
+            {
+                if (!Directory.Exists(ShortcutFolder)) return null;
+                return Directory.GetFiles(ShortcutFolder)
+                    .OrderBy(f => Path.GetFileName(f))
+                    .ToArray();
+            });
+
+            if (files == null)
             {
                 System.Diagnostics.Debug.WriteLine($"Shortcut folder not found: {ShortcutFolder}");
                 return;
             }
-
-            var files = Directory.GetFiles(ShortcutFolder)
-                .OrderBy(f => Path.GetFileName(f));
 
             foreach (var file in files)
             {
