@@ -42,4 +42,10 @@ public class SimpleCommandTests
 
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void Constructor_NullAction_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => new SimpleCommand(null!));
+    }
 }

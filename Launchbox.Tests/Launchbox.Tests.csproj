@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+  <!-- Test project for Launchbox -->
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
