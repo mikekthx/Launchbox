@@ -4,6 +4,9 @@ using System;
 
 namespace Launchbox.Tests;
 
+/// <summary>
+/// Verifies the behavior of SimpleCommand to ensure core command logic is reliable.
+/// </summary>
 public class SimpleCommandTests
 {
     [Fact]
