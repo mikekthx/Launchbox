@@ -345,7 +345,6 @@ namespace Launchbox
         [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool DestroyIcon(IntPtr hIcon);
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] private static extern int GetPrivateProfileString(string s, string k, string d, System.Text.StringBuilder r, int z, string f);
 
-
         private static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong)
         {
             if (IntPtr.Size == 8) return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
