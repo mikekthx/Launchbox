@@ -1,22 +1,21 @@
-﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml;
 
-namespace Launchbox
+namespace Launchbox;
+
+public partial class App : Application
 {
-    public partial class App : Application
+    private Window? _window;
+
+    public App()
     {
-        public App()
-        {
-            this.InitializeComponent();
-        }
+        this.InitializeComponent();
+    }
 
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
-        {
-            m_window = new MainWindow();
+    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    {
+        _window = new MainWindow();
 
-            // This MUST be here for the tray icon to receive input
-            m_window.Activate();
-        }
-
-        private Window? m_window;
+        // This MUST be here for the tray icon to receive input
+        _window.Activate();
     }
 }
