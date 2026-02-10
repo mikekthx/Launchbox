@@ -8,13 +8,24 @@ public class MockSettingsStore : ISettingsStore
 {
     private readonly Dictionary<string, object> _store = new();
 
+    public bool ShouldThrow { get; set; }
+
     public bool TryGetValue(string key, out object? value)
     {
+        if (ShouldThrow)
+        {
+            throw new Exception("Settings store failure");
+        }
         return _store.TryGetValue(key, out value);
     }
 
     public void SetValue(string key, object? value)
     {
+        if (ShouldThrow)
+        {
+            throw new Exception("Settings store failure");
+        }
+
         if (value != null)
         {
             _store[key] = value;
@@ -93,5 +104,25 @@ public class WindowPositionManagerTests
         Assert.Equal(300, w);
         Assert.True(settings.TryGetValue("WinH", out var h));
         Assert.Equal(400, h);
+    }
+
+    [Fact]
+    public void SaveWindowPosition_PropagatesException_WhenStoreFails()
+    {
+        var settings = new MockSettingsStore { ShouldThrow = true };
+        var manager = new WindowPositionManager(settings);
+
+        var exception = Assert.Throws<Exception>(() => manager.SaveWindowPosition(10, 20, 300, 400));
+        Assert.Equal("Settings store failure", exception.Message);
+    }
+
+    [Fact]
+    public void TryGetWindowPosition_PropagatesException_WhenStoreFails()
+    {
+        var settings = new MockSettingsStore { ShouldThrow = true };
+        var manager = new WindowPositionManager(settings);
+
+        var exception = Assert.Throws<Exception>(() => manager.TryGetWindowPosition(out _, out _, out _, out _));
+        Assert.Equal("Settings store failure", exception.Message);
     }
 }
