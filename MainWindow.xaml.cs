@@ -29,6 +29,7 @@ public sealed partial class MainWindow : Window
     private readonly IntPtr _oldWndProc;
     private bool _hasPositioned = false;
     private ScrollViewer? _internalScrollViewer;
+    private readonly WindowPositionManager _windowPositionManager;
 
     // Window dragging state
     private bool _isDraggingWindow = false;
@@ -42,6 +43,8 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
+
+        _windowPositionManager = new WindowPositionManager(new LocalSettingsStore());
 
         ToggleWindowCommand = new SimpleCommand(ToggleWindowVisibility);
         ExitCommand = new SimpleCommand(ExitApplication);
@@ -224,13 +227,9 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            var settings = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
             var pos = this.AppWindow.Position;
             var size = this.AppWindow.Size;
-            settings["WinX"] = pos.X;
-            settings["WinY"] = pos.Y;
-            settings["WinW"] = size.Width;
-            settings["WinH"] = size.Height;
+            _windowPositionManager.SaveWindowPosition(pos.X, pos.Y, size.Width, size.Height);
         }
         catch (Exception ex)
         {
@@ -242,12 +241,7 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            var settings = Windows.Storage.ApplicationData.Current.LocalSettings.Values;
-            if (settings.TryGetValue("WinX", out var winX) &&
-                settings.TryGetValue("WinY", out var winY) &&
-                settings.TryGetValue("WinW", out var winW) &&
-                settings.TryGetValue("WinH", out var winH) &&
-                winX is int x && winY is int y && winW is int w && winH is int h)
+            if (_windowPositionManager.TryGetWindowPosition(out int x, out int y, out int w, out int h))
             {
                 var rect = new Windows.Graphics.RectInt32(x, y, w, h);
                 var displayArea = DisplayArea.GetFromRect(rect, DisplayAreaFallback.None);
