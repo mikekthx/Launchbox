@@ -32,11 +32,12 @@ dotnet clean Launchbox.csproj
 
 ## Testing
 
-**No test framework configured.** If adding tests:
-- Use xUnit or MSTest
-- Create `Launchbox.Tests` project
-- Run: `dotnet test`
+**Test framework configured: xUnit.**
+- Project: `Launchbox.Tests` (net8.0)
+- Run: `dotnet test Launchbox.Tests/Launchbox.Tests.csproj` (cross-platform)
 - Single test: `dotnet test --filter "FullyQualifiedName~TestMethodName"`
+
+Note: `dotnet test Launchbox.sln` works on Windows but may fail on Linux due to WinUI dependencies in the main project.
 
 ## Project Structure
 
