@@ -21,6 +21,8 @@
     <Compile Include="..\WindowPositionManager.cs" Link="WindowPositionManager.cs" />
     <Compile Include="..\IVisualTreeService.cs" Link="IVisualTreeService.cs" />
     <Compile Include="..\VisualTreeFinder.cs" Link="VisualTreeFinder.cs" />
+    <Compile Include="..\IFileSystem.cs" Link="IFileSystem.cs" />
+    <Compile Include="..\ShortcutService.cs" Link="ShortcutService.cs" />
   </ItemGroup>
 
 </Project>

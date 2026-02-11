@@ -30,6 +30,7 @@ public sealed partial class MainWindow : Window
     private bool _hasPositioned = false;
     private ScrollViewer? _internalScrollViewer;
     private readonly WindowPositionManager _windowPositionManager;
+    private readonly ShortcutService _shortcutService;
 
     // Window dragging state
     private bool _isDraggingWindow = false;
@@ -45,6 +46,7 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
 
         _windowPositionManager = new WindowPositionManager(new LocalSettingsStore());
+        _shortcutService = new ShortcutService(new FileSystem());
 
         ToggleWindowCommand = new SimpleCommand(ToggleWindowVisibility);
         ExitCommand = new SimpleCommand(ExitApplication);
@@ -309,14 +311,7 @@ public sealed partial class MainWindow : Window
         // --- APP LOADING ---
         private async Task LoadAppsAsync()
         {
-            var files = await Task.Run(() =>
-            {
-                if (!Directory.Exists(_shortcutFolder)) return null;
-                return Directory.GetFiles(_shortcutFolder)
-                    .Where(f => ALLOWED_EXTENSIONS.Contains(Path.GetExtension(f).ToLowerInvariant()))
-                    .OrderBy(f => Path.GetFileName(f))
-                    .ToArray();
-            });
+            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(_shortcutFolder, ALLOWED_EXTENSIONS));
 
             if (files == null)
             {
