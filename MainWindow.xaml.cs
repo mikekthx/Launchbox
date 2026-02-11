@@ -63,7 +63,14 @@ public sealed partial class MainWindow : Window
         // 3. SCROLL SHOULD WORK NATIVELY NOW
         AppGrid.Loaded += (s, e) =>
         {
-            FindScrollViewer(AppGrid);
+            var finder = new VisualTreeFinder(new WinUIVisualTreeService());
+            _internalScrollViewer = finder.FindFirstDescendant<ScrollViewer>(AppGrid);
+            if (_internalScrollViewer != null)
+            {
+                _internalScrollViewer.VerticalScrollMode = ScrollMode.Enabled;
+                _internalScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
+                Debug.WriteLine($"ScrollViewer found! Scrollable height: {_internalScrollViewer.ScrollableHeight}");
+            }
             Debug.WriteLine($"AppGrid loaded. Scrollable height: {_internalScrollViewer?.ScrollableHeight ?? 0}");
         };
 
@@ -150,29 +157,6 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    // --- SCROLL LOGIC ---
-    private bool FindScrollViewer(DependencyObject root)
-    {
-        if (root == null) return false;
-        int count = VisualTreeHelper.GetChildrenCount(root);
-        for (int i = 0; i < count; i++)
-        {
-            var child = VisualTreeHelper.GetChild(root, i);
-            if (child is ScrollViewer sv)
-            {
-                _internalScrollViewer = sv;
-                _internalScrollViewer.VerticalScrollMode = ScrollMode.Enabled;
-                _internalScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                Debug.WriteLine($"ScrollViewer found! Scrollable height: {sv.ScrollableHeight}");
-                return true;
-            }
-            if (FindScrollViewer(child))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
     // --- WINDOW LOGIC ---
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
