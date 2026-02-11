@@ -25,6 +25,12 @@
     <Compile Include="..\IFileSystem.cs" Link="IFileSystem.cs" />
     <Compile Include="..\ShortcutService.cs" Link="ShortcutService.cs" />
     <Compile Include="..\IconService.cs" Link="IconService.cs" />
+    <Compile Include="..\AppItem.cs" Link="AppItem.cs" />
+    <Compile Include="..\Launchbox\Constants.cs" Link="Constants.cs" />
+    <Compile Include="..\Launchbox\Services\IImageFactory.cs" Link="Services\IImageFactory.cs" />
+    <Compile Include="..\Launchbox\Services\IDispatcher.cs" Link="Services\IDispatcher.cs" />
+    <Compile Include="..\Launchbox\Services\IAppLauncher.cs" Link="Services\IAppLauncher.cs" />
+    <Compile Include="..\Launchbox\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
   </ItemGroup>
 
 </Project>

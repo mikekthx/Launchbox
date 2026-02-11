@@ -43,11 +43,18 @@ Note: `dotnet test Launchbox.sln` works on Windows but may fail on Linux due to 
 
 ```
 Launchbox/
-├── App.xaml(.cs)           # Application entry point
-├── MainWindow.xaml(.cs)    # Main window UI and logic (primary file)
-├── Launchbox.csproj        # Project configuration
-├── Assets/                 # Application icons
-└── Properties/             # Launch/publish profiles
+├── App.xaml(.cs)               # Application entry point
+├── MainWindow.xaml(.cs)        # Main window UI and window management logic
+├── Launchbox.csproj            # Project configuration
+├── Constants.cs                # Global constants
+├── Services/                   # Platform-agnostic interfaces and implementations
+│   ├── IAppLauncher.cs
+│   ├── IDispatcher.cs
+│   └── IImageFactory.cs
+├── ViewModels/                 # MVVM ViewModels
+│   └── MainViewModel.cs        # Core application logic (loading/launching apps)
+├── Assets/                     # Application icons
+└── Properties/                 # Launch/publish profiles
 ```
 
 ## Code Style
@@ -121,7 +128,7 @@ Use section comments in large files:
 ### XAML
 - 4-space indentation
 - Multi-line attributes for complex elements
-- Use `x:Bind` (compiled bindings)
+- Use `x:Bind` (compiled bindings) for simple properties, or `{Binding}` for dynamic types (e.g. `AppItem.Icon`)
 - Semantic names: `RootGrid`, `AppGrid`, `TrayIcon`
 
 ## WinUI 3 Patterns
@@ -150,6 +157,18 @@ settings["Key"] = value;
 
 ## Architecture Notes
 
+### MVVM Pattern
+The application follows the Model-View-ViewModel (MVVM) pattern:
+- **View (`MainWindow.xaml`):** Handles UI layout, window management, hotkeys, and tray icon. Binds to `MainViewModel`.
+- **ViewModel (`MainViewModel.cs`):** Encapsulates business logic (scanning shortcuts, filtering extensions, launching apps). It is platform-agnostic and uses interfaces for platform services.
+- **Model (`AppItem.cs`):** Represents an application shortcut. Uses `object` for the Icon property to avoid dependency on WinUI types, allowing for easier testing.
+
+### Service Abstraction
+Platform-specific operations are abstracted behind interfaces in `Launchbox/Services/` to enable unit testing:
+- `IImageFactory`: Creates UI images (e.g., `BitmapImage`) from raw bytes.
+- `IAppLauncher`: Handles process launching (`Process.Start`).
+- `IDispatcher`: Abstracts thread dispatching (`DispatcherQueue`).
+
 - App starts **hidden off-screen**, positions on first Alt+S press
 - Window **auto-hides on deactivation** (focus loss)
 - Position persists via LocalSettings
@@ -160,7 +179,7 @@ settings["Key"] = value;
 
 ### Add app item property
 1. Add to `AppItem` class in `AppItem.cs`
-2. Populate in `LoadAppsAsync()` at line ~340
+2. Populate in `MainViewModel.LoadAppsAsync()`
 3. Update XAML DataTemplate if needed
 
 ### Modify window behavior
@@ -169,9 +188,9 @@ settings["Key"] = value;
 3. Advanced: Win32 interop in `NewWndProc()`
 
 ### Change hotkey
-1. Modify `MOD_ALT`/`VK_S` constants (~line 24)
+1. Modify `MOD_ALT`/`VK_S` constants in `Constants.cs`
 2. Update `ToolTipText` in `MainWindow.xaml:18`
 
 ### Add tray menu item
 1. Add `MenuFlyoutItem` in `MainWindow.xaml:22-28`
-2. Add command property and handler in MainWindow class
+2. Add command property and handler in MainWindow class (or bind to ViewModel command)
