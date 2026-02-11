@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -161,7 +162,6 @@ public sealed partial class MainWindow : Window
             e.Handled = true;
         }
     }
-
 
     // --- WINDOW LOGIC ---
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
@@ -322,6 +322,8 @@ public sealed partial class MainWindow : Window
                 return;
             }
 
+            // Create and add items to UI immediately (incremental loading)
+            var appItems = new List<AppItem>();
             foreach (var file in files)
             {
                 try
@@ -329,19 +331,7 @@ public sealed partial class MainWindow : Window
                     var name = Path.GetFileNameWithoutExtension(file);
                     var appItem = new AppItem { Name = name, Path = file };
                     Apps.Add(appItem);
-
-                    _ = Task.Run(() =>
-                    {
-                        var iconBytes = _iconService.ExtractIconBytes(file);
-                        if (iconBytes != null)
-                        {
-                            this.DispatcherQueue.TryEnqueue(async () =>
-                            {
-                                var bitmap = await IconHelper.CreateBitmapImageAsync(iconBytes);
-                                appItem.Icon = bitmap;
-                            });
-                        }
-                    });
+                    appItems.Add(appItem);
                 }
                 catch (Exception ex)
                 {
@@ -350,6 +340,27 @@ public sealed partial class MainWindow : Window
             }
 
             Trace.WriteLine($"Loaded {Apps.Count} apps");
+
+            // Process icon extraction in parallel but efficiently
+            await Parallel.ForEachAsync(appItems, async (item, ct) =>
+            {
+                try
+                {
+                    var iconBytes = _iconService.ExtractIconBytes(item.Path);
+                    if (iconBytes != null)
+                    {
+                        this.DispatcherQueue.TryEnqueue(async () =>
+                        {
+                            var bitmap = await IconHelper.CreateBitmapImageAsync(iconBytes);
+                            item.Icon = bitmap;
+                        });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"Failed to load icon for {item.Path}: {ex.Message}");
+                }
+            });
 
             await Task.Delay(100);
             if (_internalScrollViewer != null)
