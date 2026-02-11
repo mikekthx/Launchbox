@@ -7,40 +7,6 @@ using System;
 
 namespace Launchbox.Tests;
 
-public class MockFileSystem : IFileSystem
-{
-    private readonly HashSet<string> _directories = new();
-    private readonly Dictionary<string, List<string>> _files = new();
-
-    public void AddDirectory(string path)
-    {
-        _directories.Add(path);
-    }
-
-    public void AddFile(string directory, string filename)
-    {
-        if (!_files.ContainsKey(directory))
-        {
-            _files[directory] = new List<string>();
-        }
-        _files[directory].Add(Path.Combine(directory, filename));
-    }
-
-    public bool DirectoryExists(string path)
-    {
-        return _directories.Contains(path);
-    }
-
-    public string[] GetFiles(string path)
-    {
-        if (_files.TryGetValue(path, out var files))
-        {
-            return files.ToArray();
-        }
-        return Array.Empty<string>();
-    }
-}
-
 public class ShortcutServiceTests
 {
     private readonly string SHORTCUT_FOLDER = Path.Combine("Shortcuts");
