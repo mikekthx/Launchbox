@@ -1,5 +1,5 @@
 using Xunit;
-using Launchbox;
+using Launchbox.Helpers;
 using System;
 
 namespace Launchbox.Tests;

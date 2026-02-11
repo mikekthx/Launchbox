@@ -1,4 +1,4 @@
-namespace Launchbox;
+namespace Launchbox.Helpers;
 
 public static class Constants
 {

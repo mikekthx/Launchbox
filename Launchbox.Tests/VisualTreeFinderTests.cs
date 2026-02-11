@@ -2,7 +2,7 @@ namespace Launchbox.Tests;
 
 using Xunit;
 using System.Collections.Generic;
-using Launchbox;
+using Launchbox.Services;
 
 public class VisualTreeFinderTests
 {

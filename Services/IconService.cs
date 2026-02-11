@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using WinIcon = System.Drawing.Icon;
 
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class IconService
 {
@@ -38,7 +38,7 @@ public class IconService
         {
             resolvedPath = ResolveIconPath(path);
 
-            PrivateExtractIcons(resolvedPath, 0, 128, 128, ref hIcon, IntPtr.Zero, 1, 0);
+            NativeMethods.PrivateExtractIcons(resolvedPath, 0, 128, 128, ref hIcon, IntPtr.Zero, 1, 0);
             if (hIcon == IntPtr.Zero) return null;
 
             using var icon = WinIcon.FromHandle(hIcon);
@@ -55,13 +55,7 @@ public class IconService
         finally
         {
             if (hIcon != IntPtr.Zero)
-                DestroyIcon(hIcon);
+                NativeMethods.DestroyIcon(hIcon);
         }
     }
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    private static extern uint PrivateExtractIcons(string l, int n, int cx, int cy, ref IntPtr p, IntPtr id, uint ni, uint fl);
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-    private static extern bool DestroyIcon(IntPtr hIcon);
 }

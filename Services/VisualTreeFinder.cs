@@ -1,4 +1,4 @@
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class VisualTreeFinder
 {

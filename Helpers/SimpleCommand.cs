@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Input;
 
-namespace Launchbox;
+namespace Launchbox.Helpers;
 
 public class SimpleCommand : ICommand
 {

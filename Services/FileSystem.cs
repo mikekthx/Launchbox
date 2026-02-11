@@ -2,7 +2,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class FileSystem : IFileSystem
 {
@@ -13,10 +13,7 @@ public class FileSystem : IFileSystem
     public string GetIniValue(string path, string section, string key)
     {
         var sb = new StringBuilder(255);
-        GetPrivateProfileString(section, key, "", sb, 255, path);
+        NativeMethods.GetPrivateProfileString(section, key, "", sb, 255, path);
         return sb.ToString();
     }
-
-    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-    private static extern int GetPrivateProfileString(string s, string k, string d, StringBuilder r, int z, string f);
 }

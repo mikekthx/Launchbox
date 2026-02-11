@@ -2,6 +2,7 @@ using Xunit;
 using Launchbox;
 using Launchbox.ViewModels;
 using Launchbox.Services;
+using Launchbox.Models;
 using System.Threading.Tasks;
 using System;
 using System.IO;
@@ -21,6 +22,11 @@ public class MockDispatcher : IDispatcher
     public void TryEnqueue(Action action)
     {
         action();
+    }
+
+    public Task EnqueueAsync(Func<Task> action)
+    {
+        return action();
     }
 }
 
@@ -74,15 +80,7 @@ public class MainViewModelTests
         var viewModel = CreateViewModel();
 
         // Act
-        // LoadAppsCommand executes LoadAppsAsync
-        if (viewModel.LoadAppsCommand.CanExecute(null))
-        {
-             viewModel.LoadAppsCommand.Execute(null);
-        }
-
-        // Wait for async operations to complete
-        // Since LoadAppsAsync is async void, we have to wait a bit
-        await Task.Delay(500);
+        await viewModel.LoadAppsAsync();
 
         // Assert
         Assert.Single(viewModel.Apps);

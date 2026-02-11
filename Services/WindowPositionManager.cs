@@ -1,6 +1,6 @@
 using System;
 
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class WindowPositionManager
 {

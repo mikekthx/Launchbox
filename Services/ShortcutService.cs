@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class ShortcutService
 {
