@@ -31,6 +31,7 @@ public sealed partial class MainWindow : Window
     private ScrollViewer? _internalScrollViewer;
     private readonly WindowPositionManager _windowPositionManager;
     private readonly ShortcutService _shortcutService;
+    private readonly IconService _iconService;
 
     // Window dragging state
     private bool _isDraggingWindow = false;
@@ -46,7 +47,9 @@ public sealed partial class MainWindow : Window
         this.InitializeComponent();
 
         _windowPositionManager = new WindowPositionManager(new LocalSettingsStore());
-        _shortcutService = new ShortcutService(new FileSystem());
+        var fileSystem = new FileSystem();
+        _shortcutService = new ShortcutService(fileSystem);
+        _iconService = new IconService(fileSystem);
 
         ToggleWindowCommand = new SimpleCommand(ToggleWindowVisibility);
         ExitCommand = new SimpleCommand(ExitApplication);
@@ -329,7 +332,7 @@ public sealed partial class MainWindow : Window
 
                     _ = Task.Run(() =>
                     {
-                        var iconBytes = IconHelper.ExtractIconBytes(file);
+                        var iconBytes = _iconService.ExtractIconBytes(file);
                         if (iconBytes != null)
                         {
                             this.DispatcherQueue.TryEnqueue(async () =>
