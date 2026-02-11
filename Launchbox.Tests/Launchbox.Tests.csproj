@@ -19,6 +19,8 @@
     <Compile Include="..\SimpleCommand.cs" Link="SimpleCommand.cs" />
     <Compile Include="..\ISettingsStore.cs" Link="ISettingsStore.cs" />
     <Compile Include="..\WindowPositionManager.cs" Link="WindowPositionManager.cs" />
+    <Compile Include="..\IVisualTreeService.cs" Link="IVisualTreeService.cs" />
+    <Compile Include="..\VisualTreeFinder.cs" Link="VisualTreeFinder.cs" />
   </ItemGroup>
 
 </Project>
