@@ -46,6 +46,7 @@ public class SimpleCommandTests
     [Fact]
     public void Constructor_NullAction_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>(() => new SimpleCommand(null!));
+        Assert.Throws<ArgumentNullException>(() => new SimpleCommand((Action)null!));
+        Assert.Throws<ArgumentNullException>(() => new SimpleCommand((Action<object?>)null!));
     }
 }

@@ -1,17 +1,16 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace Launchbox;
 
 public class AppItem : INotifyPropertyChanged
 {
-    private BitmapImage? _icon;
+    private object? _icon;
 
     public string Name { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
 
-    public BitmapImage? Icon
+    public object? Icon
     {
         get => _icon;
         set
