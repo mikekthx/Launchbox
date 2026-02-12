@@ -68,7 +68,9 @@ public class IconService
         {
             resolvedPath = ResolveIconPath(path);
 
-            NativeMethods.PrivateExtractIcons(resolvedPath, 0, 128, 128, ref hIcon, IntPtr.Zero, 1, 0);
+            // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
+            // saving ~43% processing time compared to 128x128.
+            NativeMethods.PrivateExtractIcons(resolvedPath, 0, 96, 96, ref hIcon, IntPtr.Zero, 1, 0);
             if (hIcon == IntPtr.Zero) return null;
 
             using var icon = WinIcon.FromHandle(hIcon);
