@@ -33,6 +33,26 @@ public sealed partial class MainWindow : Window
     {
         this.InitializeComponent();
 
+        try
+        {
+            if (Process.GetProcessesByName("DWMBlurGlass").Length > 0)
+            {
+                // DWMBlurGlass detected, disable system backdrop to let it handle transparency
+                this.SystemBackdrop = null;
+            }
+            else
+            {
+                // Default behavior
+                this.SystemBackdrop = new DesktopAcrylicBackdrop();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error checking for DWMBlurGlass: {ex.Message}");
+            // Fallback to default
+            this.SystemBackdrop = new DesktopAcrylicBackdrop();
+        }
+
         var settingsStore = new LocalSettingsStore();
         var windowPositionManager = new WindowPositionManager(settingsStore);
         _windowService = new WindowService(this, windowPositionManager);
