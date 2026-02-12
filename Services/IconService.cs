@@ -21,12 +21,42 @@ public class IconService
         if (path.EndsWith(".url", StringComparison.OrdinalIgnoreCase))
         {
             string iconFile = _fileSystem.GetIniValue(path, "InternetShortcut", "IconFile");
+
+            if (IsUnsafePath(iconFile))
+            {
+                Trace.WriteLine($"Blocked potential unsafe icon path: {iconFile}");
+                return path;
+            }
+
             if (_fileSystem.FileExists(iconFile))
             {
                 return iconFile;
             }
         }
         return path;
+    }
+
+    private bool IsUnsafePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return false;
+
+        // Check for specific UNC patterns
+        if (path.StartsWith(@"\\?\UNC", StringComparison.OrdinalIgnoreCase)) return true;
+
+        // Allow local long paths (e.g. \\?\C:\...)
+        if (path.StartsWith(@"\\?\", StringComparison.OrdinalIgnoreCase)) return false;
+
+        // Check for standard UNC paths
+        if (path.StartsWith(@"\\") || path.StartsWith("//")) return true;
+
+        // Check using Uri as a backup
+        try
+        {
+            if (new Uri(path).IsUnc) return true;
+        }
+        catch { }
+
+        return false;
     }
 
     public byte[]? ExtractIconBytes(string path)

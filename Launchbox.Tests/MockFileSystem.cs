@@ -29,6 +29,17 @@ public class MockFileSystem : IFileSystem
     public void AddFile(string fullPath)
     {
         string? directory = Path.GetDirectoryName(fullPath);
+
+        // On non-Windows, Path.GetDirectoryName might fail for Windows paths using backslashes
+        if (string.IsNullOrEmpty(directory) && fullPath.Contains('\\'))
+        {
+             int lastSeparator = fullPath.LastIndexOf('\\');
+             if (lastSeparator > 0)
+             {
+                 directory = fullPath.Substring(0, lastSeparator);
+             }
+        }
+
         if (string.IsNullOrEmpty(directory)) return;
 
         if (!_files.ContainsKey(directory))
