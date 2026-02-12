@@ -43,6 +43,7 @@ Note: `dotnet test Launchbox.sln` works on Windows but may fail on Linux due to 
 
 ```
 Launchbox/
+├── README.md                   # Project documentation
 ├── App.xaml(.cs)               # Application entry point
 ├── MainWindow.xaml(.cs)        # Main window UI and window management logic
 ├── Launchbox.csproj            # Project configuration
