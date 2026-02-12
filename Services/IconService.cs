@@ -46,8 +46,19 @@ public class IconService
         // Check for specific UNC patterns
         if (path.StartsWith(@"\\?\UNC", StringComparison.OrdinalIgnoreCase)) return true;
 
-        // Allow local long paths (e.g. \\?\C:\...)
-        if (path.StartsWith(@"\\?\", StringComparison.OrdinalIgnoreCase)) return false;
+        // Allow local long paths ONLY if they are standard drive paths (e.g. \\?\C:\...)
+        if (path.StartsWith(@"\\?\", StringComparison.OrdinalIgnoreCase))
+        {
+            // Must be at least 7 chars: \\?\C:\
+            if (path.Length >= 7 &&
+                char.IsLetter(path[4]) &&
+                path[5] == ':' &&
+                path[6] == '\\')
+            {
+                return false;
+            }
+            return true; // Block anything else starting with \\?\ (e.g. GLOBALROOT, Volume, etc.)
+        }
 
         // Check for standard UNC paths
         if (path.StartsWith(@"\\") || path.StartsWith("//")) return true;
