@@ -17,7 +17,7 @@ public class FileSystem : IFileSystem
         return sb.ToString();
     }
 
-    public long GetFileSize(string path) => new FileInfo(path).Length;
     public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
     public Stream OpenRead(string path) => File.OpenRead(path);
+    public DateTime GetLastWriteTime(string path) => File.GetLastWriteTime(path);
 }

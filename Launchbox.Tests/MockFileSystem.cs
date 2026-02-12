@@ -13,19 +13,20 @@ public class MockFileSystem : IFileSystem
     private readonly Dictionary<string, string> _iniValues = new();
     private readonly Dictionary<string, byte[]> _fileContents = new();
     private readonly Dictionary<string, long> _fileSizes = new();
+    private readonly Dictionary<string, DateTime> _fileTimes = new();
 
     public void AddDirectory(string path)
     {
         _directories.Add(path);
     }
 
-    public void AddFile(string directory, string filename, long size = 0, byte[]? content = null)
+    public void AddFile(string directory, string filename, long size = 0, byte[]? content = null, DateTime? lastWriteTime = null)
     {
         string fullPath = Path.Combine(directory, filename);
-        AddFile(fullPath, size, content);
+        AddFile(fullPath, size, content, lastWriteTime);
     }
 
-    public void AddFile(string fullPath, long size = 0, byte[]? content = null)
+    public void AddFile(string fullPath, long size = 0, byte[]? content = null, DateTime? lastWriteTime = null)
     {
         string? directory = Path.GetDirectoryName(fullPath);
 
@@ -59,6 +60,8 @@ public class MockFileSystem : IFileSystem
         {
             _fileSizes[fullPath] = size;
         }
+
+        _fileTimes[fullPath] = lastWriteTime ?? DateTime.Now;
     }
 
     public void SetIniValue(string path, string section, string key, string value)
@@ -92,13 +95,6 @@ public class MockFileSystem : IFileSystem
         return "";
     }
 
-    public long GetFileSize(string path)
-    {
-        if (_fileSizes.TryGetValue(path, out var size))
-            return size;
-        return 0;
-    }
-
     public byte[] ReadAllBytes(string path)
     {
         if (_fileContents.TryGetValue(path, out var content))
@@ -111,5 +107,12 @@ public class MockFileSystem : IFileSystem
         if (_fileContents.TryGetValue(path, out var content))
             return new MemoryStream(content);
         throw new FileNotFoundException(path);
+    }
+
+    public DateTime GetLastWriteTime(string path)
+    {
+        if (_fileTimes.TryGetValue(path, out var time))
+            return time;
+        return DateTime.FromFileTime(0); // 1601-01-01
     }
 }

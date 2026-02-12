@@ -33,6 +33,7 @@
     <Compile Include="..\Services\NativeMethods.cs" Link="Services\NativeMethods.cs" />
     <Compile Include="..\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
     <Compile Include="..\Helpers\ImageHeaderParser.cs" Link="Helpers\ImageHeaderParser.cs" />
+    <Compile Include="..\Services\IconCacheEntry.cs" Link="Services\IconCacheEntry.cs" />
   </ItemGroup>
 
 </Project>

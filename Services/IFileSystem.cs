@@ -6,7 +6,7 @@ public interface IFileSystem
     bool FileExists(string path);
     string[] GetFiles(string path);
     string GetIniValue(string path, string section, string key);
-    long GetFileSize(string path);
     byte[] ReadAllBytes(string path);
     Stream OpenRead(string path);
+    DateTime GetLastWriteTime(string path);
 }

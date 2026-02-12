@@ -12,7 +12,7 @@ namespace Launchbox.Services;
 public class IconService
 {
     private readonly IFileSystem _fileSystem;
-    private readonly ConcurrentDictionary<string, string?> _customIconCache = new();
+    private readonly ConcurrentDictionary<string, IconCacheEntry> _customIconCache = new();
 
     public IconService(IFileSystem fileSystem)
     {
@@ -100,33 +100,46 @@ public class IconService
 
     private byte[]? TryGetCustomIconBytes(string shortcutPath)
     {
-        if (_customIconCache.TryGetValue(shortcutPath, out string? cachedPath))
-        {
-            if (cachedPath == null) return null;
-            if (_fileSystem.FileExists(cachedPath))
-            {
-                return _fileSystem.ReadAllBytes(cachedPath);
-            }
-            // If cached file no longer exists, invalidate cache and continue
-            _customIconCache.TryRemove(shortcutPath, out _);
-        }
-
         string? directory = Path.GetDirectoryName(shortcutPath);
         if (string.IsNullOrEmpty(directory)) return null;
 
         string iconsDir = Path.Combine(directory, ".icons");
-        if (!_fileSystem.DirectoryExists(iconsDir))
-        {
-            _customIconCache[shortcutPath] = null;
-            return null;
-        }
-
         string name = Path.GetFileNameWithoutExtension(shortcutPath);
         string pngPath = Path.Combine(iconsDir, name + ".png");
         string icoPath = Path.Combine(iconsDir, name + ".ico");
 
+        // Check for file existence first (avoids relying on GetLastWriteTime magic date for missing files)
         bool pngExists = _fileSystem.FileExists(pngPath);
         bool icoExists = _fileSystem.FileExists(icoPath);
+
+        // Get timestamps only if files exist
+        DateTime pngTime = pngExists ? _fileSystem.GetLastWriteTime(pngPath) : DateTime.MinValue;
+        DateTime icoTime = icoExists ? _fileSystem.GetLastWriteTime(icoPath) : DateTime.MinValue;
+
+        // Check cache
+        if (_customIconCache.TryGetValue(shortcutPath, out IconCacheEntry? cachedEntry))
+        {
+            // Valid if timestamps haven't changed
+            if (cachedEntry.PngTime == pngTime && cachedEntry.IcoTime == icoTime)
+            {
+                // Verify selected file still exists (edge case: timestamp matching MinValue but file gone?
+                // actually GetLastWriteTime handles existence check, so if file deleted, time becomes MinValue,
+                // which won't match old valid time. So this check is robust).
+                if (cachedEntry.SelectedPath == null) return null;
+
+                // Double check existence just in case, though timestamp check covers most cases
+                if (_fileSystem.FileExists(cachedEntry.SelectedPath))
+                {
+                    return _fileSystem.ReadAllBytes(cachedEntry.SelectedPath);
+                }
+            }
+        }
+
+        if (!pngExists && !icoExists)
+        {
+            _customIconCache[shortcutPath] = new IconCacheEntry(null, pngTime, icoTime);
+            return null;
+        }
 
         string? chosenPath = null;
 
@@ -170,7 +183,8 @@ public class IconService
             chosenPath = icoPath;
         }
 
-        _customIconCache[shortcutPath] = chosenPath;
+        // Update cache
+        _customIconCache[shortcutPath] = new IconCacheEntry(chosenPath, pngTime, icoTime);
 
         if (chosenPath != null)
         {
