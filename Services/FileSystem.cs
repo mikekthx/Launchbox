@@ -16,4 +16,8 @@ public class FileSystem : IFileSystem
         NativeMethods.GetPrivateProfileString(section, key, "", sb, 255, path);
         return sb.ToString();
     }
+
+    public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
+    public Stream OpenRead(string path) => File.OpenRead(path);
+    public DateTime GetLastWriteTime(string path) => File.GetLastWriteTime(path);
 }
