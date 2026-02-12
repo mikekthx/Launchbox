@@ -98,6 +98,28 @@ public class MainViewModelTests
         Assert.Equal("C:\\Test.lnk", _appLauncher.LastLaunchedPath);
     }
 
+    [Fact]
+    public async Task LoadAppsAsync_SetsIsEmptyToTrue_WhenNoAppsFound()
+    {
+        var viewModel = CreateViewModel();
+
+        await viewModel.LoadAppsAsync();
+
+        Assert.True(viewModel.IsEmpty);
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_SetsIsEmptyToFalse_WhenAppsFound()
+    {
+        string appPath = Path.Combine(_shortcutFolder, "MyApp.lnk");
+        _fileSystem.AddFile(appPath);
+        var viewModel = CreateViewModel();
+
+        await viewModel.LoadAppsAsync();
+
+        Assert.False(viewModel.IsEmpty);
+    }
+
     private MainViewModel CreateViewModel()
     {
         return new MainViewModel(
