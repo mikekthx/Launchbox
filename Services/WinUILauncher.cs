@@ -15,7 +15,7 @@ public class WinUILauncher : IAppLauncher
         string extension = Path.GetExtension(path).ToLowerInvariant();
         if (!ALLOWED_EXTENSIONS.Contains(extension))
         {
-            Debug.WriteLine($"Blocked execution of unauthorized file: {path}");
+            Trace.WriteLine($"Blocked execution of unauthorized file: {path}");
             return;
         }
 
