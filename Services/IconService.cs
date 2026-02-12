@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
 using WinIcon = System.Drawing.Icon;
@@ -10,6 +11,7 @@ namespace Launchbox.Services;
 public class IconService
 {
     private readonly IFileSystem _fileSystem;
+    private readonly ConcurrentDictionary<string, string?> _customIconCache = new();
 
     public IconService(IFileSystem fileSystem)
     {
@@ -61,6 +63,10 @@ public class IconService
 
     public byte[]? ExtractIconBytes(string path)
     {
+        // Try to load custom icon first (from Shortcuts\.icons)
+        var customIcon = TryGetCustomIconBytes(path);
+        if (customIcon != null) return customIcon;
+
         IntPtr hIcon = IntPtr.Zero;
         string resolvedPath = path;
 
@@ -89,5 +95,71 @@ public class IconService
             if (hIcon != IntPtr.Zero)
                 NativeMethods.DestroyIcon(hIcon);
         }
+    }
+
+    private byte[]? TryGetCustomIconBytes(string shortcutPath)
+    {
+        if (_customIconCache.TryGetValue(shortcutPath, out string? cachedPath))
+        {
+            if (cachedPath == null) return null;
+            if (_fileSystem.FileExists(cachedPath))
+            {
+                return _fileSystem.ReadAllBytes(cachedPath);
+            }
+            // If cached file no longer exists, invalidate cache and continue
+            _customIconCache.TryRemove(shortcutPath, out _);
+        }
+
+        string? directory = Path.GetDirectoryName(shortcutPath);
+        if (string.IsNullOrEmpty(directory)) return null;
+
+        string iconsDir = Path.Combine(directory, ".icons");
+        if (!_fileSystem.DirectoryExists(iconsDir))
+        {
+            _customIconCache[shortcutPath] = null;
+            return null;
+        }
+
+        string name = Path.GetFileNameWithoutExtension(shortcutPath);
+        string pngPath = Path.Combine(iconsDir, name + ".png");
+        string icoPath = Path.Combine(iconsDir, name + ".ico");
+
+        bool pngExists = _fileSystem.FileExists(pngPath);
+        bool icoExists = _fileSystem.FileExists(icoPath);
+
+        string? chosenPath = null;
+
+        if (pngExists && icoExists)
+        {
+            // If both exist, choose the larger file (heuristic for quality)
+            long pngSize = _fileSystem.GetFileSize(pngPath);
+            long icoSize = _fileSystem.GetFileSize(icoPath);
+            chosenPath = (pngSize >= icoSize) ? pngPath : icoPath;
+        }
+        else if (pngExists)
+        {
+            chosenPath = pngPath;
+        }
+        else if (icoExists)
+        {
+            chosenPath = icoPath;
+        }
+
+        _customIconCache[shortcutPath] = chosenPath;
+
+        if (chosenPath != null)
+        {
+            try
+            {
+                return _fileSystem.ReadAllBytes(chosenPath);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Failed to read custom icon {chosenPath}: {ex.Message}");
+                return null;
+            }
+        }
+
+        return null;
     }
 }

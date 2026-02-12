@@ -16,4 +16,7 @@ public class FileSystem : IFileSystem
         NativeMethods.GetPrivateProfileString(section, key, "", sb, 255, path);
         return sb.ToString();
     }
+
+    public long GetFileSize(string path) => new FileInfo(path).Length;
+    public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
 }

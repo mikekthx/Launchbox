@@ -11,22 +11,21 @@ public class MockFileSystem : IFileSystem
     private readonly HashSet<string> _directories = new();
     private readonly Dictionary<string, List<string>> _files = new();
     private readonly Dictionary<string, string> _iniValues = new();
+    private readonly Dictionary<string, byte[]> _fileContents = new();
+    private readonly Dictionary<string, long> _fileSizes = new();
 
     public void AddDirectory(string path)
     {
         _directories.Add(path);
     }
 
-    public void AddFile(string directory, string filename)
+    public void AddFile(string directory, string filename, long size = 0, byte[]? content = null)
     {
-        if (!_files.ContainsKey(directory))
-        {
-            _files[directory] = new List<string>();
-        }
-        _files[directory].Add(Path.Combine(directory, filename));
+        string fullPath = Path.Combine(directory, filename);
+        AddFile(fullPath, size, content);
     }
 
-    public void AddFile(string fullPath)
+    public void AddFile(string fullPath, long size = 0, byte[]? content = null)
     {
         string? directory = Path.GetDirectoryName(fullPath);
 
@@ -46,7 +45,20 @@ public class MockFileSystem : IFileSystem
         {
             _files[directory] = new List<string>();
         }
-        _files[directory].Add(fullPath);
+        if (!_files[directory].Contains(fullPath))
+        {
+            _files[directory].Add(fullPath);
+        }
+
+        if (content != null)
+        {
+            _fileContents[fullPath] = content;
+            _fileSizes[fullPath] = content.Length;
+        }
+        else
+        {
+            _fileSizes[fullPath] = size;
+        }
     }
 
     public void SetIniValue(string path, string section, string key, string value)
@@ -78,5 +90,19 @@ public class MockFileSystem : IFileSystem
         if (_iniValues.TryGetValue($"{path}|{section}|{key}", out var val))
             return val;
         return "";
+    }
+
+    public long GetFileSize(string path)
+    {
+        if (_fileSizes.TryGetValue(path, out var size))
+            return size;
+        return 0;
+    }
+
+    public byte[] ReadAllBytes(string path)
+    {
+        if (_fileContents.TryGetValue(path, out var content))
+            return content;
+        return Array.Empty<byte>();
     }
 }
