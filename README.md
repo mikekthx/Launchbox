@@ -33,6 +33,14 @@ Launchbox is a Windows desktop application launcher built with WinUI 3 and .NET 
     dotnet run --project Launchbox.csproj
     ```
 
+## Usage
+
+1.  Create a folder named `Shortcuts` on your Desktop.
+2.  Add your application shortcuts (`.lnk`) or internet shortcuts (`.url`) to this folder.
+3.  Run the application.
+4.  Press `Alt+S` to toggle the launcher visibility.
+5.  The launcher icon will appear in the system tray.
+
 ## Project Structure
 
 - `Launchbox/`: Main application project.
