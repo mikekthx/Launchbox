@@ -17,20 +17,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\SimpleCommand.cs" Link="SimpleCommand.cs" />
-    <Compile Include="..\ISettingsStore.cs" Link="ISettingsStore.cs" />
-    <Compile Include="..\WindowPositionManager.cs" Link="WindowPositionManager.cs" />
-    <Compile Include="..\IVisualTreeService.cs" Link="IVisualTreeService.cs" />
-    <Compile Include="..\VisualTreeFinder.cs" Link="VisualTreeFinder.cs" />
-    <Compile Include="..\IFileSystem.cs" Link="IFileSystem.cs" />
-    <Compile Include="..\ShortcutService.cs" Link="ShortcutService.cs" />
-    <Compile Include="..\IconService.cs" Link="IconService.cs" />
-    <Compile Include="..\AppItem.cs" Link="AppItem.cs" />
-    <Compile Include="..\Launchbox\Constants.cs" Link="Constants.cs" />
-    <Compile Include="..\Launchbox\Services\IImageFactory.cs" Link="Services\IImageFactory.cs" />
-    <Compile Include="..\Launchbox\Services\IDispatcher.cs" Link="Services\IDispatcher.cs" />
-    <Compile Include="..\Launchbox\Services\IAppLauncher.cs" Link="Services\IAppLauncher.cs" />
-    <Compile Include="..\Launchbox\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
+    <Compile Include="..\Helpers\SimpleCommand.cs" Link="Helpers\SimpleCommand.cs" />
+    <Compile Include="..\Services\ISettingsStore.cs" Link="Services\ISettingsStore.cs" />
+    <Compile Include="..\Services\WindowPositionManager.cs" Link="Services\WindowPositionManager.cs" />
+    <Compile Include="..\Services\IVisualTreeService.cs" Link="Services\IVisualTreeService.cs" />
+    <Compile Include="..\Services\VisualTreeFinder.cs" Link="Services\VisualTreeFinder.cs" />
+    <Compile Include="..\Services\IFileSystem.cs" Link="Services\IFileSystem.cs" />
+    <Compile Include="..\Services\ShortcutService.cs" Link="Services\ShortcutService.cs" />
+    <Compile Include="..\Services\IconService.cs" Link="Services\IconService.cs" />
+    <Compile Include="..\Models\AppItem.cs" Link="Models\AppItem.cs" />
+    <Compile Include="..\Helpers\Constants.cs" Link="Helpers\Constants.cs" />
+    <Compile Include="..\Services\IImageFactory.cs" Link="Services\IImageFactory.cs" />
+    <Compile Include="..\Services\IDispatcher.cs" Link="Services\IDispatcher.cs" />
+    <Compile Include="..\Services\IAppLauncher.cs" Link="Services\IAppLauncher.cs" />
+    <Compile Include="..\Services\NativeMethods.cs" Link="Services\NativeMethods.cs" />
+    <Compile Include="..\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
   </ItemGroup>
 
 </Project>

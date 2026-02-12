@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Launchbox;
+namespace Launchbox.Models;
 
 public class AppItem : INotifyPropertyChanged
 {

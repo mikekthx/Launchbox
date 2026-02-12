@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class WinUIVisualTreeService : IVisualTreeService
 {

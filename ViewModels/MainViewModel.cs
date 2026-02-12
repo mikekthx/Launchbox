@@ -1,3 +1,5 @@
+using Launchbox.Helpers;
+using Launchbox.Models;
 using Launchbox.Services;
 using System;
 using System.Collections.Generic;
@@ -43,7 +45,7 @@ public class MainViewModel
         LaunchAppCommand = new SimpleCommand(LaunchApp);
     }
 
-    private async Task LoadAppsAsync()
+    public async Task LoadAppsAsync()
     {
         var files = await Task.Run(() => _shortcutService.GetShortcutFiles(_shortcutFolder, Constants.ALLOWED_EXTENSIONS));
 
@@ -68,20 +70,21 @@ public class MainViewModel
             }
         }
 
-        _dispatcher.TryEnqueue(() =>
+        await _dispatcher.EnqueueAsync(() =>
         {
              Apps.Clear();
              foreach(var item in localAppItems) Apps.Add(item);
+             return Task.CompletedTask;
         });
 
-        await Parallel.ForEachAsync(localAppItems, (item, ct) =>
+        await Parallel.ForEachAsync(localAppItems, async (item, ct) =>
         {
             try
             {
                 var iconBytes = _iconService.ExtractIconBytes(item.Path);
                 if (iconBytes != null)
                 {
-                    _dispatcher.TryEnqueue(async () =>
+                    await _dispatcher.EnqueueAsync(async () =>
                     {
                         var image = await _imageFactory.CreateImageAsync(iconBytes);
                         item.Icon = image;
@@ -92,7 +95,6 @@ public class MainViewModel
             {
                 Trace.WriteLine($"Failed to load icon for {item.Path}: {ex.Message}");
             }
-            return ValueTask.CompletedTask;
         });
     }
 

@@ -1,6 +1,6 @@
 using Windows.Storage;
 
-namespace Launchbox;
+namespace Launchbox.Services;
 
 public class LocalSettingsStore : ISettingsStore
 {

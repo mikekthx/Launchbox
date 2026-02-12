@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 
-namespace Launchbox;
+namespace Launchbox.Helpers;
 
 public static class IconHelper
 {
