@@ -19,4 +19,5 @@ public class FileSystem : IFileSystem
 
     public long GetFileSize(string path) => new FileInfo(path).Length;
     public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
+    public Stream OpenRead(string path) => File.OpenRead(path);
 }

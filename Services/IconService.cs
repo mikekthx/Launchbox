@@ -1,3 +1,4 @@
+using Launchbox.Helpers;
 using System;
 using System.Diagnostics;
 using System.Drawing.Imaging;
@@ -131,10 +132,34 @@ public class IconService
 
         if (pngExists && icoExists)
         {
-            // If both exist, choose the larger file (heuristic for quality)
-            long pngSize = _fileSystem.GetFileSize(pngPath);
-            long icoSize = _fileSystem.GetFileSize(icoPath);
-            chosenPath = (pngSize >= icoSize) ? pngPath : icoPath;
+            // If both exist, compare dimensions to pick the better quality one.
+            int pngArea = 0;
+            int icoArea = 0;
+
+            try
+            {
+                using (var stream = _fileSystem.OpenRead(pngPath))
+                {
+                    var dims = ImageHeaderParser.GetPngDimensions(stream);
+                    if (dims != null) pngArea = dims.Value.Width * dims.Value.Height;
+                }
+            }
+            catch { }
+
+            try
+            {
+                using (var stream = _fileSystem.OpenRead(icoPath))
+                {
+                    var dims = ImageHeaderParser.GetMaxIcoDimensions(stream);
+                    if (dims != null) icoArea = dims.Value.Width * dims.Value.Height;
+                }
+            }
+            catch { }
+
+            // Prefer larger resolution
+            // If areas are equal (or both failed to parse), prefer PNG (modern/compatible)
+            if (icoArea > pngArea) chosenPath = icoPath;
+            else chosenPath = pngPath;
         }
         else if (pngExists)
         {

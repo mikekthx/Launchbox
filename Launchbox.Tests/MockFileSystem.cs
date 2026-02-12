@@ -105,4 +105,11 @@ public class MockFileSystem : IFileSystem
             return content;
         return Array.Empty<byte>();
     }
+
+    public Stream OpenRead(string path)
+    {
+        if (_fileContents.TryGetValue(path, out var content))
+            return new MemoryStream(content);
+        throw new FileNotFoundException(path);
+    }
 }

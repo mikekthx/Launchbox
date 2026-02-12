@@ -97,15 +97,18 @@ public class IconServiceTests
     }
 
     [Fact]
-    public void ExtractIconBytes_ReturnsLargerFile_WhenBothExist()
+    public void ExtractIconBytes_ReturnsHigherResolution_WhenBothExist()
     {
         string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
         string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
         string pngPath = Path.Combine(iconsDir, "App.png");
         string icoPath = Path.Combine(iconsDir, "App.ico");
 
-        byte[] pngBytes = { 1 };
-        byte[] icoBytes = { 1, 2 }; // Larger
+        // Small PNG (1x1)
+        byte[] pngBytes = CreatePng(1, 1);
+
+        // Large ICO (2x2)
+        byte[] icoBytes = CreateIco(2, 2);
 
         _mockFileSystem.AddFile(shortcutPath);
         _mockFileSystem.AddDirectory(iconsDir);
@@ -115,6 +118,57 @@ public class IconServiceTests
         var result = _iconService.ExtractIconBytes(shortcutPath);
 
         Assert.Equal(icoBytes, result);
+    }
+
+    [Fact]
+    public void ExtractIconBytes_ReturnsPng_WhenResolutionsAreEqual()
+    {
+        string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
+        string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
+        string pngPath = Path.Combine(iconsDir, "App.png");
+        string icoPath = Path.Combine(iconsDir, "App.ico");
+
+        // Equal resolution (2x2)
+        byte[] pngBytes = CreatePng(2, 2);
+        byte[] icoBytes = CreateIco(2, 2);
+
+        _mockFileSystem.AddFile(shortcutPath);
+        _mockFileSystem.AddDirectory(iconsDir);
+        _mockFileSystem.AddFile(pngPath, content: pngBytes);
+        _mockFileSystem.AddFile(icoPath, content: icoBytes);
+
+        var result = _iconService.ExtractIconBytes(shortcutPath);
+
+        Assert.Equal(pngBytes, result);
+    }
+
+    private byte[] CreatePng(int width, int height)
+    {
+        var header = new byte[]
+        {
+            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // Sig
+            0x00, 0x00, 0x00, 0x0D, // IHDR Len
+            0x49, 0x48, 0x44, 0x52, // IHDR Type
+            0, 0, 0, (byte)width,   // Width (Big Endian - simplified for test)
+            0, 0, 0, (byte)height   // Height
+        };
+        // Pad to > 24 bytes
+        var result = new byte[30];
+        Array.Copy(header, result, header.Length);
+        return result;
+    }
+
+    private byte[] CreateIco(int width, int height)
+    {
+        var header = new byte[]
+        {
+            0, 0, // Reserved
+            1, 0, // Type 1 (Icon)
+            1, 0, // Count 1
+            (byte)width, (byte)height, // Entry 1: W, H
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // Rest of entry (14 bytes needed)
+        };
+        return header;
     }
 
     [Fact]
