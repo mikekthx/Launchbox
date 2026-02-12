@@ -9,10 +9,6 @@
     xmlns:tb="using:H.NotifyIcon"
     mc:Ignorable="d">
 
-    <Window.SystemBackdrop>
-        <DesktopAcrylicBackdrop/>
-    </Window.SystemBackdrop>
-
     <Grid x:Name="RootGrid" Background="Transparent">
 
         <tb:TaskbarIcon x:Name="TrayIcon"

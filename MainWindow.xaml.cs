@@ -33,6 +33,8 @@ public sealed partial class MainWindow : Window
     {
         this.InitializeComponent();
 
+        UpdateSystemBackdrop();
+
         var settingsStore = new LocalSettingsStore();
         var windowPositionManager = new WindowPositionManager(settingsStore);
         _windowService = new WindowService(this, windowPositionManager);
@@ -140,6 +142,51 @@ public sealed partial class MainWindow : Window
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
         _windowService.OnActivated(args);
+
+        // Re-check backdrop on activation in case DWMBlurGlass started after Launchbox
+        if (args.WindowActivationState != WindowActivationState.Deactivated)
+        {
+            UpdateSystemBackdrop();
+        }
+    }
+
+    private void UpdateSystemBackdrop()
+    {
+        try
+        {
+            var processes = Process.GetProcessesByName("DWMBlurGlass");
+            bool isRunning = processes.Length > 0;
+            foreach (var p in processes)
+            {
+                p.Dispose();
+            }
+
+            if (isRunning)
+            {
+                // DWMBlurGlass detected, disable system backdrop to let it handle transparency
+                if (this.SystemBackdrop != null)
+                {
+                    this.SystemBackdrop = null;
+                }
+            }
+            else
+            {
+                // Default behavior
+                if (this.SystemBackdrop is not DesktopAcrylicBackdrop)
+                {
+                    this.SystemBackdrop = new DesktopAcrylicBackdrop();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error checking for DWMBlurGlass: {ex.Message}");
+            // Fallback to default
+            if (this.SystemBackdrop is not DesktopAcrylicBackdrop)
+            {
+                this.SystemBackdrop = new DesktopAcrylicBackdrop();
+            }
+        }
     }
 
     private void ExitApplication()
