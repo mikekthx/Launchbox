@@ -487,3 +487,7 @@ $RECYCLE.BIN/
 .claude/
 .config/
 .vscode/
+
+# Additional Tools
+omnisharp.json
+*.slnx
