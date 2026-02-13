@@ -43,6 +43,9 @@ public class IconService
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
+        // Check for NT object path prefix (\??\) which can bypass UNC checks
+        if (path.StartsWith(@"\??\", StringComparison.OrdinalIgnoreCase)) return true;
+
         // Check for specific UNC patterns
         if (path.StartsWith(@"\\?\UNC", StringComparison.OrdinalIgnoreCase)) return true;
 
