@@ -12,7 +12,7 @@ namespace Launchbox.Services;
 public class IconService
 {
     private readonly IFileSystem _fileSystem;
-    private readonly ConcurrentDictionary<string, IconCacheEntry> _customIconCache = new();
+    private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = new();
 
     public IconService(IFileSystem fileSystem)
     {
@@ -75,88 +75,72 @@ public class IconService
 
     public byte[]? ExtractIconBytes(string path)
     {
-        // Try to load custom icon first (from Shortcuts\.icons)
-        var customIcon = TryGetCustomIconBytes(path);
-        if (customIcon != null) return customIcon;
+        // 1. Gather current state (timestamps)
+        // We check these every time to support live updates, but avoid expensive operations if unchanged.
 
-        IntPtr hIcon = IntPtr.Zero;
-        string resolvedPath = path;
+        var shortcutTime = _fileSystem.GetLastWriteTime(path);
 
-        try
+        string? directory = Path.GetDirectoryName(path);
+        string name = Path.GetFileNameWithoutExtension(path);
+
+        DateTime pngTime = DateTime.MinValue;
+        DateTime icoTime = DateTime.MinValue;
+        string? pngPath = null;
+        string? icoPath = null;
+
+        if (!string.IsNullOrEmpty(directory))
         {
-            resolvedPath = ResolveIconPath(path);
+             string iconsDir = Path.Combine(directory, ".icons");
+             pngPath = Path.Combine(iconsDir, name + ".png");
+             icoPath = Path.Combine(iconsDir, name + ".ico");
 
-            // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
-            // saving ~43% processing time compared to 128x128.
-            NativeMethods.PrivateExtractIcons(resolvedPath, 0, 96, 96, ref hIcon, IntPtr.Zero, 1, 0);
-            if (hIcon == IntPtr.Zero) return null;
-
-            using var icon = WinIcon.FromHandle(hIcon);
-            using var bmp = icon.ToBitmap();
-            using var ms = new MemoryStream();
-            bmp.Save(ms, ImageFormat.Png);
-            return ms.ToArray();
+             if (_fileSystem.FileExists(pngPath)) pngTime = _fileSystem.GetLastWriteTime(pngPath);
+             if (_fileSystem.FileExists(icoPath)) icoTime = _fileSystem.GetLastWriteTime(icoPath);
         }
-        catch (Exception ex)
+
+        // 2. Check Cache
+        if (_iconCache.TryGetValue(path, out var entry))
         {
-            Trace.WriteLine($"Failed to extract icon for {path} (resolved: {resolvedPath}): {ex.Message}");
-            return null;
-        }
-        finally
-        {
-            if (hIcon != IntPtr.Zero)
-                NativeMethods.DestroyIcon(hIcon);
-        }
-    }
-
-    private byte[]? TryGetCustomIconBytes(string shortcutPath)
-    {
-        string? directory = Path.GetDirectoryName(shortcutPath);
-        if (string.IsNullOrEmpty(directory)) return null;
-
-        string iconsDir = Path.Combine(directory, ".icons");
-        string name = Path.GetFileNameWithoutExtension(shortcutPath);
-        string pngPath = Path.Combine(iconsDir, name + ".png");
-        string icoPath = Path.Combine(iconsDir, name + ".ico");
-
-        // Check for file existence first (avoids relying on GetLastWriteTime magic date for missing files)
-        bool pngExists = _fileSystem.FileExists(pngPath);
-        bool icoExists = _fileSystem.FileExists(icoPath);
-
-        // Get timestamps only if files exist
-        DateTime pngTime = pngExists ? _fileSystem.GetLastWriteTime(pngPath) : DateTime.MinValue;
-        DateTime icoTime = icoExists ? _fileSystem.GetLastWriteTime(icoPath) : DateTime.MinValue;
-
-        // Check cache
-        if (_customIconCache.TryGetValue(shortcutPath, out IconCacheEntry? cachedEntry))
-        {
-            // Valid if timestamps haven't changed
-            if (cachedEntry.PngTime == pngTime && cachedEntry.IcoTime == icoTime)
+            if (entry.ShortcutTime == shortcutTime &&
+                entry.PngTime == pngTime &&
+                entry.IcoTime == icoTime)
             {
-                // Verify selected file still exists (edge case: timestamp matching MinValue but file gone?
-                // actually GetLastWriteTime handles existence check, so if file deleted, time becomes MinValue,
-                // which won't match old valid time. So this check is robust).
-                if (cachedEntry.SelectedPath == null) return null;
-
-                // Double check existence just in case, though timestamp check covers most cases
-                if (_fileSystem.FileExists(cachedEntry.SelectedPath))
-                {
-                    return _fileSystem.ReadAllBytes(cachedEntry.SelectedPath);
-                }
+                return entry.Content;
             }
         }
 
-        if (!pngExists && !icoExists)
+        // 3. Cache Miss - Compute
+        byte[]? iconBytes = null;
+
+        // 3a. Try Custom Icon
+        if (pngPath != null && icoPath != null)
         {
-            _customIconCache[shortcutPath] = new IconCacheEntry(null, pngTime, icoTime);
-            return null;
+            iconBytes = GetCustomIconBytes(pngPath, icoPath, pngTime, icoTime);
         }
+
+        // 3b. If no custom icon, Try System Icon
+        if (iconBytes == null)
+        {
+             iconBytes = ExtractSystemIcon(path);
+        }
+
+        // 4. Update Cache
+        _iconCache[path] = new IconCacheEntry(iconBytes, shortcutTime, pngTime, icoTime);
+
+        return iconBytes;
+    }
+
+    private byte[]? GetCustomIconBytes(string pngPath, string icoPath, DateTime pngTime, DateTime icoTime)
+    {
+        bool pngExists = pngTime > DateTime.MinValue;
+        bool icoExists = icoTime > DateTime.MinValue;
+
+        if (!pngExists && !icoExists) return null;
 
         string? chosenPath = null;
 
         if (pngExists && icoExists)
         {
-            // If both exist, compare dimensions to pick the better quality one.
             int pngArea = 0;
             int icoArea = 0;
 
@@ -194,9 +178,6 @@ public class IconService
             chosenPath = icoPath;
         }
 
-        // Update cache
-        _customIconCache[shortcutPath] = new IconCacheEntry(chosenPath, pngTime, icoTime);
-
         if (chosenPath != null)
         {
             try
@@ -211,5 +192,37 @@ public class IconService
         }
 
         return null;
+    }
+
+    private byte[]? ExtractSystemIcon(string path)
+    {
+        IntPtr hIcon = IntPtr.Zero;
+        string resolvedPath = path;
+
+        try
+        {
+            resolvedPath = ResolveIconPath(path);
+
+            // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
+            // saving ~43% processing time compared to 128x128.
+            NativeMethods.PrivateExtractIcons(resolvedPath, 0, 96, 96, ref hIcon, IntPtr.Zero, 1, 0);
+            if (hIcon == IntPtr.Zero) return null;
+
+            using var icon = WinIcon.FromHandle(hIcon);
+            using var bmp = icon.ToBitmap();
+            using var ms = new MemoryStream();
+            bmp.Save(ms, ImageFormat.Png);
+            return ms.ToArray();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to extract icon for {path} (resolved: {resolvedPath}): {ex.Message}");
+            return null;
+        }
+        finally
+        {
+            if (hIcon != IntPtr.Zero)
+                NativeMethods.DestroyIcon(hIcon);
+        }
     }
 }
