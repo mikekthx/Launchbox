@@ -19,6 +19,7 @@ public class IconServiceSecurityTests
     [InlineData(@"\\attacker\share\icon.ico")]
     [InlineData(@"\\?\UNC\attacker\share\icon.ico")]
     [InlineData(@"//attacker/share/icon.ico")]
+    [InlineData(@"\??\UNC\attacker\share\icon.ico")]
     public void ResolveIconPath_IgnoresUnsafePaths(string unsafePath)
     {
         // Arrange
@@ -28,10 +29,10 @@ public class IconServiceSecurityTests
         _mockFileSystem.AddFile(urlPath);
         _mockFileSystem.SetIniValue(urlPath, "InternetShortcut", "IconFile", unsafePath);
 
-        // Even if we mock the unsafe file existing (which mimics a real scenario where the share is accessible)
-        // _mockFileSystem.AddFile(unsafePath); // Note: MockFileSystem might struggle with UNC paths, but let's assume it can store strings.
-        // Actually, let's NOT add it to the file system to prove that ResolveIconPath doesn't even try to check it?
-        // No, the vulnerability is checking it. But we want to assert the return value is the ORIGINAL path.
+        // We mock the unsafe file existing to simulate that the attacker's share is accessible.
+        // If the security check is bypassed, ResolveIconPath will find this file and return unsafePath.
+        // If the security check works, it should ignore this file and return urlPath.
+        _mockFileSystem.AddFile(unsafePath);
 
         // Act
         string result = _iconService.ResolveIconPath(urlPath);
