@@ -46,6 +46,11 @@
             <TextBlock Text="Add shortcuts to your Desktop/Shortcuts folder"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"/>
+            <Button Content="Open Shortcuts Folder"
+                    Command="{x:Bind ViewModel.OpenShortcutsFolderCommand}"
+                    HorizontalAlignment="Center"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    Margin="0,8,0,0" />
         </StackPanel>
 
         <GridView x:Name="AppGrid" 

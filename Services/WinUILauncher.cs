@@ -28,4 +28,23 @@ public class WinUILauncher : IAppLauncher
             Trace.WriteLine($"Failed to launch {path}: {ex.Message}");
         }
     }
+
+    public void OpenFolder(string path)
+    {
+        if (Directory.Exists(path))
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Failed to open folder {path}: {ex.Message}");
+            }
+        }
+        else
+        {
+            Trace.WriteLine($"Folder not found: {path}");
+        }
+    }
 }

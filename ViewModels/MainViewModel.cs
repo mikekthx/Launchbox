@@ -41,6 +41,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public ICommand LoadAppsCommand { get; }
     public ICommand LaunchAppCommand { get; }
+    public ICommand OpenShortcutsFolderCommand { get; }
 
     public MainViewModel(
         ShortcutService shortcutService,
@@ -59,6 +60,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
         LaunchAppCommand = new SimpleCommand(LaunchApp);
+        OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
     }
 
     public async Task LoadAppsAsync()
@@ -121,6 +123,11 @@ public class MainViewModel : INotifyPropertyChanged
         {
             _appLauncher.Launch(app.Path);
         }
+    }
+
+    private void OpenShortcutsFolder()
+    {
+        _appLauncher.OpenFolder(_shortcutFolder);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

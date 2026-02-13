@@ -33,10 +33,16 @@ public class MockDispatcher : IDispatcher
 public class MockAppLauncher : IAppLauncher
 {
     public string? LastLaunchedPath { get; private set; }
+    public string? LastOpenedFolder { get; private set; }
 
     public void Launch(string path)
     {
         LastLaunchedPath = path;
+    }
+
+    public void OpenFolder(string path)
+    {
+        LastOpenedFolder = path;
     }
 }
 
@@ -118,6 +124,16 @@ public class MainViewModelTests
         await viewModel.LoadAppsAsync();
 
         Assert.False(viewModel.IsEmpty);
+    }
+
+    [Fact]
+    public void OpenShortcutsFolderCommand_OpensShortcutFolder()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.OpenShortcutsFolderCommand.Execute(null);
+
+        Assert.Equal(_shortcutFolder, _appLauncher.LastOpenedFolder);
     }
 
     private MainViewModel CreateViewModel()
