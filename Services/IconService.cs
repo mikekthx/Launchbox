@@ -94,11 +94,18 @@ public class IconService
         if (!string.IsNullOrEmpty(directory))
         {
              string iconsDir = Path.Combine(directory, ".icons");
-             pngPath = Path.Combine(iconsDir, name + ".png");
-             icoPath = Path.Combine(iconsDir, name + ".ico");
 
-             if (_fileSystem.FileExists(pngPath)) pngTime = _fileSystem.GetLastWriteTime(pngPath);
-             if (_fileSystem.FileExists(icoPath)) icoTime = _fileSystem.GetLastWriteTime(icoPath);
+             // Optimization: Check if .icons directory exists before checking for individual files
+             // This significantly reduces syscalls (checking 1 directory vs 2 potentially missing files)
+             if (_fileSystem.DirectoryExists(iconsDir))
+             {
+                 pngPath = Path.Combine(iconsDir, name + ".png");
+                 icoPath = Path.Combine(iconsDir, name + ".ico");
+
+                 // Optimization: GetLastWriteTime returns 1601 date if file missing, avoiding extra FileExists check
+                 pngTime = _fileSystem.GetLastWriteTime(pngPath);
+                 icoTime = _fileSystem.GetLastWriteTime(icoPath);
+             }
         }
 
         // 2. Check Cache
@@ -135,8 +142,9 @@ public class IconService
 
     private byte[]? GetCustomIconBytes(string pngPath, string icoPath, DateTime pngTime, DateTime icoTime)
     {
-        bool pngExists = pngTime > DateTime.MinValue;
-        bool icoExists = icoTime > DateTime.MinValue;
+        // Check year > 1900 because GetLastWriteTime returns ~1601 for missing files
+        bool pngExists = pngTime.Year > 1900;
+        bool icoExists = icoTime.Year > 1900;
 
         if (!pngExists && !icoExists) return null;
 
