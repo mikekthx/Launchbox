@@ -19,7 +19,7 @@
                 <TextBlock Text="Shortcuts Folder" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <TextBox Text="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}" IsReadOnly="True" Width="300" />
-                    <Button Grid.Column="1" Content="Browse..." Command="{x:Bind ViewModel.BrowseFolderCommand}" />
+                    <Button Grid.Column="1" Content="Browse..." Command="{x:Bind ViewModel.BrowseFolderCommand}" CommandParameter="{x:Bind}" />
                 </Grid>
                 <TextBlock Text="Changes will be applied immediately."
                            Style="{ThemeResource CaptionTextBlockStyle}"

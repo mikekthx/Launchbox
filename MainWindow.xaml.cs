@@ -18,6 +18,7 @@ public sealed partial class MainWindow : Window
     private ScrollViewer? _internalScrollViewer;
     private readonly WindowService _windowService;
     private readonly SettingsService _settingsService;
+    private readonly IFilePickerService _filePickerService;
     private SettingsWindow? _settingsWindow;
 
     // Window dragging state
@@ -38,6 +39,7 @@ public sealed partial class MainWindow : Window
         var settingsStore = new LocalSettingsStore();
         var startupService = new WinUIStartupService();
         _settingsService = new SettingsService(settingsStore, startupService);
+        _filePickerService = new WinUIFilePickerService();
 
         var windowPositionManager = new WindowPositionManager(settingsStore);
         _windowService = new WindowService(this, windowPositionManager, _settingsService);
@@ -205,7 +207,7 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            _settingsWindow = new SettingsWindow(_settingsService, _windowService);
+            _settingsWindow = new SettingsWindow(_settingsService, _windowService, _filePickerService);
             _settingsWindow.Closed += (s, e) => _settingsWindow = null;
             _settingsWindow.Activate();
         }

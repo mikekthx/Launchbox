@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Launchbox.Services;
 
-public class WindowService
+public class WindowService : IWindowService
 {
     private readonly Window _window;
     private readonly WindowPositionManager _positionManager;

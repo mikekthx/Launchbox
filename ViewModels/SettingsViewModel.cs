@@ -11,19 +11,21 @@ namespace Launchbox.ViewModels;
 public class SettingsViewModel : INotifyPropertyChanged
 {
     private readonly SettingsService _settingsService;
-    private readonly WindowService _windowService;
+    private readonly IWindowService _windowService;
+    private readonly IFilePickerService _filePickerService;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand ResetPositionCommand { get; }
-    public ICommand? BrowseFolderCommand { get; set; }
+    public ICommand BrowseFolderCommand { get; }
 
     public ObservableCollection<string> Modifiers { get; } = new() { "Alt", "Ctrl", "Shift", "Win" };
 
-    public SettingsViewModel(SettingsService settingsService, WindowService windowService)
+    public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
+        _filePickerService = filePickerService ?? throw new ArgumentNullException(nameof(filePickerService));
 
         _settingsService.PropertyChanged += OnServicePropertyChanged;
 
@@ -31,6 +33,18 @@ public class SettingsViewModel : INotifyPropertyChanged
         _ = _settingsService.InitializeAsync();
 
         ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());
+        BrowseFolderCommand = new SimpleCommand(BrowseFolderAsync);
+    }
+
+    private async void BrowseFolderAsync(object? parameter)
+    {
+        if (parameter == null) return; // Need window handle
+
+        var folder = await _filePickerService.PickSingleFolderAsync(parameter);
+        if (!string.IsNullOrEmpty(folder))
+        {
+            ShortcutsPath = folder;
+        }
     }
 
     private void OnServicePropertyChanged(object? sender, PropertyChangedEventArgs e)

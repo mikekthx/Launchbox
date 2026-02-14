@@ -1,5 +1,4 @@
 using Xunit;
-using Launchbox;
 using Launchbox.ViewModels;
 using Launchbox.Services;
 using Launchbox.Models;
@@ -54,6 +53,7 @@ public class MainViewModelTests
     private readonly MockImageFactory _imageFactory;
     private readonly MockDispatcher _dispatcher;
     private readonly MockAppLauncher _appLauncher;
+    private readonly SettingsService _settingsService;
     private readonly string _shortcutFolder = Path.Combine("C:", "Shortcuts");
 
     public MainViewModelTests()
@@ -65,7 +65,25 @@ public class MainViewModelTests
         _dispatcher = new MockDispatcher();
         _appLauncher = new MockAppLauncher();
 
-        _fileSystem.AddDirectory(_shortcutFolder);
+        // Create SettingsService with MockStore
+        var settingsStore = new MockSettingsStore();
+        var startupService = new MockStartupService();
+        _settingsService = new SettingsService(settingsStore, startupService);
+        _settingsService.ShortcutsPath = _shortcutFolder;
+
+        _fileSystem.CreateDirectory(_shortcutFolder);
+    }
+
+    private MainViewModel CreateViewModel()
+    {
+        return new MainViewModel(
+            _shortcutService,
+            _iconService,
+            _imageFactory,
+            _dispatcher,
+            _appLauncher,
+            _fileSystem,
+            _settingsService);
     }
 
     [Fact]
@@ -80,6 +98,7 @@ public class MainViewModelTests
     public async Task LoadAppsCommand_LoadsApps()
     {
         // Arrange
+        // Add file to the shortcut folder defined in settings
         string appPath = Path.Combine(_shortcutFolder, "MyApp.lnk");
         _fileSystem.AddFile(appPath);
 
@@ -130,7 +149,6 @@ public class MainViewModelTests
     public void OpenShortcutsFolderCommand_OpensShortcutFolder()
     {
         var viewModel = CreateViewModel();
-        _fileSystem.AddDirectory(_shortcutFolder);
 
         viewModel.OpenShortcutsFolderCommand.Execute(null);
 
@@ -140,39 +158,17 @@ public class MainViewModelTests
     [Fact]
     public void OpenShortcutsFolderCommand_CreatesFolder_IfMissing()
     {
-        var viewModel = CreateViewModel();
-        // Ensure folder doesn't exist initially (though MockFileSystem starts empty except for what's added in Constructor)
-        // In Constructor we added _shortcutFolder, so let's use a different one or clear it?
-        // MockFileSystem doesn't have RemoveDirectory.
-
-        // Let's create a NEW viewModel with a different path that doesn't exist
+        // Change settings to a path that doesn't exist
         string newPath = Path.Combine("C:", "NewShortcuts");
-        var newViewModel = new MainViewModel(
-            _shortcutService,
-            _iconService,
-            _imageFactory,
-            _dispatcher,
-            _appLauncher,
-            _fileSystem,
-            newPath);
+        _settingsService.ShortcutsPath = newPath;
+
+        var viewModel = CreateViewModel();
 
         Assert.False(_fileSystem.DirectoryExists(newPath));
 
-        newViewModel.OpenShortcutsFolderCommand.Execute(null);
+        viewModel.OpenShortcutsFolderCommand.Execute(null);
 
         Assert.True(_fileSystem.DirectoryExists(newPath));
         Assert.Equal(newPath, _appLauncher.LastOpenedFolder);
-    }
-
-    private MainViewModel CreateViewModel()
-    {
-        return new MainViewModel(
-            _shortcutService,
-            _iconService,
-            _imageFactory,
-            _dispatcher,
-            _appLauncher,
-            _fileSystem,
-            _shortcutFolder);
     }
 }
