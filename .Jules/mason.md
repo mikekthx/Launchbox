@@ -1,0 +1,3 @@
+## 2024-05-24 - Moving Window Visibility Logic to ViewModels
+**Learning:** In WinUI 3, window management methods like `AppWindow.Hide()` often tempt developers to write logic in code-behind. By exposing `Hide()` through `IWindowService`, we can orchestrate window visibility directly from the ViewModel (e.g., hiding after launch), maintaining strict MVVM separation and enabling better unit testing.
+**Action:** Always check if UI-specific actions (Close, Hide, Minimize) are driving business logic flow. If so, abstract them into a Service (like `IWindowService`) and inject them into the ViewModel.

@@ -138,6 +138,19 @@ public class WindowService : IWindowService
         }
     }
 
+    public void Hide()
+    {
+        if (_appWindow == null) return;
+        try
+        {
+            _appWindow.Hide();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to hide window: {ex.Message}");
+        }
+    }
+
     public void ResetPosition()
     {
         if (_appWindow == null) return;

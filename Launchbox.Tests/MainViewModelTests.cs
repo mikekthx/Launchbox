@@ -54,6 +54,7 @@ public class MainViewModelTests
     private readonly MockDispatcher _dispatcher;
     private readonly MockAppLauncher _appLauncher;
     private readonly SettingsService _settingsService;
+    private readonly MockWindowService _windowService;
     private readonly string _shortcutFolder = Path.Combine("C:", "Shortcuts");
 
     public MainViewModelTests()
@@ -64,6 +65,7 @@ public class MainViewModelTests
         _imageFactory = new MockImageFactory();
         _dispatcher = new MockDispatcher();
         _appLauncher = new MockAppLauncher();
+        _windowService = new MockWindowService();
 
         // Create SettingsService with MockStore
         var settingsStore = new MockSettingsStore();
@@ -83,7 +85,8 @@ public class MainViewModelTests
             _dispatcher,
             _appLauncher,
             _fileSystem,
-            _settingsService);
+            _settingsService,
+            _windowService);
     }
 
     [Fact]
@@ -121,6 +124,27 @@ public class MainViewModelTests
         viewModel.LaunchAppCommand.Execute(appItem);
 
         Assert.Equal("C:\\Test.lnk", _appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void LaunchAppCommand_HidesWindow()
+    {
+        var viewModel = CreateViewModel();
+        var appItem = new AppItem { Name = "Test", Path = "C:\\Test.lnk" };
+
+        viewModel.LaunchAppCommand.Execute(appItem);
+
+        Assert.True(_windowService.HideCalled);
+    }
+
+    [Fact]
+    public void ToggleWindowCommand_TogglesVisibility()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.ToggleWindowCommand.Execute(null);
+
+        Assert.True(_windowService.ToggleVisibilityCalled);
     }
 
     [Fact]

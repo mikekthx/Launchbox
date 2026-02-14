@@ -23,6 +23,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly IAppLauncher _appLauncher;
     private readonly IFileSystem _fileSystem;
     private readonly SettingsService _settingsService;
+    private readonly IWindowService _windowService;
 
     public ObservableCollection<AppItem> Apps { get; } = new();
 
@@ -43,6 +44,7 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand LoadAppsCommand { get; }
     public ICommand LaunchAppCommand { get; }
     public ICommand OpenShortcutsFolderCommand { get; }
+    public ICommand ToggleWindowCommand { get; }
 
     public MainViewModel(
         ShortcutService shortcutService,
@@ -51,7 +53,8 @@ public class MainViewModel : INotifyPropertyChanged
         IDispatcher dispatcher,
         IAppLauncher appLauncher,
         IFileSystem fileSystem,
-        SettingsService settingsService)
+        SettingsService settingsService,
+        IWindowService windowService)
     {
         _shortcutService = shortcutService;
         _iconService = iconService;
@@ -60,12 +63,14 @@ public class MainViewModel : INotifyPropertyChanged
         _appLauncher = appLauncher;
         _fileSystem = fileSystem;
         _settingsService = settingsService;
+        _windowService = windowService;
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
 
         LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
         LaunchAppCommand = new SimpleCommand(LaunchApp);
         OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
+        ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
     }
 
     private void SettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -138,6 +143,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (parameter is AppItem app)
         {
+            _windowService.Hide();
             _appLauncher.Launch(app.Path);
         }
     }
