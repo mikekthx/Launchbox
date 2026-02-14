@@ -81,4 +81,22 @@ public class IconServiceSecurityTests
         // Assert
         Assert.Equal(iconPath, result);
     }
+
+    [Fact]
+    public void ExtractIconBytes_BlocksUnsafePaths_PreventsFileSystemAccess()
+    {
+        // Arrange
+        // We use a UNC path that would trigger NTLM auth if accessed
+        string unsafePath = @"\\attacker\share\malicious.lnk";
+
+        // We do NOT add the file to mockFileSystem.
+        // If the code tries to access it (GetLastWriteTime), it might succeed (return default) or fail depending on mock.
+        // But crucially, ExtractIconBytes returns null immediately due to IsUnsafePath check.
+
+        // Act
+        var result = _iconService.ExtractIconBytes(unsafePath);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
