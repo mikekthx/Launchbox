@@ -20,6 +20,8 @@ public class IconServiceSecurityTests
     [InlineData(@"\\?\UNC\attacker\share\icon.ico")]
     [InlineData(@"//attacker/share/icon.ico")]
     [InlineData(@"\??\UNC\attacker\share\icon.ico")]
+    [InlineData(@"/\attacker/share/icon.ico")]
+    [InlineData(@"\/attacker/share/icon.ico")]
     public void ResolveIconPath_IgnoresUnsafePaths(string unsafePath)
     {
         // Arrange
