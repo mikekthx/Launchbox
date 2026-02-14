@@ -44,6 +44,7 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand LoadAppsCommand { get; }
     public ICommand LaunchAppCommand { get; }
     public ICommand OpenShortcutsFolderCommand { get; }
+    public ICommand ToggleWindowCommand { get; }
 
     public MainViewModel(
         ShortcutService shortcutService,
@@ -69,6 +70,7 @@ public class MainViewModel : INotifyPropertyChanged
         LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
         LaunchAppCommand = new SimpleCommand(LaunchApp);
         OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
+        ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
     }
 
     private void SettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)

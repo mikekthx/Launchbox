@@ -138,6 +138,16 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void ToggleWindowCommand_TogglesVisibility()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.ToggleWindowCommand.Execute(null);
+
+        Assert.True(_windowService.ToggleVisibilityCalled);
+    }
+
+    [Fact]
     public async Task LoadAppsAsync_SetsIsEmptyToTrue_WhenNoAppsFound()
     {
         var viewModel = CreateViewModel();

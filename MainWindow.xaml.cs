@@ -26,16 +26,11 @@ public sealed partial class MainWindow : Window
     private Windows.Graphics.PointInt32 _dragStartWindowPos;
     private Windows.Foundation.Point _dragStartPointerPos;
 
-    public System.Windows.Input.ICommand ToggleWindowCommand { get; }
     public System.Windows.Input.ICommand ExitCommand { get; }
     public System.Windows.Input.ICommand OpenSettingsCommand { get; }
 
     public MainWindow()
     {
-        this.InitializeComponent();
-
-        UpdateSystemBackdrop();
-
         var settingsStore = new LocalSettingsStore();
         var startupService = new WinUIStartupService();
         _settingsService = new SettingsService(settingsStore, startupService);
@@ -53,7 +48,10 @@ public sealed partial class MainWindow : Window
 
         ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
 
-        ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
+        this.InitializeComponent();
+
+        UpdateSystemBackdrop();
+
         ExitCommand = new SimpleCommand(ExitApplication);
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
 
