@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 
@@ -13,12 +14,8 @@ public static class IconHelper
         try
         {
             var image = new BitmapImage();
-            using var stream = new InMemoryRandomAccessStream();
-            using var writer = new DataWriter(stream.GetOutputStreamAt(0));
-            writer.WriteBytes(imageBytes);
-            await writer.StoreAsync();
-            stream.Seek(0);
-            await image.SetSourceAsync(stream);
+            using var stream = new MemoryStream(imageBytes);
+            await image.SetSourceAsync(stream.AsRandomAccessStream());
             return image;
         }
         catch (Exception ex)
