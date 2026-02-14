@@ -90,6 +90,12 @@ public class IconService
 
     public byte[]? ExtractIconBytes(string path)
     {
+        if (IsUnsafePath(path))
+        {
+            Trace.WriteLine($"Blocked icon extraction for unsafe path: {path}");
+            return null;
+        }
+
         // 1. Gather current state (timestamps)
         // We check these every time to support live updates, but avoid expensive operations if unchanged.
 
