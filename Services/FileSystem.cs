@@ -6,6 +6,7 @@ namespace Launchbox.Services;
 
 public class FileSystem : IFileSystem
 {
+    public void CreateDirectory(string path) => Directory.CreateDirectory(path);
     public bool DirectoryExists(string path) => Directory.Exists(path);
     public bool FileExists(string path) => File.Exists(path);
     public string[] GetFiles(string path) => Directory.GetFiles(path);

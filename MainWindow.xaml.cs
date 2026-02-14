@@ -46,7 +46,7 @@ public sealed partial class MainWindow : Window
         var dispatcher = new WinUIDispatcher(this.DispatcherQueue);
         var launcher = new WinUILauncher();
 
-        ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, _shortcutFolder);
+        ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _shortcutFolder);
 
         ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
         ExitCommand = new SimpleCommand(ExitApplication);

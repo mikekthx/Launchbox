@@ -2,6 +2,7 @@ namespace Launchbox.Services;
 
 public interface IFileSystem
 {
+    void CreateDirectory(string path);
     bool DirectoryExists(string path);
     bool FileExists(string path);
     string[] GetFiles(string path);
