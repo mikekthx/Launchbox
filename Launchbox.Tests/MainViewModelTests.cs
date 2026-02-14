@@ -33,10 +33,16 @@ public class MockDispatcher : IDispatcher
 public class MockAppLauncher : IAppLauncher
 {
     public string? LastLaunchedPath { get; private set; }
+    public string? LastOpenedFolder { get; private set; }
 
     public void Launch(string path)
     {
         LastLaunchedPath = path;
+    }
+
+    public void OpenFolder(string path)
+    {
+        LastOpenedFolder = path;
     }
 }
 
@@ -120,6 +126,44 @@ public class MainViewModelTests
         Assert.False(viewModel.IsEmpty);
     }
 
+    [Fact]
+    public void OpenShortcutsFolderCommand_OpensShortcutFolder()
+    {
+        var viewModel = CreateViewModel();
+        _fileSystem.AddDirectory(_shortcutFolder);
+
+        viewModel.OpenShortcutsFolderCommand.Execute(null);
+
+        Assert.Equal(_shortcutFolder, _appLauncher.LastOpenedFolder);
+    }
+
+    [Fact]
+    public void OpenShortcutsFolderCommand_CreatesFolder_IfMissing()
+    {
+        var viewModel = CreateViewModel();
+        // Ensure folder doesn't exist initially (though MockFileSystem starts empty except for what's added in Constructor)
+        // In Constructor we added _shortcutFolder, so let's use a different one or clear it?
+        // MockFileSystem doesn't have RemoveDirectory.
+
+        // Let's create a NEW viewModel with a different path that doesn't exist
+        string newPath = Path.Combine("C:", "NewShortcuts");
+        var newViewModel = new MainViewModel(
+            _shortcutService,
+            _iconService,
+            _imageFactory,
+            _dispatcher,
+            _appLauncher,
+            _fileSystem,
+            newPath);
+
+        Assert.False(_fileSystem.DirectoryExists(newPath));
+
+        newViewModel.OpenShortcutsFolderCommand.Execute(null);
+
+        Assert.True(_fileSystem.DirectoryExists(newPath));
+        Assert.Equal(newPath, _appLauncher.LastOpenedFolder);
+    }
+
     private MainViewModel CreateViewModel()
     {
         return new MainViewModel(
@@ -128,6 +172,7 @@ public class MainViewModelTests
             _imageFactory,
             _dispatcher,
             _appLauncher,
+            _fileSystem,
             _shortcutFolder);
     }
 }

@@ -69,6 +69,11 @@ public class MockFileSystem : IFileSystem
         _iniValues[$"{path}|{section}|{key}"] = value;
     }
 
+    public void CreateDirectory(string path)
+    {
+        _directories.Add(path);
+    }
+
     public bool DirectoryExists(string path)
     {
         return _directories.Contains(path);

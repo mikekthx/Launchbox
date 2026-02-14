@@ -21,6 +21,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly IImageFactory _imageFactory;
     private readonly IDispatcher _dispatcher;
     private readonly IAppLauncher _appLauncher;
+    private readonly IFileSystem _fileSystem;
     private readonly string _shortcutFolder;
 
     public ObservableCollection<AppItem> Apps { get; } = new();
@@ -41,6 +42,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public ICommand LoadAppsCommand { get; }
     public ICommand LaunchAppCommand { get; }
+    public ICommand OpenShortcutsFolderCommand { get; }
 
     public MainViewModel(
         ShortcutService shortcutService,
@@ -48,6 +50,7 @@ public class MainViewModel : INotifyPropertyChanged
         IImageFactory imageFactory,
         IDispatcher dispatcher,
         IAppLauncher appLauncher,
+        IFileSystem fileSystem,
         string shortcutFolder)
     {
         _shortcutService = shortcutService;
@@ -55,10 +58,12 @@ public class MainViewModel : INotifyPropertyChanged
         _imageFactory = imageFactory;
         _dispatcher = dispatcher;
         _appLauncher = appLauncher;
+        _fileSystem = fileSystem;
         _shortcutFolder = shortcutFolder;
 
         LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
         LaunchAppCommand = new SimpleCommand(LaunchApp);
+        OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
     }
 
     public async Task LoadAppsAsync()
@@ -121,6 +126,15 @@ public class MainViewModel : INotifyPropertyChanged
         {
             _appLauncher.Launch(app.Path);
         }
+    }
+
+    private void OpenShortcutsFolder()
+    {
+        if (!_fileSystem.DirectoryExists(_shortcutFolder))
+        {
+            _fileSystem.CreateDirectory(_shortcutFolder);
+        }
+        _appLauncher.OpenFolder(_shortcutFolder);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
