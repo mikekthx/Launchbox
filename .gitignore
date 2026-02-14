@@ -492,3 +492,4 @@ $RECYCLE.BIN/
 # Additional Tools
 omnisharp.json
 *.slnx
+nul
