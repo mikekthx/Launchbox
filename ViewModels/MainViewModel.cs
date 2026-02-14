@@ -23,6 +23,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly IAppLauncher _appLauncher;
     private readonly IFileSystem _fileSystem;
     private readonly SettingsService _settingsService;
+    private readonly IWindowService _windowService;
 
     public ObservableCollection<AppItem> Apps { get; } = new();
 
@@ -51,7 +52,8 @@ public class MainViewModel : INotifyPropertyChanged
         IDispatcher dispatcher,
         IAppLauncher appLauncher,
         IFileSystem fileSystem,
-        SettingsService settingsService)
+        SettingsService settingsService,
+        IWindowService windowService)
     {
         _shortcutService = shortcutService;
         _iconService = iconService;
@@ -60,6 +62,7 @@ public class MainViewModel : INotifyPropertyChanged
         _appLauncher = appLauncher;
         _fileSystem = fileSystem;
         _settingsService = settingsService;
+        _windowService = windowService;
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
 
@@ -138,6 +141,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         if (parameter is AppItem app)
         {
+            _windowService.Hide();
             _appLauncher.Launch(app.Path);
         }
     }

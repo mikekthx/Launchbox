@@ -51,7 +51,7 @@ public sealed partial class MainWindow : Window
         var dispatcher = new WinUIDispatcher(this.DispatcherQueue);
         var launcher = new WinUILauncher();
 
-        ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService);
+        ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
 
         ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
         ExitCommand = new SimpleCommand(ExitApplication);
@@ -229,7 +229,6 @@ public sealed partial class MainWindow : Window
         if (ViewModel.LaunchAppCommand.CanExecute(e.ClickedItem))
         {
             ViewModel.LaunchAppCommand.Execute(e.ClickedItem);
-            this.AppWindow.Hide();
         }
     }
 }
