@@ -23,7 +23,7 @@
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
                     <MenuFlyoutItem Text="Show" Command="{x:Bind ToggleWindowCommand}" />
-                    <MenuFlyoutItem Text="Reset Position" Command="{x:Bind ResetPositionCommand}" />
+                    <MenuFlyoutItem Text="Settings" Command="{x:Bind OpenSettingsCommand}" />
                     <MenuFlyoutSeparator />
                     <MenuFlyoutItem Text="Exit" Command="{x:Bind ExitCommand}" />
                 </MenuFlyout>

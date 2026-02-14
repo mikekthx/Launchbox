@@ -6,20 +6,24 @@ using System.Diagnostics;
 
 namespace Launchbox.Services;
 
-public class WindowService
+public class WindowService : IWindowService
 {
     private readonly Window _window;
     private readonly WindowPositionManager _positionManager;
+    private readonly SettingsService _settingsService;
     private AppWindow? _appWindow;
     private IntPtr _hWnd;
     private IntPtr _oldWndProc;
     private WndProcDelegate? _wndProcDelegate;
     private bool _hasPositioned = false;
 
-    public WindowService(Window window, WindowPositionManager positionManager)
+    public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService)
     {
         _window = window;
         _positionManager = positionManager;
+        _settingsService = settingsService;
+
+        _settingsService.PropertyChanged += SettingsService_PropertyChanged;
     }
 
     public void Initialize()
@@ -39,10 +43,7 @@ public class WindowService
         _appWindow.Changed += AppWindow_Changed;
 
         // Hotkey
-        if (!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, Constants.MOD_ALT, Constants.VK_S))
-        {
-            Trace.WriteLine("Failed to register Alt+S hotkey.");
-        }
+        UpdateHotkey();
 
         // WndProc
         _wndProcDelegate = new WndProcDelegate(NewWndProc);
@@ -50,6 +51,39 @@ public class WindowService
         if (_oldWndProc == IntPtr.Zero)
         {
             Trace.WriteLine("Failed to set WndProc hook.");
+        }
+    }
+
+    private void SettingsService_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SettingsService.HotkeyModifiers) ||
+            e.PropertyName == nameof(SettingsService.HotkeyKey))
+        {
+            // Update on UI thread if needed? RegisterHotKey is thread-affine?
+            // Usually RegisterHotKey must be called on the thread that created the window.
+            // PropertyChanged might come from any thread?
+            // SettingsService.PropertyChanged likely from UI thread if set from UI.
+            // If set from background (e.g. startup check), hotkey not involved.
+            // Assuming UI thread for now.
+            UpdateHotkey();
+        }
+    }
+
+    private void UpdateHotkey()
+    {
+        // Unregister existing first
+        NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
+
+        int mod = _settingsService.HotkeyModifiers;
+        int key = _settingsService.HotkeyKey;
+
+        if (!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key))
+        {
+            Trace.WriteLine($"Failed to register hotkey: {mod}+{key}");
+        }
+        else
+        {
+            Trace.WriteLine($"Registered hotkey: {mod}+{key}");
         }
     }
 

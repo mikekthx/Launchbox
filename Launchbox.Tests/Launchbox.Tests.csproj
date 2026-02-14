@@ -34,6 +34,11 @@
     <Compile Include="..\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
     <Compile Include="..\Helpers\ImageHeaderParser.cs" Link="Helpers\ImageHeaderParser.cs" />
     <Compile Include="..\Services\IconCacheEntry.cs" Link="Services\IconCacheEntry.cs" />
+    <Compile Include="..\Services\SettingsService.cs" Link="Services\SettingsService.cs" />
+    <Compile Include="..\Services\IStartupService.cs" Link="Services\IStartupService.cs" />
+    <Compile Include="..\Services\IFilePickerService.cs" Link="Services\IFilePickerService.cs" />
+    <Compile Include="..\Services\IWindowService.cs" Link="Services\IWindowService.cs" />
+    <Compile Include="..\ViewModels\SettingsViewModel.cs" Link="ViewModels\SettingsViewModel.cs" />
   </ItemGroup>
 
 </Project>
