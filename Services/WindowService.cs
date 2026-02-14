@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace Launchbox.Services;
 
-public class WindowService : IWindowService
+public class WindowService : IWindowService, IDisposable
 {
     private readonly Window _window;
     private readonly WindowPositionManager _positionManager;
@@ -171,9 +171,41 @@ public class WindowService : IWindowService
 
     public void Cleanup()
     {
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            // Unsubscribe managed events
+            if (_settingsService != null)
+            {
+                _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
+            }
+
+            if (_appWindow != null)
+            {
+                _appWindow.Changed -= AppWindow_Changed;
+            }
+        }
+
+        // Clean up unmanaged resources
         try
         {
             NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
+
+            if (_oldWndProc != IntPtr.Zero)
+            {
+                NativeMethods.SetWindowLongPtr(_hWnd, -4, _oldWndProc);
+                _oldWndProc = IntPtr.Zero;
+            }
         }
         catch (Exception ex)
         {
