@@ -13,12 +13,12 @@ namespace Launchbox;
 
 public sealed partial class MainWindow : Window
 {
-    private readonly string _shortcutFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
-
     public MainViewModel ViewModel { get; }
 
     private ScrollViewer? _internalScrollViewer;
     private readonly WindowService _windowService;
+    private readonly SettingsService _settingsService;
+    private SettingsWindow? _settingsWindow;
 
     // Window dragging state
     private bool _isDraggingWindow = false;
@@ -27,7 +27,7 @@ public sealed partial class MainWindow : Window
 
     public System.Windows.Input.ICommand ToggleWindowCommand { get; }
     public System.Windows.Input.ICommand ExitCommand { get; }
-    public System.Windows.Input.ICommand ResetPositionCommand { get; }
+    public System.Windows.Input.ICommand OpenSettingsCommand { get; }
 
     public MainWindow()
     {
@@ -36,8 +36,11 @@ public sealed partial class MainWindow : Window
         UpdateSystemBackdrop();
 
         var settingsStore = new LocalSettingsStore();
+        var startupService = new WinUIStartupService();
+        _settingsService = new SettingsService(settingsStore, startupService);
+
         var windowPositionManager = new WindowPositionManager(settingsStore);
-        _windowService = new WindowService(this, windowPositionManager);
+        _windowService = new WindowService(this, windowPositionManager, _settingsService);
 
         var fileSystem = new FileSystem();
         var shortcutService = new ShortcutService(fileSystem);
@@ -46,14 +49,17 @@ public sealed partial class MainWindow : Window
         var dispatcher = new WinUIDispatcher(this.DispatcherQueue);
         var launcher = new WinUILauncher();
 
-        ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _shortcutFolder);
+        ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService);
 
         ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
         ExitCommand = new SimpleCommand(ExitApplication);
-        ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());
+        OpenSettingsCommand = new SimpleCommand(OpenSettings);
 
         // 1. WINDOW SETUP
         _windowService.Initialize();
+
+        // Initialize settings (async)
+        _ = _settingsService.InitializeAsync();
 
         // 2. WINDOW DRAGGING - Use custom pointer tracking
         RootGrid.PointerPressed += RootGrid_PointerPressed;
@@ -186,6 +192,26 @@ public sealed partial class MainWindow : Window
             {
                 this.SystemBackdrop = new DesktopAcrylicBackdrop();
             }
+        }
+    }
+
+    private void OpenSettings()
+    {
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
+        try
+        {
+            _settingsWindow = new SettingsWindow(_settingsService, _windowService);
+            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+            _settingsWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error opening settings: {ex.Message}");
         }
     }
 

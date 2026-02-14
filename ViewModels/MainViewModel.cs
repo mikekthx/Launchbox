@@ -22,7 +22,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly IDispatcher _dispatcher;
     private readonly IAppLauncher _appLauncher;
     private readonly IFileSystem _fileSystem;
-    private readonly string _shortcutFolder;
+    private readonly SettingsService _settingsService;
 
     public ObservableCollection<AppItem> Apps { get; } = new();
 
@@ -51,7 +51,7 @@ public class MainViewModel : INotifyPropertyChanged
         IDispatcher dispatcher,
         IAppLauncher appLauncher,
         IFileSystem fileSystem,
-        string shortcutFolder)
+        SettingsService settingsService)
     {
         _shortcutService = shortcutService;
         _iconService = iconService;
@@ -59,36 +59,50 @@ public class MainViewModel : INotifyPropertyChanged
         _dispatcher = dispatcher;
         _appLauncher = appLauncher;
         _fileSystem = fileSystem;
-        _shortcutFolder = shortcutFolder;
+        _settingsService = settingsService;
+
+        _settingsService.PropertyChanged += SettingsService_PropertyChanged;
 
         LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
         LaunchAppCommand = new SimpleCommand(LaunchApp);
         OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
     }
 
+    private void SettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SettingsService.ShortcutsPath))
+        {
+            // Reload apps when folder path changes
+            _ = LoadAppsAsync();
+        }
+    }
+
     public async Task LoadAppsAsync()
     {
-        var files = await Task.Run(() => _shortcutService.GetShortcutFiles(_shortcutFolder, Constants.ALLOWED_EXTENSIONS));
-
-        if (files == null)
-        {
-            Trace.WriteLine($"Shortcut folder not found: {_shortcutFolder}");
-            return;
-        }
+        var shortcutFolder = _settingsService.ShortcutsPath;
+        var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS));
 
         var localAppItems = new List<AppItem>();
-        foreach (var file in files)
+
+        if (files != null)
         {
-            try
+            foreach (var file in files)
             {
-                var name = Path.GetFileNameWithoutExtension(file);
-                var appItem = new AppItem { Name = name, Path = file };
-                localAppItems.Add(appItem);
+                try
+                {
+                    var name = Path.GetFileNameWithoutExtension(file);
+                    var appItem = new AppItem { Name = name, Path = file };
+                    localAppItems.Add(appItem);
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine($"Failed to load app {file}: {ex.Message}");
+                }
             }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to load app {file}: {ex.Message}");
-            }
+        }
+        else
+        {
+            Trace.WriteLine($"Shortcut folder not found: {shortcutFolder}");
         }
 
         await _dispatcher.EnqueueAsync(() =>
@@ -130,11 +144,12 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void OpenShortcutsFolder()
     {
-        if (!_fileSystem.DirectoryExists(_shortcutFolder))
+        var shortcutFolder = _settingsService.ShortcutsPath;
+        if (!_fileSystem.DirectoryExists(shortcutFolder))
         {
-            _fileSystem.CreateDirectory(_shortcutFolder);
+            _fileSystem.CreateDirectory(shortcutFolder);
         }
-        _appLauncher.OpenFolder(_shortcutFolder);
+        _appLauncher.OpenFolder(shortcutFolder);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
