@@ -66,6 +66,18 @@ public class IconService
         // Check for standard UNC paths
         if (path.StartsWith(@"\\") || path.StartsWith("//")) return true;
 
+        // Check for mixed slash UNC paths (e.g. /\server/share or \/server/share)
+        if (path.StartsWith(@"/\") || path.StartsWith(@"\/")) return true;
+
+        // Check normalized path for hidden UNC (Defense in depth)
+        try
+        {
+            string fullPath = Path.GetFullPath(path);
+            if (fullPath.StartsWith(@"\\") || fullPath.StartsWith("//")) return true;
+            if (new Uri(fullPath).IsUnc) return true;
+        }
+        catch { }
+
         // Check using Uri as a backup
         try
         {
