@@ -54,22 +54,19 @@ jobs:
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
         $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-        
+
         # Securely read the password
         $pwd = ConvertTo-SecureString -String "${{ secrets.Pfx_Key }}" -Force -AsPlainText
         
         # Import to the Personal store (Fixes APPX0105)
         $cert = Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $pwd
-        
-        # Import to the Trusted Root store (Fixes APPX0107)
-        Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\Root -Password $pwd
-        
+
         # Save the certificate thumbprint to the runner's environment variables
         echo "CERT_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
     # Create the app package by building and packaging the single-project MSIX
     - name: Create the app package
-      run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:GenerateAppxPackageOnBuild=true /p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT
+      run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:GenerateAppxPackageOnBuild=true /p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT /p:NoWarn=APPX0107
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x86|x64
