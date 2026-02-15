@@ -15,8 +15,8 @@ public class FileSystem : IFileSystem
     {
         // Start with a reasonable buffer size to minimize reallocations
         int capacity = 512;
-        StringBuilder sb = new StringBuilder(capacity);
-        int ret = NativeMethods.GetPrivateProfileString(section, key, "", sb, capacity, path);
+        var sb = new StringBuilder(capacity);
+        int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, sb, capacity, path);
 
         // Check for truncation. GetPrivateProfileString returns size - 1 (or sometimes size - 2)
         // if the buffer was too small. We loop to double the buffer size until it fits.
@@ -31,7 +31,7 @@ public class FileSystem : IFileSystem
             }
 
             sb = new StringBuilder(capacity);
-            ret = NativeMethods.GetPrivateProfileString(section, key, "", sb, capacity, path);
+            ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, sb, capacity, path);
         }
 
         return sb.ToString();
