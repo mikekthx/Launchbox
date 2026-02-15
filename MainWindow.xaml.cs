@@ -8,7 +8,6 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.IO;
-using H.NotifyIcon;
 
 namespace Launchbox;
 
@@ -21,7 +20,6 @@ public sealed partial class MainWindow : Window
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
     private SettingsWindow? _settingsWindow;
-    private TaskbarIcon? _trayIcon;
 
     private DateTime _lastBackdropCheck = DateTime.MinValue;
     private bool _isDwmBlurGlassRunning = false;
@@ -61,9 +59,6 @@ public sealed partial class MainWindow : Window
 
         ExitCommand = new SimpleCommand(ExitApplication);
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
-
-        // Initialize TaskbarIcon in code-behind to avoid WinUI 3 XAML compiler issues with out-of-tree elements
-        InitializeTrayIcon();
 
         // 1. WINDOW SETUP
         _windowService.Initialize();
@@ -229,38 +224,10 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void InitializeTrayIcon()
-    {
-        _trayIcon = new TaskbarIcon
-        {
-            ToolTipText = "Launchbox (Alt+S)",
-            IconSource = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri("ms-appx:///Assets/Square44x44Logo.targetsize-24_altform-unplated.png"))
-        };
-
-        _trayIcon.LeftClickCommand = ViewModel.ToggleWindowCommand;
-        _trayIcon.DoubleClickCommand = ViewModel.ToggleWindowCommand;
-
-        var flyout = new MenuFlyout();
-
-        var showItem = new MenuFlyoutItem { Text = "Show", Command = ViewModel.ToggleWindowCommand };
-        var settingsItem = new MenuFlyoutItem { Text = "Settings", Command = OpenSettingsCommand };
-        var exitItem = new MenuFlyoutItem { Text = "Exit", Command = ExitCommand };
-
-        flyout.Items.Add(showItem);
-        flyout.Items.Add(settingsItem);
-        flyout.Items.Add(new MenuFlyoutSeparator());
-        flyout.Items.Add(exitItem);
-
-        _trayIcon.ContextFlyout = flyout;
-
-        // Add to the visual tree to ensure proper lifecycle management
-        RootGrid.Children.Add(_trayIcon);
-    }
-
     private void ExitApplication()
     {
         _windowService.Cleanup();
-        _trayIcon?.Dispose();
+        TrayIcon?.Dispose();
         this.Close();
     }
 
