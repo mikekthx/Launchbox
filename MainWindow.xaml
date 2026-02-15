@@ -19,14 +19,14 @@
         <tb:TaskbarIcon x:Name="TrayIcon"
                         ToolTipText="Launchbox (Alt+S)"
                         IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
-                        LeftClickCommand="{x:Bind ViewModel.ToggleWindowCommand}"
-                        DoubleClickCommand="{x:Bind ViewModel.ToggleWindowCommand}">
+                        LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}"
+                        DoubleClickCommand="{Binding ViewModel.ToggleWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Show" Command="{x:Bind ViewModel.ToggleWindowCommand}" />
-                    <MenuFlyoutItem Text="Settings" Command="{x:Bind OpenSettingsCommand}" />
+                    <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}" />
+                    <MenuFlyoutItem Text="Settings" Command="{Binding OpenSettingsCommand}" />
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Exit" Command="{x:Bind ExitCommand}" />
+                    <MenuFlyoutItem Text="Exit" Command="{Binding ExitCommand}" />
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
@@ -34,7 +34,7 @@
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
-                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5">
                 <SymbolIcon.RenderTransform>
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
@@ -48,7 +48,7 @@
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"/>
             <Button Content="Open Shortcuts Folder"
-                    Command="{x:Bind ViewModel.OpenShortcutsFolderCommand}"
+                    Command="{Binding ViewModel.OpenShortcutsFolderCommand}"
                     HorizontalAlignment="Center"
                     Style="{ThemeResource AccentButtonStyle}"
                     Margin="0,8,0,0" />
