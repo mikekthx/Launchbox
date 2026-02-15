@@ -21,7 +21,7 @@ public class WinUILauncher : IAppLauncher
 
         try
         {
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            using var process = Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
         }
         catch (Exception ex)
         {
@@ -35,7 +35,7 @@ public class WinUILauncher : IAppLauncher
         {
             try
             {
-                Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                using var process = Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             }
             catch (Exception ex)
             {
