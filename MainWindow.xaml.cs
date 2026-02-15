@@ -53,7 +53,7 @@ public sealed partial class MainWindow : Window
         ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
 
         this.InitializeComponent();
-        this.DataContext = this;
+        RootGrid.DataContext = this;
 
         UpdateSystemBackdrop();
 
