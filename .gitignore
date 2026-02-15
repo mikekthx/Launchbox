@@ -493,3 +493,4 @@ $RECYCLE.BIN/
 omnisharp.json
 *.slnx
 nul
+SigningCertificate_Encoded.txt
