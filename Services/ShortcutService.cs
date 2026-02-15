@@ -21,7 +21,7 @@ public class ShortcutService
         }
 
         return _fileSystem.GetFiles(folderPath)
-            .Where(f => allowedExtensions.Contains(Path.GetExtension(f).ToLowerInvariant()))
+            .Where(f => allowedExtensions.Contains(Path.GetExtension(f) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
             .OrderBy(f => Path.GetFileName(f))
             .ToArray();
     }
