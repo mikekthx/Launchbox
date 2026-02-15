@@ -16,19 +16,6 @@
             <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </Grid.Resources>
 
-        <tb:TaskbarIcon x:Name="TrayIcon"
-                        ToolTipText="Launchbox (Alt+S)"
-                        IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png">
-            <tb:TaskbarIcon.ContextFlyout>
-                <MenuFlyout>
-                    <MenuFlyoutItem x:Name="ShowMenuItem" Text="Show" />
-                    <MenuFlyoutItem x:Name="SettingsMenuItem" Text="Settings" />
-                    <MenuFlyoutSeparator />
-                    <MenuFlyoutItem x:Name="ExitMenuItem" Text="Exit" />
-                </MenuFlyout>
-            </tb:TaskbarIcon.ContextFlyout>
-        </tb:TaskbarIcon>
-
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
