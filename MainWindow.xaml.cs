@@ -60,6 +60,13 @@ public sealed partial class MainWindow : Window
         ExitCommand = new SimpleCommand(ExitApplication);
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
 
+        // Assign TaskbarIcon commands manually to avoid XAML binding issues with out-of-tree elements
+        TrayIcon.LeftClickCommand = ViewModel.ToggleWindowCommand;
+        TrayIcon.DoubleClickCommand = ViewModel.ToggleWindowCommand;
+        ShowMenuItem.Command = ViewModel.ToggleWindowCommand;
+        SettingsMenuItem.Command = OpenSettingsCommand;
+        ExitMenuItem.Command = ExitCommand;
+
         // 1. WINDOW SETUP
         _windowService.Initialize();
 

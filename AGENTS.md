@@ -130,7 +130,7 @@ Use section comments in large files:
 - 4-space indentation
 - Multi-line attributes for complex elements
 - Use `x:Bind` (compiled bindings) for simple properties. For dynamic types (e.g. `AppItem.Icon`), use `x:Bind` with a cast: `{x:Bind (media:ImageSource)Icon}`.
-- When adding commands or variables to out-of-tree UI elements (such as TaskbarIcon, ContextFlyout, or MenuFlyout), always use standard {Binding} instead of {x:Bind} to avoid CS1503 casting errors during compilation. Ensure `RootGrid.DataContext = this;` (or the specific element's DataContext) is set in the code-behind, as WinUI 3 `Window` does not have a `DataContext` property.
+- When adding commands or variables to out-of-tree UI elements (such as TaskbarIcon, ContextFlyout, or MenuFlyout), avoid using {x:Bind} or {Binding} in XAML as they can cause CS1503 casting errors during compilation. Instead, assign `x:Name` to the elements and set their properties (like `Command`) in the code-behind constructor.
 - Semantic names: `RootGrid`, `AppGrid`, `TrayIcon`
 
 ## WinUI 3 Patterns

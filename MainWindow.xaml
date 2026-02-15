@@ -18,15 +18,13 @@
 
         <tb:TaskbarIcon x:Name="TrayIcon"
                         ToolTipText="Launchbox (Alt+S)"
-                        IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
-                        LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}"
-                        DoubleClickCommand="{Binding ViewModel.ToggleWindowCommand}">
+                        IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}" />
-                    <MenuFlyoutItem Text="Settings" Command="{Binding OpenSettingsCommand}" />
+                    <MenuFlyoutItem x:Name="ShowMenuItem" Text="Show" />
+                    <MenuFlyoutItem x:Name="SettingsMenuItem" Text="Settings" />
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Exit" Command="{Binding ExitCommand}" />
+                    <MenuFlyoutItem x:Name="ExitMenuItem" Text="Exit" />
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
