@@ -38,6 +38,25 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
+    # Cache NuGet packages to speed up future builds
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    # Cache MSBuild intermediate files for incremental builds
+    - name: Cache MSBuild obj folders
+      uses: actions/cache@v4
+      with:
+        path: '**/obj'
+        # The key includes the matrix configuration so Debug and Release don't mix
+        key: ${{ runner.os }}-obj-${{ matrix.configuration }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-obj-${{ matrix.configuration }}-
+
     # Execute all unit tests in the specific test project
     - name: Execute unit tests
       run: dotnet test $env:Test_Project_Path
