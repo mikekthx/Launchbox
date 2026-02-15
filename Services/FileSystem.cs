@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,8 +14,27 @@ public class FileSystem : IFileSystem
 
     public string GetIniValue(string path, string section, string key)
     {
-        var sb = new StringBuilder(255);
-        NativeMethods.GetPrivateProfileString(section, key, "", sb, 255, path);
+        // Start with a reasonable buffer size to minimize reallocations
+        int capacity = 512;
+        var sb = new StringBuilder(capacity);
+        int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, sb, capacity, path);
+
+        // Check for truncation. GetPrivateProfileString returns size - 1 (or sometimes size - 2)
+        // if the buffer was too small. We loop to double the buffer size until it fits.
+        while (ret >= capacity - 2)
+        {
+            capacity *= 2;
+            if (capacity > 65536)
+            {
+                // Safety limit to prevent infinite allocation.
+                // If it's larger than 64KB, we accept truncation.
+                break;
+            }
+
+            sb = new StringBuilder(capacity);
+            ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, sb, capacity, path);
+        }
+
         return sb.ToString();
     }
 

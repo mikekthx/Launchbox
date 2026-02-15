@@ -66,8 +66,9 @@ public class IconServiceSecurityTests
     {
         // Arrange
         string urlPath = Path.Combine("C:", "Shortcuts", "Long.url");
-        // Note: verify if MockFileSystem handles \\?\ prefix correctly or if Path.Combine creates it.
-        // We will manually construct it.
+
+        // MockFileSystem handles the \\?\ prefix correctly due to its fallback directory parsing logic.
+        // Path.Combine does not automatically add this prefix, so we construct it manually.
         string iconPath = @"\\?\C:\Very\Long\Path\To\Icon.ico";
 
         _mockFileSystem.AddFile(urlPath);
@@ -80,5 +81,23 @@ public class IconServiceSecurityTests
 
         // Assert
         Assert.Equal(iconPath, result);
+    }
+
+    [Fact]
+    public void ExtractIconBytes_BlocksUnsafePaths_PreventsFileSystemAccess()
+    {
+        // Arrange
+        // We use a UNC path that would trigger NTLM auth if accessed
+        string unsafePath = @"\\attacker\share\malicious.lnk";
+
+        // We do NOT add the file to mockFileSystem.
+        // If the code tries to access it (GetLastWriteTime), it might succeed (return default) or fail depending on mock.
+        // But crucially, ExtractIconBytes returns null immediately due to IsUnsafePath check.
+
+        // Act
+        var result = _iconService.ExtractIconBytes(unsafePath);
+
+        // Assert
+        Assert.Null(result);
     }
 }

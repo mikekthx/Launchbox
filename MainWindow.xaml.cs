@@ -21,6 +21,10 @@ public sealed partial class MainWindow : Window
     private readonly IFilePickerService _filePickerService;
     private SettingsWindow? _settingsWindow;
 
+    private DateTime _lastBackdropCheck = DateTime.MinValue;
+    private bool _isDwmBlurGlassRunning = false;
+    private static readonly TimeSpan BackdropCheckInterval = TimeSpan.FromSeconds(60);
+
     // Window dragging state
     private bool _isDraggingWindow = false;
     private Windows.Graphics.PointInt32 _dragStartWindowPos;
@@ -160,14 +164,18 @@ public sealed partial class MainWindow : Window
     {
         try
         {
-            var processes = Process.GetProcessesByName("DWMBlurGlass");
-            bool isRunning = processes.Length > 0;
-            foreach (var p in processes)
+            if (DateTime.Now - _lastBackdropCheck >= BackdropCheckInterval)
             {
-                p.Dispose();
+                _lastBackdropCheck = DateTime.Now;
+                var processes = Process.GetProcessesByName("DWMBlurGlass");
+                _isDwmBlurGlassRunning = processes.Length > 0;
+                foreach (var p in processes)
+                {
+                    p.Dispose();
+                }
             }
 
-            if (isRunning)
+            if (_isDwmBlurGlassRunning)
             {
                 // DWMBlurGlass detected, disable system backdrop to let it handle transparency
                 if (this.SystemBackdrop != null)
