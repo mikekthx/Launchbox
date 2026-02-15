@@ -18,8 +18,8 @@ jobs:
 
     env:
       Solution_Name: Launchbox.sln
-      Project_Directory: Launchbox
-      Project_Path: Launchbox\Launchbox.csproj
+      Project_Directory: .
+      Project_Path: Launchbox.csproj
       Test_Project_Path: Launchbox.Tests\Launchbox.Tests.csproj
 
     steps:
