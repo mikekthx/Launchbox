@@ -129,7 +129,7 @@ Use section comments in large files:
 ### XAML
 - 4-space indentation
 - Multi-line attributes for complex elements
-- Use `x:Bind` (compiled bindings) for simple properties, or `{Binding}` for dynamic types (e.g. `AppItem.Icon`)
+- Use `x:Bind` (compiled bindings) for simple properties. For dynamic types (e.g. `AppItem.Icon`), use `x:Bind` with a cast: `{x:Bind (media:ImageSource)Icon}`.
 - Semantic names: `RootGrid`, `AppGrid`, `TrayIcon`
 
 ## WinUI 3 Patterns
