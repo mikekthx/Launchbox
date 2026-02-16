@@ -248,6 +248,7 @@ public sealed partial class MainWindow : Window
     {
         _windowService.Cleanup();
         TrayIcon?.Dispose();
+        ViewModel?.Dispose();
     }
 
     private void AppGrid_ItemClick(object sender, ItemClickEventArgs e)

@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 
 namespace Launchbox.ViewModels;
 
-public class MainViewModel : INotifyPropertyChanged
+public class MainViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly ShortcutService _shortcutService;
     private readonly IconService _iconService;
@@ -169,5 +169,14 @@ public class MainViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void Dispose()
+    {
+        if (_settingsService != null)
+        {
+            _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
+        }
+        GC.SuppressFinalize(this);
     }
 }

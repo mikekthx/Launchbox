@@ -9,6 +9,14 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+        this.UnhandledException += App_UnhandledException;
+    }
+
+    private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        System.Diagnostics.Trace.WriteLine($"UNHANDLED EXCEPTION: {e.Exception}");
+        // Prevent crash if possible, though for WinUI 3 unhandled exceptions often terminate anyway
+        // e.Handled = true;
     }
 
     protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
