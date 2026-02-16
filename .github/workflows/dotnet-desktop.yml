@@ -25,6 +25,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Enable Windows Long Paths
+        run: Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
+
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
@@ -51,7 +54,7 @@ jobs:
         run: msbuild $env:Solution_Name /t:Restore /p:Configuration=Debug
 
       - name: Build the application for CodeQL
-        run: msbuild $env:Solution_Name /p:Configuration=Debug /p:EmitCompilerGeneratedFiles=true
+        run: msbuild $env:Solution_Name /p:Configuration=Debug /p:EmitCompilerGeneratedFiles=true /p:CompilerGeneratedFilesOutputPath=obj\Gen
 
       - name: Perform Analysis
         uses: github/codeql-action/analyze@v4
