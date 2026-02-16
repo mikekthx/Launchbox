@@ -118,7 +118,7 @@ public class IconServiceSecurityTests
         // Assert
         // We verify that GetIniValue was NOT called for the unsafe path.
         // The mock logs "GetIniValue: {path}"
-        Assert.False(_mockFileSystem.OperationsLog.Any(op => op.Contains(unsafePath)));
+        Assert.DoesNotContain(op => op.Contains(unsafePath), _mockFileSystem.OperationsLog);
 
         // It should return the path itself (as it failed to resolve or was blocked)
         Assert.Equal(unsafePath, result);
