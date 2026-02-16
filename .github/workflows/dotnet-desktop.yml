@@ -109,7 +109,8 @@ jobs:
         name: MSIX Package - ${{ matrix.configuration }}
         path: ${{ env.Project_Directory }}\AppPackages
 
+    # Generate the unforgeable birth certificate for the installer
     - name: Generate artifact attestation
       uses: actions/attest-build-provenance@v3
       with:
-        subject-path: AppPackages/**/*.msix
+        subject-path: AppPackages/**/*.msi*
