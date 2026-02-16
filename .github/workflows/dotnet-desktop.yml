@@ -164,7 +164,7 @@ jobs:
     # Upload the MSIX package
     - name: Upload build artifacts
       if: github.event_name != 'pull_request'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: MSIX Package - ${{ matrix.configuration }}
         path: ${{ env.Project_Directory }}\AppPackages
