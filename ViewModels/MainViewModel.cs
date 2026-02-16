@@ -13,7 +13,7 @@ using System.Runtime.CompilerServices;
 
 namespace Launchbox.ViewModels;
 
-public class MainViewModel : INotifyPropertyChanged
+public class MainViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly ShortcutService _shortcutService;
     private readonly IconService _iconService;
@@ -24,7 +24,7 @@ public class MainViewModel : INotifyPropertyChanged
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
 
-    public ObservableCollection<AppItem> Apps { get; } = new();
+    public ObservableCollection<AppItem> Apps { get; } = [];
 
     private bool _isEmpty;
     public bool IsEmpty
@@ -83,59 +83,66 @@ public class MainViewModel : INotifyPropertyChanged
 
     public async Task LoadAppsAsync()
     {
-        var shortcutFolder = _settingsService.ShortcutsPath;
-        var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS));
-
-        var localAppItems = new List<AppItem>();
-
-        if (files != null)
+        try
         {
-            foreach (var file in files)
+            var shortcutFolder = _settingsService.ShortcutsPath;
+            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS));
+
+            var localAppItems = new List<AppItem>();
+
+            if (files != null)
+            {
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var name = Path.GetFileNameWithoutExtension(file);
+                        var appItem = new AppItem { Name = name, Path = file };
+                        localAppItems.Add(appItem);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine($"Failed to load app {file}: {ex.Message}");
+                    }
+                }
+            }
+            else
+            {
+                Trace.WriteLine($"Shortcut folder not found: {shortcutFolder}");
+            }
+
+            await _dispatcher.EnqueueAsync(() =>
+            {
+                Apps.Clear();
+                foreach (var item in localAppItems) Apps.Add(item);
+                IsEmpty = Apps.Count == 0;
+                return Task.CompletedTask;
+            });
+
+            await Parallel.ForEachAsync(localAppItems, async (item, ct) =>
             {
                 try
                 {
-                    var name = Path.GetFileNameWithoutExtension(file);
-                    var appItem = new AppItem { Name = name, Path = file };
-                    localAppItems.Add(appItem);
+                    var iconBytes = _iconService.ExtractIconBytes(item.Path);
+                    if (iconBytes != null)
+                    {
+                        await _dispatcher.EnqueueAsync(async () =>
+                        {
+                            var image = await _imageFactory.CreateImageAsync(iconBytes);
+                            item.Icon = image;
+                        });
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine($"Failed to load app {file}: {ex.Message}");
+                    Trace.WriteLine($"Failed to load icon for {item.Path}: {ex.Message}");
                 }
-            }
+            });
         }
-        else
+        catch (Exception ex)
         {
-            Trace.WriteLine($"Shortcut folder not found: {shortcutFolder}");
+            Trace.WriteLine($"Unexpected error in LoadAppsAsync: {ex}");
         }
-
-        await _dispatcher.EnqueueAsync(() =>
-        {
-            Apps.Clear();
-            foreach (var item in localAppItems) Apps.Add(item);
-            IsEmpty = Apps.Count == 0;
-            return Task.CompletedTask;
-        });
-
-        await Parallel.ForEachAsync(localAppItems, async (item, ct) =>
-        {
-            try
-            {
-                var iconBytes = _iconService.ExtractIconBytes(item.Path);
-                if (iconBytes != null)
-                {
-                    await _dispatcher.EnqueueAsync(async () =>
-                    {
-                        var image = await _imageFactory.CreateImageAsync(iconBytes);
-                        item.Icon = image;
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to load icon for {item.Path}: {ex.Message}");
-            }
-        });
     }
 
     private void LaunchApp(object? parameter)
@@ -162,5 +169,14 @@ public class MainViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void Dispose()
+    {
+        if (_settingsService != null)
+        {
+            _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
+        }
+        GC.SuppressFinalize(this);
     }
 }

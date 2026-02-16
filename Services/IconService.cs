@@ -9,21 +9,16 @@ using WinIcon = System.Drawing.Icon;
 
 namespace Launchbox.Services;
 
-public class IconService
+public class IconService(IFileSystem fileSystem)
 {
-    private readonly IFileSystem _fileSystem;
-    private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = new();
-
-    public IconService(IFileSystem fileSystem)
-    {
-        _fileSystem = fileSystem;
-    }
+    private readonly IFileSystem _fileSystem = fileSystem;
+    private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
 
     public string ResolveIconPath(string path)
     {
         if (path.EndsWith(".url", StringComparison.OrdinalIgnoreCase))
         {
-            string iconFile = _fileSystem.GetIniValue(path, "InternetShortcut", "IconFile");
+            string iconFile = _fileSystem.GetIniValue(path, Constants.INTERNET_SHORTCUT_SECTION, Constants.ICON_FILE_KEY);
 
             if (IsUnsafePath(iconFile))
             {
@@ -111,7 +106,7 @@ public class IconService
 
         if (!string.IsNullOrEmpty(directory))
         {
-            string iconsDir = Path.Combine(directory, ".icons");
+            string iconsDir = Path.Combine(directory, Constants.ICONS_DIR);
 
             // Optimization: Check if .icons directory exists before checking for individual files
             // This significantly reduces syscalls (checking 1 directory vs 2 potentially missing files)

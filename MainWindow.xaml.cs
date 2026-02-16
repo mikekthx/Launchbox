@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Launchbox;
 
@@ -87,6 +88,7 @@ public sealed partial class MainWindow : Window
 
         // 5. EVENT HOOKS
         this.Activated += MainWindow_Activated;
+        this.Closed += MainWindow_Closed;
 
         // 6. LOAD APPS
         AppGrid.ItemsSource = ViewModel.Apps;
@@ -161,19 +163,32 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void UpdateSystemBackdrop()
+    private async void UpdateSystemBackdrop()
     {
         try
         {
             if (DateTime.Now - _lastBackdropCheck >= BackdropCheckInterval)
             {
                 _lastBackdropCheck = DateTime.Now;
-                var processes = Process.GetProcessesByName("DWMBlurGlass");
-                _isDwmBlurGlassRunning = processes.Length > 0;
-                foreach (var p in processes)
+                _isDwmBlurGlassRunning = await Task.Run(() =>
                 {
-                    p.Dispose();
-                }
+                    try
+                    {
+                        var processes = Process.GetProcessesByName(Constants.DWM_BLUR_GLASS_PROCESS_NAME);
+                        try
+                        {
+                            return processes.Length > 0;
+                        }
+                        finally
+                        {
+                            foreach (var p in processes) p.Dispose();
+                        }
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                });
             }
 
             if (_isDwmBlurGlassRunning)
@@ -226,9 +241,14 @@ public sealed partial class MainWindow : Window
 
     private void ExitApplication()
     {
+        this.Close();
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
         _windowService.Cleanup();
         TrayIcon?.Dispose();
-        this.Close();
+        ViewModel?.Dispose();
     }
 
     private void AppGrid_ItemClick(object sender, ItemClickEventArgs e)
