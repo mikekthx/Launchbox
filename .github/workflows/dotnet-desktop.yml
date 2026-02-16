@@ -6,7 +6,30 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+  security-events: write
+  checks: write
+
 jobs:
+
+  analyze:
+    name: Security Scan (CodeQL)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: csharp
+
+      - name: Perform Analysis
+        uses: github/codeql-action/analyze@v3
 
   build:
 
@@ -15,12 +38,6 @@ jobs:
         configuration: [Debug, Release]
 
     runs-on: windows-latest
-
-    permissions:
-      id-token: write
-      attestations: write
-      artifact-metadata: write
-      contents: read
 
     env:
       Solution_Name: Launchbox.sln
@@ -43,6 +60,10 @@ jobs:
     # Add MSBuild to the PATH
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
+	
+    # Check if the code follows your style rules
+    - name: Verify Code Format
+      run: dotnet format --verify-no-changes --verbosity minimal
 
     # Cache NuGet packages to speed up future builds
     - name: Cache NuGet packages
@@ -58,14 +79,22 @@ jobs:
       uses: actions/cache@v4
       with:
         path: '**/obj'
-        # The key includes the matrix configuration so Debug and Release don't mix
         key: ${{ runner.os }}-obj-${{ matrix.configuration }}-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-obj-${{ matrix.configuration }}-
 
     # Execute all unit tests in the specific test project
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path
+      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx"
+
+    # Turn that TRX file into a beautiful UI report in GitHub
+    - name: Publish Test Report
+      uses: dorny/test-reporter@v2
+      if: always()
+      with:
+        name: Unit Test Results (${{ matrix.configuration }})
+        path: "**/test-results.trx"
+        reporter: dotnet-trx
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
@@ -79,14 +108,8 @@ jobs:
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
         $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-
-        # Securely read the password
         $pwd = ConvertTo-SecureString -String "${{ secrets.Pfx_Key }}" -Force -AsPlainText
-        
-        # Import to the Personal store (Fixes APPX0105)
         $cert = Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $pwd
-
-        # Save the certificate thumbprint to the runner's environment variables
         echo "CERT_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
 
     # Create the app package by building and packaging the single-project MSIX
