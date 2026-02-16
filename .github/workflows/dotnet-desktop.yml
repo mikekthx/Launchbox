@@ -19,6 +19,8 @@ jobs:
   analyze:
     name: Security Scan (CodeQL)
     runs-on: windows-latest
+    env:
+      Solution_Name: Launchbox.sln
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,8 +30,27 @@ jobs:
         with:
           languages: csharp
 
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v4
+      - name: Install .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup MSBuild.exe
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore the application
+        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=Debug
+
+      - name: Build the application for CodeQL
+        run: msbuild $env:Solution_Name /p:Configuration=Debug
 
       - name: Perform Analysis
         uses: github/codeql-action/analyze@v4
