@@ -66,7 +66,7 @@ jobs:
 
     # Check if the code follows your style rules
     - name: Verify Code Format
-      run: dotnet format --verify-no-changes --verbosity minimal
+      run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
 
     # Cache NuGet packages to speed up future builds
     - name: Cache NuGet packages
