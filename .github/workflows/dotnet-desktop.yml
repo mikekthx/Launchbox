@@ -137,6 +137,7 @@ jobs:
 
     # Decode and install the base 64 encoded pfx
     - name: Decode and install the pfx
+      if: github.event_name != 'pull_request'
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
         $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
@@ -147,6 +148,7 @@ jobs:
 
     # Create the app package by building and packaging the single-project MSIX
     - name: Create the app package
+      if: github.event_name != 'pull_request'
       run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:GenerateAppxPackageOnBuild=true /p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT /p:NoWarn=APPX0107
       env:
         Appx_Bundle: Always
@@ -156,10 +158,12 @@ jobs:
 
     # Remove the pfx
     - name: Remove the pfx
+      if: github.event_name != 'pull_request'
       run: Remove-Item -path $env:Project_Directory\GitHubActionsWorkflow.pfx
 
     # Upload the MSIX package
     - name: Upload build artifacts
+      if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: MSIX Package - ${{ matrix.configuration }}
@@ -167,6 +171,7 @@ jobs:
 
     # Generate the unforgeable birth certificate for the installer
     - name: Generate artifact attestation
+      if: github.event_name != 'pull_request'
       uses: actions/attest-build-provenance@v3
       with:
         subject-path: AppPackages/**/*.msi*
