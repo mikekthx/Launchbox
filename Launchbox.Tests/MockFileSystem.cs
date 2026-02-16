@@ -33,11 +33,11 @@ public class MockFileSystem : IFileSystem
         // On non-Windows, Path.GetDirectoryName might fail for Windows paths using backslashes
         if (string.IsNullOrEmpty(directory) && fullPath.Contains('\\'))
         {
-             int lastSeparator = fullPath.LastIndexOf('\\');
-             if (lastSeparator > 0)
-             {
-                 directory = fullPath.Substring(0, lastSeparator);
-             }
+            int lastSeparator = fullPath.LastIndexOf('\\');
+            if (lastSeparator > 0)
+            {
+                directory = fullPath.Substring(0, lastSeparator);
+            }
         }
 
         if (string.IsNullOrEmpty(directory)) return;

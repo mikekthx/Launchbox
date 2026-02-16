@@ -111,19 +111,19 @@ public class IconService
 
         if (!string.IsNullOrEmpty(directory))
         {
-             string iconsDir = Path.Combine(directory, ".icons");
+            string iconsDir = Path.Combine(directory, ".icons");
 
-             // Optimization: Check if .icons directory exists before checking for individual files
-             // This significantly reduces syscalls (checking 1 directory vs 2 potentially missing files)
-             if (_fileSystem.DirectoryExists(iconsDir))
-             {
-                 pngPath = Path.Combine(iconsDir, name + ".png");
-                 icoPath = Path.Combine(iconsDir, name + ".ico");
+            // Optimization: Check if .icons directory exists before checking for individual files
+            // This significantly reduces syscalls (checking 1 directory vs 2 potentially missing files)
+            if (_fileSystem.DirectoryExists(iconsDir))
+            {
+                pngPath = Path.Combine(iconsDir, name + ".png");
+                icoPath = Path.Combine(iconsDir, name + ".ico");
 
-                 // Optimization: GetLastWriteTime returns 1601 date if file missing, avoiding extra FileExists check
-                 pngTime = _fileSystem.GetLastWriteTime(pngPath);
-                 icoTime = _fileSystem.GetLastWriteTime(icoPath);
-             }
+                // Optimization: GetLastWriteTime returns 1601 date if file missing, avoiding extra FileExists check
+                pngTime = _fileSystem.GetLastWriteTime(pngPath);
+                icoTime = _fileSystem.GetLastWriteTime(icoPath);
+            }
         }
 
         // 2. Check Cache
@@ -149,7 +149,7 @@ public class IconService
         // 3b. If no custom icon, Try System Icon
         if (iconBytes == null)
         {
-             iconBytes = ExtractSystemIcon(path);
+            iconBytes = ExtractSystemIcon(path);
         }
 
         // 4. Update Cache

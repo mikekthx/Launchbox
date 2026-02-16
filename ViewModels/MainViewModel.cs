@@ -111,10 +111,10 @@ public class MainViewModel : INotifyPropertyChanged
 
         await _dispatcher.EnqueueAsync(() =>
         {
-             Apps.Clear();
-             foreach(var item in localAppItems) Apps.Add(item);
-             IsEmpty = Apps.Count == 0;
-             return Task.CompletedTask;
+            Apps.Clear();
+            foreach (var item in localAppItems) Apps.Add(item);
+            IsEmpty = Apps.Count == 0;
+            return Task.CompletedTask;
         });
 
         await Parallel.ForEachAsync(localAppItems, async (item, ct) =>

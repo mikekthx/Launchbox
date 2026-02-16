@@ -92,7 +92,7 @@ public sealed partial class MainWindow : Window
         AppGrid.ItemsSource = ViewModel.Apps;
         if (ViewModel.LoadAppsCommand.CanExecute(null))
         {
-             ViewModel.LoadAppsCommand.Execute(null);
+            ViewModel.LoadAppsCommand.Execute(null);
         }
     }
 
