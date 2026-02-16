@@ -1,6 +1,7 @@
 using Xunit;
 using Launchbox.Services;
 using System.IO;
+using System.Linq;
 
 namespace Launchbox.Tests;
 
@@ -99,5 +100,27 @@ public class IconServiceSecurityTests
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact]
+    public void ResolveIconPath_BlocksUnsafePath_BeforeProcessing()
+    {
+        // Arrange
+        // We use a UNC path that represents a potential NTLM leak vector
+        string unsafePath = @"\\attacker\share\malicious.url";
+
+        // Act
+        // We call ResolveIconPath with the unsafe path directly.
+        // Before the fix, this will call GetIniValue (and thus GetPrivateProfileString), potentially leaking credentials.
+        // After the fix, it should return immediately.
+        string result = _iconService.ResolveIconPath(unsafePath);
+
+        // Assert
+        // We verify that GetIniValue was NOT called for the unsafe path.
+        // The mock logs "GetIniValue: {path}"
+        Assert.False(_mockFileSystem.OperationsLog.Any(op => op.Contains(unsafePath)));
+
+        // It should return the path itself (as it failed to resolve or was blocked)
+        Assert.Equal(unsafePath, result);
     }
 }

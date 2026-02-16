@@ -15,6 +15,8 @@ public class MockFileSystem : IFileSystem
     private readonly Dictionary<string, long> _fileSizes = new();
     private readonly Dictionary<string, DateTime> _fileTimes = new();
 
+    public List<string> OperationsLog { get; } = new();
+
     public void AddDirectory(string path)
     {
         _directories.Add(path);
@@ -95,6 +97,7 @@ public class MockFileSystem : IFileSystem
 
     public string GetIniValue(string path, string section, string key)
     {
+        OperationsLog.Add($"GetIniValue: {path}");
         if (_iniValues.TryGetValue($"{path}|{section}|{key}", out var val))
             return val;
         return "";

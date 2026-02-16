@@ -16,6 +16,12 @@ public class IconService(IFileSystem fileSystem)
 
     public string ResolveIconPath(string path)
     {
+        if (IsUnsafePath(path))
+        {
+            Trace.WriteLine($"Blocked resolution for unsafe path: {path}");
+            return path;
+        }
+
         if (path.EndsWith(".url", StringComparison.OrdinalIgnoreCase))
         {
             string iconFile = _fileSystem.GetIniValue(path, Constants.INTERNET_SHORTCUT_SECTION, Constants.ICON_FILE_KEY);
