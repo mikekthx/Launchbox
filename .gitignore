@@ -497,3 +497,4 @@ omnisharp.json
 *.slnx
 nul
 SigningCertificate_Encoded.txt
+key.ps1

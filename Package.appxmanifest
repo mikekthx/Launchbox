@@ -9,15 +9,13 @@
   IgnorableNamespaces="uap uap5 rescap">
 
   <Identity
-    Name="7ab4f0a4-3738-4785-9dca-c50b3686f0c3"
-    Publisher="CN=mikekthx"
+    Name="mikekthx.Launchbox"
+    Publisher="CN=9C52BF34-6468-4F21-8977-C3DDEAB78843"
     Version="1.0.0.0" />
-
-  <mp:PhoneIdentity PhoneProductId="7ab4f0a4-3738-4785-9dca-c50b3686f0c3" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Launchbox</DisplayName>
-    <PublisherDisplayName>Mike</PublisherDisplayName>
+    <PublisherDisplayName>mikekthx</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 

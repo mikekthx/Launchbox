@@ -56,12 +56,13 @@
 
   <!-- Publish Properties -->
   <PropertyGroup>
-    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
-    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
-    <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
-    <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
-    <SelfContained Condition="'$(Configuration)' != 'Debug'">true</SelfContained>
-    <PackageCertificateThumbprint>81FD3AC85601A7F785DF8DCAF279B4022D1F98A0</PackageCertificateThumbprint>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+    <PackageCertificateThumbprint>DFD96A970880F317C54EC45259DBCAD34D3CFA4C</PackageCertificateThumbprint>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug'">
+    <PublishReadyToRun>True</PublishReadyToRun>
+    <PublishTrimmed>True</PublishTrimmed>
+    <SelfContained>True</SelfContained>
   </PropertyGroup>
 </Project>
