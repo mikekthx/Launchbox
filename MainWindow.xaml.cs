@@ -20,11 +20,8 @@ public sealed partial class MainWindow : Window
     private readonly WindowService _windowService;
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
+    private readonly IBackdropService _backdropService;
     private SettingsWindow? _settingsWindow;
-
-    private DateTime _lastBackdropCheck = DateTime.MinValue;
-    private bool _isDwmBlurGlassRunning = false;
-    private static readonly TimeSpan BackdropCheckInterval = TimeSpan.FromSeconds(60);
 
     // Window dragging state
     private bool _isDraggingWindow = false;
@@ -52,11 +49,12 @@ public sealed partial class MainWindow : Window
         var launcher = new WinUILauncher();
 
         ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
+        _backdropService = new BackdropService(this);
 
         this.InitializeComponent();
         RootGrid.DataContext = this;
 
-        UpdateSystemBackdrop();
+        _ = _backdropService.UpdateBackdropAsync();
 
         ExitCommand = new SimpleCommand(ExitApplication);
         OpenSettingsCommand = new SimpleCommand(OpenSettings);
@@ -159,63 +157,7 @@ public sealed partial class MainWindow : Window
         // Re-check backdrop on activation in case DWMBlurGlass started after Launchbox
         if (args.WindowActivationState != WindowActivationState.Deactivated)
         {
-            UpdateSystemBackdrop();
-        }
-    }
-
-    private async void UpdateSystemBackdrop()
-    {
-        try
-        {
-            if (DateTime.Now - _lastBackdropCheck >= BackdropCheckInterval)
-            {
-                _lastBackdropCheck = DateTime.Now;
-                _isDwmBlurGlassRunning = await Task.Run(() =>
-                {
-                    try
-                    {
-                        var processes = Process.GetProcessesByName(Constants.DWM_BLUR_GLASS_PROCESS_NAME);
-                        try
-                        {
-                            return processes.Length > 0;
-                        }
-                        finally
-                        {
-                            foreach (var p in processes) p.Dispose();
-                        }
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                });
-            }
-
-            if (_isDwmBlurGlassRunning)
-            {
-                // DWMBlurGlass detected, disable system backdrop to let it handle transparency
-                if (this.SystemBackdrop != null)
-                {
-                    this.SystemBackdrop = null;
-                }
-            }
-            else
-            {
-                // Default behavior
-                if (this.SystemBackdrop is not DesktopAcrylicBackdrop)
-                {
-                    this.SystemBackdrop = new DesktopAcrylicBackdrop();
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error checking for DWMBlurGlass: {ex.Message}");
-            // Fallback to default
-            if (this.SystemBackdrop is not DesktopAcrylicBackdrop)
-            {
-                this.SystemBackdrop = new DesktopAcrylicBackdrop();
-            }
+            _ = _backdropService.UpdateBackdropAsync();
         }
     }
 
