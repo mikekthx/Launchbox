@@ -14,7 +14,9 @@ public static class IconHelper
         try
         {
             var image = new BitmapImage();
-            using var stream = new MemoryStream(imageBytes);
+            // Do NOT use 'using' here. The MemoryStream must remain open for the lifetime of the BitmapImage.
+            // Since MemoryStream over a byte array holds no unmanaged resources, let GC handle it.
+            var stream = new MemoryStream(imageBytes);
             await image.SetSourceAsync(stream.AsRandomAccessStream());
             return image;
         }
