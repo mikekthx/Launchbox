@@ -43,7 +43,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: Cache NuGet packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -100,7 +100,7 @@ jobs:
 
     # Cache NuGet packages to speed up future builds
     - name: Cache NuGet packages
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -109,7 +109,7 @@ jobs:
 
     # Cache MSBuild intermediate files for incremental builds
     - name: Cache MSBuild obj folders
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: '**/obj'
         key: ${{ runner.os }}-obj-${{ matrix.configuration }}-${{ github.sha }}
