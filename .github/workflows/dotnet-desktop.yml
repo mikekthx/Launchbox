@@ -60,7 +60,7 @@ jobs:
     # Add MSBuild to the PATH
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
-	
+
     # Check if the code follows your style rules
     - name: Verify Code Format
       run: dotnet format --verify-no-changes --verbosity minimal
