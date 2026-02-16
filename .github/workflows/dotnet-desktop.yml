@@ -59,7 +59,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "obj\Gen\WinRT.SourceGenerator\Generator.WinRTSourceGenerator"
 
       - name: Build the application for CodeQL
-        run: msbuild $env:Solution_Name /p:Configuration=Debug /p:EmitCompilerGeneratedFiles=true /p:CompilerGeneratedFilesOutputPath=obj\Gen
+        run: msbuild $env:Solution_Name /p:Configuration=Debug /p:EmitCompilerGeneratedFiles=true /p:CompilerGeneratedFilesOutputPath=obj\Gen /p:AppxPackageSigningEnabled=false
 
       - name: Perform Analysis
         uses: github/codeql-action/analyze@v4
