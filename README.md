@@ -2,9 +2,9 @@
 
 Launchbox is a modern, lightweight Windows desktop application launcher built with **WinUI 3** and **.NET 8**. It integrates seamlessly with your system tray, providing instant access to your favorite shortcuts with a global hotkey.
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/yourusername/Launchbox/actions)
-[![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen)](https://github.com/yourusername/Launchbox/security/code-scanning)
-[![Dependabot](https://img.shields.io/badge/Dependabot-Active-blue)](https://github.com/yourusername/Launchbox/network/dependencies)
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/mikekthx/Launchbox/actions)
+[![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen)](https://github.com/mikekthx/Launchbox/security/code-scanning)
+[![Dependabot](https://img.shields.io/badge/Dependabot-Active-blue)](https://github.com/mikekthx/Launchbox/network/dependencies)
 
 ## Features
 
@@ -13,6 +13,7 @@ Launchbox is a modern, lightweight Windows desktop application launcher built wi
 - **📂 Shortcut Management**: Automatically reads shortcuts from your `Desktop\Shortcuts` folder.
 - **🎨 Modern UI**: Built with WinUI 3 for a native Windows 11 look and feel.
 - **🔗 Support for Various Shortcuts**: Handles standard Application shortcuts (`.lnk`) and Internet shortcuts (`.url`).
+- **🖼️ Custom Icons**: Supports custom icons (`.ico`, `.png`) for your shortcuts.
 
 ## Screenshots
 
@@ -22,7 +23,7 @@ Launchbox is a modern, lightweight Windows desktop application launcher built wi
 
 Launchbox is distributed as a packaged **MSIX** installer.
 
-1.  Download the latest release from the [Releases](https://github.com/yourusername/Launchbox/releases) page.
+1.  Download the latest release from the [Releases](https://github.com/mikekthx/Launchbox/releases) page.
 2.  Double-click the `.msix` file to install.
 3.  Once installed, Launchbox will start automatically.
 
@@ -42,7 +43,7 @@ To build and run Launchbox locally, follow these steps:
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/yourusername/Launchbox.git
+    git clone https://github.com/mikekthx/Launchbox.git
     cd Launchbox
     ```
 
@@ -64,7 +65,7 @@ To build and run Launchbox locally, follow these steps:
 
 ## Contributing
 
-We welcome contributions! Please follow these guidelines:
+I welcome any contributions! Please follow these guidelines:
 
 1.  **Fork** the repository and create a new branch for your feature or bugfix.
 2.  Ensure your code adheres to the project's coding standards. We enforce `dotnet format` in our CI pipeline.
