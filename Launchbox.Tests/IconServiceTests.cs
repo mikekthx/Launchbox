@@ -221,4 +221,35 @@ public class IconServiceTests
         var result2 = _iconService.ExtractIconBytes(shortcutPath);
         Assert.Equal(pngBytes, result2);
     }
+
+    [Fact]
+    public void PruneCache_RemovesUnusedEntries_ReturnsCount()
+    {
+        string shortcutPath1 = Path.Combine("C:", "Shortcuts", "App1.lnk");
+        string shortcutPath2 = Path.Combine("C:", "Shortcuts", "App2.lnk");
+        string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
+        string pngPath1 = Path.Combine(iconsDir, "App1.png");
+        string pngPath2 = Path.Combine(iconsDir, "App2.png");
+
+        _mockFileSystem.AddFile(shortcutPath1);
+        _mockFileSystem.AddFile(shortcutPath2);
+        _mockFileSystem.AddDirectory(iconsDir);
+        // Mock custom icons to avoid NativeMethods P/Invoke on Linux
+        _mockFileSystem.AddFile(pngPath1, content: new byte[] { 1 });
+        _mockFileSystem.AddFile(pngPath2, content: new byte[] { 2 });
+
+        // Populate cache
+        _iconService.ExtractIconBytes(shortcutPath1);
+        _iconService.ExtractIconBytes(shortcutPath2);
+
+        // Prune shortcutPath2 (keep shortcutPath1)
+        var activePaths = new[] { shortcutPath1 };
+        int removedCount = _iconService.PruneCache(activePaths);
+
+        Assert.Equal(1, removedCount);
+
+        // Verify removing everything
+        removedCount = _iconService.PruneCache(System.Array.Empty<string>());
+        Assert.Equal(1, removedCount);
+    }
 }
