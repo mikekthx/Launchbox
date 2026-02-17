@@ -12,6 +12,12 @@ public class WinUILauncher : IAppLauncher
 
     public void Launch(string path)
     {
+        if (PathSecurity.IsUnsafePath(path))
+        {
+            Trace.WriteLine($"Blocked execution of unsafe file: {path}");
+            return;
+        }
+
         string extension = Path.GetExtension(path).ToLowerInvariant();
         if (!ALLOWED_EXTENSIONS.Contains(extension))
         {
@@ -31,6 +37,12 @@ public class WinUILauncher : IAppLauncher
 
     public void OpenFolder(string path)
     {
+        if (PathSecurity.IsUnsafePath(path))
+        {
+            Trace.WriteLine($"Blocked opening of unsafe folder: {path}");
+            return;
+        }
+
         if (Directory.Exists(path))
         {
             try
