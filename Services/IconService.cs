@@ -1,5 +1,6 @@
 using Launchbox.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Collections.Concurrent;
@@ -13,6 +14,24 @@ public class IconService(IFileSystem fileSystem)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
+
+    public int PruneCache(IEnumerable<string> activePaths)
+    {
+        var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
+        int removedCount = 0;
+
+        foreach (var key in _iconCache.Keys)
+        {
+            if (!activeSet.Contains(key))
+            {
+                if (_iconCache.TryRemove(key, out _))
+                {
+                    removedCount++;
+                }
+            }
+        }
+        return removedCount;
+    }
 
     public string ResolveIconPath(string path)
     {
