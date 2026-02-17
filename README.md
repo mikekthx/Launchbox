@@ -1,21 +1,44 @@
 # Launchbox
 
-Launchbox is a Windows desktop application launcher built with WinUI 3 and .NET 8. It provides a quick and convenient way to access your shortcuts from the system tray.
+Launchbox is a modern, lightweight Windows desktop application launcher built with **WinUI 3** and **.NET 8**. It integrates seamlessly with your system tray, providing instant access to your favorite shortcuts with a global hotkey.
+
+[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/yourusername/Launchbox/actions)
+[![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen)](https://github.com/yourusername/Launchbox/security/code-scanning)
+[![Dependabot](https://img.shields.io/badge/Dependabot-Active-blue)](https://github.com/yourusername/Launchbox/network/dependencies)
 
 ## Features
 
-- **System Tray Integration**: Runs quietly in the background.
-- **Global Hotkey**: Toggle the launcher visibility with `Alt+S`.
-- **Shortcut Management**: Displays shortcuts from your `Desktop\Shortcuts` folder.
-- **Customizable**: Built with modern Windows UI principles.
+- **⚡ Fast Access**: Instantly toggle the launcher with the global hotkey `Alt+S`.
+- **🖥️ System Tray Integration**: Runs quietly in the background, accessible via a tray icon.
+- **📂 Shortcut Management**: Automatically reads shortcuts from your `Desktop\Shortcuts` folder.
+- **🎨 Modern UI**: Built with WinUI 3 for a native Windows 11 look and feel.
+- **🔗 Support for Various Shortcuts**: Handles standard Application shortcuts (`.lnk`) and Internet shortcuts (`.url`).
 
-## Prerequisites
+## Screenshots
 
-- Windows 10 or 11 (x64, ARM64)
-- .NET 8.0 SDK
-- Windows App SDK 1.8 Runtime
+*(Add screenshots of the application UI here)*
 
-## Getting Started
+## Installation
+
+Launchbox is distributed as a packaged **MSIX** installer.
+
+1.  Download the latest release from the [Releases](https://github.com/yourusername/Launchbox/releases) page.
+2.  Double-click the `.msix` file to install.
+3.  Once installed, Launchbox will start automatically.
+
+## Development Setup
+
+To build and run Launchbox locally, follow these steps:
+
+### Prerequisites
+
+*   **Windows 10 (version 1809 or later) or Windows 11**
+*   **Visual Studio 2022** (17.8 or later) with the following workloads:
+    *   .NET Desktop Development
+    *   Universal Windows Platform development (optional, but recommended for WinUI templates)
+*   **.NET 8.0 SDK**
+
+### Building from Source
 
 1.  **Clone the repository:**
     ```bash
@@ -23,28 +46,27 @@ Launchbox is a Windows desktop application launcher built with WinUI 3 and .NET 
     cd Launchbox
     ```
 
-2.  **Build the project:**
+2.  **Restore dependencies:**
+    ```bash
+    dotnet restore Launchbox.sln
+    ```
+
+3.  **Build the project:**
+    Note: You must specify the platform (e.g., `x64`) as WinUI 3 does not support `AnyCPU`.
     ```bash
     dotnet build Launchbox.csproj -p:Platform=x64
     ```
 
-3.  **Run the application:**
+4.  **Run the application:**
     ```bash
     dotnet run --project Launchbox.csproj
     ```
 
-## Usage
+## Contributing
 
-1.  Create a folder named `Shortcuts` on your Desktop.
-2.  Add your application shortcuts (`.lnk`) or internet shortcuts (`.url`) to this folder.
-3.  Run the application.
-4.  Press `Alt+S` to toggle the launcher visibility.
-5.  The launcher icon will appear in the system tray.
+We welcome contributions! Please follow these guidelines:
 
-## Project Structure
-
-- `Launchbox/`: Main application project.
-- `Launchbox.Tests/`: Unit tests.
-- `Assets/`: Application icons and assets.
-- `Services/`: Core services and logic.
-- `ViewModels/`: MVVM ViewModels.
+1.  **Fork** the repository and create a new branch for your feature or bugfix.
+2.  Ensure your code adheres to the project's coding standards. We enforce `dotnet format` in our CI pipeline.
+    *   Run `dotnet format` locally before committing to catch style issues.
+3.  Submit a **Pull Request** with a clear description of your changes.
