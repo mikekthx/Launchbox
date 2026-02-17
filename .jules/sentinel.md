@@ -1,4 +1,4 @@
-## 2026-05-24 - Unrestricted File Execution
+## 2026-02-17 - Unrestricted File Execution
 **Vulnerability:** `WinUILauncher.Launch` permitted execution of any file with `.lnk` or `.url` extension, regardless of path (including UNC paths), enabling NTLM leaks and remote code execution via network shares.
 **Learning:** Checking file extensions alone is insufficient; path origin must also be validated to prevent loading from untrusted zones (e.g., SMB shares).
 **Prevention:** Integrate centralized path validation (`PathSecurity.IsUnsafePath`) into all process launching mechanisms (`Process.Start`).
