@@ -89,6 +89,16 @@ public class IconService(IFileSystem fileSystem)
         return false;
     }
 
+    /// <summary>
+    /// Extracts icon bytes for a given file path, utilizing an in-memory cache and supporting custom icons.
+    /// </summary>
+    /// <param name="path">The full path to the shortcut or file.</param>
+    /// <returns>A byte array containing the PNG-encoded icon, or null if extraction fails.</returns>
+    /// <remarks>
+    /// This method first checks for custom icons (PNG or ICO) in a strictly defined `.icons` subdirectory.
+    /// If no custom icon is found, it falls back to the system's default icon extraction.
+    /// Results are cached based on file modification timestamps to minimize I/O operations.
+    /// </remarks>
     public byte[]? ExtractIconBytes(string path)
     {
         if (IsUnsafePath(path))
@@ -162,8 +172,8 @@ public class IconService(IFileSystem fileSystem)
     private byte[]? GetCustomIconBytes(string pngPath, string icoPath, DateTime pngTime, DateTime icoTime)
     {
         // Check year > 1900 because GetLastWriteTime returns ~1601 for missing files
-        bool pngExists = pngTime.Year > 1900;
-        bool icoExists = icoTime.Year > 1900;
+        bool pngExists = pngTime.Year > Constants.MIN_VALID_YEAR;
+        bool icoExists = icoTime.Year > Constants.MIN_VALID_YEAR;
 
         if (!pngExists && !icoExists) return null;
 
@@ -171,57 +181,41 @@ public class IconService(IFileSystem fileSystem)
 
         if (pngExists && icoExists)
         {
-            int pngArea = 0;
-            int icoArea = 0;
-
-            try
-            {
-                using (var stream = _fileSystem.OpenRead(pngPath))
-                {
-                    var dims = ImageHeaderParser.GetPngDimensions(stream);
-                    if (dims != null) pngArea = dims.Value.Width * dims.Value.Height;
-                }
-            }
-            catch { }
-
-            try
-            {
-                using (var stream = _fileSystem.OpenRead(icoPath))
-                {
-                    var dims = ImageHeaderParser.GetMaxIcoDimensions(stream);
-                    if (dims != null) icoArea = dims.Value.Width * dims.Value.Height;
-                }
-            }
-            catch { }
+            int pngArea = GetImageArea(pngPath, ImageHeaderParser.GetPngDimensions);
+            int icoArea = GetImageArea(icoPath, ImageHeaderParser.GetMaxIcoDimensions);
 
             // Prefer larger resolution
             // If areas are equal (or both failed to parse), prefer PNG (modern/compatible)
-            if (icoArea > pngArea) chosenPath = icoPath;
-            else chosenPath = pngPath;
+            chosenPath = (icoArea > pngArea) ? icoPath : pngPath;
         }
-        else if (pngExists)
+        else
         {
-            chosenPath = pngPath;
-        }
-        else if (icoExists)
-        {
-            chosenPath = icoPath;
+            chosenPath = pngExists ? pngPath : icoPath;
         }
 
-        if (chosenPath != null)
+        try
         {
-            try
-            {
-                return _fileSystem.ReadAllBytes(chosenPath);
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to read custom icon {chosenPath}: {ex.Message}");
-                return null;
-            }
+            return _fileSystem.ReadAllBytes(chosenPath);
         }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to read custom icon {chosenPath}: {ex.Message}");
+            return null;
+        }
+    }
 
-        return null;
+    private int GetImageArea(string path, Func<Stream, (int Width, int Height)?> parser)
+    {
+        try
+        {
+            using var stream = _fileSystem.OpenRead(path);
+            var dims = parser(stream);
+            return dims.HasValue ? dims.Value.Width * dims.Value.Height : 0;
+        }
+        catch
+        {
+            return 0;
+        }
     }
 
     private byte[]? ExtractSystemIcon(string path)
@@ -235,7 +229,7 @@ public class IconService(IFileSystem fileSystem)
 
             // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
             // saving ~43% processing time compared to 128x128.
-            NativeMethods.PrivateExtractIcons(resolvedPath, 0, 96, 96, ref hIcon, IntPtr.Zero, 1, 0);
+            NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, ref hIcon, IntPtr.Zero, 1, 0);
             if (hIcon == IntPtr.Zero) return null;
 
             using var icon = WinIcon.FromHandle(hIcon);
