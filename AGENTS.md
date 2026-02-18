@@ -33,11 +33,19 @@ dotnet clean Launchbox.csproj
 ## Testing
 
 **Test framework configured: xUnit.**
-- Project: `Launchbox.Tests` (net8.0)
-- Run: `dotnet test Launchbox.Tests/Launchbox.Tests.csproj` (cross-platform)
+- Project: `Launchbox.Tests` (net8.0-windows10.0.19041.0)
+- Run: `dotnet test Launchbox.Tests/Launchbox.Tests.csproj`
 - Single test: `dotnet test --filter "FullyQualifiedName~TestMethodName"`
 
-Note: `dotnet test Launchbox.sln` works on Windows but may fail on Linux due to WinUI dependencies in the main project.
+Note: Both the main project and test project have WinUI dependencies. `dotnet test` requires Windows.
+
+The test project uses **file-linking** (`<Compile Include="..\ClassName.cs" Link="..." />`) instead of a `<ProjectReference>` to include production code. This avoids pulling in the WinUI application host while testing real production classes. When adding a new testable class, add a corresponding `<Compile Include>` entry to `Launchbox.Tests/Launchbox.Tests.csproj`.
+
+### CI/CD
+- CI runs `dotnet format --verify-no-changes` -- run `dotnet format Launchbox.sln` locally before committing
+- Tests run in both **Debug** and **Release** configurations
+- **CodeQL** security scan runs on every push/PR
+- MSIX packages are built and signed on non-PR builds
 
 ## Project Structure
 
@@ -46,14 +54,33 @@ Launchbox/
 ├── README.md                   # Project documentation
 ├── App.xaml(.cs)               # Application entry point
 ├── MainWindow.xaml(.cs)        # Main window UI and window management logic
+├── SettingsWindow.xaml(.cs)    # Settings dialog UI
 ├── Launchbox.csproj            # Project configuration
-├── Constants.cs                # Global constants
+├── Helpers/                    # Utility classes and constants
+│   ├── Constants.cs            # Global constants (hotkey, window size, etc.)
+│   ├── IconHelper.cs           # Icon extraction helpers
+│   ├── ImageHeaderParser.cs    # Image format detection
+│   ├── PathSecurity.cs         # Path validation and sanitization
+│   ├── SimpleCommand.cs        # ICommand implementation
+│   └── BooleanToVisibilityConverter.cs
+├── Models/                     # Data models
+│   └── AppItem.cs              # Application shortcut model
 ├── Services/                   # Platform-agnostic interfaces and implementations
-│   ├── IAppLauncher.cs
-│   ├── IDispatcher.cs
-│   └── IImageFactory.cs
+│   ├── IAppLauncher.cs         # Process launching abstraction
+│   ├── IBackdropService.cs     # Window backdrop management
+│   ├── IDispatcher.cs          # UI thread dispatch abstraction
+│   ├── IFilePickerService.cs   # File/folder picker abstraction
+│   ├── IFileSystem.cs          # File system operations abstraction
+│   ├── IImageFactory.cs        # Image creation from bytes
+│   ├── ISettingsStore.cs       # Settings persistence abstraction
+│   ├── IStartupService.cs      # Startup registration abstraction
+│   ├── IVisualTreeService.cs   # Visual tree traversal abstraction
+│   ├── IWindowService.cs       # Window management abstraction
+│   └── ...                     # WinUI implementations (WinUI*.cs)
 ├── ViewModels/                 # MVVM ViewModels
-│   └── MainViewModel.cs        # Core application logic (loading/launching apps)
+│   ├── MainViewModel.cs        # Core application logic (loading/launching apps)
+│   └── SettingsViewModel.cs    # Settings page logic
+├── Launchbox.Tests/            # xUnit test project (file-linked)
 ├── Assets/                     # Application icons
 └── Properties/                 # Launch/publish profiles
 ```
@@ -113,7 +140,7 @@ catch (Exception ex)
 - Use `finally` for cleanup
 
 ### P/Invoke
-Place in dedicated section, single-line format:
+All P/Invoke declarations are centralized in `Services/NativeMethods.cs`. Use single-line format:
 ```csharp
 [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
 ```
@@ -151,11 +178,12 @@ settings["Key"] = value;
 
 ## Dependencies
 
-| Package                     | Purpose             |
-| --------------------------- | ------------------- |
-| Microsoft.WindowsAppSDK 1.8 | WinUI 3 framework   |
-| H.NotifyIcon.WinUI          | System tray support |
-| System.Drawing.Common       | Icon extraction     |
+| Package                          | Purpose                 |
+| -------------------------------- | ----------------------- |
+| Microsoft.WindowsAppSDK 1.8      | WinUI 3 framework       |
+| Microsoft.Windows.SDK.BuildTools | Windows SDK build tools |
+| H.NotifyIcon.WinUI               | System tray support     |
+| System.Drawing.Common            | Icon extraction         |
 
 ## Architecture Notes
 
@@ -163,24 +191,41 @@ settings["Key"] = value;
 The application follows the Model-View-ViewModel (MVVM) pattern:
 - **View (`MainWindow.xaml`):** Handles UI layout, window management, hotkeys, and tray icon. Binds to `MainViewModel`.
 - **ViewModel (`MainViewModel.cs`):** Encapsulates business logic (scanning shortcuts, filtering extensions, launching apps). It is platform-agnostic and uses interfaces for platform services.
-- **Model (`AppItem.cs`):** Represents an application shortcut. Uses `object` for the Icon property to avoid dependency on WinUI types, allowing for easier testing.
+- **Model (`Models/AppItem.cs`):** Represents an application shortcut. Uses `object` for the Icon property to avoid dependency on WinUI types, allowing for easier testing.
 
 ### Service Abstraction
-Platform-specific operations are abstracted behind interfaces in `Launchbox/Services/` to enable unit testing:
-- `IImageFactory`: Creates UI images (e.g., `BitmapImage`) from raw bytes.
+Platform-specific operations are abstracted behind interfaces in `Services/` to enable unit testing:
 - `IAppLauncher`: Handles process launching (`Process.Start`).
+- `IBackdropService`: Manages window backdrop effects (Mica, Acrylic).
 - `IDispatcher`: Abstracts thread dispatching (`DispatcherQueue`).
+- `IFilePickerService`: Abstracts file/folder picker dialogs.
+- `IFileSystem`: Abstracts file system operations (directory enumeration, file reads).
+- `IImageFactory`: Creates UI images (e.g., `BitmapImage`) from raw bytes.
+- `ISettingsStore`: Abstracts settings persistence (LocalSettings).
+- `IStartupService`: Manages app startup registration.
+- `IVisualTreeService`: Abstracts visual tree traversal for UI elements.
+- `IWindowService`: Abstracts window management operations.
 
+Key non-interface services:
+- `SettingsService`: Central settings coordinator. Raises `PropertyChanged`/`SettingsChanged` events that trigger app reloads and hotkey re-registration.
+- `IconService`: Icon extraction pipeline with caching, custom icon support (`.icons/` directory), and resolution comparison.
+- `ShortcutService`: Discovers and filters shortcut files by allowed extensions.
+- `NativeMethods`: Centralized P/Invoke declarations (user32, kernel32).
+
+### Window Behavior
 - App starts **hidden off-screen**, positions on first Alt+S press
 - Window **auto-hides on deactivation** (focus loss)
 - Position persists via LocalSettings
 - System tray icon required for operation
 - Global hotkey Alt+S via Win32 RegisterHotKey
 
+### Dependency Composition
+All dependencies are composed **manually** in the `MainWindow` constructor (no DI container). `SettingsService`, `WindowService`, and `LocalSettingsStore` are shared singleton instances passed to both `MainViewModel` and `SettingsViewModel`. When adding a new service, wire it up in the `MainWindow` constructor.
+
 ## Common Tasks
 
 ### Add app item property
-1. Add to `AppItem` class in `AppItem.cs`
+1. Add to `AppItem` class in `Models/AppItem.cs`
 2. Populate in `MainViewModel.LoadAppsAsync()`
 3. Update XAML DataTemplate if needed
 
@@ -190,12 +235,18 @@ Platform-specific operations are abstracted behind interfaces in `Launchbox/Serv
 3. Advanced: Win32 interop in `NewWndProc()`
 
 ### Change hotkey
-1. Modify `MOD_ALT`/`VK_S` constants in `Constants.cs`
-2. Update `ToolTipText` in `MainWindow.xaml:18`
+1. Modify `MOD_ALT`/`VK_S` constants in `Helpers/Constants.cs`
+2. Update `ToolTipText` in `MainWindow.xaml` (search for `ToolTipText`)
 
 ### Add tray menu item
-1. Add `MenuFlyoutItem` in `MainWindow.xaml:22-28`
+1. Add `MenuFlyoutItem` in `MainWindow.xaml` (search for `ContextFlyout`)
 2. Add command property and handler in MainWindow class (or bind to ViewModel command)
+
+### Add a new test
+1. Add a `<Compile Include="..\Path\To\Class.cs" Link="Path\To\Class.cs" />` entry in `Launchbox.Tests/Launchbox.Tests.csproj`
+2. Create a test file in `Launchbox.Tests/` following the `ClassNameTests.cs` naming convention
+3. Use existing mock classes (`MockFileSystem`, `MockSettingsStore`, etc.) or create new ones implementing the relevant interface
+4. Run: `dotnet test Launchbox.Tests/Launchbox.Tests.csproj`
 
 ## Date Awareness
 When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.

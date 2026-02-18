@@ -2,22 +2,21 @@
 
 Launchbox is a modern, lightweight Windows desktop application launcher built with **WinUI 3** and **.NET 8**. It integrates seamlessly with your system tray, providing instant access to your favorite shortcuts with a global hotkey.
 
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)](https://github.com/mikekthx/Launchbox/actions)
+[![Build Status](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml/badge.svg)](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen)](https://github.com/mikekthx/Launchbox/security/code-scanning)
 [![Dependabot](https://img.shields.io/badge/Dependabot-Active-blue)](https://github.com/mikekthx/Launchbox/network/dependencies)
 
 ## Features
 
-- **⚡ Fast Access**: Instantly toggle the launcher with the global hotkey `Alt+S`.
+- **⚡ Fast Access**: Instantly toggle the launcher with a configurable global hotkey (default `Alt+S`).
 - **🖥️ System Tray Integration**: Runs quietly in the background, accessible via a tray icon.
-- **📂 Shortcut Management**: Automatically reads shortcuts from your `Desktop\Shortcuts` folder.
-- **🎨 Modern UI**: Built with WinUI 3 for a native Windows 11 look and feel.
+- **📂 Shortcut Management**: Automatically reads shortcuts from a configurable folder (default `Desktop\Shortcuts`).
+- **🎨 Modern UI**: Built with WinUI 3 with an acrylic backdrop for a native Windows 11 look and feel.
 - **🔗 Support for Various Shortcuts**: Handles standard Application shortcuts (`.lnk`) and Internet shortcuts (`.url`).
-- **🖼️ Custom Icons**: Supports custom icons (`.ico`, `.png`) for your shortcuts.
-
-## Screenshots
-
-*(Add screenshots of the application UI here)*
+- **🖼️ Custom Icons**: Override any shortcut's icon by placing a `.png` or `.ico` file in the `.icons` directory alongside your shortcuts.
+- **⚙️ Settings**: Dedicated settings window for hotkey, shortcuts folder, startup behavior, and window position.
+- **🚀 Run at Startup**: Optionally launch Launchbox on Windows startup via MSIX StartupTask.
+- **📌 Draggable Window**: Reposition the launcher window by dragging; position persists across sessions.
 
 ## Installation
 
@@ -62,6 +61,14 @@ To build and run Launchbox locally, follow these steps:
     ```bash
     dotnet run --project Launchbox.csproj
     ```
+
+## Testing
+
+The project uses **xUnit** for unit testing. Run tests with:
+
+```bash
+dotnet test Launchbox.Tests/Launchbox.Tests.csproj
+```
 
 ## Contributing
 
