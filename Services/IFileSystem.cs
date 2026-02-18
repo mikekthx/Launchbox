@@ -13,4 +13,5 @@ public interface IFileSystem
     byte[] ReadAllBytes(string path);
     Stream OpenRead(string path);
     DateTime GetLastWriteTime(string path);
+    long GetFileSize(string path);
 }

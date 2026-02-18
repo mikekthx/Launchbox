@@ -223,6 +223,26 @@ public class IconServiceTests
     }
 
     [Fact]
+    public void ExtractIconBytes_ReturnsNull_WhenCustomIconIsTooLarge()
+    {
+        string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
+        string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
+        string pngPath = Path.Combine(iconsDir, "App.png");
+
+        // Size > 5MB
+        long largeSize = 6 * 1024 * 1024;
+
+        _mockFileSystem.AddFile(shortcutPath);
+        _mockFileSystem.AddDirectory(iconsDir);
+        // We set size explicitly. Content is null but size check should trigger before read.
+        _mockFileSystem.AddFile(pngPath, size: largeSize, content: null);
+
+        var result = _iconService.ExtractIconBytes(shortcutPath);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
     public void PruneCache_RemovesUnusedEntries_ReturnsCount()
     {
         string shortcutPath1 = Path.Combine("C:", "Shortcuts", "App1.lnk");
