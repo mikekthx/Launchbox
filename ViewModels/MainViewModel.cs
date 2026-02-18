@@ -66,7 +66,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
 
-        LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
+        LoadAppsCommand = new AsyncSimpleCommand(LoadAppsAsync);
         LaunchAppCommand = new SimpleCommand(LaunchApp);
         OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
         ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());

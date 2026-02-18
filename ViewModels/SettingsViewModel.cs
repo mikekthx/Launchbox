@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace Launchbox.ViewModels;
 
-public class SettingsViewModel : INotifyPropertyChanged
+public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
@@ -122,5 +122,11 @@ public class SettingsViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? name = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
+    public void Dispose()
+    {
+        _settingsService.PropertyChanged -= OnServicePropertyChanged;
+        GC.SuppressFinalize(this);
     }
 }
