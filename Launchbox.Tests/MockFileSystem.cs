@@ -123,4 +123,11 @@ public class MockFileSystem : IFileSystem
             return time;
         return DateTime.FromFileTime(0); // 1601-01-01
     }
+
+    public long GetFileSize(string path)
+    {
+        if (_fileSizes.TryGetValue(path, out var size))
+            return size;
+        throw new FileNotFoundException(path);
+    }
 }

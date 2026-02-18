@@ -165,6 +165,13 @@ public class IconService(IFileSystem fileSystem)
 
         try
         {
+            // Security: Limit file size to 5MB to prevent DoS via large files
+            if (_fileSystem.GetFileSize(chosenPath) > 5 * 1024 * 1024)
+            {
+                Trace.WriteLine($"Blocked loading of large icon file: {chosenPath}");
+                return null;
+            }
+
             return _fileSystem.ReadAllBytes(chosenPath);
         }
         catch (Exception ex)

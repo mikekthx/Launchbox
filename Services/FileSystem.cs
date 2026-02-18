@@ -41,4 +41,5 @@ public class FileSystem : IFileSystem
     public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
     public Stream OpenRead(string path) => File.OpenRead(path);
     public DateTime GetLastWriteTime(string path) => File.GetLastWriteTime(path);
+    public long GetFileSize(string path) => new FileInfo(path).Length;
 }
