@@ -130,8 +130,9 @@ public sealed partial class MainWindow : Window
         if (!_isDraggingWindow) return;
 
         var currentPointerPos = e.GetCurrentPoint(null).Position;
-        var deltaX = (int)(currentPointerPos.X - _dragStartPointerPos.X);
-        var deltaY = (int)(currentPointerPos.Y - _dragStartPointerPos.Y);
+        var scale = RootGrid.XamlRoot?.RasterizationScale ?? 1.0;
+        var deltaX = (int)((currentPointerPos.X - _dragStartPointerPos.X) * scale);
+        var deltaY = (int)((currentPointerPos.Y - _dragStartPointerPos.Y) * scale);
 
         var newX = _dragStartWindowPos.X + deltaX;
         var newY = _dragStartWindowPos.Y + deltaY;

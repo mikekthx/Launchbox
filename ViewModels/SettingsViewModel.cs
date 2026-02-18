@@ -3,7 +3,9 @@ using Launchbox.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Launchbox.ViewModels;
@@ -30,7 +32,7 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         _settingsService.PropertyChanged += OnServicePropertyChanged;
 
         // Ensure startup status is fresh
-        _ = _settingsService.InitializeAsync();
+        _ = InitializeSettingsAsync();
 
         ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());
         BrowseFolderCommand = new SimpleCommand(BrowseFolderAsync);
@@ -40,10 +42,41 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
     {
         if (parameter == null) return; // Need window handle
 
-        var folder = await _filePickerService.PickSingleFolderAsync(parameter);
-        if (!string.IsNullOrEmpty(folder))
+        try
         {
-            ShortcutsPath = folder;
+            var folder = await _filePickerService.PickSingleFolderAsync(parameter);
+            if (!string.IsNullOrEmpty(folder))
+            {
+                ShortcutsPath = folder;
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to browse for folder: {ex.Message}");
+        }
+    }
+
+    private async Task InitializeSettingsAsync()
+    {
+        try
+        {
+            await _settingsService.InitializeAsync();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to initialize settings: {ex.Message}");
+        }
+    }
+
+    private async Task SetRunAtStartupSafeAsync(bool value)
+    {
+        try
+        {
+            await _settingsService.SetRunAtStartupAsync(value);
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to set run at startup: {ex.Message}");
         }
     }
 
@@ -72,8 +105,7 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         {
             if (_settingsService.IsRunAtStartup != value)
             {
-                // Fire and forget async call
-                _ = _settingsService.SetRunAtStartupAsync(value);
+                _ = SetRunAtStartupSafeAsync(value);
             }
         }
     }
