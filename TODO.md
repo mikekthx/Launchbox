@@ -12,7 +12,7 @@
 - [x] Missing null guards on all 8 MainViewModel constructor parameters, inconsistent with SettingsViewModel pattern (MainViewModel.cs:48-65)
 - [x] async void BrowseFolderAsync has no try/catch -- COM failure would crash app (SettingsViewModel.cs:39-48)
 - [x] Fire-and-forget tasks with no error handling: InitializeAsync and SetRunAtStartupAsync failures silently lost (SettingsViewModel.cs:33,76)
-- [ ] Missing SetLastError=true on ALL 13 P/Invoke declarations -- Win32 error codes unreliable (NativeMethods.cs)
+- [x] Missing SetLastError=true on ALL 13 P/Invoke declarations -- Win32 error codes unreliable (NativeMethods.cs)
 - [ ] IWindowService too narrow: Initialize() and OnActivated() not on interface; MainWindow uses concrete WindowService type, defeating abstraction (IWindowService.cs, WindowService.cs:29,274)
 - [ ] RegisterHotKey thread affinity not enforced -- PropertyChanged from background thread would silently fail (WindowService.cs:57-69)
 - [ ] No .editorconfig file -- dotnet format in CI enforces invisible rules; AGENTS.md formatting rules unenforceable
