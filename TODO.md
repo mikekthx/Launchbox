@@ -66,7 +66,7 @@
 
 ### Tests
 - [ ] SettingsViewModelTests use fragile async polling with DateTime timeout -- should use event-driven waiting
-- [ ] Mock classes (MockSettingsStore, MockImageFactory, etc.) scattered inside unrelated test files -- extract to own files
+- [x] Mock classes (MockSettingsStore, MockImageFactory, etc.) scattered inside unrelated test files -- extract to own files
 - [ ] MockFileSystem has no error simulation capability unlike other mocks (MockStartupService has ShouldFail)
 
 ## Low
