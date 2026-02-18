@@ -88,6 +88,8 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
             var shortcutFolder = _settingsService.ShortcutsPath;
             var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS));
 
+            _iconService.PruneCache(files ?? []);
+
             var localAppItems = new List<AppItem>();
 
             if (files != null)

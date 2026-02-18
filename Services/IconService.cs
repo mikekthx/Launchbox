@@ -1,5 +1,6 @@
 using Launchbox.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Collections.Concurrent;
@@ -14,9 +15,27 @@ public class IconService(IFileSystem fileSystem)
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
 
+    public int PruneCache(IEnumerable<string> activePaths)
+    {
+        var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
+        int removedCount = 0;
+
+        foreach (var key in _iconCache.Keys)
+        {
+            if (!activeSet.Contains(key))
+            {
+                if (_iconCache.TryRemove(key, out _))
+                {
+                    removedCount++;
+                }
+            }
+        }
+        return removedCount;
+    }
+
     public string ResolveIconPath(string path)
     {
-        if (IsUnsafePath(path))
+        if (PathSecurity.IsUnsafePath(path))
         {
             Trace.WriteLine($"Blocked resolution for unsafe path: {path}");
             return path;
@@ -26,7 +45,7 @@ public class IconService(IFileSystem fileSystem)
         {
             string iconFile = _fileSystem.GetIniValue(path, Constants.INTERNET_SHORTCUT_SECTION, Constants.ICON_FILE_KEY);
 
-            if (IsUnsafePath(iconFile))
+            if (PathSecurity.IsUnsafePath(iconFile))
             {
                 Trace.WriteLine($"Blocked potential unsafe icon path: {iconFile}");
                 return path;
@@ -38,55 +57,6 @@ public class IconService(IFileSystem fileSystem)
             }
         }
         return path;
-    }
-
-    private bool IsUnsafePath(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path)) return false;
-
-        // Check for NT object path prefix (\??\) which can bypass UNC checks
-        if (path.StartsWith(@"\??\", StringComparison.OrdinalIgnoreCase)) return true;
-
-        // Check for specific UNC patterns
-        if (path.StartsWith(@"\\?\UNC", StringComparison.OrdinalIgnoreCase)) return true;
-
-        // Allow local long paths ONLY if they are standard drive paths (e.g. \\?\C:\...)
-        if (path.StartsWith(@"\\?\", StringComparison.OrdinalIgnoreCase))
-        {
-            // Must be at least 7 chars: \\?\C:\
-            if (path.Length >= 7 &&
-                char.IsLetter(path[4]) &&
-                path[5] == ':' &&
-                path[6] == '\\')
-            {
-                return false;
-            }
-            return true; // Block anything else starting with \\?\ (e.g. GLOBALROOT, Volume, etc.)
-        }
-
-        // Check for standard UNC paths
-        if (path.StartsWith(@"\\") || path.StartsWith("//")) return true;
-
-        // Check for mixed slash UNC paths (e.g. /\server/share or \/server/share)
-        if (path.StartsWith(@"/\") || path.StartsWith(@"\/")) return true;
-
-        // Check normalized path for hidden UNC (Defense in depth)
-        try
-        {
-            string fullPath = Path.GetFullPath(path);
-            if (fullPath.StartsWith(@"\\") || fullPath.StartsWith("//")) return true;
-            if (new Uri(fullPath).IsUnc) return true;
-        }
-        catch { }
-
-        // Check using Uri as a backup
-        try
-        {
-            if (new Uri(path).IsUnc) return true;
-        }
-        catch { }
-
-        return false;
     }
 
     /// <summary>
@@ -101,7 +71,7 @@ public class IconService(IFileSystem fileSystem)
     /// </remarks>
     public byte[]? ExtractIconBytes(string path)
     {
-        if (IsUnsafePath(path))
+        if (PathSecurity.IsUnsafePath(path))
         {
             Trace.WriteLine($"Blocked icon extraction for unsafe path: {path}");
             return null;
