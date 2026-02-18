@@ -1,40 +1,56 @@
 # Categorizes changes to the user interface
 ui:
-  - '**/*.xaml'
-  - '**/*.xaml.cs'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.xaml'
+      - '**/*.xaml.cs'
 
 # Categorizes changes to the core C# application logic
 core-logic:
-  - '**/*.cs'
-  - '!**/*.xaml.cs'
-  - '!**/*.Tests/**/*.cs'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.cs'
+      - '!**/*.xaml.cs'
+      - '!**/*.Tests/**/*.cs'
 
 # Categorizes changes to the unit testing project
 tests:
-  - 'Launchbox.Tests/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Launchbox.Tests/**/*'
 
 # Categorizes changes to NuGet packages or project structure
 dependencies:
-  - '**/*.csproj'
-  - '**/*.sln'
-  - '.github/dependabot.yml'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.csproj'
+      - '**/*.sln'
+      - '.github/dependabot.yml'
 
 # Categorizes changes to the GitHub Actions pipeline
 github_actions:
-  - '.github/workflows/**/*.yml'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/workflows/**/*.yml'
 
 # Categorizes documentation updates
 documentation:
-  - '**/*.md'
-  - 'docs/**/*'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.md'
+      - 'docs/**/*'
 
 # Tracks critical WinUI/MSIX packaging file changes
 packaging:
-  - '**/*.appxmanifest'
-  - '**/*.wapproj'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.appxmanifest'
+      - '**/*.wapproj'
 
 # Tracks images, icons, and visual assets
 assets:
-  - '**/*.png'
-  - '**/*.ico'
-  - '**/*.svg'
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.png'
+      - '**/*.ico'
+      - '**/*.svg'
