@@ -68,12 +68,12 @@ Launchbox/
 
 ### Naming Conventions
 
-| Element | Convention | Example |
-|---------|------------|---------|
-| Classes/Methods/Properties | PascalCase | `MainWindow`, `LoadAppsAsync` |
-| Private fields | _camelCase | `_isDraggingWindow` |
-| Constants | UPPER_SNAKE_CASE | `HOTKEY_ID`, `MOD_ALT` |
-| Parameters/Locals | camelCase | `sender`, `displayArea` |
+| Element                    | Convention       | Example                       |
+| -------------------------- | ---------------- | ----------------------------- |
+| Classes/Methods/Properties | PascalCase       | `MainWindow`, `LoadAppsAsync` |
+| Private fields             | _camelCase       | `_isDraggingWindow`           |
+| Constants                  | UPPER_SNAKE_CASE | `HOTKEY_ID`, `MOD_ALT`        |
+| Parameters/Locals          | camelCase        | `sender`, `displayArea`       |
 
 ### Imports Order
 1. `Microsoft.UI.*` namespaces
@@ -151,11 +151,11 @@ settings["Key"] = value;
 
 ## Dependencies
 
-| Package | Purpose |
-|---------|---------|
-| Microsoft.WindowsAppSDK 1.8 | WinUI 3 framework |
-| H.NotifyIcon.WinUI | System tray support |
-| System.Drawing.Common | Icon extraction |
+| Package                     | Purpose             |
+| --------------------------- | ------------------- |
+| Microsoft.WindowsAppSDK 1.8 | WinUI 3 framework   |
+| H.NotifyIcon.WinUI          | System tray support |
+| System.Drawing.Common       | Icon extraction     |
 
 ## Architecture Notes
 
@@ -196,3 +196,6 @@ Platform-specific operations are abstracted behind interfaces in `Launchbox/Serv
 ### Add tray menu item
 1. Add `MenuFlyoutItem` in `MainWindow.xaml:22-28`
 2. Add command property and handler in MainWindow class (or bind to ViewModel command)
+
+## Date Awareness
+When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.
