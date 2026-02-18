@@ -8,43 +8,6 @@ using System.IO;
 
 namespace Launchbox.Tests;
 
-public class MockImageFactory : IImageFactory
-{
-    public Task<object?> CreateImageAsync(byte[] imageBytes)
-    {
-        return Task.FromResult<object?>("MockImage");
-    }
-}
-
-public class MockDispatcher : IDispatcher
-{
-    public void TryEnqueue(Action action)
-    {
-        action();
-    }
-
-    public Task EnqueueAsync(Func<Task> action)
-    {
-        return action();
-    }
-}
-
-public class MockAppLauncher : IAppLauncher
-{
-    public string? LastLaunchedPath { get; private set; }
-    public string? LastOpenedFolder { get; private set; }
-
-    public void Launch(string path)
-    {
-        LastLaunchedPath = path;
-    }
-
-    public void OpenFolder(string path)
-    {
-        LastOpenedFolder = path;
-    }
-}
-
 public class MainViewModelTests
 {
     private readonly MockFileSystem _fileSystem;
