@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.ComponentModel;
@@ -23,6 +24,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     private readonly IFileSystem _fileSystem;
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
+    private CancellationTokenSource? _loadCts;
 
     public ObservableCollection<AppItem> Apps { get; } = [];
 
@@ -55,18 +57,18 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         SettingsService settingsService,
         IWindowService windowService)
     {
-        _shortcutService = shortcutService;
-        _iconService = iconService;
-        _imageFactory = imageFactory;
-        _dispatcher = dispatcher;
-        _appLauncher = appLauncher;
-        _fileSystem = fileSystem;
-        _settingsService = settingsService;
-        _windowService = windowService;
+        _shortcutService = shortcutService ?? throw new ArgumentNullException(nameof(shortcutService));
+        _iconService = iconService ?? throw new ArgumentNullException(nameof(iconService));
+        _imageFactory = imageFactory ?? throw new ArgumentNullException(nameof(imageFactory));
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        _appLauncher = appLauncher ?? throw new ArgumentNullException(nameof(appLauncher));
+        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
 
-        LoadAppsCommand = new SimpleCommand(async () => await LoadAppsAsync());
+        LoadAppsCommand = new AsyncSimpleCommand(LoadAppsAsync);
         LaunchAppCommand = new SimpleCommand(LaunchApp);
         OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
         ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
@@ -83,10 +85,19 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public async Task LoadAppsAsync()
     {
+        // Cancel any in-flight load
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        var cts = new CancellationTokenSource();
+        _loadCts = cts;
+        var ct = cts.Token;
+
         try
         {
             var shortcutFolder = _settingsService.ShortcutsPath;
-            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS));
+            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS), ct);
+
+            ct.ThrowIfCancellationRequested();
 
             _iconService.PruneCache(files ?? []);
 
@@ -113,6 +124,8 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                 Trace.WriteLine($"Shortcut folder not found: {shortcutFolder}");
             }
 
+            ct.ThrowIfCancellationRequested();
+
             await _dispatcher.EnqueueAsync(() =>
             {
                 Apps.Clear();
@@ -121,12 +134,12 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                 return Task.CompletedTask;
             });
 
-            await Parallel.ForEachAsync(localAppItems, async (item, ct) =>
+            await Parallel.ForEachAsync(localAppItems, ct, async (item, token) =>
             {
                 try
                 {
                     var iconBytes = _iconService.ExtractIconBytes(item.Path);
-                    if (iconBytes != null)
+                    if (iconBytes != null && !token.IsCancellationRequested)
                     {
                         await _dispatcher.EnqueueAsync(async () =>
                         {
@@ -135,11 +148,19 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
                         });
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     Trace.WriteLine($"Failed to load icon for {item.Path}: {ex.Message}");
                 }
             });
+        }
+        catch (OperationCanceledException)
+        {
+            // Load was superseded by a newer call -- expected, not an error
         }
         catch (Exception ex)
         {
@@ -175,10 +196,9 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
     public void Dispose()
     {
-        if (_settingsService != null)
-        {
-            _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
-        }
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
         GC.SuppressFinalize(this);
     }
 }

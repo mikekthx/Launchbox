@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Compile Include="..\Helpers\SimpleCommand.cs" Link="Helpers\SimpleCommand.cs" />
+    <Compile Include="..\Helpers\AsyncSimpleCommand.cs" Link="Helpers\AsyncSimpleCommand.cs" />
     <Compile Include="..\Helpers\PathSecurity.cs" Link="Helpers\PathSecurity.cs" />
     <Compile Include="..\Services\ISettingsStore.cs" Link="Services\ISettingsStore.cs" />
     <Compile Include="..\Services\WindowPositionManager.cs" Link="Services\WindowPositionManager.cs" />
