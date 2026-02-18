@@ -15,7 +15,7 @@ public class WindowService : IWindowService, IDisposable
     private IntPtr _hWnd;
     private IntPtr _oldWndProc;
     private WndProcDelegate? _wndProcDelegate;
-    private bool _hasPositioned = false;
+    private bool _hasPositioned;
 
     public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService)
     {
@@ -46,7 +46,7 @@ public class WindowService : IWindowService, IDisposable
         UpdateHotkey();
 
         // WndProc
-        _wndProcDelegate = new WndProcDelegate(NewWndProc);
+        _wndProcDelegate = NewWndProc;
         _oldWndProc = NativeMethods.SetWindowLongPtr(_hWnd, -4, _wndProcDelegate);
         if (_oldWndProc == IntPtr.Zero)
         {
@@ -77,14 +77,9 @@ public class WindowService : IWindowService, IDisposable
         int mod = _settingsService.HotkeyModifiers;
         int key = _settingsService.HotkeyKey;
 
-        if (!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key))
-        {
-            Trace.WriteLine($"Failed to register hotkey: {mod}+{key}");
-        }
-        else
-        {
-            Trace.WriteLine($"Registered hotkey: {mod}+{key}");
-        }
+        Trace.WriteLine(!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key)
+            ? $"Failed to register hotkey: {mod}+{key}"
+            : $"Registered hotkey: {mod}+{key}");
     }
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
@@ -97,15 +92,15 @@ public class WindowService : IWindowService, IDisposable
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        const uint WM_HOTKEY = 0x0312;
-        const uint WM_NCLBUTTONDBLCLK = 0x00A3;
+        const uint wmHotkey = 0x0312;
+        const uint wmNclbuttondblclk = 0x00A3;
 
-        if (msg == WM_HOTKEY && wParam.ToInt32() == Constants.HOTKEY_ID)
+        if (msg == wmHotkey && wParam.ToInt32() == Constants.HOTKEY_ID)
         {
             ToggleVisibility();
             return IntPtr.Zero;
         }
-        if (msg == WM_NCLBUTTONDBLCLK) return IntPtr.Zero;
+        if (msg == wmNclbuttondblclk) return IntPtr.Zero;
 
         return NativeMethods.CallWindowProc(_oldWndProc, hWnd, msg, wParam, lParam);
     }
@@ -185,10 +180,7 @@ public class WindowService : IWindowService, IDisposable
         if (disposing)
         {
             // Unsubscribe managed events
-            if (_settingsService != null)
-            {
-                _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
-            }
+            _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
 
             if (_appWindow != null)
             {
