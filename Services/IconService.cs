@@ -14,6 +14,7 @@ public class IconService(IFileSystem fileSystem)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
+    private readonly object _gdiLock = new();
 
     public int PruneCache(IEnumerable<string> activePaths)
     {
@@ -202,11 +203,14 @@ public class IconService(IFileSystem fileSystem)
             NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, ref hIcon, IntPtr.Zero, 1, 0);
             if (hIcon == IntPtr.Zero) return null;
 
-            using var icon = WinIcon.FromHandle(hIcon);
-            using var bmp = icon.ToBitmap();
-            using var ms = new MemoryStream();
-            bmp.Save(ms, ImageFormat.Png);
-            return ms.ToArray();
+            lock (_gdiLock)
+            {
+                using var icon = WinIcon.FromHandle(hIcon);
+                using var bmp = icon.ToBitmap();
+                using var ms = new MemoryStream();
+                bmp.Save(ms, ImageFormat.Png);
+                return ms.ToArray();
+            }
         }
         catch (Exception ex)
         {
