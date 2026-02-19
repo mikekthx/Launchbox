@@ -1,9 +1,9 @@
-using Launchbox.Helpers;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Launchbox.Helpers;
 
 namespace Launchbox.Services;
 
@@ -37,7 +37,10 @@ public class BackdropService : IBackdropService
                         }
                         finally
                         {
-                            foreach (var p in processes) p.Dispose();
+                            foreach (var p in processes)
+                            {
+                                p.Dispose();
+                            }
                         }
                     }
                     catch

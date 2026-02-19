@@ -1,14 +1,14 @@
-using Launchbox.Helpers;
-using Launchbox.Services;
-using Launchbox.ViewModels;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Launchbox.Helpers;
+using Launchbox.Services;
+using Launchbox.ViewModels;
 
 namespace Launchbox;
 
@@ -127,7 +127,10 @@ public sealed partial class MainWindow : Window
 
     private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
-        if (!_isDraggingWindow) return;
+        if (!_isDraggingWindow)
+        {
+            return;
+        }
 
         var currentPointerPos = e.GetCurrentPoint(null).Position;
         var scale = RootGrid.XamlRoot?.RasterizationScale ?? 1.0;

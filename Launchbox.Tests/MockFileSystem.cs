@@ -1,8 +1,8 @@
-using Launchbox.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Launchbox.Services;
 
 namespace Launchbox.Tests;
 
@@ -42,7 +42,10 @@ public class MockFileSystem : IFileSystem
             }
         }
 
-        if (string.IsNullOrEmpty(directory)) return;
+        if (string.IsNullOrEmpty(directory))
+        {
+            return;
+        }
 
         if (!_files.ContainsKey(directory))
         {

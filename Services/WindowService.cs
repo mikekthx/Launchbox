@@ -1,8 +1,8 @@
-using Launchbox.Helpers;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Launchbox.Helpers;
 
 namespace Launchbox.Services;
 
@@ -100,14 +100,20 @@ public class WindowService : IWindowService, IDisposable
             ToggleVisibility();
             return IntPtr.Zero;
         }
-        if (msg == wmNclbuttondblclk) return IntPtr.Zero;
+        if (msg == wmNclbuttondblclk)
+        {
+            return IntPtr.Zero;
+        }
 
         return NativeMethods.CallWindowProc(_oldWndProc, hWnd, msg, wParam, lParam);
     }
 
     public void ToggleVisibility()
     {
-        if (_appWindow == null) return;
+        if (_appWindow == null)
+        {
+            return;
+        }
 
         try
         {
@@ -120,10 +126,16 @@ public class WindowService : IWindowService, IDisposable
                 if (!_hasPositioned)
                 {
                     _hasPositioned = true;
-                    if (!RestoreWindowPosition()) CenterWindow();
+                    if (!RestoreWindowPosition())
+                    {
+                        CenterWindow();
+                    }
                 }
                 _appWindow.Show();
-                if (NativeMethods.IsIconic(_hWnd)) NativeMethods.ShowWindow(_hWnd, NativeMethods.SwRestore);
+                if (NativeMethods.IsIconic(_hWnd))
+                {
+                    NativeMethods.ShowWindow(_hWnd, NativeMethods.SwRestore);
+                }
                 NativeMethods.SetForegroundWindow(_hWnd);
             }
         }
@@ -135,7 +147,10 @@ public class WindowService : IWindowService, IDisposable
 
     public void Hide()
     {
-        if (_appWindow == null) return;
+        if (_appWindow == null)
+        {
+            return;
+        }
         try
         {
             _appWindow.Hide();
@@ -148,7 +163,10 @@ public class WindowService : IWindowService, IDisposable
 
     public void ResetPosition()
     {
-        if (_appWindow == null) return;
+        if (_appWindow == null)
+        {
+            return;
+        }
 
         try
         {
@@ -207,7 +225,10 @@ public class WindowService : IWindowService, IDisposable
 
     private void CenterWindow()
     {
-        if (_appWindow == null) return;
+        if (_appWindow == null)
+        {
+            return;
+        }
 
         try
         {
@@ -225,7 +246,10 @@ public class WindowService : IWindowService, IDisposable
 
     private void SaveWindowPosition()
     {
-        if (_appWindow == null) return;
+        if (_appWindow == null)
+        {
+            return;
+        }
 
         try
         {
@@ -241,7 +265,10 @@ public class WindowService : IWindowService, IDisposable
 
     private bool RestoreWindowPosition()
     {
-        if (_appWindow == null) return false;
+        if (_appWindow == null)
+        {
+            return false;
+        }
 
         try
         {

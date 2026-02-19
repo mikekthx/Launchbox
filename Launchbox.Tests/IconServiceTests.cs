@@ -1,6 +1,6 @@
+using System.IO;
 using Xunit;
 using Launchbox.Services;
-using System.IO;
 
 namespace Launchbox.Tests;
 

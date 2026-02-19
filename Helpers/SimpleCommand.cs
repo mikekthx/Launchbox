@@ -9,7 +9,10 @@ public class SimpleCommand : ICommand
 
     public SimpleCommand(Action action)
     {
-        if (action == null) throw new ArgumentNullException(nameof(action));
+        if (action == null)
+        {
+            throw new ArgumentNullException(nameof(action));
+        }
         _action = _ => action();
     }
 

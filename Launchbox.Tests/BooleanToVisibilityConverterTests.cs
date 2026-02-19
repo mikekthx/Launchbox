@@ -1,7 +1,7 @@
+using System;
+using Microsoft.UI.Xaml;
 using Xunit;
 using Launchbox.Helpers;
-using Microsoft.UI.Xaml;
-using System;
 
 namespace Launchbox.Tests;
 

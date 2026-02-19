@@ -1,9 +1,9 @@
-using Launchbox.Helpers;
 using System;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Launchbox.Helpers;
 
 namespace Launchbox.Services;
 
@@ -108,7 +108,10 @@ public class SettingsService : INotifyPropertyChanged
 
     public async Task SetRunAtStartupAsync(bool enable)
     {
-        if (!_startupService.IsSupported) return;
+        if (!_startupService.IsSupported)
+        {
+            return;
+        }
 
         if (enable)
         {

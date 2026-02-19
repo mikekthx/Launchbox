@@ -11,7 +11,10 @@ public class VisualTreeFinder
 
     public T? FindFirstDescendant<T>(object root) where T : class
     {
-        if (root == null) return null;
+        if (root == null)
+        {
+            return null;
+        }
 
         int count = _visualTreeService.GetChildrenCount(root);
         for (int i = 0; i < count; i++)

@@ -121,7 +121,7 @@ csharp_style_prefer_collection_expression = true:suggestion
 # 2. System.*
 # 3. Windows.*
 # 4. Others
-dotnet_sort_system_directives_first = false
+dotnet_sort_system_directives_first = true
 file_header_template = unset
 
 # Qualify static members?

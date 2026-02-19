@@ -12,11 +12,17 @@ public static class ImageHeaderParser
     {
         try
         {
-            if (stream.Length < 24) return null;
+            if (stream.Length < 24)
+            {
+                return null;
+            }
 
             stream.Position = 0;
             var header = new byte[24];
-            if (stream.Read(header, 0, 24) != 24) return null;
+            if (stream.Read(header, 0, 24) != 24)
+            {
+                return null;
+            }
 
             // PNG Signature: 89 50 4E 47 0D 0A 1A 0A
             if (header[0] != 0x89 || header[1] != 0x50 || header[2] != 0x4E || header[3] != 0x47 ||
@@ -47,21 +53,36 @@ public static class ImageHeaderParser
     {
         try
         {
-            if (stream.Length < 6) return null;
+            if (stream.Length < 6)
+            {
+                return null;
+            }
 
             stream.Position = 0;
             var header = new byte[6];
-            if (stream.Read(header, 0, 6) != 6) return null;
+            if (stream.Read(header, 0, 6) != 6)
+            {
+                return null;
+            }
 
             // Reserved (2 bytes) must be 0
-            if (header[0] != 0 || header[1] != 0) return null;
+            if (header[0] != 0 || header[1] != 0)
+            {
+                return null;
+            }
 
             // Type (2 bytes) must be 1 for Icon (2 for Cursor)
-            if (header[2] != 1 || header[3] != 0) return null;
+            if (header[2] != 1 || header[3] != 0)
+            {
+                return null;
+            }
 
             // Count (2 bytes)
             int count = header[4] | (header[5] << 8);
-            if (count == 0) return null;
+            if (count == 0)
+            {
+                return null;
+            }
 
             int maxWidth = 0;
             int maxHeight = 0;
@@ -70,15 +91,24 @@ public static class ImageHeaderParser
             var entry = new byte[16];
             for (int i = 0; i < count; i++)
             {
-                if (stream.Read(entry, 0, 16) != 16) break;
+                if (stream.Read(entry, 0, 16) != 16)
+                {
+                    break;
+                }
 
                 // Width (1 byte): 0 means 256
                 int w = entry[0];
-                if (w == 0) w = 256;
+                if (w == 0)
+                {
+                    w = 256;
+                }
 
                 // Height (1 byte): 0 means 256
                 int h = entry[1];
-                if (h == 0) h = 256;
+                if (h == 0)
+                {
+                    h = 256;
+                }
 
                 if (w * h > maxWidth * maxHeight)
                 {

@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
+using Xunit;
 using Launchbox.Helpers;
 using Launchbox.Services;
 using Launchbox.ViewModels;
-using Xunit;
 
 namespace Launchbox.Tests;
 

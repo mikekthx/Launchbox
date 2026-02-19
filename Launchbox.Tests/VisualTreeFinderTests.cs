@@ -1,8 +1,8 @@
-namespace Launchbox.Tests;
-
-using Xunit;
 using System.Collections.Generic;
+using Xunit;
 using Launchbox.Services;
+
+namespace Launchbox.Tests;
 
 public class VisualTreeFinderTests
 {
@@ -19,13 +19,19 @@ public class VisualTreeFinderTests
     {
         public int GetChildrenCount(object parent)
         {
-            if (parent is TestNode node) return node.Children.Count;
+            if (parent is TestNode node)
+            {
+                return node.Children.Count;
+            }
             return 0;
         }
 
         public object GetChild(object parent, int index)
         {
-            if (parent is TestNode node) return node.Children[index];
+            if (parent is TestNode node)
+            {
+                return node.Children[index];
+            }
             throw new System.ArgumentOutOfRangeException();
         }
     }

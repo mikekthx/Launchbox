@@ -1,11 +1,11 @@
-using Launchbox.Helpers;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.InteropServices;
+using Launchbox.Helpers;
 using WinIcon = System.Drawing.Icon;
 
 namespace Launchbox.Services;
@@ -146,7 +146,10 @@ public class IconService(IFileSystem fileSystem)
         bool pngExists = pngTime.Year > Constants.MIN_VALID_YEAR;
         bool icoExists = icoTime.Year > Constants.MIN_VALID_YEAR;
 
-        if (!pngExists && !icoExists) return null;
+        if (!pngExists && !icoExists)
+        {
+            return null;
+        }
 
         string? chosenPath = null;
 
@@ -208,7 +211,10 @@ public class IconService(IFileSystem fileSystem)
             // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
             // saving ~43% processing time compared to 128x128.
             NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, ref hIcon, IntPtr.Zero, 1, 0);
-            if (hIcon == IntPtr.Zero) return null;
+            if (hIcon == IntPtr.Zero)
+            {
+                return null;
+            }
 
             lock (_gdiLock)
             {

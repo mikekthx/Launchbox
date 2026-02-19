@@ -1,6 +1,6 @@
+using System.Collections.Generic;
 using Xunit;
 using Launchbox.Services;
-using System.Collections.Generic;
 
 namespace Launchbox.Tests;
 

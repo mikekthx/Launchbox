@@ -1,9 +1,9 @@
-using Launchbox.Helpers;
 using System;
 using System.Diagnostics;
 using System.IO;
 using Xunit;
 using Xunit.Abstractions;
+using Launchbox.Helpers;
 
 namespace Launchbox.Tests;
 
@@ -34,7 +34,10 @@ public class PerformanceBenchmarkTests
             {
                 var dims = ImageHeaderParser.GetPngDimensions(ms);
                 // Force evaluation
-                if (dims == null) throw new Exception("Parsing failed");
+                if (dims == null)
+                {
+                    throw new Exception("Parsing failed");
+                }
             }
         }
         swParser.Stop();

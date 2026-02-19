@@ -1,5 +1,3 @@
-using Launchbox.Helpers;
-using Launchbox.Services;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -7,6 +5,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Launchbox.Helpers;
+using Launchbox.Services;
 
 namespace Launchbox.ViewModels;
 
@@ -40,7 +40,10 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 
     private async void BrowseFolderAsync(object? parameter)
     {
-        if (parameter == null) return; // Need window handle
+        if (parameter == null)
+        {
+            return; // Need window handle
+        }
 
         try
         {
@@ -115,17 +118,35 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         get
         {
             var mod = _settingsService.HotkeyModifiers;
-            if (mod == Constants.MOD_CONTROL) return "Ctrl";
-            if (mod == Constants.MOD_SHIFT) return "Shift";
-            if (mod == Constants.MOD_WIN) return "Win";
+            if (mod == Constants.MOD_CONTROL)
+            {
+                return "Ctrl";
+            }
+            if (mod == Constants.MOD_SHIFT)
+            {
+                return "Shift";
+            }
+            if (mod == Constants.MOD_WIN)
+            {
+                return "Win";
+            }
             return "Alt";
         }
         set
         {
             int mod = Constants.MOD_ALT;
-            if (value == "Ctrl") mod = Constants.MOD_CONTROL;
-            else if (value == "Shift") mod = Constants.MOD_SHIFT;
-            else if (value == "Win") mod = Constants.MOD_WIN;
+            if (value == "Ctrl")
+            {
+                mod = Constants.MOD_CONTROL;
+            }
+            else if (value == "Shift")
+            {
+                mod = Constants.MOD_SHIFT;
+            }
+            else if (value == "Win")
+            {
+                mod = Constants.MOD_WIN;
+            }
 
             _settingsService.HotkeyModifiers = mod;
         }
