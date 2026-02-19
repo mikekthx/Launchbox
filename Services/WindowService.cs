@@ -47,7 +47,7 @@ public class WindowService : IWindowService, IDisposable
 
         // WndProc
         _wndProcDelegate = NewWndProc;
-        _oldWndProc = NativeMethods.SetWindowLongPtr(_hWnd, -4, _wndProcDelegate);
+        _oldWndProc = NativeMethods.SetWindowLongPtr(_hWnd, NativeMethods.GWLP_WNDPROC, _wndProcDelegate);
         if (_oldWndProc == IntPtr.Zero)
         {
             Trace.WriteLine("Failed to set WndProc hook.");
@@ -92,15 +92,12 @@ public class WindowService : IWindowService, IDisposable
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
-        const uint wmHotkey = 0x0312;
-        const uint wmNclbuttondblclk = 0x00A3;
-
-        if (msg == wmHotkey && wParam.ToInt32() == Constants.HOTKEY_ID)
+        if (msg == NativeMethods.WM_HOTKEY && wParam.ToInt32() == Constants.HOTKEY_ID)
         {
             ToggleVisibility();
             return IntPtr.Zero;
         }
-        if (msg == wmNclbuttondblclk) return IntPtr.Zero;
+        if (msg == NativeMethods.WM_NCLBUTTONDBLCLK) return IntPtr.Zero;
 
         return NativeMethods.CallWindowProc(_oldWndProc, hWnd, msg, wParam, lParam);
     }
@@ -195,7 +192,7 @@ public class WindowService : IWindowService, IDisposable
 
             if (_oldWndProc != IntPtr.Zero)
             {
-                NativeMethods.SetWindowLongPtr(_hWnd, -4, _oldWndProc);
+                NativeMethods.SetWindowLongPtr(_hWnd, NativeMethods.GWLP_WNDPROC, _oldWndProc);
                 _oldWndProc = IntPtr.Zero;
             }
         }

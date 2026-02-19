@@ -20,6 +20,21 @@ public static class NativeMethods
     // From MainWindow.xaml.cs
     public const int SwRestore = 9;
 
+    /// <summary>
+    /// Sets a new address for the window procedure.
+    /// </summary>
+    public const int GWLP_WNDPROC = -4;
+
+    /// <summary>
+    /// Posted when the user presses a hot key registered by the RegisterHotKey function.
+    /// </summary>
+    public const int WM_HOTKEY = 0x0312;
+
+    /// <summary>
+    /// Posted when the user double-clicks the left mouse button while the cursor is within the nonclient area of a window.
+    /// </summary>
+    public const int WM_NCLBUTTONDBLCLK = 0x00A3;
+
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
