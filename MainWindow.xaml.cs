@@ -17,7 +17,7 @@ public sealed partial class MainWindow : Window
     public MainViewModel ViewModel { get; }
 
     private ScrollViewer? _internalScrollViewer;
-    private readonly WindowService _windowService;
+    private readonly IWindowService _windowService;
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
     private readonly IBackdropService _backdropService;
