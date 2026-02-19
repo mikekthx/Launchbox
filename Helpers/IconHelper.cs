@@ -1,9 +1,9 @@
-using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
+using Microsoft.UI.Xaml.Media.Imaging;
 
 namespace Launchbox.Helpers;
 

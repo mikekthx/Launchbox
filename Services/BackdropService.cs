@@ -1,8 +1,8 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using Launchbox.Helpers;
 
 namespace Launchbox.Services;

@@ -1,6 +1,6 @@
-using Microsoft.UI.Dispatching;
 using System;
 using System.Threading.Tasks;
+using Microsoft.UI.Dispatching;
 
 namespace Launchbox.Services;
 

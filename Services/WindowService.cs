@@ -1,7 +1,7 @@
-using System;
-using System.Diagnostics;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
+using System.Diagnostics;
 using Launchbox.Helpers;
 
 namespace Launchbox.Services;
