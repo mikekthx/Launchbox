@@ -16,6 +16,7 @@ public sealed partial class SettingsWindow : Window
 
         this.Title = "Launchbox Settings";
         this.ExtendsContentIntoTitleBar = true;
+        this.SetTitleBar(AppTitleBar);
 
         this.Closed += (s, e) => ViewModel.Dispose();
     }
