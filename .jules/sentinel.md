@@ -12,3 +12,8 @@
 **Vulnerability:** `IconService.ExtractIconBytes` accepted direct UNC paths, bypassing `ResolveIconPath` checks for `.url` files, potentially leaking NTLM credentials via `GetLastWriteTime` and `PrivateExtractIcons`.
 **Learning:** Input sanitization must be applied at the entry point of public methods (`ExtractIconBytes`), not just in helper methods (`ResolveIconPath`) or specific file types (`.url`).
 **Prevention:** Validate all file paths against `IsUnsafePath` immediately upon entry in `IconService` methods before any file system access.
+
+## 2026-06-25 - Icon Path Environment Variables
+**Vulnerability:** `IconService.ResolveIconPath` failed to expand environment variables (e.g., `%SystemRoot%`) before file validation, causing failure for system icons and potentially masking malicious paths hidden behind variables.
+**Learning:** `File.Exists` does not expand environment variables, and unexpanded paths might bypass path security checks intended for the resolved path.
+**Prevention:** Always expand environment variables (`Environment.ExpandEnvironmentVariables`) immediately when retrieving paths from external configuration (e.g., INI files) before validation.

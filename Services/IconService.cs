@@ -47,6 +47,10 @@ public class IconService(IFileSystem fileSystem)
             string iconFile = _fileSystem.GetIniValue(path, Constants.INTERNET_SHORTCUT_SECTION, Constants.ICON_FILE_KEY);
             iconFile = Environment.ExpandEnvironmentVariables(iconFile);
 
+            // Expand environment variables to support system paths (e.g., %SystemRoot%)
+            // and ensure path security checks are performed on the actual target path.
+            iconFile = Environment.ExpandEnvironmentVariables(iconFile);
+
             if (PathSecurity.IsUnsafePath(iconFile))
             {
                 Trace.WriteLine($"Blocked potential unsafe icon path: {iconFile}");
