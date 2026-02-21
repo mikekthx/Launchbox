@@ -23,33 +23,33 @@
 ## Medium
 
 ### Reliability & Error Handling
-- [ ] Hotkey change is not atomic: old hotkey unregistered before new one succeeds, leaving app with no hotkey on failure (WindowService.cs:72-88)
+- [ ] Hotkey change is not atomic: old hotkey unregistered before new one succeeds, leaving app with no hotkey on failure (WindowService.cs:72-83)
 - [ ] No user-facing feedback when RegisterHotKey fails -- only Trace.WriteLine (WindowService.cs:80-83)
-- [ ] OpenShortcutsFolder and LaunchApp have no try/catch -- exceptions propagate unhandled (MainViewModel.cs:150-167)
+- [ ] OpenShortcutsFolder and LaunchApp have no try/catch -- exceptions propagate unhandled (MainViewModel.cs:171-188)
 - [ ] ShortcutService.GetShortcutFiles has no error handling for UnauthorizedAccessException (ShortcutService.cs:16-27)
 - [ ] SettingsService.InitializeAsync has no try-catch; callers use fire-and-forget (SettingsService.cs:101-107)
-- [ ] Parallel.ForEachAsync without bounded parallelism -- could exhaust GDI handles on many-core systems (MainViewModel.cs:124)
-- [ ] CancellationToken from Parallel.ForEachAsync never forwarded to inner async operations (MainViewModel.cs:124)
+- [ ] Parallel.ForEachAsync without bounded parallelism -- could exhaust GDI handles on many-core systems (MainViewModel.cs:137)
+- [ ] CancellationToken from Parallel.ForEachAsync never forwarded to inner async operations (MainViewModel.cs:137-159)
+- [ ] WindowService constructor has no null guards on parameters -- inconsistent with all other services (WindowService.cs:20-24)
 
 ### Resource Leaks & Lifecycle
-- [ ] SettingsWindow not closed on app exit -- orphaned window remains (MainWindow.xaml.cs:189-194)
+- [ ] SettingsWindow not closed on app exit -- orphaned window remains (MainWindow.xaml.cs:190-195)
 - [ ] Missing PointerCaptureLost handler: _isDraggingWindow stays true if capture lost unexpectedly (MainWindow.xaml.cs:69-71)
-- [ ] WindowService.Dispose() missing _disposed guard and finalizer despite managing unmanaged resources (WindowService.cs:177-214)
-- [ ] IWindowService does not extend IDisposable; Cleanup() duplicates Dispose() (IWindowService.cs, WindowService.cs:172)
+- [ ] WindowService.Dispose() missing _disposed guard and finalizer despite managing unmanaged resources (WindowService.cs:172-206)
+- [ ] IWindowService does not extend IDisposable; Cleanup() duplicates Dispose() (IWindowService.cs, WindowService.cs:167)
 
 ### Security
 - [ ] PathSecurity.IsUnsafePath: catch blocks return false (safe) on parse failure -- should default to true (unsafe) (PathSecurity.cs:39-52)
 - [ ] FileSystem performs no path validation -- defense-in-depth gap (FileSystem.cs)
-- [ ] pull_request_target trigger on labeler workflow without fork safety guard (labeler.yml:4)
 - [ ] PublishTrimmed enabled without TrimMode or SuppressTrimAnalysisWarnings -- WinUI reflection may break (Launchbox.csproj:62-66)
 
 ### Architecture & Code Quality
 - [ ] Missing IIconService and IShortcutService interfaces -- breaks consistent abstraction pattern (IconService.cs, ShortcutService.cs)
-- [ ] Magic strings for modifier keys duplicated in 3 places -- use a dictionary (SettingsViewModel.cs:22,86-96)
+- [ ] Magic strings for modifier keys duplicated in 3 places -- use a dictionary (SettingsViewModel.cs:24,118-131)
 - [ ] Constants.ALLOWED_EXTENSIONS array is mutable at runtime -- use IReadOnlyList<string> (Constants.cs:25)
 - [ ] AppItem.Name/Path don't raise PropertyChanged -- should be { get; init; } to enforce set-once intent (AppItem.cs:10-11)
 - [ ] PrivateExtractIcons has obfuscated param names (l, n, cx, p) and incorrect types for general use (NativeMethods.cs:12)
-- [ ] BackdropService silent catch blocks and Debug.WriteLine (should be Trace.WriteLine per coding standards) (BackdropService.cs:43-46,69)
+- [ ] Debug.WriteLine used instead of Trace.WriteLine per coding standards (BackdropService.cs:69, MainWindow.xaml.cs:82,84,181)
 
 ### UI/UX
 - [ ] Empty-state StackPanel and GridView overlap -- no mutual exclusion in XAML (MainWindow.xaml:34-97)
@@ -83,3 +83,4 @@
 - [ ] ImageHeaderParser: no IHDR chunk validation for PNG, no upper bound on ICO entry count, silent exception swallowing
 - [ ] No version auto-increment in CI -- every build is 1.0.0.0 (Package.appxmanifest:14)
 - [ ] In-tree XAML elements using {Binding} instead of {x:Bind} contrary to project conventions (MainWindow.xaml:37,51)
+- [ ] Launchbox.Tests.csproj has inconsistent indentation -- mix of tabs and spaces (Tests.csproj:6,10)
