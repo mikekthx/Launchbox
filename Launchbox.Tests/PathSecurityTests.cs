@@ -45,4 +45,23 @@ public class PathSecurityTests
         Assert.False(PathSecurity.IsUnsafePath(""));
         Assert.False(PathSecurity.IsUnsafePath("   "));
     }
+
+    [Fact]
+    public void IsUnsafePath_ReturnsTrue_OnInvalidPathException()
+    {
+        // These paths cause Path.GetFullPath (and possibly new Uri) to throw exceptions on Windows.
+        // We want IsUnsafePath to return true (fail closed) instead of false.
+        Assert.True(PathSecurity.IsUnsafePath("path|with|pipe"));
+        Assert.True(PathSecurity.IsUnsafePath("path<with<bracket"));
+        Assert.True(PathSecurity.IsUnsafePath("path>with>bracket"));
+        Assert.True(PathSecurity.IsUnsafePath("path\"with\"quote"));
+    }
+
+    [Fact]
+    public void IsUnsafePath_AllowsRelativePaths()
+    {
+        Assert.False(PathSecurity.IsUnsafePath("config.xml"));
+        Assert.False(PathSecurity.IsUnsafePath(@"subfolder\file.txt"));
+        Assert.False(PathSecurity.IsUnsafePath("..\\parent.txt"));
+    }
 }

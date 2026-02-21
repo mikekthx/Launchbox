@@ -42,14 +42,25 @@ public static class PathSecurity
             if (fullPath.StartsWith(@"\\") || fullPath.StartsWith("//")) return true;
             if (new Uri(fullPath).IsUnc) return true;
         }
-        catch { }
+        catch
+        {
+            // If we can't parse the path, assume it's unsafe (Fail Closed)
+            return true;
+        }
 
         // Check using Uri as a backup
         try
         {
-            if (new Uri(path).IsUnc) return true;
+            if (Uri.TryCreate(path, UriKind.Absolute, out Uri? uri) && uri.IsUnc)
+            {
+                return true;
+            }
         }
-        catch { }
+        catch
+        {
+            // If unexpected exception occurs, assume unsafe
+            return true;
+        }
 
         return false;
     }
