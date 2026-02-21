@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Xunit;
 
 namespace Launchbox.Tests;
+
 public class VisualTreeFinderTests
 {
     private class TestNode
