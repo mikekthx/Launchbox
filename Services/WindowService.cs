@@ -166,6 +166,13 @@ public class WindowService : IWindowService, IDisposable
         Dispose();
     }
 
+    private bool _disposed;
+
+    ~WindowService()
+    {
+        Dispose(false);
+    }
+
     public void Dispose()
     {
         Dispose(true);
@@ -174,6 +181,8 @@ public class WindowService : IWindowService, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
+        if (_disposed) return;
+
         if (disposing)
         {
             // Unsubscribe managed events
@@ -200,6 +209,8 @@ public class WindowService : IWindowService, IDisposable
         {
             Trace.WriteLine($"Error during exit: {ex.Message}");
         }
+
+        _disposed = true;
     }
 
     private void CenterWindow()
