@@ -179,12 +179,19 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
     private void OpenShortcutsFolder()
     {
-        var shortcutFolder = _settingsService.ShortcutsPath;
-        if (!_fileSystem.DirectoryExists(shortcutFolder))
+        try
         {
-            _fileSystem.CreateDirectory(shortcutFolder);
+            var shortcutFolder = _settingsService.ShortcutsPath;
+            if (!_fileSystem.DirectoryExists(shortcutFolder))
+            {
+                _fileSystem.CreateDirectory(shortcutFolder);
+            }
+            _appLauncher.OpenFolder(shortcutFolder);
         }
-        _appLauncher.OpenFolder(shortcutFolder);
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to open shortcuts folder: {ex.Message}");
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

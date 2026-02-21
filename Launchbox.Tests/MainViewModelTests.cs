@@ -158,4 +158,37 @@ public class MainViewModelTests
         Assert.True(_fileSystem.DirectoryExists(newPath));
         Assert.Equal(newPath, _appLauncher.LastOpenedFolder);
     }
+
+    [Fact]
+    public void OpenShortcutsFolderCommand_CatchesException_WhenDirectoryCreationFails()
+    {
+        // Arrange
+        var throwingFileSystem = new ThrowingFileSystem();
+        var viewModel = new MainViewModel(
+            _shortcutService,
+            _iconService,
+            _imageFactory,
+            _dispatcher,
+            _appLauncher,
+            throwingFileSystem,
+            _settingsService,
+            _windowService);
+
+        string newPath = Path.Combine("C:", "NewShortcuts");
+        _settingsService.ShortcutsPath = newPath;
+
+        // Act & Assert
+        // This should not throw
+        var exception = Record.Exception(() => viewModel.OpenShortcutsFolderCommand.Execute(null));
+
+        Assert.Null(exception);
+    }
+
+    private class ThrowingFileSystem : MockFileSystem
+    {
+        public override void CreateDirectory(string path)
+        {
+            throw new UnauthorizedAccessException("Access denied");
+        }
+    }
 }
