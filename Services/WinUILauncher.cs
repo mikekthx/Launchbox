@@ -18,6 +18,12 @@ public class WinUILauncher : IAppLauncher
             return;
         }
 
+        if (!File.Exists(path))
+        {
+            Trace.WriteLine($"Blocked execution of non-existent file: {path}");
+            return;
+        }
+
         string extension = Path.GetExtension(path).ToLowerInvariant();
         if (!ALLOWED_EXTENSIONS.Contains(extension))
         {
