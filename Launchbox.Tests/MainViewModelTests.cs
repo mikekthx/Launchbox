@@ -1,10 +1,10 @@
-using Xunit;
-using Launchbox.ViewModels;
-using Launchbox.Services;
 using Launchbox.Models;
-using System.Threading.Tasks;
+using Launchbox.Services;
+using Launchbox.ViewModels;
 using System;
 using System.IO;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Launchbox.Tests;
 

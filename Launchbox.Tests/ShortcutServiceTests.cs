@@ -1,16 +1,16 @@
-using Xunit;
 using Launchbox.Services;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Xunit;
 
 namespace Launchbox.Tests;
 
 public class ShortcutServiceTests
 {
-    private readonly string SHORTCUT_FOLDER = Path.Combine("Shortcuts");
-    private readonly string[] ALLOWED_EXTENSIONS = { ".lnk", ".url" };
+    private static readonly string SHORTCUT_FOLDER = Path.Combine("Shortcuts");
+    private static readonly string[] ALLOWED_EXTENSIONS = { ".lnk", ".url" };
 
     [Fact]
     public void GetShortcutFiles_ReturnsNull_WhenDirectoryDoesNotExist()

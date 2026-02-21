@@ -1,8 +1,9 @@
-namespace Launchbox.Tests;
 
-using Xunit;
-using System.Collections.Generic;
 using Launchbox.Services;
+using System.Collections.Generic;
+using Xunit;
+
+namespace Launchbox.Tests;
 
 public class VisualTreeFinderTests
 {

@@ -120,7 +120,7 @@ public class WindowService : IWindowService, IDisposable
                     if (!RestoreWindowPosition()) CenterWindow();
                 }
                 _appWindow.Show();
-                if (NativeMethods.IsIconic(_hWnd)) NativeMethods.ShowWindow(_hWnd, NativeMethods.SwRestore);
+                if (NativeMethods.IsIconic(_hWnd)) NativeMethods.ShowWindow(_hWnd, NativeMethods.SW_RESTORE);
                 NativeMethods.SetForegroundWindow(_hWnd);
             }
         }
