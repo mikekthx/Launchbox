@@ -4,13 +4,13 @@ using Launchbox.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace Launchbox.ViewModels;
 

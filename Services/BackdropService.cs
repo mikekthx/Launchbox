@@ -12,7 +12,7 @@ public class BackdropService : IBackdropService
     private readonly Window _window;
     private DateTime _lastBackdropCheck = DateTime.MinValue;
     private bool _isDwmBlurGlassRunning = false;
-    private static readonly TimeSpan BackdropCheckInterval = TimeSpan.FromSeconds(60);
+    private static readonly TimeSpan BACKDROP_CHECK_INTERVAL = TimeSpan.FromSeconds(60);
 
     public BackdropService(Window window)
     {
@@ -23,7 +23,7 @@ public class BackdropService : IBackdropService
     {
         try
         {
-            if (DateTime.Now - _lastBackdropCheck >= BackdropCheckInterval)
+            if (DateTime.Now - _lastBackdropCheck >= BACKDROP_CHECK_INTERVAL)
             {
                 _lastBackdropCheck = DateTime.Now;
                 _isDwmBlurGlassRunning = await Task.Run(() =>

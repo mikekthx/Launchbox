@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using Launchbox.Services;
+using System.Threading.Tasks;
 
 namespace Launchbox.Tests;
 

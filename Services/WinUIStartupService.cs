@@ -7,7 +7,7 @@ namespace Launchbox.Services;
 
 public class WinUIStartupService : IStartupService
 {
-    private const string TaskId = "LaunchboxStartup";
+    private const string TASK_ID = "LaunchboxStartup";
 
     public bool IsSupported => true;
 
@@ -15,7 +15,7 @@ public class WinUIStartupService : IStartupService
     {
         try
         {
-            var task = await StartupTask.GetAsync(TaskId);
+            var task = await StartupTask.GetAsync(TASK_ID);
             return task.State == StartupTaskState.Enabled || task.State == StartupTaskState.EnabledByPolicy;
         }
         catch (Exception ex)
@@ -29,7 +29,7 @@ public class WinUIStartupService : IStartupService
     {
         try
         {
-            var task = await StartupTask.GetAsync(TaskId);
+            var task = await StartupTask.GetAsync(TASK_ID);
             var state = await task.RequestEnableAsync();
             return state == StartupTaskState.Enabled || state == StartupTaskState.EnabledByPolicy;
         }
@@ -44,7 +44,7 @@ public class WinUIStartupService : IStartupService
     {
         try
         {
-            var task = await StartupTask.GetAsync(TaskId);
+            var task = await StartupTask.GetAsync(TASK_ID);
             task.Disable();
         }
         catch (Exception ex)

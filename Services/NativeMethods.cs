@@ -18,7 +18,7 @@ public static class NativeMethods
     public static extern int GetPrivateProfileString(string s, string k, string d, StringBuilder r, int z, string f);
 
     // From MainWindow.xaml.cs
-    public const int SwRestore = 9;
+    public const int SW_RESTORE = 9;
 
     /// <summary>
     /// Sets a new address for the window procedure.
