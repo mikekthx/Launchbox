@@ -18,7 +18,7 @@
 **Learning:** `File.Exists` does not expand environment variables, and unexpanded paths might bypass path security checks intended for the resolved path.
 **Prevention:** Always expand environment variables (`Environment.ExpandEnvironmentVariables`) immediately when retrieving paths from external configuration (e.g., INI files) before validation.
 
-## 2026-06-26 - Invalid File Execution & Symlinks
+## 2026-02-21 - Invalid File Execution & Symlinks
 **Vulnerability:** `WinUILauncher.Launch` allowed execution without verifying file existence, potentially enabling directory traversal or phantom path execution. Additionally, `GetPrivateProfileString` (used in `GetIniValue`) can access NTLM shares via symlinks even if the path string looks local.
 **Learning:** `File.Exists` returns true for symlinks, so `IsUnsafePath` string checks can be bypassed by local symlinks pointing to UNC shares.
 **Prevention:** Enforce `File.Exists` for basic validation, and consider checking `FileAttributes.ReparsePoint` before reading sensitive file formats (like INI) to prevent redirect attacks.
