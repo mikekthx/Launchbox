@@ -15,7 +15,7 @@ public class ShortcutService
 
     public string[]? GetShortcutFiles(string folderPath, string[] allowedExtensions)
     {
-        if (!_fileSystem.DirectoryExists(folderPath))
+        if (allowedExtensions == null || !_fileSystem.DirectoryExists(folderPath))
         {
             return null;
         }
