@@ -103,7 +103,7 @@ public class MockFileSystem : IFileSystem
         return "";
     }
 
-    public byte[] ReadAllBytes(string path)
+    public virtual byte[] ReadAllBytes(string path)
     {
         if (_fileContents.TryGetValue(path, out var content))
             return content;
