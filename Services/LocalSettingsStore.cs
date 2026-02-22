@@ -1,3 +1,5 @@
+using System;
+using System.Diagnostics;
 using Windows.Storage;
 
 namespace Launchbox.Services;
@@ -13,11 +15,27 @@ public class LocalSettingsStore : ISettingsStore
 
     public bool TryGetValue(string key, out object? value)
     {
-        return _settings.Values.TryGetValue(key, out value);
+        try
+        {
+            return _settings.Values.TryGetValue(key, out value);
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to read setting {key}: {ex.Message}");
+            value = null;
+            return false;
+        }
     }
 
     public void SetValue(string key, object? value)
     {
-        _settings.Values[key] = value;
+        try
+        {
+            _settings.Values[key] = value;
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to write setting {key}: {ex.Message}");
+        }
     }
 }
