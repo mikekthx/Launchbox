@@ -272,8 +272,9 @@ public class IconService(IFileSystem fileSystem)
             var dims = parser(stream);
             return dims.HasValue ? dims.Value.Width * dims.Value.Height : 0;
         }
-        catch
+        catch (Exception ex)
         {
+            Trace.WriteLine($"Failed to get image area for {path}: {ex.Message}");
             return 0;
         }
     }
