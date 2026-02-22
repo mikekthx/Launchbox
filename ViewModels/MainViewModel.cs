@@ -15,8 +15,8 @@ namespace Launchbox.ViewModels;
 
 public class MainViewModel : ViewModelBase, IDisposable
 {
-    private readonly ShortcutService _shortcutService;
-    private readonly IconService _iconService;
+    private readonly IShortcutService _shortcutService;
+    private readonly IIconService _iconService;
     private readonly IImageFactory _imageFactory;
     private readonly IDispatcher _dispatcher;
     private readonly IAppLauncher _appLauncher;
@@ -40,8 +40,8 @@ public class MainViewModel : ViewModelBase, IDisposable
     public ICommand ToggleWindowCommand { get; }
 
     public MainViewModel(
-        ShortcutService shortcutService,
-        IconService iconService,
+        IShortcutService shortcutService,
+        IIconService iconService,
         IImageFactory imageFactory,
         IDispatcher dispatcher,
         IAppLauncher appLauncher,
