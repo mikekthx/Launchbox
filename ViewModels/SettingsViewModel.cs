@@ -148,17 +148,10 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         {
             if (!string.IsNullOrEmpty(value))
             {
-                // Try to parse full key name (e.g. "F1", "Home", "Enter")
-                if (Enum.TryParse<VirtualKey>(value, true, out var key))
-                {
-                    // Ensure it's a valid key
-                    if (Enum.IsDefined(typeof(VirtualKey), key))
-                    {
-                        _settingsService.HotkeyKey = (int)key;
-                    }
-                }
                 // Fallback for single char (e.g. "1" -> Number1, "a" -> A)
-                else if (value.Length == 1 && char.IsLetterOrDigit(value[0]))
+                // Prioritize this for alphanumeric chars because Enum.TryParse("5") returns VirtualKey.XButton1 (5)
+                // whereas we want VirtualKey.Number5 (53).
+                if (value.Length == 1 && char.IsLetterOrDigit(value[0]))
                 {
                     char c = char.ToUpperInvariant(value[0]);
                     var virtualKey = (VirtualKey)c;
@@ -166,6 +159,15 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
                     if (Enum.IsDefined(typeof(VirtualKey), virtualKey))
                     {
                         _settingsService.HotkeyKey = (int)virtualKey;
+                    }
+                }
+                // Try to parse full key name (e.g. "F1", "Home", "Enter")
+                else if (Enum.TryParse<VirtualKey>(value, true, out var key))
+                {
+                    // Ensure it's a valid key
+                    if (Enum.IsDefined(typeof(VirtualKey), key))
+                    {
+                        _settingsService.HotkeyKey = (int)key;
                     }
                 }
             }
