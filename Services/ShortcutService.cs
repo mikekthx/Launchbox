@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Launchbox.Services;
 
-public class ShortcutService
+public class ShortcutService : IShortcutService
 {
     private readonly IFileSystem _fileSystem;
 

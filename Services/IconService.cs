@@ -10,7 +10,7 @@ using WinIcon = System.Drawing.Icon;
 
 namespace Launchbox.Services;
 
-public class IconService(IFileSystem fileSystem)
+public class IconService(IFileSystem fileSystem) : IIconService
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
