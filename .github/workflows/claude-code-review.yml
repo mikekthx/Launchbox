@@ -37,6 +37,5 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: "Review this pull request. Focus on code quality, potential bugs, and adherence to the project's coding standards."
-          # allowed_bots: "*" # Removed wildcard to avoid potential parsing issues with newer Claude Code versions
-          # Enable full output for debugging if needed
-          # show_full_output: true
+          allowed_bots: "*"
+          claude_args: '--allowed-tools "Bash(gh pr*)"'
