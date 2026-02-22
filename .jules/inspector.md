@@ -9,3 +9,7 @@
 ## 2026-02-18 - [Reliability] Expand Environment Variables in File Paths
 **Learning:** `File.Exists` and similar APIs do not automatically expand environment variables (e.g., `%SystemRoot%`). Paths retrieved from INI files or shortcuts often contain these variables, leading to silent failures (file not found) if not explicitly expanded using `Environment.ExpandEnvironmentVariables`.
 **Action:** Always call `Environment.ExpandEnvironmentVariables` on file paths originating from external configuration (INI, Registry, User Input) before using them in file system operations.
+
+## 2024-05-23 - [LocalSettingsStore Reliability]
+**Learning:** `ApplicationDataContainer.Values` operations (accessing/setting keys) can throw exceptions (e.g. COMException, quota exceeded, file system errors), which crashes the app if unhandled on the UI thread.
+**Action:** Wrap all `LocalSettings` interactions in `try-catch` blocks and log failures instead of crashing.
