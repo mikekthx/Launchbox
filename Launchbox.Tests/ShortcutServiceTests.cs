@@ -79,4 +79,16 @@ public class ShortcutServiceTests
         Assert.Single(result);
         Assert.Contains(result, f => f.EndsWith("App1.lnk"));
     }
+
+    [Fact]
+    public void GetShortcutFiles_ReturnsNull_WhenAllowedExtensionsIsNull()
+    {
+        var mockFileSystem = new MockFileSystem();
+        mockFileSystem.AddDirectory(SHORTCUT_FOLDER);
+        var service = new ShortcutService(mockFileSystem);
+
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, null!);
+
+        Assert.Null(result);
+    }
 }
