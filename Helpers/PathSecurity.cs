@@ -9,6 +9,12 @@ public static class PathSecurity
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
+        // Check for invalid path characters (Fail Closed)
+        // Explicitly check for common Windows invalid characters that might pass Path.GetFullPath on some runtimes
+        char[] invalidChars = Path.GetInvalidPathChars();
+        if (path.IndexOfAny(invalidChars) >= 0) return true;
+        if (path.IndexOfAny(new[] { '|', '<', '>', '"', '*', '?' }) >= 0) return true;
+
         // Check for NT object path prefix (\??\) which can bypass UNC checks
         if (path.StartsWith(@"\??\", StringComparison.OrdinalIgnoreCase)) return true;
 
