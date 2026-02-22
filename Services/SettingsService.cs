@@ -35,9 +35,12 @@ public class SettingsService : INotifyPropertyChanged
         {
             if (ShortcutsPath != value)
             {
-                _store.SetValue(nameof(ShortcutsPath), value);
+                if (!PathSecurity.IsUnsafePath(value))
+                {
+                    _store.SetValue(nameof(ShortcutsPath), value);
+                    SettingsChanged?.Invoke(this, EventArgs.Empty);
+                }
                 OnPropertyChanged();
-                SettingsChanged?.Invoke(this, EventArgs.Empty);
             }
         }
     }

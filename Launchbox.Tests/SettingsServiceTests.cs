@@ -86,4 +86,21 @@ public class SettingsServiceTests
 
         Assert.True(service.IsRunAtStartup);
     }
+
+    [Theory]
+    [InlineData(@"\\attacker\share")]
+    [InlineData(@"\\?\UNC\attacker\share")]
+    [InlineData(@"//attacker/share")]
+    public void ShortcutsPath_RejectsUnsafePaths(string unsafePath)
+    {
+        var settingsStore = new MockSettingsStore();
+        var startupService = new MockStartupService();
+        var service = new SettingsService(settingsStore, startupService);
+        var initialPath = service.ShortcutsPath;
+
+        service.ShortcutsPath = unsafePath;
+
+        Assert.Equal(initialPath, service.ShortcutsPath);
+        Assert.False(settingsStore.TryGetValue("ShortcutsPath", out _));
+    }
 }
