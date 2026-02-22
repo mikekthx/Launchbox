@@ -39,4 +39,46 @@ public class IconServiceExceptionTests
         // We expect empty array (MockFileSystem behavior) but NO CRASH.
         Assert.Empty(result);
     }
+
+    [Fact]
+    public void ExtractIconBytes_ReturnsNull_WhenCustomIconReadFails()
+    {
+        string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
+        string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
+        string pngPath = Path.Combine(iconsDir, "App.png");
+
+        // Use custom mock that throws for PNG read
+        var faultyFileSystem = new FaultyFileSystem();
+        var iconService = new IconService(faultyFileSystem);
+
+        // Add file metadata
+        faultyFileSystem.AddFile(shortcutPath);
+        faultyFileSystem.AddDirectory(iconsDir);
+
+        // Add valid PNG entry (so it's chosen)
+        // Content doesn't matter as ReadAllBytes will throw before reading it
+        faultyFileSystem.AddFile(pngPath, size: 1024, content: new byte[1024], lastWriteTime: DateTime.Now);
+
+        // Configure to fail
+        faultyFileSystem.FailPath = pngPath;
+
+        var result = iconService.ExtractIconBytes(shortcutPath);
+
+        // Should return null (graceful failure)
+        Assert.Null(result);
+    }
+
+    private class FaultyFileSystem : MockFileSystem
+    {
+        public string? FailPath { get; set; }
+
+        public override byte[] ReadAllBytes(string path)
+        {
+            if (FailPath != null && path.Equals(FailPath, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new IOException("Simulated read failure");
+            }
+            return base.ReadAllBytes(path);
+        }
+    }
 }
