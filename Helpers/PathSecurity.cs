@@ -9,6 +9,24 @@ public static class PathSecurity
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
 
+        // Check for invalid path characters (Fail Closed)
+        // Explicitly check for common Windows invalid characters that might pass Path.GetFullPath on some runtimes
+        char[] invalidChars = Path.GetInvalidPathChars();
+        if (path.IndexOfAny(invalidChars) >= 0) return true;
+        if (path.IndexOfAny(new[] { '|', '<', '>', '"', '*' }) >= 0) return true;
+
+        // Check for '?' separately to allow the valid extended path prefix \\?\
+        int qIndex = path.IndexOf('?');
+        if (qIndex >= 0)
+        {
+            // If ? is present, it must be the 3rd char (index 2) AND path must start with \\?\
+            // Also ensure there are no *other* question marks later in the path
+            if (qIndex != 2 || !path.StartsWith(@"\\?\", StringComparison.Ordinal) || path.IndexOf('?', 3) >= 0)
+            {
+                return true;
+            }
+        }
+
         // Check for NT object path prefix (\??\) which can bypass UNC checks
         if (path.StartsWith(@"\??\", StringComparison.OrdinalIgnoreCase)) return true;
 
@@ -42,14 +60,25 @@ public static class PathSecurity
             if (fullPath.StartsWith(@"\\") || fullPath.StartsWith("//")) return true;
             if (new Uri(fullPath).IsUnc) return true;
         }
-        catch { }
+        catch
+        {
+            // If we can't parse the path, assume it's unsafe (Fail Closed)
+            return true;
+        }
 
         // Check using Uri as a backup
         try
         {
-            if (new Uri(path).IsUnc) return true;
+            if (Uri.TryCreate(path, UriKind.Absolute, out Uri? uri) && uri.IsUnc)
+            {
+                return true;
+            }
         }
-        catch { }
+        catch
+        {
+            // If unexpected exception occurs, assume unsafe
+            return true;
+        }
 
         return false;
     }

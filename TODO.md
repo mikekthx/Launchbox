@@ -39,7 +39,7 @@
 - [ ] IWindowService does not extend IDisposable; Cleanup() duplicates Dispose() (IWindowService.cs, WindowService.cs:167)
 
 ### Security
-- [ ] PathSecurity.IsUnsafePath: catch blocks return false (safe) on parse failure -- should default to true (unsafe) (PathSecurity.cs:39-52)
+- [x] PathSecurity.IsUnsafePath: catch blocks return false (safe) on parse failure -- should default to true (unsafe) (PathSecurity.cs:39-52)
 - [ ] FileSystem performs no path validation -- defense-in-depth gap (FileSystem.cs)
 - [ ] PublishTrimmed enabled without TrimMode or SuppressTrimAnalysisWarnings -- WinUI reflection may break (Launchbox.csproj:62-66)
 
