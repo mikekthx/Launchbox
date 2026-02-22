@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Launchbox.Helpers;
@@ -37,8 +38,9 @@ public static class ImageHeaderParser
 
             return (width, height);
         }
-        catch
+        catch (Exception ex)
         {
+            Trace.WriteLine($"Failed to parse PNG dimensions: {ex.Message}");
             return null;
         }
     }
@@ -89,8 +91,9 @@ public static class ImageHeaderParser
 
             return (maxWidth, maxHeight);
         }
-        catch
+        catch (Exception ex)
         {
+            Trace.WriteLine($"Failed to parse ICO dimensions: {ex.Message}");
             return null;
         }
     }

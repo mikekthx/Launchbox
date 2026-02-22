@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using System;
 using System.IO;
 using Xunit;
 
@@ -93,6 +94,14 @@ public class ImageHeaderParserTests
         Assert.NotNull(result);
         Assert.Equal(1, result.Value.Width);
         Assert.Equal(1, result.Value.Height);
+    }
+
+    [Fact]
+    public void GetPngDimensions_ReturnsNull_WhenStreamThrows()
+    {
+        using var stream = new ThrowingStream();
+        var result = ImageHeaderParser.GetPngDimensions(stream);
+        Assert.Null(result);
     }
 
     // --- ICO Tests ---
@@ -221,6 +230,14 @@ public class ImageHeaderParserTests
         Assert.Equal(64, result.Value.Height);
     }
 
+    [Fact]
+    public void GetMaxIcoDimensions_ReturnsNull_WhenStreamThrows()
+    {
+        using var stream = new ThrowingStream();
+        var result = ImageHeaderParser.GetMaxIcoDimensions(stream);
+        Assert.Null(result);
+    }
+
     // --- Helper methods ---
 
     private static byte[] CreatePng(int width, int height)
@@ -283,5 +300,11 @@ public class ImageHeaderParserTests
         }
 
         return data;
+    }
+
+    private class ThrowingStream : MemoryStream
+    {
+        public override long Length => throw new IOException("Test exception");
+        public override long Position { get => throw new IOException("Test exception"); set => throw new IOException("Test exception"); }
     }
 }
