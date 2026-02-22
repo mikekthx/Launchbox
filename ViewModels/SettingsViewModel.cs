@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.System;
 
 namespace Launchbox.ViewModels;
 
@@ -130,17 +131,41 @@ public class SettingsViewModel : ViewModelBase, IDisposable
 
     public string HotkeyKeyString
     {
-        get => ((char)_settingsService.HotkeyKey).ToString();
+        get
+        {
+            var key = (VirtualKey)_settingsService.HotkeyKey;
+            // Return digit characters for Number0-Number9 to keep UI clean
+            if (key >= VirtualKey.Number0 && key <= VirtualKey.Number9)
+            {
+                return ((char)key).ToString();
+            }
+            return key.ToString();
+        }
         set
         {
             if (!string.IsNullOrEmpty(value))
             {
-                string upper = value.ToUpperInvariant();
-                char c = upper[0];
-                // Only allow A-Z, 0-9
-                if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+                // Fallback for single char (e.g. "1" -> Number1, "a" -> A)
+                // Prioritize this for alphanumeric chars because Enum.TryParse("5") returns VirtualKey.XButton1 (5)
+                // whereas we want VirtualKey.Number5 (53).
+                if (value.Length == 1 && char.IsLetterOrDigit(value[0]))
                 {
-                    _settingsService.HotkeyKey = (int)c;
+                    char c = char.ToUpperInvariant(value[0]);
+                    var virtualKey = (VirtualKey)c;
+
+                    if (Enum.IsDefined(typeof(VirtualKey), virtualKey))
+                    {
+                        _settingsService.HotkeyKey = (int)virtualKey;
+                    }
+                }
+                // Try to parse full key name (e.g. "F1", "Home", "Enter")
+                else if (Enum.TryParse<VirtualKey>(value, true, out var key))
+                {
+                    // Ensure it's a valid key
+                    if (Enum.IsDefined(typeof(VirtualKey), key))
+                    {
+                        _settingsService.HotkeyKey = (int)key;
+                    }
                 }
             }
             // Always notify to refresh UI (e.g., if user typed invalid char, revert to old value)

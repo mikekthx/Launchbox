@@ -52,7 +52,7 @@
                         <ComboBox ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100"
                                   AutomationProperties.Name="Hotkey modifier" />
                         <TextBlock Text="+" VerticalAlignment="Center"/>
-                        <TextBox Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="50" MaxLength="1" HorizontalContentAlignment="Center"
+                        <TextBox Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center"
                                  AutomationProperties.Name="Hotkey key" />
                     </StackPanel>
                 </StackPanel>
