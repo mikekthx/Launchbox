@@ -117,15 +117,15 @@ public class PathSecurityTests
     {
         if (Path.DirectorySeparatorChar == '/')
         {
-             var path = @"\\server\share\file.txt";
-             var expected = @"...\\\server\share\file.txt";
-             Assert.Equal(expected, PathSecurity.RedactPath(path));
+            var path = @"\\server\share\file.txt";
+            var expected = @"...\\\server\share\file.txt";
+            Assert.Equal(expected, PathSecurity.RedactPath(path));
         }
         else
         {
-             var path = @"\\server\share\file.txt";
-             var expected = @"...\file.txt";
-             Assert.Equal(expected, PathSecurity.RedactPath(path));
+            var path = @"\\server\share\file.txt";
+            var expected = @"...\file.txt";
+            Assert.Equal(expected, PathSecurity.RedactPath(path));
         }
     }
 
