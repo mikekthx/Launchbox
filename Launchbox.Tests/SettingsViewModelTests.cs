@@ -3,6 +3,7 @@ using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
 using System.Threading.Tasks;
+using Windows.System;
 using Xunit;
 
 namespace Launchbox.Tests;
@@ -78,21 +79,38 @@ public class SettingsViewModelTests
         Assert.Equal(Constants.MOD_ALT, service.HotkeyModifiers);
     }
 
-    [Fact]
-    public void HotkeyKeyString_ValidatesAndUpdates()
+    [Theory]
+    [InlineData("k", (int)VirtualKey.K)]
+    [InlineData("5", (int)VirtualKey.Number5)]
+    [InlineData("F1", (int)VirtualKey.F1)]
+    [InlineData("Enter", (int)VirtualKey.Enter)]
+    [InlineData("Home", (int)VirtualKey.Home)]
+    public void HotkeyKeyString_ValidatesAndUpdates(string input, int expectedKey)
     {
         var (service, _, _, vm) = CreateViewModel();
 
-        vm.HotkeyKeyString = "k";
-        Assert.Equal((int)'K', service.HotkeyKey); // Converted to upper char code
+        vm.HotkeyKeyString = input;
+        Assert.Equal(expectedKey, service.HotkeyKey);
+    }
 
-        vm.HotkeyKeyString = "5";
-        Assert.Equal((int)'5', service.HotkeyKey);
-
-        // Invalid char
+    [Fact]
+    public void HotkeyKeyString_RejectsInvalidInput()
+    {
+        var (service, _, _, vm) = CreateViewModel();
         var oldKey = service.HotkeyKey;
+
+        // Invalid input
+        vm.HotkeyKeyString = "InvalidKeyName";
+        Assert.Equal(oldKey, service.HotkeyKey);
+
+        // '?' corresponds to no standard virtual key for hotkeys
         vm.HotkeyKeyString = "?";
-        Assert.Equal(oldKey, service.HotkeyKey); // Should not change
+        Assert.Equal(oldKey, service.HotkeyKey);
+
+        // '$' (ASCII 36) maps to VirtualKey.Home (36), but we should block it via char.IsLetterOrDigit restriction
+        // to prevent accidental mapping of symbols.
+        vm.HotkeyKeyString = "$";
+        Assert.Equal(oldKey, service.HotkeyKey);
     }
 
     [Fact]

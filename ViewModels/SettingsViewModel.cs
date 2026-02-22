@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.System;
 
 namespace Launchbox.ViewModels;
 
@@ -133,17 +134,39 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 
     public string HotkeyKeyString
     {
-        get => ((char)_settingsService.HotkeyKey).ToString();
+        get
+        {
+            var key = (VirtualKey)_settingsService.HotkeyKey;
+            // Return digit characters for Number0-Number9 to keep UI clean
+            if (key >= VirtualKey.Number0 && key <= VirtualKey.Number9)
+            {
+                return ((char)key).ToString();
+            }
+            return key.ToString();
+        }
         set
         {
             if (!string.IsNullOrEmpty(value))
             {
-                string upper = value.ToUpperInvariant();
-                char c = upper[0];
-                // Only allow A-Z, 0-9
-                if ((c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))
+                // Try to parse full key name (e.g. "F1", "Home", "Enter")
+                if (Enum.TryParse<VirtualKey>(value, true, out var key))
                 {
-                    _settingsService.HotkeyKey = (int)c;
+                    // Ensure it's a valid key
+                    if (Enum.IsDefined(typeof(VirtualKey), key))
+                    {
+                        _settingsService.HotkeyKey = (int)key;
+                    }
+                }
+                // Fallback for single char (e.g. "1" -> Number1, "a" -> A)
+                else if (value.Length == 1 && char.IsLetterOrDigit(value[0]))
+                {
+                    char c = char.ToUpperInvariant(value[0]);
+                    var virtualKey = (VirtualKey)c;
+
+                    if (Enum.IsDefined(typeof(VirtualKey), virtualKey))
+                    {
+                        _settingsService.HotkeyKey = (int)virtualKey;
+                    }
                 }
             }
             // Always notify to refresh UI (e.g., if user typed invalid char, revert to old value)
