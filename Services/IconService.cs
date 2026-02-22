@@ -17,7 +17,6 @@ public class IconService(IFileSystem fileSystem)
     private readonly ConcurrentDictionary<string, Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>> _directoryCache = [];
     private readonly ConcurrentDictionary<string, Lazy<(DateTime Timestamp, DateTime CacheTime)>> _fileTimestampCache = [];
     private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromSeconds(2);
-    private readonly object _gdiLock = new();
 
     public int PruneCache(IEnumerable<string> activePaths)
     {
@@ -293,14 +292,11 @@ public class IconService(IFileSystem fileSystem)
             NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, ref hIcon, IntPtr.Zero, 1, 0);
             if (hIcon == IntPtr.Zero) return null;
 
-            lock (_gdiLock)
-            {
-                using var icon = WinIcon.FromHandle(hIcon);
-                using var bmp = icon.ToBitmap();
-                using var ms = new MemoryStream();
-                bmp.Save(ms, ImageFormat.Png);
-                return ms.ToArray();
-            }
+            using var icon = WinIcon.FromHandle(hIcon);
+            using var bmp = icon.ToBitmap();
+            using var ms = new MemoryStream();
+            bmp.Save(ms, ImageFormat.Png);
+            return ms.ToArray();
         }
         catch (Exception ex)
         {
