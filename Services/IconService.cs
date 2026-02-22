@@ -14,10 +14,15 @@ public class IconService(IFileSystem fileSystem)
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
+    private readonly ConcurrentDictionary<string, Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>> _directoryCache = [];
+    private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromSeconds(2);
     private readonly object _gdiLock = new();
 
     public int PruneCache(IEnumerable<string> activePaths)
     {
+        // Clear directory cache to prevent memory leaks as it's only needed during bursts
+        _directoryCache.Clear();
+
         var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
 
@@ -99,17 +104,56 @@ public class IconService(IFileSystem fileSystem)
         if (!string.IsNullOrEmpty(directory))
         {
             string iconsDir = Path.Combine(directory, Constants.ICONS_DIR);
+            bool dirExists = false;
+            HashSet<string>? dirFiles = null;
 
-            // Optimization: Check if .icons directory exists before checking for individual files
-            // This significantly reduces syscalls (checking 1 directory vs 2 potentially missing files)
-            if (_fileSystem.DirectoryExists(iconsDir))
+            // Loop to handle potential race conditions during cache expiration
+            while (true)
+            {
+                var lazyEntry = _directoryCache.GetOrAdd(iconsDir, dir => new Lazy<(bool, HashSet<string>?, DateTime)>(() =>
+                {
+                    bool exists = _fileSystem.DirectoryExists(dir);
+                    HashSet<string>? files = null;
+                    if (exists)
+                    {
+                        try
+                        {
+                            var fileList = _fileSystem.GetFiles(dir);
+                            files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
+                        }
+                        catch
+                        {
+                            files = null;
+                        }
+                    }
+                    return (exists, files, DateTime.UtcNow);
+                }));
+
+                var dirEntry = lazyEntry.Value;
+
+                if ((DateTime.UtcNow - dirEntry.Timestamp) < CACHE_DURATION)
+                {
+                    dirExists = dirEntry.Exists;
+                    dirFiles = dirEntry.Files;
+                    break;
+                }
+                else
+                {
+                    // Cache expired, try to remove and retry
+                    _directoryCache.TryRemove(iconsDir, out _);
+                }
+            }
+
+            if (dirExists)
             {
                 pngPath = Path.Combine(iconsDir, name + ".png");
                 icoPath = Path.Combine(iconsDir, name + ".ico");
 
-                // Optimization: GetLastWriteTime returns 1601 date if file missing, avoiding extra FileExists check
-                pngTime = _fileSystem.GetLastWriteTime(pngPath);
-                icoTime = _fileSystem.GetLastWriteTime(icoPath);
+                bool pngExists = dirFiles == null || dirFiles.Contains(pngPath);
+                bool icoExists = dirFiles == null || dirFiles.Contains(icoPath);
+
+                if (pngExists) pngTime = _fileSystem.GetLastWriteTime(pngPath);
+                if (icoExists) icoTime = _fileSystem.GetLastWriteTime(icoPath);
             }
         }
 
