@@ -191,6 +191,9 @@ public class IconServiceTests
         byte[] newBytes = { 9, 9, 9 };
         _mockFileSystem.AddFile(pngPath, content: newBytes, lastWriteTime: DateTime.Now);
 
+        // Force cache clear to verify it picks up changes (since we have 2s cache now)
+        _iconService.PruneCache(System.Array.Empty<string>());
+
         // Second call: Should detect timestamp change and reload
         var result2 = _iconService.ExtractIconBytes(shortcutPath);
         Assert.Equal(newBytes, result2);
