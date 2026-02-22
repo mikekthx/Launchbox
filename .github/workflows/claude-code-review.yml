@@ -38,5 +38,3 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: "Review this pull request. Focus on code quality, potential bugs, and adherence to the project's coding standards."
           allowed_bots: "*"
-          # Allow Claude to use gh pr commands to fetch PR details
-          claude_args: '--allowed-tools "Bash(gh pr*)"'
