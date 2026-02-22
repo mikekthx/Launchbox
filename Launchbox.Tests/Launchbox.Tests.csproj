@@ -45,6 +45,7 @@
     <Compile Include="..\Services\IWindowService.cs" Link="Services\IWindowService.cs" />
     <Compile Include="..\ViewModels\SettingsViewModel.cs" Link="ViewModels\SettingsViewModel.cs" />
     <Compile Include="..\Helpers\BooleanToVisibilityConverter.cs" Link="Helpers\BooleanToVisibilityConverter.cs" />
+    <Compile Include="..\Helpers\BulkObservableCollection.cs" Link="Helpers\BulkObservableCollection.cs" />
   </ItemGroup>
 
 </Project>

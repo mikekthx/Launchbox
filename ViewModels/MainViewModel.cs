@@ -26,7 +26,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     private readonly IWindowService _windowService;
     private CancellationTokenSource? _loadCts;
 
-    public ObservableCollection<AppItem> Apps { get; } = [];
+    public BulkObservableCollection<AppItem> Apps { get; } = [];
 
     private bool _isEmpty;
     public bool IsEmpty
@@ -128,8 +128,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
 
             await _dispatcher.EnqueueAsync(() =>
             {
-                Apps.Clear();
-                foreach (var item in localAppItems) Apps.Add(item);
+                Apps.ReplaceAll(localAppItems);
                 IsEmpty = Apps.Count == 0;
                 return Task.CompletedTask;
             });
