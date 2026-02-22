@@ -81,4 +81,67 @@ public class PathSecurityTests
         // \??\ prefix is still considered unsafe by policy (though technically valid NT path)
         Assert.True(PathSecurity.IsUnsafePath(@"\??\C:\Windows\System32\notepad.exe"));
     }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void RedactPath_ReturnsEmpty_WhenNullOrWhitespace(string? path)
+    {
+        Assert.Equal("[Empty]", PathSecurity.RedactPath(path));
+    }
+
+    [Fact]
+    public void RedactPath_RedactsStandardPath()
+    {
+        // Check platform behavior
+        string path;
+        string expected;
+
+        if (Path.DirectorySeparatorChar == '/')
+        {
+            path = "/home/user/test.txt";
+            expected = @"...\test.txt";
+        }
+        else
+        {
+            path = @"C:\Users\User\Desktop\test.txt";
+            expected = @"...\test.txt";
+        }
+
+        Assert.Equal(expected, PathSecurity.RedactPath(path));
+    }
+
+    [Fact]
+    public void RedactPath_RedactsUNCPath_IfParsable()
+    {
+        if (Path.DirectorySeparatorChar == '/')
+        {
+            var path = @"\\server\share\file.txt";
+            var expected = @"...\\\server\share\file.txt";
+            Assert.Equal(expected, PathSecurity.RedactPath(path));
+        }
+        else
+        {
+            var path = @"\\server\share\file.txt";
+            var expected = @"...\file.txt";
+            Assert.Equal(expected, PathSecurity.RedactPath(path));
+        }
+    }
+
+    [Fact]
+    public void RedactPath_ReturnsRedacted_WhenRoot()
+    {
+        string path;
+        if (Path.DirectorySeparatorChar == '/')
+        {
+            path = "/";
+        }
+        else
+        {
+            path = @"C:\";
+        }
+
+        Assert.Equal("[Redacted]", PathSecurity.RedactPath(path));
+    }
 }

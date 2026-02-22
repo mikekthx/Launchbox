@@ -82,4 +82,24 @@ public static class PathSecurity
 
         return false;
     }
+
+    public static string RedactPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return "[Empty]";
+
+        try
+        {
+            var fileName = Path.GetFileName(path);
+            if (string.IsNullOrEmpty(fileName))
+            {
+                // This happens for root paths like C:\ or \\server\share
+                return "[Redacted]";
+            }
+            return $"...\\{fileName}";
+        }
+        catch
+        {
+            return "[Invalid Path]";
+        }
+    }
 }
