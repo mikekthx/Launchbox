@@ -40,7 +40,7 @@ public class IconService(IFileSystem fileSystem)
         return removedCount;
     }
 
-    public string ResolveIconPath(string path)
+    internal string ResolveIconPath(string path)
     {
         if (PathSecurity.IsUnsafePath(path))
         {
