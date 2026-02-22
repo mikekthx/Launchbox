@@ -68,9 +68,6 @@ public class PathSecurityTests
     [Fact]
     public void IsUnsafePath_HandlesQuestionMarkCorrectly()
     {
-        // Verified: The ? character is a wildcard and strictly invalid in standard paths on Windows.
-        // However, it is a required part of the \\?\ extended path prefix.
-
         // ? is strictly invalid in standard paths
         Assert.True(PathSecurity.IsUnsafePath("path?with?question"));
         Assert.True(PathSecurity.IsUnsafePath("C:\\path\\file?.txt"));
