@@ -107,10 +107,21 @@ public class SettingsViewModelTests
         vm.HotkeyKeyString = "?";
         Assert.Equal(oldKey, service.HotkeyKey);
 
-        // '$' (ASCII 36) maps to VirtualKey.Home (36), but we should block it via char.IsLetterOrDigit restriction
-        // to prevent accidental mapping of symbols.
+        // '$' (ASCII 36) maps to VirtualKey.Home (36), but Enum.TryParse("$") fails because "$" is not a valid enum name.
+        // The char.IsLetterOrDigit check prevents it from taking the single-char fallback path where (VirtualKey)'$' would be valid.
         vm.HotkeyKeyString = "$";
         Assert.Equal(oldKey, service.HotkeyKey);
+    }
+
+    [Fact]
+    public void HotkeyKeyString_AcceptsNumericEnumValues()
+    {
+        var (service, _, _, vm) = CreateViewModel();
+
+        // "36" is the integer value for VirtualKey.Home
+        // Enum.TryParse accepts string representations of underlying integer values
+        vm.HotkeyKeyString = "36";
+        Assert.Equal((int)VirtualKey.Home, service.HotkeyKey);
     }
 
     [Fact]
