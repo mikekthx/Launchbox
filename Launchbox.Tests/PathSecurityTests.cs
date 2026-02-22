@@ -64,4 +64,21 @@ public class PathSecurityTests
         Assert.False(PathSecurity.IsUnsafePath(@"subfolder\file.txt"));
         Assert.False(PathSecurity.IsUnsafePath("..\\parent.txt"));
     }
+
+    [Fact]
+    public void IsUnsafePath_HandlesQuestionMarkCorrectly()
+    {
+        // ? is strictly invalid in standard paths
+        Assert.True(PathSecurity.IsUnsafePath("path?with?question"));
+        Assert.True(PathSecurity.IsUnsafePath("C:\\path\\file?.txt"));
+
+        // ? is allowed ONLY as part of the \\?\ prefix
+        Assert.False(PathSecurity.IsUnsafePath(@"\\?\C:\Windows\System32\notepad.exe"));
+
+        // ? is NOT allowed elsewhere even if starting with \\?\
+        Assert.True(PathSecurity.IsUnsafePath(@"\\?\C:\Windows\System32\note?pad.exe"));
+
+        // \??\ prefix is still considered unsafe by policy (though technically valid NT path)
+        Assert.True(PathSecurity.IsUnsafePath(@"\??\C:\Windows\System32\notepad.exe"));
+    }
 }
