@@ -55,11 +55,15 @@ public class BooleanToVisibilityConverterTests
         Assert.Equal(Visibility.Collapsed, result);
     }
 
-    [Fact]
-    public void ConvertBack_ThrowsNotImplementedException()
+    [Theory]
+    [InlineData(Visibility.Visible)]
+    [InlineData(Visibility.Collapsed)]
+    [InlineData(null)]
+    [InlineData("random string")]
+    public void ConvertBack_AlwaysThrowsNotImplementedException(object value)
     {
         var converter = new BooleanToVisibilityConverter();
         Assert.Throws<NotImplementedException>(() =>
-            converter.ConvertBack(Visibility.Visible, typeof(bool), null, "en-US"));
+            converter.ConvertBack(value, typeof(bool), null, "en-US"));
     }
 }
