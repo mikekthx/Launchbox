@@ -14,7 +14,6 @@ public class SettingsService : INotifyPropertyChanged
     private readonly IStartupService _startupService;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public event EventHandler? SettingsChanged;
 
     public SettingsService(ISettingsStore store, IStartupService startupService)
     {
@@ -50,7 +49,6 @@ public class SettingsService : INotifyPropertyChanged
                 if (!PathSecurity.IsUnsafePath(value))
                 {
                     _store.SetValue(nameof(ShortcutsPath), value);
-                    SettingsChanged?.Invoke(this, EventArgs.Empty);
                 }
                 OnPropertyChanged();
             }
@@ -73,7 +71,6 @@ public class SettingsService : INotifyPropertyChanged
             {
                 _store.SetValue(nameof(HotkeyModifiers), value);
                 OnPropertyChanged();
-                SettingsChanged?.Invoke(this, EventArgs.Empty);
             }
         }
     }
@@ -94,7 +91,6 @@ public class SettingsService : INotifyPropertyChanged
             {
                 _store.SetValue(nameof(HotkeyKey), value);
                 OnPropertyChanged();
-                SettingsChanged?.Invoke(this, EventArgs.Empty);
             }
         }
     }

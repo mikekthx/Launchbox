@@ -45,7 +45,7 @@ All platform-specific operations are behind interfaces in `Services/` to enable 
 
 Key services:
 - **`WindowService`** (`IWindowService`) — Window positioning, hotkey registration via `RegisterHotKey`/`WndProc`, toggle visibility, auto-hide on deactivation.
-- **`SettingsService`** — Central settings coordinator; raises `PropertyChanged`/`SettingsChanged` to trigger reloads and hotkey re-registration.
+- **`SettingsService`** — Central settings coordinator; raises `PropertyChanged` to trigger reloads and hotkey re-registration.
 - **`IconService`** — Icon extraction pipeline with caching (`IconCacheEntry`) and `.icons/` directory support.
 - **`ShortcutService`** — Discovers shortcut files by allowed extensions.
 - **`BackdropService`** (`IBackdropService`) — Handles DWM Blur Glass backdrop effects.
