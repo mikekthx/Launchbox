@@ -15,7 +15,7 @@ public class IconService(IFileSystem fileSystem)
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
     private readonly ConcurrentDictionary<string, Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>> _directoryCache = [];
-    private static readonly TimeSpan CacheDuration = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromSeconds(2);
     private readonly object _gdiLock = new();
 
     public int PruneCache(IEnumerable<string> activePaths)
@@ -129,12 +129,12 @@ public class IconService(IFileSystem fileSystem)
                     return (exists, files, DateTime.UtcNow);
                 }));
 
-                var entry = lazyEntry.Value;
+                var dirEntry = lazyEntry.Value;
 
-                if ((DateTime.UtcNow - entry.Timestamp) < CacheDuration)
+                if ((DateTime.UtcNow - dirEntry.Timestamp) < CACHE_DURATION)
                 {
-                    dirExists = entry.Exists;
-                    dirFiles = entry.Files;
+                    dirExists = dirEntry.Exists;
+                    dirFiles = dirEntry.Files;
                     break;
                 }
                 else
