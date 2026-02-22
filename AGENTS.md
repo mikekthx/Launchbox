@@ -207,7 +207,7 @@ Platform-specific operations are abstracted behind interfaces in `Services/` to 
 - `IWindowService`: Abstracts window management operations.
 
 Key non-interface services:
-- `SettingsService`: Central settings coordinator. Raises `PropertyChanged`/`SettingsChanged` events that trigger app reloads and hotkey re-registration.
+- `SettingsService`: Central settings coordinator. Raises `PropertyChanged` events that trigger app reloads and hotkey re-registration.
 - `IconService`: Icon extraction pipeline with caching, custom icon support (`.icons/` directory), and resolution comparison.
 - `ShortcutService`: Discovers and filters shortcut files by allowed extensions.
 - `NativeMethods`: Centralized P/Invoke declarations (user32, kernel32).
