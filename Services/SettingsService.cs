@@ -1,6 +1,7 @@
 using Launchbox.Helpers;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -27,12 +28,23 @@ public class SettingsService : INotifyPropertyChanged
         {
             if (_store.TryGetValue(nameof(ShortcutsPath), out var val) && val is string path)
             {
-                return path;
+                if (!PathSecurity.IsUnsafePath(path))
+                {
+                    return path;
+                }
+                Trace.WriteLine($"Ignored unsafe ShortcutsPath from settings: {path}");
             }
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
         }
         set
         {
+            if (PathSecurity.IsUnsafePath(value))
+            {
+                Trace.WriteLine($"Blocked setting unsafe ShortcutsPath: {value}");
+                OnPropertyChanged();
+                return;
+            }
+
             if (ShortcutsPath != value)
             {
                 _store.SetValue(nameof(ShortcutsPath), value);

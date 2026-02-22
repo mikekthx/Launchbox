@@ -22,3 +22,8 @@
 **Vulnerability:** `WinUILauncher.Launch` allowed execution without verifying file existence, potentially enabling directory traversal or phantom path execution. Additionally, `GetPrivateProfileString` (used in `GetIniValue`) can access NTLM shares via symlinks even if the path string looks local.
 **Learning:** `File.Exists` returns true for symlinks, so `IsUnsafePath` string checks can be bypassed by local symlinks pointing to UNC shares.
 **Prevention:** Enforce `File.Exists` for basic validation, and consider checking `FileAttributes.ReparsePoint` before reading sensitive file formats (like INI) to prevent redirect attacks.
+
+## 2026-06-26 - Unsafe Settings Configuration
+**Vulnerability:** `SettingsService.ShortcutsPath` allowed setting arbitrary UNC paths, enabling NTLM credential theft via SMB authentication when the application accesses the shortcut folder.
+**Learning:** Properties bound to UI inputs must validate data in the setter to prevent invalid state, and getters should validate stored data to protect against tampering.
+**Prevention:** Always validate file paths against a security policy (like `PathSecurity.IsUnsafePath`) before storing or using them, especially if they can trigger network access.
