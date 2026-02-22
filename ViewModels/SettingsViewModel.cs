@@ -4,19 +4,16 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Launchbox.ViewModels;
 
-public class SettingsViewModel : INotifyPropertyChanged, IDisposable
+public class SettingsViewModel : ViewModelBase, IDisposable
 {
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
     private readonly IFilePickerService _filePickerService;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand ResetPositionCommand { get; }
     public ICommand BrowseFolderCommand { get; }
@@ -149,11 +146,6 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
             // Always notify to refresh UI (e.g., if user typed invalid char, revert to old value)
             OnPropertyChanged(nameof(HotkeyKeyString));
         }
-    }
-
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
     public void Dispose()

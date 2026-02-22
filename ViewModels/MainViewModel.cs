@@ -7,14 +7,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace Launchbox.ViewModels;
 
-public class MainViewModel : INotifyPropertyChanged, IDisposable
+public class MainViewModel : ViewModelBase, IDisposable
 {
     private readonly ShortcutService _shortcutService;
     private readonly IconService _iconService;
@@ -32,14 +31,7 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
     public bool IsEmpty
     {
         get => _isEmpty;
-        private set
-        {
-            if (_isEmpty != value)
-            {
-                _isEmpty = value;
-                OnPropertyChanged();
-            }
-        }
+        private set => SetProperty(ref _isEmpty, value);
     }
 
     public ICommand LoadAppsCommand { get; }
@@ -191,13 +183,6 @@ public class MainViewModel : INotifyPropertyChanged, IDisposable
         {
             Trace.WriteLine($"Failed to open shortcuts folder: {ex.Message}");
         }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public void Dispose()

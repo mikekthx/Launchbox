@@ -1,19 +1,15 @@
 using Launchbox.Helpers;
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Launchbox.Services;
 
-public class SettingsService : INotifyPropertyChanged
+public class SettingsService : ObservableObject
 {
     private readonly ISettingsStore _store;
     private readonly IStartupService _startupService;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     public SettingsService(ISettingsStore store, IStartupService startupService)
     {
@@ -99,14 +95,7 @@ public class SettingsService : INotifyPropertyChanged
     public bool IsRunAtStartup
     {
         get => _isRunAtStartup;
-        private set
-        {
-            if (_isRunAtStartup != value)
-            {
-                _isRunAtStartup = value;
-                OnPropertyChanged();
-            }
-        }
+        private set => SetProperty(ref _isRunAtStartup, value);
     }
 
     public async Task InitializeAsync()
@@ -141,8 +130,4 @@ public class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
 }
