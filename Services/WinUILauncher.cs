@@ -14,20 +14,20 @@ public class WinUILauncher : IAppLauncher
     {
         if (PathSecurity.IsUnsafePath(path))
         {
-            Trace.WriteLine($"Blocked execution of unsafe file: {path}");
+            Trace.WriteLine($"Blocked execution of unsafe file: {PathSecurity.RedactPath(path)}");
             return;
         }
 
         if (!File.Exists(path))
         {
-            Trace.WriteLine($"Blocked execution of non-existent file: {path}");
+            Trace.WriteLine($"Blocked execution of non-existent file: {PathSecurity.RedactPath(path)}");
             return;
         }
 
         string extension = Path.GetExtension(path).ToLowerInvariant();
         if (!ALLOWED_EXTENSIONS.Contains(extension))
         {
-            Trace.WriteLine($"Blocked execution of unauthorized file: {path}");
+            Trace.WriteLine($"Blocked execution of unauthorized file: {PathSecurity.RedactPath(path)}");
             return;
         }
 
@@ -37,7 +37,7 @@ public class WinUILauncher : IAppLauncher
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to launch {path}: {ex.Message}");
+            Trace.WriteLine($"Failed to launch {PathSecurity.RedactPath(path)}: {ex.Message}");
         }
     }
 
@@ -45,7 +45,7 @@ public class WinUILauncher : IAppLauncher
     {
         if (PathSecurity.IsUnsafePath(path))
         {
-            Trace.WriteLine($"Blocked opening of unsafe folder: {path}");
+            Trace.WriteLine($"Blocked opening of unsafe folder: {PathSecurity.RedactPath(path)}");
             return;
         }
 
@@ -57,12 +57,12 @@ public class WinUILauncher : IAppLauncher
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"Failed to open folder {path}: {ex.Message}");
+                Trace.WriteLine($"Failed to open folder {PathSecurity.RedactPath(path)}: {ex.Message}");
             }
         }
         else
         {
-            Trace.WriteLine($"Folder not found: {path}");
+            Trace.WriteLine($"Folder not found: {PathSecurity.RedactPath(path)}");
         }
     }
 }
