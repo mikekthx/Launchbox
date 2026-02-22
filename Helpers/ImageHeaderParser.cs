@@ -17,7 +17,7 @@ public static class ImageHeaderParser
 
             stream.Position = 0;
             var header = new byte[24];
-            if (stream.Read(header, 0, 24) != 24) return null;
+            stream.ReadExactly(header, 0, 24);
 
             // PNG Signature: 89 50 4E 47 0D 0A 1A 0A
             if (header[0] != 0x89 || header[1] != 0x50 || header[2] != 0x4E || header[3] != 0x47 ||
@@ -53,7 +53,7 @@ public static class ImageHeaderParser
 
             stream.Position = 0;
             var header = new byte[6];
-            if (stream.Read(header, 0, 6) != 6) return null;
+            stream.ReadExactly(header, 0, 6);
 
             // Reserved (2 bytes) must be 0
             if (header[0] != 0 || header[1] != 0) return null;
@@ -72,7 +72,14 @@ public static class ImageHeaderParser
             var entry = new byte[16];
             for (int i = 0; i < count; i++)
             {
-                if (stream.Read(entry, 0, 16) != 16) break;
+                try
+                {
+                    stream.ReadExactly(entry, 0, 16);
+                }
+                catch (EndOfStreamException)
+                {
+                    break;
+                }
 
                 // Width (1 byte): 0 means 256
                 int w = entry[0];
