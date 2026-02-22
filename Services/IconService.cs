@@ -15,6 +15,7 @@ public class IconService(IFileSystem fileSystem)
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
     private readonly ConcurrentDictionary<string, Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>> _directoryCache = [];
+    private readonly ConcurrentDictionary<string, Lazy<(DateTime Timestamp, DateTime CacheTime)>> _fileTimestampCache = [];
     private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromSeconds(2);
     private readonly object _gdiLock = new();
 
@@ -22,6 +23,7 @@ public class IconService(IFileSystem fileSystem)
     {
         // Clear directory cache to prevent memory leaks as it's only needed during bursts
         _directoryCache.Clear();
+        _fileTimestampCache.Clear();
 
         var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
@@ -99,7 +101,7 @@ public class IconService(IFileSystem fileSystem)
         // 1. Gather current state (timestamps)
         // We check these every time to support live updates, but avoid expensive operations if unchanged.
 
-        var shortcutTime = _fileSystem.GetLastWriteTime(path);
+        var shortcutTime = GetCachedLastWriteTime(path);
 
         string? directory = Path.GetDirectoryName(path);
         string name = Path.GetFileNameWithoutExtension(path);
@@ -160,8 +162,8 @@ public class IconService(IFileSystem fileSystem)
                 bool pngExists = dirFiles == null || dirFiles.Contains(pngPath);
                 bool icoExists = dirFiles == null || dirFiles.Contains(icoPath);
 
-                if (pngExists) pngTime = _fileSystem.GetLastWriteTime(pngPath);
-                if (icoExists) icoTime = _fileSystem.GetLastWriteTime(icoPath);
+                if (pngExists) pngTime = GetCachedLastWriteTime(pngPath);
+                if (icoExists) icoTime = GetCachedLastWriteTime(icoPath);
             }
         }
 
@@ -195,6 +197,29 @@ public class IconService(IFileSystem fileSystem)
         _iconCache[path] = new IconCacheEntry(iconBytes, shortcutTime, pngTime, icoTime);
 
         return iconBytes;
+    }
+
+    private DateTime GetCachedLastWriteTime(string path)
+    {
+        while (true)
+        {
+            var lazyEntry = _fileTimestampCache.GetOrAdd(path, p => new Lazy<(DateTime, DateTime)>(() =>
+            {
+                return (_fileSystem.GetLastWriteTime(p), DateTime.UtcNow);
+            }));
+
+            var entry = lazyEntry.Value;
+
+            if ((DateTime.UtcNow - entry.CacheTime) < CACHE_DURATION)
+            {
+                return entry.Timestamp;
+            }
+            else
+            {
+                // Cache expired, try to remove and retry
+                _fileTimestampCache.TryRemove(path, out _);
+            }
+        }
     }
 
     private byte[]? GetCustomIconBytes(string pngPath, string icoPath, DateTime pngTime, DateTime icoTime)
