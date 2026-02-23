@@ -9,6 +9,16 @@ namespace Launchbox.Services;
 public class WinUILauncher : IAppLauncher
 {
     private static readonly string[] ALLOWED_EXTENSIONS = Constants.ALLOWED_EXTENSIONS;
+    private readonly IShortcutResolver _shortcutResolver;
+    private readonly IProcessStarter _processStarter;
+    private readonly IFileSystem _fileSystem;
+
+    public WinUILauncher(IShortcutResolver shortcutResolver, IProcessStarter processStarter, IFileSystem fileSystem)
+    {
+        _shortcutResolver = shortcutResolver;
+        _processStarter = processStarter;
+        _fileSystem = fileSystem;
+    }
 
     public void Launch(string path)
     {
@@ -18,7 +28,7 @@ public class WinUILauncher : IAppLauncher
             return;
         }
 
-        if (!File.Exists(path))
+        if (!_fileSystem.FileExists(path))
         {
             Trace.WriteLine($"Blocked execution of non-existent file: {PathSecurity.RedactPath(path)}");
             return;
@@ -31,9 +41,25 @@ public class WinUILauncher : IAppLauncher
             return;
         }
 
+        // Validate shortcut target (Defense-in-depth)
+        if (extension == ".lnk" || extension == ".url")
+        {
+            string? targetPath = _shortcutResolver.ResolveTarget(path);
+
+            // If we can resolve it, check if the target is safe
+            if (!string.IsNullOrEmpty(targetPath))
+            {
+                if (PathSecurity.IsUnsafePath(targetPath))
+                {
+                    Trace.WriteLine($"Blocked execution of shortcut pointing to unsafe target: {PathSecurity.RedactPath(targetPath)}");
+                    return;
+                }
+            }
+        }
+
         try
         {
-            using var process = Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            using var process = _processStarter.Start(new ProcessStartInfo(path) { UseShellExecute = true });
         }
         catch (Exception ex)
         {
@@ -49,11 +75,11 @@ public class WinUILauncher : IAppLauncher
             return;
         }
 
-        if (Directory.Exists(path))
+        if (_fileSystem.DirectoryExists(path))
         {
             try
             {
-                using var process = Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+                using var process = _processStarter.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             }
             catch (Exception ex)
             {

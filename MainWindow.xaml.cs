@@ -46,7 +46,9 @@ public sealed partial class MainWindow : Window
         var iconService = new IconService(fileSystem);
         var imageFactory = new WinUIImageFactory();
         var dispatcher = new WinUIDispatcher(this.DispatcherQueue);
-        var launcher = new WinUILauncher();
+        var shortcutResolver = new WindowsShortcutResolver(fileSystem);
+        var processStarter = new ProcessStarter();
+        var launcher = new WinUILauncher(shortcutResolver, processStarter, fileSystem);
 
         ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
         _backdropService = new BackdropService(this);

@@ -37,6 +37,12 @@
     <Compile Include="..\Services\IImageFactory.cs" Link="Services\IImageFactory.cs" />
     <Compile Include="..\Services\IDispatcher.cs" Link="Services\IDispatcher.cs" />
     <Compile Include="..\Services\IAppLauncher.cs" Link="Services\IAppLauncher.cs" />
+    <Compile Include="..\Services\IShortcutResolver.cs" Link="Services\IShortcutResolver.cs" />
+    <Compile Include="..\Services\IProcessStarter.cs" Link="Services\IProcessStarter.cs" />
+    <Compile Include="..\Services\WinUILauncher.cs" Link="Services\WinUILauncher.cs" />
+    <Compile Include="..\Services\WindowsShortcutResolver.cs" Link="Services\WindowsShortcutResolver.cs" />
+    <Compile Include="..\Services\ProcessStarter.cs" Link="Services\ProcessStarter.cs" />
+    <Compile Include="..\Services\ShellLink.cs" Link="Services\ShellLink.cs" />
     <Compile Include="..\Services\NativeMethods.cs" Link="Services\NativeMethods.cs" />
     <Compile Include="..\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
     <Compile Include="..\Helpers\ImageHeaderParser.cs" Link="Helpers\ImageHeaderParser.cs" />
