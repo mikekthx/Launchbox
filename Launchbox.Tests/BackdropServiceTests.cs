@@ -1,8 +1,8 @@
-using Launchbox.Services;
-using Launchbox.Helpers;
-using Xunit;
 using System;
 using System.Threading.Tasks;
+using Launchbox.Helpers;
+using Launchbox.Services;
+using Xunit;
 
 namespace Launchbox.Tests;
 
@@ -58,7 +58,7 @@ public class BackdropServiceTests
     [Fact]
     public async Task UpdateBackdropAsync_Throttling_DoesNotCheckProcessAgain()
     {
-         // Arrange
+        // Arrange
         var processService = new MockProcessService { ShouldReturnTrue = true };
         var windowWrapper = new MockBackdropWindowWrapper { IsBackdropSet = true, IsDesktopAcrylicBackdropSet = true };
 
