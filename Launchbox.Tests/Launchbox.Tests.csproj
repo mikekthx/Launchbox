@@ -28,6 +28,7 @@
     <Compile Include="..\Services\IVisualTreeService.cs" Link="Services\IVisualTreeService.cs" />
     <Compile Include="..\Services\VisualTreeFinder.cs" Link="Services\VisualTreeFinder.cs" />
     <Compile Include="..\Services\IFileSystem.cs" Link="Services\IFileSystem.cs" />
+    <Compile Include="..\Services\FileSystem.cs" Link="Services\FileSystem.cs" />
     <Compile Include="..\Services\IShortcutService.cs" Link="Services\IShortcutService.cs" />
     <Compile Include="..\Services\ShortcutService.cs" Link="Services\ShortcutService.cs" />
     <Compile Include="..\Services\IIconService.cs" Link="Services\IIconService.cs" />
