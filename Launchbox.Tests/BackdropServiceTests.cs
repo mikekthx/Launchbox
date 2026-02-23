@@ -63,6 +63,7 @@ public class BackdropServiceTests
         var windowWrapper = new MockBackdropWindowWrapper { IsBackdropSet = true, IsDesktopAcrylicBackdropSet = true };
 
         var time = new DateTime(2023, 1, 1, 12, 0, 0);
+        // Inject time provider
         var service = new BackdropService(processService, windowWrapper, () => time);
 
         // Act 1
