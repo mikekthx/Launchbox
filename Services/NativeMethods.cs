@@ -17,6 +17,9 @@ public static class NativeMethods
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetPrivateProfileString(string s, string k, string d, StringBuilder r, int z, string f);
 
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    public static extern int GetPrivateProfileString(string s, string k, string d, [Out] char[] r, int z, string f);
+
     // From MainWindow.xaml.cs
     public const int SW_RESTORE = 9;
 

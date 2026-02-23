@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,27 +16,41 @@ public class FileSystem : IFileSystem
     public string GetIniValue(string path, string section, string key)
     {
         // Start with a reasonable buffer size to minimize reallocations
-        int capacity = 512;
-        var sb = new StringBuilder(capacity);
-        int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, sb, capacity, path);
-
-        // Check for truncation. GetPrivateProfileString returns size - 1 (or sometimes size - 2)
-        // if the buffer was too small. We loop to double the buffer size until it fits.
-        while (ret >= capacity - 2)
+        // 4096 is enough for almost all paths and typical INI values.
+        int capacity = 4096;
+        char[] buffer = ArrayPool<char>.Shared.Rent(capacity);
+        try
         {
-            capacity *= 2;
-            if (capacity > 65536)
+            while (true)
             {
-                // Safety limit to prevent infinite allocation.
-                // If it's larger than 64KB, we accept truncation.
-                break;
+                int size = buffer.Length;
+                int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, buffer, size, path);
+
+                // Check for truncation. GetPrivateProfileString returns size - 1 (or sometimes size - 2)
+                // if the buffer was too small.
+                if (ret < size - 2)
+                {
+                    return new string(buffer, 0, ret);
+                }
+
+                // Truncated. Loop to double the buffer size until it fits.
+                int newCapacity = size * 2;
+                if (newCapacity > 65536)
+                {
+                    // Safety limit to prevent infinite allocation.
+                    // If it's larger than 64KB, we accept truncation.
+                    return new string(buffer, 0, ret);
+                }
+
+                var newBuffer = ArrayPool<char>.Shared.Rent(newCapacity);
+                ArrayPool<char>.Shared.Return(buffer);
+                buffer = newBuffer;
             }
-
-            sb = new StringBuilder(capacity);
-            ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, sb, capacity, path);
         }
-
-        return sb.ToString();
+        finally
+        {
+            ArrayPool<char>.Shared.Return(buffer);
+        }
     }
 
     public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
