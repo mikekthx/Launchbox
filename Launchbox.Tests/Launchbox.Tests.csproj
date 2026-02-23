@@ -50,6 +50,10 @@
     <Compile Include="..\Helpers\BulkObservableCollection.cs" Link="Helpers\BulkObservableCollection.cs" />
     <Compile Include="..\Helpers\ObservableObject.cs" Link="Helpers\ObservableObject.cs" />
     <Compile Include="..\ViewModels\ViewModelBase.cs" Link="ViewModels\ViewModelBase.cs" />
+    <Compile Include="..\Services\BackdropService.cs" Link="Services\BackdropService.cs" />
+    <Compile Include="..\Services\IBackdropService.cs" Link="Services\IBackdropService.cs" />
+    <Compile Include="..\Services\IProcessService.cs" Link="Services\IProcessService.cs" />
+    <Compile Include="..\Services\IBackdropWindowWrapper.cs" Link="Services\IBackdropWindowWrapper.cs" />
   </ItemGroup>
 
 </Project>

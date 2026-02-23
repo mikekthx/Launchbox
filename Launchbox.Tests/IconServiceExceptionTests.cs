@@ -37,7 +37,7 @@ public class IconServiceExceptionTests
         var result = _iconService.ExtractIconBytes(shortcutPath);
 
         // We expect empty array (MockFileSystem behavior) but NO CRASH.
-        Assert.Empty(result);
+        Assert.Empty(result!);
     }
 
     [Fact]

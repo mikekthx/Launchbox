@@ -11,7 +11,7 @@ public class BooleanToVisibilityConverterTests
     public void Convert_True_ReturnsVisible()
     {
         var converter = new BooleanToVisibilityConverter();
-        var result = converter.Convert(true, typeof(Visibility), null, "en-US");
+        var result = converter.Convert(true, typeof(Visibility), null!, "en-US");
         Assert.Equal(Visibility.Visible, result);
     }
 
@@ -19,7 +19,7 @@ public class BooleanToVisibilityConverterTests
     public void Convert_False_ReturnsCollapsed()
     {
         var converter = new BooleanToVisibilityConverter();
-        var result = converter.Convert(false, typeof(Visibility), null, "en-US");
+        var result = converter.Convert(false, typeof(Visibility), null!, "en-US");
         Assert.Equal(Visibility.Collapsed, result);
     }
 
@@ -43,7 +43,7 @@ public class BooleanToVisibilityConverterTests
     public void Convert_Null_ReturnsCollapsed()
     {
         var converter = new BooleanToVisibilityConverter();
-        var result = converter.Convert(null, typeof(Visibility), null, "en-US");
+        var result = converter.Convert(null, typeof(Visibility), null!, "en-US");
         Assert.Equal(Visibility.Collapsed, result);
     }
 
@@ -51,7 +51,7 @@ public class BooleanToVisibilityConverterTests
     public void Convert_NonBoolean_ReturnsCollapsed()
     {
         var converter = new BooleanToVisibilityConverter();
-        var result = converter.Convert("not a bool", typeof(Visibility), null, "en-US");
+        var result = converter.Convert("not a bool", typeof(Visibility), null!, "en-US");
         Assert.Equal(Visibility.Collapsed, result);
     }
 
