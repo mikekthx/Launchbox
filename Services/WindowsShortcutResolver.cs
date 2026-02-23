@@ -46,7 +46,7 @@ public class WindowsShortcutResolver : IShortcutResolver
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-             return null;
+            return null;
         }
 
         try
@@ -59,7 +59,7 @@ public class WindowsShortcutResolver : IShortcutResolver
         }
         catch (COMException)
         {
-             return null;
+            return null;
         }
     }
 
