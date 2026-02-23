@@ -54,6 +54,7 @@ public class WinUILauncher : IAppLauncher
                     Trace.WriteLine($"Blocked execution of shortcut pointing to unsafe target: {PathSecurity.RedactPath(targetPath)}");
                     return;
                 }
+                Trace.WriteLine($"Shortcut target validated: {PathSecurity.RedactPath(targetPath)}");
             }
         }
 
