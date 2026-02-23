@@ -31,4 +31,7 @@ public class MockWindowService : IWindowService
     {
         HideCalled = true;
     }
+
+    public void Exit() { }
+    public void OpenSettings() { }
 }

@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Launchbox;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
@@ -11,17 +12,20 @@ public class WindowService : IWindowService, IDisposable
     private readonly Window _window;
     private readonly WindowPositionManager _positionManager;
     private readonly SettingsService _settingsService;
+    private readonly IFilePickerService _filePickerService;
     private AppWindow? _appWindow;
     private IntPtr _hWnd;
     private IntPtr _oldWndProc;
     private WndProcDelegate? _wndProcDelegate;
     private bool _hasPositioned;
+    private SettingsWindow? _settingsWindow;
 
-    public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService)
+    public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService)
     {
         _window = window;
         _positionManager = positionManager;
         _settingsService = settingsService;
+        _filePickerService = filePickerService;
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
     }
@@ -143,6 +147,31 @@ public class WindowService : IWindowService, IDisposable
         }
     }
 
+    public void Exit()
+    {
+        _window.Close();
+    }
+
+    public void OpenSettings()
+    {
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
+        try
+        {
+            _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService);
+            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+            _settingsWindow.Activate();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Error opening settings: {ex.Message}");
+        }
+    }
+
     public void ResetPosition()
     {
         if (_appWindow == null) return;
@@ -192,6 +221,8 @@ public class WindowService : IWindowService, IDisposable
             {
                 _appWindow.Changed -= AppWindow_Changed;
             }
+
+            _settingsWindow?.Close();
         }
 
         // Clean up unmanaged resources

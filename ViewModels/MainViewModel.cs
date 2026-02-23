@@ -38,6 +38,8 @@ public class MainViewModel : ViewModelBase, IDisposable
     public ICommand LaunchAppCommand { get; }
     public ICommand OpenShortcutsFolderCommand { get; }
     public ICommand ToggleWindowCommand { get; }
+    public ICommand ExitCommand { get; }
+    public ICommand OpenSettingsCommand { get; }
 
     public MainViewModel(
         IShortcutService shortcutService,
@@ -64,6 +66,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         LaunchAppCommand = new SimpleCommand(LaunchApp);
         OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
         ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
+        ExitCommand = new SimpleCommand(() => _windowService.Exit());
+        OpenSettingsCommand = new SimpleCommand(() => _windowService.OpenSettings());
     }
 
     private void SettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
