@@ -1,7 +1,7 @@
-using System;
-using System.Threading.Tasks;
 using Launchbox.Helpers;
 using Launchbox.Services;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Launchbox.Tests;
