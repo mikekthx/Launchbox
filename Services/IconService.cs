@@ -44,7 +44,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
     {
         if (PathSecurity.IsUnsafePath(path))
         {
-            Trace.WriteLine($"Blocked resolution for unsafe path: {path}");
+            Trace.WriteLine($"Blocked resolution for unsafe path: {PathSecurity.RedactPath(path)}");
             return path;
         }
 
@@ -67,7 +67,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
 
             if (PathSecurity.IsUnsafePath(iconFile))
             {
-                Trace.WriteLine($"Blocked potential unsafe icon path: {iconFile}");
+                Trace.WriteLine($"Blocked potential unsafe icon path: {PathSecurity.RedactPath(iconFile)}");
                 return path;
             }
 
@@ -93,7 +93,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
     {
         if (PathSecurity.IsUnsafePath(path))
         {
-            Trace.WriteLine($"Blocked icon extraction for unsafe path: {path}");
+            Trace.WriteLine($"Blocked icon extraction for unsafe path: {PathSecurity.RedactPath(path)}");
             return null;
         }
 
@@ -250,7 +250,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
             // Security: Limit file size to 5MB to prevent DoS via large files
             if (_fileSystem.GetFileSize(chosenPath) > 5 * 1024 * 1024)
             {
-                Trace.WriteLine($"Blocked loading of large icon file: {chosenPath}");
+                Trace.WriteLine($"Blocked loading of large icon file: {PathSecurity.RedactPath(chosenPath)}");
                 return null;
             }
 
@@ -258,7 +258,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to read custom icon {chosenPath}: {ex.Message}");
+            Trace.WriteLine($"Failed to read custom icon {PathSecurity.RedactPath(chosenPath)}: {ex.Message}");
             return null;
         }
     }
@@ -273,7 +273,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to get image area for {path}: {ex.Message}");
+            Trace.WriteLine($"Failed to get image area for {PathSecurity.RedactPath(path)}: {ex.Message}");
             return 0;
         }
     }
@@ -300,7 +300,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to extract icon for {path} (resolved: {resolvedPath}): {ex.Message}");
+            Trace.WriteLine($"Failed to extract icon for {PathSecurity.RedactPath(path)} (resolved: {PathSecurity.RedactPath(resolvedPath)}): {ex.Message}");
             return null;
         }
         finally

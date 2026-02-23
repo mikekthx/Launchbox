@@ -27,3 +27,8 @@
 **Vulnerability:** `SettingsService.ShortcutsPath` allowed setting arbitrary UNC paths, enabling NTLM credential theft via SMB authentication when the application accesses the shortcut folder.
 **Learning:** Properties bound to UI inputs must validate data in the setter to prevent invalid state, and getters should validate stored data to protect against tampering.
 **Prevention:** Always validate file paths against a security policy (like `PathSecurity.IsUnsafePath`) before storing or using them, especially if they can trigger network access.
+
+## 2025-05-27 - Inconsistent Path Redaction in Logs
+**Vulnerability:** Found that `IconService` and `WindowsShortcutResolver` were logging full file paths in `Trace.WriteLine` calls upon errors, potentially leaking sensitive user directory structures or file names to debug logs.
+**Learning:** Even internal logging mechanisms like `Trace` should be treated as potential information leak vectors. Consistent redaction (e.g., using `PathSecurity.RedactPath`) is crucial across all services handling user paths.
+**Prevention:** Enforce usage of `PathSecurity.RedactPath` in all logging statements that include file paths. Added `TraceRedactionTests` to verify this behavior.
