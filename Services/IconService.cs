@@ -18,7 +18,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
     private readonly ConcurrentDictionary<string, Lazy<(DateTime Timestamp, DateTime CacheTime)>> _fileTimestampCache = [];
     private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromSeconds(2);
     // Lock object to serialize GDI+ operations which are not thread-safe even on separate instances
-    private static readonly object _gdiLock = new();
+    private static readonly object GDI_LOCK = new();
 
     public int PruneCache(IEnumerable<string> activePaths)
     {
@@ -294,7 +294,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
             NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, ref hIcon, IntPtr.Zero, 1, 0);
             if (hIcon == IntPtr.Zero) return null;
 
-            lock (_gdiLock)
+            lock (GDI_LOCK)
             {
                 using var icon = WinIcon.FromHandle(hIcon);
                 using var bmp = icon.ToBitmap();
