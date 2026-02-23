@@ -9,6 +9,8 @@ public class MockWindowService : IWindowService
     public bool ToggleVisibilityCalled { get; private set; }
     public bool InitializeCalled { get; private set; }
     public bool OnActivatedCalled { get; private set; }
+    public bool ExitCalled { get; private set; }
+    public bool OpenSettingsCalled { get; private set; }
 
     public void Initialize()
     {
@@ -30,5 +32,15 @@ public class MockWindowService : IWindowService
     public void Hide()
     {
         HideCalled = true;
+    }
+
+    public void Exit()
+    {
+        ExitCalled = true;
+    }
+
+    public void OpenSettings()
+    {
+        OpenSettingsCalled = true;
     }
 }

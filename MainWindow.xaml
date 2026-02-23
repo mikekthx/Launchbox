@@ -24,9 +24,9 @@
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
                     <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}" />
-                    <MenuFlyoutItem Text="Settings" Command="{Binding OpenSettingsCommand}" />
+                    <MenuFlyoutItem Text="Settings" Command="{Binding ViewModel.OpenSettingsCommand}" />
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Exit" Command="{Binding ExitCommand}" />
+                    <MenuFlyoutItem Text="Exit" Command="{Binding ViewModel.ExitCommand}" />
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>

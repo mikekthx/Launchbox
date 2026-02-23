@@ -34,4 +34,14 @@ public interface IWindowService
     /// Hides the window.
     /// </summary>
     void Hide();
+
+    /// <summary>
+    /// Exits the application by closing the main window.
+    /// </summary>
+    void Exit();
+
+    /// <summary>
+    /// Opens the settings window, or activates it if already open.
+    /// </summary>
+    void OpenSettings();
 }

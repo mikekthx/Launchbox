@@ -21,15 +21,11 @@ public sealed partial class MainWindow : Window
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
     private readonly IBackdropService _backdropService;
-    private SettingsWindow? _settingsWindow;
 
     // Window dragging state
     private bool _isDraggingWindow = false;
     private Windows.Graphics.PointInt32 _dragStartWindowPos;
     private Windows.Foundation.Point _dragStartPointerPos;
-
-    public System.Windows.Input.ICommand ExitCommand { get; }
-    public System.Windows.Input.ICommand OpenSettingsCommand { get; }
 
     public MainWindow()
     {
@@ -39,7 +35,7 @@ public sealed partial class MainWindow : Window
         _filePickerService = new WinUIFilePickerService();
 
         var windowPositionManager = new WindowPositionManager(settingsStore);
-        _windowService = new WindowService(this, windowPositionManager, _settingsService);
+        _windowService = new WindowService(this, windowPositionManager, _settingsService, _filePickerService);
 
         var fileSystem = new FileSystem();
         var shortcutService = new ShortcutService(fileSystem);
@@ -60,9 +56,6 @@ public sealed partial class MainWindow : Window
         RootGrid.DataContext = this;
 
         _ = _backdropService.UpdateBackdropAsync();
-
-        ExitCommand = new SimpleCommand(ExitApplication);
-        OpenSettingsCommand = new SimpleCommand(OpenSettings);
 
         // 1. WINDOW SETUP
         _windowService.Initialize();
@@ -165,31 +158,6 @@ public sealed partial class MainWindow : Window
         {
             _ = _backdropService.UpdateBackdropAsync();
         }
-    }
-
-    private void OpenSettings()
-    {
-        if (_settingsWindow != null)
-        {
-            _settingsWindow.Activate();
-            return;
-        }
-
-        try
-        {
-            _settingsWindow = new SettingsWindow(_settingsService, _windowService, _filePickerService);
-            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
-            _settingsWindow.Activate();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error opening settings: {ex.Message}");
-        }
-    }
-
-    private void ExitApplication()
-    {
-        this.Close();
     }
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
