@@ -1,6 +1,4 @@
 using Launchbox.Helpers;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -9,36 +7,37 @@ namespace Launchbox.Services;
 
 public class BackdropService : IBackdropService
 {
-    private readonly Window _window;
+    private readonly IBackdropWindowWrapper _windowWrapper;
+    private readonly IProcessService _processService;
+    private readonly Func<DateTime> _timeProvider;
+
     private DateTime _lastBackdropCheck = DateTime.MinValue;
     private bool _isDwmBlurGlassRunning = false;
     private static readonly TimeSpan BACKDROP_CHECK_INTERVAL = TimeSpan.FromSeconds(60);
 
-    public BackdropService(Window window)
+    public BackdropService(
+        IProcessService processService,
+        IBackdropWindowWrapper windowWrapper,
+        Func<DateTime>? timeProvider = null)
     {
-        _window = window;
+        _processService = processService;
+        _windowWrapper = windowWrapper;
+        _timeProvider = timeProvider ?? (() => DateTime.Now);
     }
 
     public async Task UpdateBackdropAsync()
     {
         try
         {
-            if (DateTime.Now - _lastBackdropCheck >= BACKDROP_CHECK_INTERVAL)
+            var now = _timeProvider();
+            if (now - _lastBackdropCheck >= BACKDROP_CHECK_INTERVAL)
             {
-                _lastBackdropCheck = DateTime.Now;
+                _lastBackdropCheck = now;
                 _isDwmBlurGlassRunning = await Task.Run(() =>
                 {
                     try
                     {
-                        var processes = Process.GetProcessesByName(Constants.DWM_BLUR_GLASS_PROCESS_NAME);
-                        try
-                        {
-                            return processes.Length > 0;
-                        }
-                        finally
-                        {
-                            foreach (var p in processes) p.Dispose();
-                        }
+                        return _processService.IsProcessRunning(Constants.DWM_BLUR_GLASS_PROCESS_NAME);
                     }
                     catch
                     {
@@ -50,17 +49,17 @@ public class BackdropService : IBackdropService
             if (_isDwmBlurGlassRunning)
             {
                 // DWMBlurGlass detected, disable system backdrop to let it handle transparency
-                if (_window.SystemBackdrop != null)
+                if (_windowWrapper.IsBackdropSet)
                 {
-                    _window.SystemBackdrop = null;
+                    _windowWrapper.ClearBackdrop();
                 }
             }
             else
             {
                 // Default behavior
-                if (_window.SystemBackdrop is not DesktopAcrylicBackdrop)
+                if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
                 {
-                    _window.SystemBackdrop = new DesktopAcrylicBackdrop();
+                    _windowWrapper.SetDesktopAcrylicBackdrop();
                 }
             }
         }
@@ -68,9 +67,9 @@ public class BackdropService : IBackdropService
         {
             Debug.WriteLine($"Error checking for DWMBlurGlass: {ex.Message}");
             // Fallback to default
-            if (_window.SystemBackdrop is not DesktopAcrylicBackdrop)
+            if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
             {
-                _window.SystemBackdrop = new DesktopAcrylicBackdrop();
+                _windowWrapper.SetDesktopAcrylicBackdrop();
             }
         }
     }

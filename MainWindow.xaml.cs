@@ -49,7 +49,10 @@ public sealed partial class MainWindow : Window
         var launcher = new WinUILauncher();
 
         ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
-        _backdropService = new BackdropService(this);
+
+        var processService = new ProcessService();
+        var backdropWrapper = new BackdropWindowWrapper(this);
+        _backdropService = new BackdropService(processService, backdropWrapper);
 
         this.InitializeComponent();
         RootGrid.DataContext = this;
