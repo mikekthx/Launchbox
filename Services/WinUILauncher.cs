@@ -46,7 +46,7 @@ public class WinUILauncher : IAppLauncher
         {
             string? targetPath = _shortcutResolver.ResolveTarget(path);
 
-            // If we can resolve it, check if the target is safe
+            // If we can resolve it, check if the target is safe (Defense-in-depth)
             if (!string.IsNullOrEmpty(targetPath))
             {
                 if (PathSecurity.IsUnsafePath(targetPath))
