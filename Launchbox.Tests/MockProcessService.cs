@@ -1,5 +1,5 @@
-using System;
 using Launchbox.Services;
+using System;
 
 namespace Launchbox.Tests;
 
