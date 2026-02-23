@@ -1,5 +1,5 @@
-using Launchbox.Helpers;
 using Launchbox;
+using Launchbox.Helpers;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
