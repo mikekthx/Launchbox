@@ -37,7 +37,7 @@ public class WindowsShortcutResolver : IShortcutResolver
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Trace.WriteLine($"Failed to resolve shortcut {shortcutPath}: {ex.Message}");
+            System.Diagnostics.Trace.WriteLine($"Failed to resolve shortcut {PathSecurity.RedactPath(shortcutPath)}: {ex.Message}");
             return null;
         }
     }
