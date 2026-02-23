@@ -11,13 +11,25 @@ public static class IconHelper
 {
     public static async Task<BitmapImage?> CreateBitmapImageAsync(byte[] imageBytes)
     {
+        return await CreateImageAsync(
+            imageBytes,
+            () => new BitmapImage(),
+            async (img, stream) => await img.SetSourceAsync(stream.AsRandomAccessStream()));
+    }
+
+    internal static async Task<T?> CreateImageAsync<T>(
+        byte[] imageBytes,
+        Func<T> createInstance,
+        Func<T, MemoryStream, Task> setSourceAction)
+        where T : class
+    {
         try
         {
-            var image = new BitmapImage();
-            // Do NOT use 'using' here. The MemoryStream must remain open for the lifetime of the BitmapImage.
+            var image = createInstance();
+            // Do NOT use 'using' here. The MemoryStream must remain open for the lifetime of the BitmapImage (or T).
             // Since MemoryStream over a byte array holds no unmanaged resources, let GC handle it.
             var stream = new MemoryStream(imageBytes);
-            await image.SetSourceAsync(stream.AsRandomAccessStream());
+            await setSourceAction(image, stream);
             return image;
         }
         catch (Exception ex)

@@ -47,6 +47,7 @@
     <Compile Include="..\Services\NativeMethods.cs" Link="Services\NativeMethods.cs" />
     <Compile Include="..\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
     <Compile Include="..\Helpers\ImageHeaderParser.cs" Link="Helpers\ImageHeaderParser.cs" />
+    <Compile Include="..\Helpers\IconHelper.cs" Link="Helpers\IconHelper.cs" />
     <Compile Include="..\Services\IconCacheEntry.cs" Link="Services\IconCacheEntry.cs" />
     <Compile Include="..\Services\SettingsService.cs" Link="Services\SettingsService.cs" />
     <Compile Include="..\Services\IStartupService.cs" Link="Services\IStartupService.cs" />
