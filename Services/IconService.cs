@@ -115,45 +115,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         if (!string.IsNullOrEmpty(directory))
         {
             string iconsDir = Path.Combine(directory, Constants.ICONS_DIR);
-            bool dirExists = false;
-            HashSet<string>? dirFiles = null;
-
-            // Loop to handle potential race conditions during cache expiration
-            while (true)
-            {
-                var lazyEntry = _directoryCache.GetOrAdd(iconsDir, dir => new Lazy<(bool, HashSet<string>?, DateTime)>(() =>
-                {
-                    bool exists = _fileSystem.DirectoryExists(dir);
-                    HashSet<string>? files = null;
-                    if (exists)
-                    {
-                        try
-                        {
-                            var fileList = _fileSystem.GetFiles(dir);
-                            files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
-                        }
-                        catch
-                        {
-                            files = null;
-                        }
-                    }
-                    return (exists, files, DateTime.UtcNow);
-                }));
-
-                var dirEntry = lazyEntry.Value;
-
-                if ((DateTime.UtcNow - dirEntry.Timestamp) < CACHE_DURATION)
-                {
-                    dirExists = dirEntry.Exists;
-                    dirFiles = dirEntry.Files;
-                    break;
-                }
-                else
-                {
-                    // Cache expired, try to remove and retry
-                    _directoryCache.TryRemove(iconsDir, out _);
-                }
-            }
+            var (dirExists, dirFiles) = GetCachedDirectoryInfo(iconsDir);
 
             if (dirExists)
             {
@@ -198,6 +160,49 @@ public class IconService(IFileSystem fileSystem) : IIconService
         _iconCache[path] = new IconCacheEntry(iconBytes, shortcutTime, pngTime, icoTime);
 
         return iconBytes;
+    }
+
+    /// <summary>
+    /// Retrieves cached directory information (existence and file list) with a short expiration.
+    /// </summary>
+    /// <param name="directoryPath">The directory path to query.</param>
+    /// <returns>A tuple containing a boolean indicating existence and a HashSet of file paths if successful.</returns>
+    private (bool Exists, HashSet<string>? Files) GetCachedDirectoryInfo(string directoryPath)
+    {
+        // Loop to handle potential race conditions during cache expiration
+        while (true)
+        {
+            var lazyEntry = _directoryCache.GetOrAdd(directoryPath, dir => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() =>
+            {
+                bool exists = _fileSystem.DirectoryExists(dir);
+                HashSet<string>? files = null;
+                if (exists)
+                {
+                    try
+                    {
+                        var fileList = _fileSystem.GetFiles(dir);
+                        files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
+                    }
+                    catch
+                    {
+                        files = null;
+                    }
+                }
+                return (exists, files, DateTime.UtcNow);
+            }));
+
+            var dirEntry = lazyEntry.Value;
+
+            if ((DateTime.UtcNow - dirEntry.Timestamp) < CACHE_DURATION)
+            {
+                return (dirEntry.Exists, dirEntry.Files);
+            }
+            else
+            {
+                // Cache expired, try to remove and retry
+                _directoryCache.TryRemove(directoryPath, out _);
+            }
+        }
     }
 
     private DateTime GetCachedLastWriteTime(string path)
