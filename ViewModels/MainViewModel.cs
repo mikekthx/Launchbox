@@ -111,13 +111,13 @@ public class MainViewModel : ViewModelBase, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine($"Failed to load app {file}: {ex.Message}");
+                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {ex.Message}");
                     }
                 }
             }
             else
             {
-                Trace.WriteLine($"Shortcut folder not found: {shortcutFolder}");
+                Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(shortcutFolder)}");
             }
 
             ct.ThrowIfCancellationRequested();
@@ -149,7 +149,7 @@ public class MainViewModel : ViewModelBase, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine($"Failed to load icon for {item.Path}: {ex.Message}");
+                    Trace.WriteLine($"Failed to load icon for {PathSecurity.RedactPath(item.Path)}: {ex.Message}");
                 }
             });
         }
