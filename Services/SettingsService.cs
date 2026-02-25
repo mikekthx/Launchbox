@@ -27,7 +27,7 @@ public class SettingsService : ObservableObject
                 {
                     return path;
                 }
-                Trace.WriteLine($"Ignored unsafe ShortcutsPath from settings: {path}");
+                Trace.WriteLine($"Ignored unsafe ShortcutsPath from settings: {PathSecurity.RedactPath(path)}");
             }
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
         }
@@ -35,7 +35,7 @@ public class SettingsService : ObservableObject
         {
             if (PathSecurity.IsUnsafePath(value))
             {
-                Trace.WriteLine($"Blocked setting unsafe ShortcutsPath: {value}");
+                Trace.WriteLine($"Blocked setting unsafe ShortcutsPath: {PathSecurity.RedactPath(value)}");
                 OnPropertyChanged();
                 return;
             }
