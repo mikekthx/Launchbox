@@ -99,13 +99,18 @@ public class IconService(IFileSystem fileSystem) : IIconService
             return null;
         }
 
+        // Expand environment variables (e.g., %APPDATA%) to ensure correct cache key
+        // and that GetLastWriteTime works on the actual file.
+        // This also aligns cache keys with PruneCache which typically receives absolute paths.
+        string expandedPath = Environment.ExpandEnvironmentVariables(path);
+
         // 1. Gather current state (timestamps)
         // We check these every time to support live updates, but avoid expensive operations if unchanged.
 
-        var shortcutTime = GetCachedLastWriteTime(path);
+        var shortcutTime = GetCachedLastWriteTime(expandedPath);
 
-        string? directory = Path.GetDirectoryName(path);
-        string name = Path.GetFileNameWithoutExtension(path);
+        string? directory = Path.GetDirectoryName(expandedPath);
+        string name = Path.GetFileNameWithoutExtension(expandedPath);
 
         DateTime pngTime = DateTime.MinValue;
         DateTime icoTime = DateTime.MinValue;
@@ -131,7 +136,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
 
         // 2. Check Cache
-        if (_iconCache.TryGetValue(path, out var entry))
+        if (_iconCache.TryGetValue(expandedPath, out var entry))
         {
             if (entry.ShortcutTime == shortcutTime &&
                 entry.PngTime == pngTime &&
@@ -153,11 +158,12 @@ public class IconService(IFileSystem fileSystem) : IIconService
         // 3b. If no custom icon, Try System Icon
         if (iconBytes == null)
         {
-            iconBytes = ExtractSystemIcon(path);
+            // Use expandedPath so ExtractSystemIcon->ResolveIconPath gets the correct path
+            iconBytes = ExtractSystemIcon(expandedPath);
         }
 
         // 4. Update Cache
-        _iconCache[path] = new IconCacheEntry(iconBytes, shortcutTime, pngTime, icoTime);
+        _iconCache[expandedPath] = new IconCacheEntry(iconBytes, shortcutTime, pngTime, icoTime);
 
         return iconBytes;
     }
