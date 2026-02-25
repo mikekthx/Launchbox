@@ -220,16 +220,29 @@ public class IconService(IFileSystem fileSystem) : IIconService
                 return (_fileSystem.GetLastWriteTime(p), DateTime.UtcNow);
             }));
 
-            var entry = lazyEntry.Value;
+            try
+            {
+                var entry = lazyEntry.Value;
 
-            if ((DateTime.UtcNow - entry.CacheTime) < CACHE_DURATION)
-            {
-                return entry.Timestamp;
+                if ((DateTime.UtcNow - entry.CacheTime) < CACHE_DURATION)
+                {
+                    return entry.Timestamp;
+                }
+                else
+                {
+                    // Cache expired, try to remove and retry
+                    _fileTimestampCache.TryRemove(path, out _);
+                }
             }
-            else
+            catch
             {
-                // Cache expired, try to remove and retry
+                // If the lazy value factory threw an exception (e.g., GetLastWriteTime failed),
+                // remove the faulty entry so subsequent calls can retry instead of getting the cached exception.
                 _fileTimestampCache.TryRemove(path, out _);
+
+                // Return a safe default to prevent crashing the caller.
+                // Using MinValue signals "very old" or "invalid", which is generally safe for timestamp checks.
+                return DateTime.MinValue;
             }
         }
     }
