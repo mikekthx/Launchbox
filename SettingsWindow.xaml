@@ -28,7 +28,8 @@
                 <!-- General -->
                 <StackPanel Spacing="8">
                     <TextBlock Text="General" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-                    <ToggleSwitch Header="Run at Startup" IsOn="{x:Bind ViewModel.RunAtStartup, Mode=TwoWay}" />
+                    <ToggleSwitch Header="Run at Startup" IsOn="{x:Bind ViewModel.RunAtStartup, Mode=TwoWay}"
+                                  ToolTipService.ToolTip="Automatically launch Launchbox when you sign in to Windows" />
                 </StackPanel>
 
                 <!-- Shortcuts -->
@@ -50,10 +51,13 @@
                     <TextBlock Text="Global Hotkey" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ComboBox ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100"
-                                  AutomationProperties.Name="Hotkey modifier" />
+                                  AutomationProperties.Name="Hotkey modifier"
+                                  ToolTipService.ToolTip="Select a modifier key (e.g., Alt)" />
                         <TextBlock Text="+" VerticalAlignment="Center"/>
                         <TextBox Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center"
-                                 AutomationProperties.Name="Hotkey key" />
+                                 AutomationProperties.Name="Hotkey key"
+                                 PlaceholderText="Key"
+                                 ToolTipService.ToolTip="Enter a key (e.g., S, F1, Home)" />
                     </StackPanel>
                 </StackPanel>
 
