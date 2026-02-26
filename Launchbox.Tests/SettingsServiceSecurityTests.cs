@@ -1,5 +1,6 @@
 using Launchbox.Helpers;
 using Launchbox.Services;
+using System.Diagnostics;
 using System.IO;
 using Xunit;
 
@@ -7,6 +8,37 @@ namespace Launchbox.Tests;
 
 public class SettingsServiceSecurityTests
 {
+    [Fact]
+    public void ShortcutsPath_Setter_RedactsUnsafePath_InTrace()
+    {
+        using var sw = new StringWriter();
+        using var listener = new TextWriterTraceListener(sw);
+        Trace.Listeners.Add(listener);
+
+        try
+        {
+            var settingsStore = new MockSettingsStore();
+            var startupService = new MockStartupService();
+            var service = new SettingsService(settingsStore, startupService);
+
+            string unsafePath = @"\\attacker\share\SecretProject";
+
+            // Act
+            service.ShortcutsPath = unsafePath;
+
+            Trace.Flush();
+            string log = sw.ToString();
+
+            // Assert
+            string expectedMessage = $"Blocked setting unsafe ShortcutsPath: {PathSecurity.RedactPath(unsafePath)}";
+            Assert.Contains(expectedMessage, log);
+        }
+        finally
+        {
+            Trace.Listeners.Remove(listener);
+        }
+    }
+
     [Fact]
     public void ShortcutsPath_Setter_RejectsUnsafePath()
     {
