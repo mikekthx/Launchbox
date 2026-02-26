@@ -117,7 +117,7 @@ public class MockFileSystem : IFileSystem
         throw new FileNotFoundException(path);
     }
 
-    public DateTime GetLastWriteTime(string path)
+    public virtual DateTime GetLastWriteTime(string path)
     {
         if (_fileTimes.TryGetValue(path, out var time))
             return time;
