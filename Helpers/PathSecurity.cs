@@ -102,4 +102,17 @@ public static class PathSecurity
             return "[Invalid Path]";
         }
     }
+
+    /// <summary>
+    /// Returns a safe exception message that avoids leaking sensitive paths or system information.
+    /// Use this instead of ex.Message when logging exceptions related to file system operations.
+    /// </summary>
+    public static string GetSafeExceptionMessage(Exception ex)
+    {
+        if (ex == null) return "[Unknown Error]";
+
+        // Return only the exception type name
+        // ex.Message often contains the full path which we want to avoid leaking
+        return $"[{ex.GetType().Name}]";
+    }
 }

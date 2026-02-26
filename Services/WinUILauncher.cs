@@ -64,7 +64,7 @@ public class WinUILauncher : IAppLauncher
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to launch {PathSecurity.RedactPath(path)}: {ex.Message}");
+            Trace.WriteLine($"Failed to launch {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -84,7 +84,7 @@ public class WinUILauncher : IAppLauncher
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"Failed to open folder {PathSecurity.RedactPath(path)}: {ex.Message}");
+                Trace.WriteLine($"Failed to open folder {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             }
         }
         else

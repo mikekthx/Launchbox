@@ -1,3 +1,4 @@
+using Launchbox.Helpers;
 using System;
 using System.Diagnostics;
 using Windows.Storage;
@@ -25,7 +26,7 @@ public class LocalSettingsStore : ISettingsStore
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to read setting {key}: {ex.Message}");
+            Trace.WriteLine($"Failed to read setting {key}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             value = null;
             return false;
         }
@@ -39,7 +40,7 @@ public class LocalSettingsStore : ISettingsStore
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to write setting {key}: {ex.Message}");
+            Trace.WriteLine($"Failed to write setting {key}: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
