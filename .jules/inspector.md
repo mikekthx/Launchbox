@@ -13,3 +13,7 @@
 ## 2024-05-23 - [LocalSettingsStore Reliability]
 **Learning:** `ApplicationDataContainer.Values` operations (accessing/setting keys) can throw exceptions (e.g. COMException, quota exceeded, file system errors), which crashes the app if unhandled on the UI thread.
 **Action:** Wrap all `LocalSettings` interactions in `try-catch` blocks and log failures instead of crashing.
+
+## 2026-02-18 - [UI Reliability] Handle Pointer Capture Loss
+**Learning:** Custom window dragging logic that relies solely on `PointerReleased` can leave the app in a "stuck" dragging state if the interaction is interrupted by system events (e.g., Alt-Tab, notifications) which fire `PointerCanceled` or `PointerCaptureLost` instead.
+**Action:** Explicitly handle `PointerCanceled` and `PointerCaptureLost` events to reset dragging state and release pointer capture, ensuring the UI recovers gracefully from interruptions.
