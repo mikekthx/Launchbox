@@ -247,34 +247,37 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
     }
 
+    /// <summary>
+    /// Attempts to load a custom icon (PNG or ICO) from the .icons directory.
+    /// Prefers the file with the largest valid image area.
+    /// </summary>
     private byte[]? GetCustomIconBytes(string pngPath, string icoPath, DateTime pngTime, DateTime icoTime)
     {
-        // Check year > 1900 because GetLastWriteTime returns ~1601 for missing files
-        bool pngExists = pngTime.Year > Constants.MIN_VALID_YEAR;
-        bool icoExists = icoTime.Year > Constants.MIN_VALID_YEAR;
+        bool pngValid = IsValidTimestamp(pngTime);
+        bool icoValid = IsValidTimestamp(icoTime);
 
-        if (!pngExists && !icoExists) return null;
+        if (!pngValid && !icoValid) return null;
 
-        string? chosenPath = null;
-
-        if (pngExists && icoExists)
+        string chosenPath;
+        if (pngValid && icoValid)
         {
+            // Both exist, so we must decide which one is better.
             int pngArea = GetImageArea(pngPath, ImageHeaderParser.GetPngDimensions);
             int icoArea = GetImageArea(icoPath, ImageHeaderParser.GetMaxIcoDimensions);
 
-            // Prefer larger resolution
-            // If areas are equal (or both failed to parse), prefer PNG (modern/compatible)
+            // Prefer larger resolution. If equal (or both invalid), prefer PNG for modern compatibility.
             chosenPath = (icoArea > pngArea) ? icoPath : pngPath;
         }
         else
         {
-            chosenPath = pngExists ? pngPath : icoPath;
+            // Only one exists
+            chosenPath = pngValid ? pngPath : icoPath;
         }
 
         try
         {
-            // Security: Limit file size to 5MB to prevent DoS via large files
-            if (_fileSystem.GetFileSize(chosenPath) > 5 * 1024 * 1024)
+            // Security: Limit file size to prevent DoS via large files
+            if (_fileSystem.GetFileSize(chosenPath) > Constants.MAX_ICON_FILE_SIZE_BYTES)
             {
                 Trace.WriteLine($"Blocked loading of large icon file: {PathSecurity.RedactPath(chosenPath)}");
                 return null;
@@ -287,6 +290,12 @@ public class IconService(IFileSystem fileSystem) : IIconService
             Trace.WriteLine($"Failed to read custom icon {PathSecurity.RedactPath(chosenPath)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
+    }
+
+    private static bool IsValidTimestamp(DateTime timestamp)
+    {
+        // GetLastWriteTime returns ~1601 for missing files, so we check > 1900
+        return timestamp.Year > Constants.MIN_VALID_YEAR;
     }
 
     private int GetImageArea(string path, Func<Stream, (int Width, int Height)?> parser)

@@ -16,6 +16,7 @@ public static class Constants
     // Icon constants
     public const int ICON_SIZE = 96;
     public const int MIN_VALID_YEAR = 1900;
+    public const long MAX_ICON_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
     public const string DWM_BLUR_GLASS_PROCESS_NAME = "DWMBlurGlass";
     public const string INTERNET_SHORTCUT_SECTION = "InternetShortcut";
