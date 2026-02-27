@@ -23,10 +23,22 @@
                         DoubleClickCommand="{Binding ViewModel.ToggleWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}" />
-                    <MenuFlyoutItem Text="Settings" Command="{Binding ViewModel.OpenSettingsCommand}" />
+                    <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="View" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
+                    <MenuFlyoutItem Text="Settings" Command="{Binding ViewModel.OpenSettingsCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="Setting" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Exit" Command="{Binding ViewModel.ExitCommand}" />
+                    <MenuFlyoutItem Text="Exit" Command="{Binding ViewModel.ExitCommand}">
+                        <MenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="Cancel" />
+                        </MenuFlyoutItem.Icon>
+                    </MenuFlyoutItem>
                 </MenuFlyout>
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
@@ -35,7 +47,8 @@
                     VerticalAlignment="Center"
                     Spacing="12"
                     Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5">
+            <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
+                        AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
                 </SymbolIcon.RenderTransform>
@@ -47,11 +60,16 @@
             <TextBlock Text="Add shortcuts to your Desktop/Shortcuts folder"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"/>
-            <Button Content="Open Shortcuts Folder"
-                    Command="{Binding ViewModel.OpenShortcutsFolderCommand}"
+            <Button Command="{Binding ViewModel.OpenShortcutsFolderCommand}"
                     HorizontalAlignment="Center"
                     Style="{ThemeResource AccentButtonStyle}"
-                    Margin="0,8,0,0" />
+                    Margin="0,8,0,0"
+                    AutomationProperties.Name="Open Shortcuts Folder">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <SymbolIcon Symbol="Folder" />
+                    <TextBlock Text="Open Shortcuts Folder" />
+                </StackPanel>
+            </Button>
         </StackPanel>
 
         <GridView x:Name="AppGrid" 
