@@ -111,7 +111,7 @@ public class MainViewModel : ViewModelBase, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {ex.Message}");
+                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
                     }
                 }
             }
@@ -149,7 +149,7 @@ public class MainViewModel : ViewModelBase, IDisposable
                 }
                 catch (Exception ex)
                 {
-                    Trace.WriteLine($"Failed to load icon for {PathSecurity.RedactPath(item.Path)}: {ex.Message}");
+                    Trace.WriteLine($"Failed to load icon for {PathSecurity.RedactPath(item.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
                 }
             });
         }
@@ -159,7 +159,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Unexpected error in LoadAppsAsync: {ex}");
+            Trace.WriteLine($"Unexpected error in LoadAppsAsync: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -185,7 +185,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to open shortcuts folder: {ex.Message}");
+            Trace.WriteLine($"Failed to open shortcuts folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 

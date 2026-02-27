@@ -284,7 +284,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to read custom icon {PathSecurity.RedactPath(chosenPath)}: {ex.Message}");
+            Trace.WriteLine($"Failed to read custom icon {PathSecurity.RedactPath(chosenPath)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
     }
@@ -299,7 +299,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to get image area for {PathSecurity.RedactPath(path)}: {ex.Message}");
+            Trace.WriteLine($"Failed to get image area for {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return 0;
         }
     }
@@ -329,7 +329,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to extract icon for {PathSecurity.RedactPath(path)} (resolved: {PathSecurity.RedactPath(resolvedPath)}): {ex.Message}");
+            Trace.WriteLine($"Failed to extract icon for {PathSecurity.RedactPath(path)} (resolved: {PathSecurity.RedactPath(resolvedPath)}): {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
         finally
