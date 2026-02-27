@@ -23,11 +23,12 @@ public class SettingsService : ObservableObject
         {
             if (_store.TryGetValue(nameof(ShortcutsPath), out var val) && val is string path)
             {
-                if (!PathSecurity.IsUnsafePath(path))
+                var expandedPath = Environment.ExpandEnvironmentVariables(path);
+                if (!PathSecurity.IsUnsafePath(expandedPath))
                 {
-                    return path;
+                    return expandedPath;
                 }
-                Trace.WriteLine($"Ignored unsafe ShortcutsPath from settings: {PathSecurity.RedactPath(path)}");
+                Trace.WriteLine($"Ignored unsafe ShortcutsPath from settings: {PathSecurity.RedactPath(expandedPath)}");
             }
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
         }
