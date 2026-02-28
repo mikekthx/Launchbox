@@ -10,13 +10,34 @@ namespace Launchbox.Services;
 
 public class FileSystem : IFileSystem
 {
-    public void CreateDirectory(string path) => Directory.CreateDirectory(path);
-    public bool DirectoryExists(string path) => Directory.Exists(path);
-    public bool FileExists(string path) => File.Exists(path);
-    public string[] GetFiles(string path) => Directory.GetFiles(path);
+    public void CreateDirectory(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) throw new UnauthorizedAccessException($"Access to path '{PathSecurity.RedactPath(path)}' is denied.");
+        Directory.CreateDirectory(path);
+    }
+
+    public bool DirectoryExists(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) return false;
+        return Directory.Exists(path);
+    }
+
+    public bool FileExists(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) return false;
+        return File.Exists(path);
+    }
+
+    public string[] GetFiles(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) return Array.Empty<string>();
+        return Directory.GetFiles(path);
+    }
 
     public string GetIniValue(string path, string section, string key)
     {
+        if (PathSecurity.IsUnsafePath(path)) return string.Empty;
+
         // Security: Prevent symlink redirection attacks on INI files (like .url)
         try
         {
@@ -75,8 +96,27 @@ public class FileSystem : IFileSystem
         }
     }
 
-    public byte[] ReadAllBytes(string path) => File.ReadAllBytes(path);
-    public Stream OpenRead(string path) => File.OpenRead(path);
-    public DateTime GetLastWriteTime(string path) => File.GetLastWriteTime(path);
-    public long GetFileSize(string path) => new FileInfo(path).Length;
+    public byte[] ReadAllBytes(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) throw new UnauthorizedAccessException($"Access to path '{PathSecurity.RedactPath(path)}' is denied.");
+        return File.ReadAllBytes(path);
+    }
+
+    public Stream OpenRead(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) throw new UnauthorizedAccessException($"Access to path '{PathSecurity.RedactPath(path)}' is denied.");
+        return File.OpenRead(path);
+    }
+
+    public DateTime GetLastWriteTime(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) throw new UnauthorizedAccessException($"Access to path '{PathSecurity.RedactPath(path)}' is denied.");
+        return File.GetLastWriteTime(path);
+    }
+
+    public long GetFileSize(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) throw new UnauthorizedAccessException($"Access to path '{PathSecurity.RedactPath(path)}' is denied.");
+        return new FileInfo(path).Length;
+    }
 }
