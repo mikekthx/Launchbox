@@ -89,7 +89,29 @@ public static class PathSecurity
 
         try
         {
-            var fileName = Path.GetFileName(path);
+            // On Linux/Mac, Path.GetFileName doesn't understand Windows backslashes.
+            // We manually split by backslash if running on non-Windows (or just always for safety)
+            // to ensure we get just the filename.
+
+            // Normalize separators first? No, string manipulation is safer.
+            int lastSlash = path.LastIndexOfAny(new[] { '\\', '/' });
+            string fileName;
+
+            if (lastSlash >= 0 && lastSlash < path.Length - 1)
+            {
+                fileName = path.Substring(lastSlash + 1);
+            }
+            else if (lastSlash == path.Length - 1)
+            {
+                // Ends with slash
+                return "[Redacted]";
+            }
+            else
+            {
+                // No slashes
+                fileName = path;
+            }
+
             if (string.IsNullOrEmpty(fileName))
             {
                 // This happens for root paths like C:\ or \\server\share

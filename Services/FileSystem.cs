@@ -1,5 +1,7 @@
+using Launchbox.Helpers;
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,6 +17,26 @@ public class FileSystem : IFileSystem
 
     public string GetIniValue(string path, string section, string key)
     {
+        // Security: Prevent symlink redirection attacks on INI files (like .url)
+        try
+        {
+            if (File.Exists(path))
+            {
+                var attr = File.GetAttributes(path);
+                if ((attr & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint)
+                {
+                    Trace.WriteLine($"Blocked INI read on reparse point: {PathSecurity.RedactPath(path)}");
+                    return string.Empty;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Fail closed on any file access error (e.g. Access Denied)
+            Trace.WriteLine($"Failed to validate INI file {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return string.Empty;
+        }
+
         // Start with a reasonable buffer size to minimize reallocations
         // 4096 is enough for almost all paths and typical INI values.
         int capacity = 4096;
