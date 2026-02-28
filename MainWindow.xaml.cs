@@ -67,6 +67,8 @@ public sealed partial class MainWindow : Window
         RootGrid.PointerPressed += RootGrid_PointerPressed;
         RootGrid.PointerMoved += RootGrid_PointerMoved;
         RootGrid.PointerReleased += RootGrid_PointerReleased;
+        RootGrid.PointerCanceled += RootGrid_PointerReleased;
+        RootGrid.PointerCaptureLost += RootGrid_PointerCaptureLost;
 
         // 3. SCROLL SHOULD WORK NATIVELY NOW
         AppGrid.Loaded += (s, e) =>
@@ -147,6 +149,12 @@ public sealed partial class MainWindow : Window
             RootGrid.ReleasePointerCapture(e.Pointer);
             e.Handled = true;
         }
+    }
+
+    private void RootGrid_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+    {
+        _isDraggingWindow = false;
+        e.Handled = true;
     }
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
