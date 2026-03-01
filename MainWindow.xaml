@@ -46,7 +46,7 @@
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
-                    Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
@@ -60,7 +60,7 @@
             <TextBlock Text="Add shortcuts to your Desktop/Shortcuts folder"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"/>
-            <Button Command="{Binding ViewModel.OpenShortcutsFolderCommand}"
+            <Button Command="{x:Bind ViewModel.OpenShortcutsFolderCommand}"
                     HorizontalAlignment="Center"
                     Style="{ThemeResource AccentButtonStyle}"
                     Margin="0,8,0,0"
