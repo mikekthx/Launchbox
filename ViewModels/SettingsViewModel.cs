@@ -33,10 +33,10 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         _ = InitializeSettingsAsync();
 
         ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());
-        BrowseFolderCommand = new SimpleCommand(BrowseFolderAsync);
+        BrowseFolderCommand = new AsyncSimpleCommand<object?>(BrowseFolderAsync);
     }
 
-    private async void BrowseFolderAsync(object? parameter)
+    private async Task BrowseFolderAsync(object? parameter)
     {
         if (parameter == null) return; // Need window handle
 

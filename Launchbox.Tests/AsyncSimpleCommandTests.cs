@@ -102,4 +102,37 @@ public class AsyncSimpleCommandTests
         // If we reached here, it didn't crash.
         Assert.True(true);
     }
+
+    [Fact]
+    public void GenericConstructor_NullAction_ThrowsArgumentNullException()
+    {
+        Assert.Throws<ArgumentNullException>(() => new AsyncSimpleCommand<string>(null!));
+    }
+
+    [Fact]
+    public async Task GenericExecute_PassesParameter()
+    {
+        var tcs = new TaskCompletionSource<string?>();
+        var command = new AsyncSimpleCommand<string>(async (param) =>
+        {
+            await Task.Yield();
+            tcs.SetResult(param);
+        });
+
+        command.Execute("TestParameter");
+
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000));
+        Assert.Equal(tcs.Task, completedTask);
+        Assert.Equal("TestParameter", await tcs.Task);
+    }
+
+    [Fact]
+    public void GenericExecute_SwallowsException()
+    {
+        var command = new AsyncSimpleCommand<int>(param => throw new Exception("Test Generic Exception"));
+
+        var exception = Record.Exception(() => command.Execute(123));
+
+        Assert.Null(exception);
+    }
 }
