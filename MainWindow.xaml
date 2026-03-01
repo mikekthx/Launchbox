@@ -43,10 +43,11 @@
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
 
-        <StackPanel HorizontalAlignment="Center"
+        <StackPanel x:Name="EmptyStatePanel"
+                    x:Load="{x:Bind ViewModel.IsEmpty, Mode=OneWay}"
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Spacing="12"
-                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    Spacing="12">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
