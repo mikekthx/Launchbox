@@ -172,6 +172,6 @@ jobs:
     # Generate the unforgeable birth certificate for the installer
     - name: Generate artifact attestation
       if: github.event_name != 'pull_request'
-      uses: actions/attest-build-provenance@v3
+      uses: actions/attest-build-provenance@v4
       with:
         subject-path: AppPackages/**/*.msi*
