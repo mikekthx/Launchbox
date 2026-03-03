@@ -7,10 +7,10 @@ namespace Launchbox.Services;
 /// </summary>
 public class WindowPositionManager
 {
-    private const string SettingKeyX = "WinX";
-    private const string SettingKeyY = "WinY";
-    private const string SettingKeyWidth = "WinW";
-    private const string SettingKeyHeight = "WinH";
+    private const string SETTING_KEY_X = "WinX";
+    private const string SETTING_KEY_Y = "WinY";
+    private const string SETTING_KEY_WIDTH = "WinW";
+    private const string SETTING_KEY_HEIGHT = "WinH";
 
     private readonly ISettingsStore _settings;
 
@@ -38,10 +38,10 @@ public class WindowPositionManager
         width = 0;
         height = 0;
 
-        if (_settings.TryGetValue(SettingKeyX, out var winX) &&
-            _settings.TryGetValue(SettingKeyY, out var winY) &&
-            _settings.TryGetValue(SettingKeyWidth, out var winW) &&
-            _settings.TryGetValue(SettingKeyHeight, out var winH) &&
+        if (_settings.TryGetValue(SETTING_KEY_X, out var winX) &&
+            _settings.TryGetValue(SETTING_KEY_Y, out var winY) &&
+            _settings.TryGetValue(SETTING_KEY_WIDTH, out var winW) &&
+            _settings.TryGetValue(SETTING_KEY_HEIGHT, out var winH) &&
             winX is int valX && winY is int valY && winW is int valW && winH is int valH)
         {
             x = valX;
@@ -63,9 +63,9 @@ public class WindowPositionManager
     /// <param name="height">The height of the window.</param>
     public void SaveWindowPosition(int x, int y, int width, int height)
     {
-        _settings.SetValue(SettingKeyX, x);
-        _settings.SetValue(SettingKeyY, y);
-        _settings.SetValue(SettingKeyWidth, width);
-        _settings.SetValue(SettingKeyHeight, height);
+        _settings.SetValue(SETTING_KEY_X, x);
+        _settings.SetValue(SETTING_KEY_Y, y);
+        _settings.SetValue(SETTING_KEY_WIDTH, width);
+        _settings.SetValue(SETTING_KEY_HEIGHT, height);
     }
 }
