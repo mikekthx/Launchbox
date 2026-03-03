@@ -26,6 +26,8 @@ public class IconServiceEnvVarsTests
         // Use a path format that works for MockFileSystem across platforms
         // On Windows it will be C:\ExpandedIcons, on Linux C:/ExpandedIcons
         string envVal = Path.Combine("C:", "ExpandedIcons");
+        // Force the mock to see this as C:\ExpandedIcons (or / depending on platform) by replacing separators
+        envVal = envVal.Replace('\\', '/');
 
         Environment.SetEnvironmentVariable(envVar, envVal);
 
@@ -34,14 +36,14 @@ public class IconServiceEnvVarsTests
             // 2. Determine syntax
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             // If running on Linux, .NET uses $VAR syntax for Environment.ExpandEnvironmentVariables
-            string envRef = isWindows ? $"%{envVar}%" : $"${envVar}";
+            // Actually Environment.ExpandEnvironmentVariables uses %VAR% on ALL platforms in .NET
+            string envRef = $"%{envVar}%";
 
             // 3. Setup File System
-            string urlFile = Path.Combine("C:", "Shortcuts", "App.url");
+            string urlFile = "C:/Shortcuts/App.url";
 
             // The path stored in the INI file, using the environment variable
-            // Note: Path.Combine might mess up if envRef starts with $? No.
-            string iconRelPath = Path.Combine(envRef, "App.ico");
+            string iconRelPath = $"{envRef}/App.ico";
 
             // The expected path after expansion
             string expectedIconPath = Path.Combine(envVal, "App.ico");
