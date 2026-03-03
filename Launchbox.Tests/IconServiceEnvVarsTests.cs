@@ -46,7 +46,9 @@ public class IconServiceEnvVarsTests
             string iconRelPath = $"{envRef}/App.ico";
 
             // The expected path after expansion
-            string expectedIconPath = Path.Combine(envVal, "App.ico");
+            // Note: Don't use Path.Combine because envVal uses forced '/' and Path.Combine adds '\' on Windows,
+            // resulting in a mixed slash path "C:/ExpandedIcons\App.ico" that fails the string exact match.
+            string expectedIconPath = $"{envVal}/App.ico";
 
             _mockFileSystem.AddFile(urlFile);
             _mockFileSystem.AddFile(expectedIconPath); // Add the resolved path to FS, NOT the %VAR% path

@@ -43,7 +43,7 @@ public class BooleanToVisibilityConverterTests
     public void Convert_Null_ReturnsCollapsed()
     {
         var converter = new BooleanToVisibilityConverter();
-        var result = converter.Convert(null, typeof(Visibility), null!, "en-US");
+        var result = converter.Convert(null!, typeof(Visibility), null!, "en-US");
         Assert.Equal(Visibility.Collapsed, result);
     }
 
@@ -64,6 +64,6 @@ public class BooleanToVisibilityConverterTests
     {
         var converter = new BooleanToVisibilityConverter();
         Assert.Throws<NotImplementedException>(() =>
-            converter.ConvertBack(value!, typeof(bool), null, "en-US"));
+            converter.ConvertBack(value!, typeof(bool), null!, "en-US"));
     }
 }
