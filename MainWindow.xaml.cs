@@ -174,12 +174,4 @@ public sealed partial class MainWindow : Window
         TrayIcon?.Dispose();
         ViewModel?.Dispose();
     }
-
-    private void AppGrid_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (ViewModel.LaunchAppCommand.CanExecute(e.ClickedItem))
-        {
-            ViewModel.LaunchAppCommand.Execute(e.ClickedItem);
-        }
-    }
 }
