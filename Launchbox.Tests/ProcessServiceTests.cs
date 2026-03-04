@@ -1,0 +1,41 @@
+using System.Diagnostics;
+using Launchbox.Services;
+using Xunit;
+
+namespace Launchbox.Tests;
+
+public class ProcessServiceTests
+{
+    private readonly ProcessService _processService;
+
+    public ProcessServiceTests()
+    {
+        _processService = new ProcessService();
+    }
+
+    [Fact]
+    public void IsProcessRunning_ReturnsTrue_WhenProcessExists()
+    {
+        // Arrange
+        var currentProcessName = Process.GetCurrentProcess().ProcessName;
+
+        // Act
+        var isRunning = _processService.IsProcessRunning(currentProcessName);
+
+        // Assert
+        Assert.True(isRunning);
+    }
+
+    [Fact]
+    public void IsProcessRunning_ReturnsFalse_WhenProcessDoesNotExist()
+    {
+        // Arrange
+        var nonExistentProcessName = "ThisProcessShouldNotBeRunning_123456789";
+
+        // Act
+        var isRunning = _processService.IsProcessRunning(nonExistentProcessName);
+
+        // Assert
+        Assert.False(isRunning);
+    }
+}
