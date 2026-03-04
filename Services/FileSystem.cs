@@ -57,22 +57,31 @@ public class FileSystem : IFileSystem
             return string.Empty;
         }
 
-        // Start with a reasonable buffer size to minimize reallocations
-        // 4096 is enough for almost all paths and typical INI values.
-        int capacity = 4096;
+        // Fast-path: allocate buffer on the stack for typical small INI values to avoid ArrayPool rent/return overhead
+        Span<char> stackBuffer = stackalloc char[512];
+        int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, ref MemoryMarshal.GetReference(stackBuffer), stackBuffer.Length, path);
+
+        if (ret < stackBuffer.Length - 2)
+        {
+            if (ret == 0) return string.Empty;
+            return new string(stackBuffer.Slice(0, ret));
+        }
+
+        // Fallback: value exceeds stack buffer size, allocate larger buffer from ArrayPool
+        int capacity = stackBuffer.Length * 2;
         char[] buffer = ArrayPool<char>.Shared.Rent(capacity);
         try
         {
             while (true)
             {
                 int size = buffer.Length;
-                int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, buffer, size, path);
+                ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, buffer, size, path);
 
                 // Truncation check: GetPrivateProfileString returns size - 1 or size - 2 when the
                 // provided buffer is insufficient for the full INI value.
                 if (ret < size - 2)
                 {
-                    return new string(buffer, 0, ret);
+                    return new string(buffer.AsSpan(0, ret));
                 }
 
                 // Truncated. Loop to double the buffer size until it fits.
@@ -81,7 +90,7 @@ public class FileSystem : IFileSystem
                 {
                     // Safety limit to prevent infinite allocation.
                     // Accept truncated result if value exceeds 64KB limit to avoid excessive allocation.
-                    return new string(buffer, 0, ret);
+                    return new string(buffer.AsSpan(0, ret));
                 }
 
                 var newBuffer = ArrayPool<char>.Shared.Rent(newCapacity);
