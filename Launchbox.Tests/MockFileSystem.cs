@@ -95,7 +95,7 @@ public class MockFileSystem : IFileSystem
         return Array.Empty<string>();
     }
 
-    public string GetIniValue(string path, string section, string key)
+    public virtual string GetIniValue(string path, string section, string key)
     {
         OperationsLog.Add($"GetIniValue: {path}");
         if (_iniValues.TryGetValue($"{path}|{section}|{key}", out var val))
