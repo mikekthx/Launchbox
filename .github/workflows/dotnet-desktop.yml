@@ -164,7 +164,7 @@ jobs:
     # Upload the MSIX package
     - name: Upload build artifacts
       if: github.event_name != 'pull_request'
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: MSIX Package - ${{ matrix.configuration }}
         path: ${{ env.Project_Directory }}\AppPackages
@@ -172,6 +172,6 @@ jobs:
     # Generate the unforgeable birth certificate for the installer
     - name: Generate artifact attestation
       if: github.event_name != 'pull_request'
-      uses: actions/attest-build-provenance@v3
+      uses: actions/attest@v4
       with:
         subject-path: AppPackages/**/*.msi*

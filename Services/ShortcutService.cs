@@ -20,9 +20,17 @@ public class ShortcutService : IShortcutService
             return null;
         }
 
-        return _fileSystem.GetFiles(folderPath)
-            .Where(f => allowedExtensions.Contains(Path.GetExtension(f) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
-            .OrderBy(f => Path.GetFileName(f))
-            .ToArray();
+        try
+        {
+            return _fileSystem.GetFiles(folderPath)
+                .Where(f => allowedExtensions.Contains(Path.GetExtension(f) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                .OrderBy(f => Path.GetFileName(f))
+                .ToArray();
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+        {
+            System.Diagnostics.Trace.WriteLine($"Failed to access shortcut folder {Launchbox.Helpers.PathSecurity.RedactPath(folderPath)}: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+            return null;
+        }
     }
 }

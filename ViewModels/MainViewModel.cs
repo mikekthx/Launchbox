@@ -167,8 +167,15 @@ public class MainViewModel : ViewModelBase, IDisposable
     {
         if (parameter is AppItem app)
         {
-            _windowService.Hide();
-            _appLauncher.Launch(app.Path);
+            try
+            {
+                _windowService.Hide();
+                _appLauncher.Launch(app.Path);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Failed to launch app {PathSecurity.RedactPath(app.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            }
         }
     }
 
