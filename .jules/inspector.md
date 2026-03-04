@@ -17,3 +17,7 @@
 ## 2026-02-18 - [UI Reliability] Handle Pointer Capture Loss
 **Learning:** Custom window dragging logic that relies solely on `PointerReleased` can leave the app in a "stuck" dragging state if the interaction is interrupted by system events (e.g., Alt-Tab, notifications) which fire `PointerCanceled` or `PointerCaptureLost` instead.
 **Action:** Explicitly handle `PointerCanceled` and `PointerCaptureLost` events to reset dragging state and release pointer capture, ensuring the UI recovers gracefully from interruptions.
+
+## 2024-05-24 - [Memory Reliability] Prevent RCW Accumulation with COM Objects
+**Learning:** Instantiating COM objects (like `ShellLink` for shortcut resolution) in high-frequency loops without explicit disposal leads to temporary memory bloat and Runtime Callable Wrapper (RCW) accumulation before the garbage collector runs.
+**Action:** Always explicitly release COM objects using `Marshal.ReleaseComObject()` within a `finally` block to ensure deterministic memory cleanup.
