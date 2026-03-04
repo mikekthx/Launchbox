@@ -91,7 +91,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         try
         {
             var shortcutFolder = _settingsService.ShortcutsPath;
-            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS), ct);
+            var files = _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS);
 
             ct.ThrowIfCancellationRequested();
 

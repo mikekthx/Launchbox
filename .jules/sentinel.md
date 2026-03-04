@@ -38,6 +38,11 @@
 **Learning:** Security validations should be enforced as close to the resource boundary as possible (Defense in Depth). High-level checks can be easily bypassed by new features or refactored code.
 **Prevention:** Integrate centralized path validation directly into the lowest-level file system wrapper (`FileSystem.cs`). Ensure that all file system access attempts are explicitly blocked (returning safe defaults or throwing `UnauthorizedAccessException`) before reaching the underlying `System.IO` API.
 
+## 2026-03-02 - Missing Base-Level Execution Validation
+**Vulnerability:** `ProcessStarter` wrapped `Process.Start` directly without performing explicit path validation. If a high-level component failed to check `PathSecurity.IsUnsafePath` before delegating execution to `IProcessStarter`, arbitrary code execution or NTLM leaks via malicious UNC paths could occur.
+**Learning:** Path security validations must be applied at the lowest abstraction layer of process execution (`ProcessStarter`), similar to the file system wrappers, ensuring defense-in-depth across the application boundary.
+**Prevention:** Ensure `ProcessStarter.Start` immediately checks `startInfo.FileName` against `PathSecurity.IsUnsafePath` and explicitly throws an `UnauthorizedAccessException` to block potentially unsafe executions.
+
 ## 2026-11-09 - Missing Base-Level Path Validation in ProcessStarter
 **Vulnerability:** Process launching mechanisms like `Process.Start` were previously lacking centralized path validations. While `WinUILauncher` handled most executions, any future addition of a component directly calling `IProcessStarter` could lead to unrestricted file execution and UNC path leaks.
 **Learning:** Checking file paths at the boundaries is not enough; we must also check the input right before execution.

@@ -4,7 +4,6 @@ using System.Buffers;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Launchbox.Services;
 
@@ -69,8 +68,8 @@ public class FileSystem : IFileSystem
                 int size = buffer.Length;
                 int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, buffer, size, path);
 
-                // Check for truncation. GetPrivateProfileString returns size - 1 (or sometimes size - 2)
-                // if the buffer was too small.
+                // Truncation check: GetPrivateProfileString returns size - 1 or size - 2 when the
+                // provided buffer is insufficient for the full INI value.
                 if (ret < size - 2)
                 {
                     return new string(buffer, 0, ret);
@@ -81,7 +80,7 @@ public class FileSystem : IFileSystem
                 if (newCapacity > 65536)
                 {
                     // Safety limit to prevent infinite allocation.
-                    // If it's larger than 64KB, we accept truncation.
+                    // Accept truncated result if value exceeds 64KB limit to avoid excessive allocation.
                     return new string(buffer, 0, ret);
                 }
 

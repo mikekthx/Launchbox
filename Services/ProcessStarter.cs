@@ -10,8 +10,7 @@ public class ProcessStarter : IProcessStarter
     {
         if (startInfo != null && PathSecurity.IsUnsafePath(startInfo.FileName))
         {
-            Trace.WriteLine($"Blocked process start for unsafe path: {PathSecurity.RedactPath(startInfo.FileName)}");
-            throw new UnauthorizedAccessException($"Execution of unsafe path blocked.");
+            throw new UnauthorizedAccessException($"Execution of unsafe path '{PathSecurity.RedactPath(startInfo.FileName)}' is denied.");
         }
 
         return startInfo != null ? Process.Start(startInfo) : null;

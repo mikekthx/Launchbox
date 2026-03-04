@@ -28,6 +28,7 @@
     <Compile Include="..\Services\LocalSettingsStore.cs" Link="Services\LocalSettingsStore.cs" />
     <Compile Include="..\Services\WindowPositionManager.cs" Link="Services\WindowPositionManager.cs" />
     <Compile Include="..\Services\IVisualTreeService.cs" Link="Services\IVisualTreeService.cs" />
+    <Compile Include="..\Services\WinUIVisualTreeService.cs" Link="Services\WinUIVisualTreeService.cs" />
     <Compile Include="..\Services\VisualTreeFinder.cs" Link="Services\VisualTreeFinder.cs" />
     <Compile Include="..\Services\IFileSystem.cs" Link="Services\IFileSystem.cs" />
     <Compile Include="..\Services\FileSystem.cs" Link="Services\FileSystem.cs" />
