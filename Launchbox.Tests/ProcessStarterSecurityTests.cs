@@ -7,13 +7,24 @@ namespace Launchbox.Tests;
 
 public class ProcessStarterSecurityTests
 {
-    [Fact]
-    public void Start_WithUnsafePath_ThrowsUnauthorizedAccessException()
-    {
-        var starter = new ProcessStarter();
-        var startInfo = new ProcessStartInfo(@"\\malicious\share\file.exe");
+    private readonly ProcessStarter _processStarter;
 
-        var ex = Assert.Throws<UnauthorizedAccessException>(() => starter.Start(startInfo));
-        Assert.Contains("Execution of unsafe path blocked", ex.Message);
+    public ProcessStarterSecurityTests()
+    {
+        _processStarter = new ProcessStarter();
+    }
+
+    [Theory]
+    [InlineData(@"\\attacker\share\malware.exe")]
+    [InlineData(@"//attacker/share/malware.exe")]
+    [InlineData(@"/\attacker/share/malware.exe")]
+    [InlineData(@"\/attacker/share/malware.exe")]
+    [InlineData(@"\\?\UNC\attacker\share\malware.exe")]
+    public void Start_ThrowsUnauthorizedAccessException_ForUnsafePath(string unsafePath)
+    {
+        var startInfo = new ProcessStartInfo(unsafePath);
+
+        var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
+        Assert.Contains("Execution of unsafe path", exception.Message);
     }
 }
