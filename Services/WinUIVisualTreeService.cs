@@ -5,11 +5,18 @@ namespace Launchbox.Services;
 
 public class WinUIVisualTreeService : IVisualTreeService
 {
+    private readonly IVisualTreeHelperWrapper _visualTreeHelper;
+
+    public WinUIVisualTreeService(IVisualTreeHelperWrapper? visualTreeHelper = null)
+    {
+        _visualTreeHelper = visualTreeHelper ?? new VisualTreeHelperWrapper();
+    }
+
     public int GetChildrenCount(object parent)
     {
         if (parent is DependencyObject d)
         {
-            return VisualTreeHelper.GetChildrenCount(d);
+            return _visualTreeHelper.GetChildrenCount(d);
         }
         return 0;
     }
@@ -18,7 +25,7 @@ public class WinUIVisualTreeService : IVisualTreeService
     {
         if (parent is DependencyObject d)
         {
-            return VisualTreeHelper.GetChild(d, index);
+            return _visualTreeHelper.GetChild(d, index);
         }
         throw new System.ArgumentException("Parent must be a DependencyObject");
     }
