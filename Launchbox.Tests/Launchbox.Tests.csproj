@@ -57,6 +57,7 @@
     <Compile Include="..\Services\SettingsService.cs" Link="Services\SettingsService.cs" />
     <Compile Include="..\Services\IStartupService.cs" Link="Services\IStartupService.cs" />
     <Compile Include="..\Services\IFilePickerService.cs" Link="Services\IFilePickerService.cs" />
+    <Compile Include="..\Services\WinUIFilePickerService.cs" Link="Services\WinUIFilePickerService.cs" />
     <Compile Include="..\Services\IWindowService.cs" Link="Services\IWindowService.cs" />
     <Compile Include="..\ViewModels\SettingsViewModel.cs" Link="ViewModels\SettingsViewModel.cs" />
     <Compile Include="..\Helpers\BooleanToVisibilityConverter.cs" Link="Helpers\BooleanToVisibilityConverter.cs" />
