@@ -62,7 +62,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
             // Expand environment variables to support system paths (e.g., %SystemRoot%)
             // and ensure path security checks are performed on the actual target path.
             // PERF: Only call ExpandEnvironmentVariables if needed to avoid overhead
-            if (iconFile.Contains('%'))
+            if (iconFile.Contains('%') || iconFile.Contains('$'))
             {
                 iconFile = Environment.ExpandEnvironmentVariables(iconFile);
             }
