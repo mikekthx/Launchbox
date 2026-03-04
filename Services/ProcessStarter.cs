@@ -14,6 +14,6 @@ public class ProcessStarter : IProcessStarter
             throw new UnauthorizedAccessException($"Execution of unsafe path blocked.");
         }
 
-        return Process.Start(startInfo!);
+        return startInfo != null ? Process.Start(startInfo) : null;
     }
 }
