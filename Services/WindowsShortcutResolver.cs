@@ -49,10 +49,9 @@ public class WindowsShortcutResolver : IShortcutResolver
             return null;
         }
 
-        IShellLinkW? link = null;
         try
         {
-            link = (IShellLinkW)new ShellLink();
+            IShellLinkW link = (IShellLinkW)new ShellLink();
             ((IPersistFile)link).Load(path, 0);
             var sb = new StringBuilder(260); // MAX_PATH
             link.GetPath(sb, sb.Capacity, IntPtr.Zero, 0);
@@ -61,13 +60,6 @@ public class WindowsShortcutResolver : IShortcutResolver
         catch (COMException)
         {
             return null;
-        }
-        finally
-        {
-            if (link != null)
-            {
-                Marshal.ReleaseComObject(link);
-            }
         }
     }
 
