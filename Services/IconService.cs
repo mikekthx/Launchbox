@@ -14,6 +14,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
 {
     private readonly IFileSystem _fileSystem = fileSystem;
     private readonly ConcurrentDictionary<string, IconCacheEntry> _iconCache = [];
+    private readonly ConcurrentDictionary<string, string> _expandedPathCache = [];
     private readonly ConcurrentDictionary<string, Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>> _directoryCache = [];
     private readonly ConcurrentDictionary<string, Lazy<(DateTime Timestamp, DateTime CacheTime)>> _fileTimestampCache = [];
     private static readonly TimeSpan CACHE_DURATION = TimeSpan.FromSeconds(2);
@@ -25,6 +26,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         // Clear directory cache to prevent memory leaks as it's only needed during bursts
         _directoryCache.Clear();
         _fileTimestampCache.Clear();
+        _expandedPathCache.Clear();
 
         var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
@@ -40,6 +42,15 @@ public class IconService(IFileSystem fileSystem) : IIconService
             }
         }
         return removedCount;
+    }
+
+    private string GetExpandedPath(string path)
+    {
+        if (path.Contains('%') || path.Contains('$'))
+        {
+            return _expandedPathCache.GetOrAdd(path, p => Environment.ExpandEnvironmentVariables(p));
+        }
+        return path;
     }
 
     internal string ResolveIconPath(string path)
@@ -61,11 +72,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
 
             // Expand environment variables to support system paths (e.g., %SystemRoot%)
             // and ensure path security checks are performed on the actual target path.
-            // PERF: Only call ExpandEnvironmentVariables if needed to avoid overhead
-            if (iconFile.Contains('%') || iconFile.Contains('$'))
-            {
-                iconFile = Environment.ExpandEnvironmentVariables(iconFile);
-            }
+            iconFile = GetExpandedPath(iconFile);
 
             if (PathSecurity.IsUnsafePath(iconFile))
             {
@@ -102,7 +109,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         // Expand environment variables (e.g., %APPDATA%) to ensure correct cache key
         // and that GetLastWriteTime works on the actual file.
         // This also aligns cache keys with PruneCache which typically receives absolute paths.
-        string expandedPath = Environment.ExpandEnvironmentVariables(path);
+        string expandedPath = GetExpandedPath(path);
 
         // 1. Gather current state (timestamps)
         // We check these every time to support live updates, but avoid expensive operations if unchanged.
