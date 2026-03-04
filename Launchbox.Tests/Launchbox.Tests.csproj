@@ -42,6 +42,7 @@
     <Compile Include="..\Helpers\Constants.cs" Link="Helpers\Constants.cs" />
     <Compile Include="..\Services\IImageFactory.cs" Link="Services\IImageFactory.cs" />
     <Compile Include="..\Services\IDispatcher.cs" Link="Services\IDispatcher.cs" />
+    <Compile Include="..\Services\WinUIDispatcher.cs" Link="Services\WinUIDispatcher.cs" />
     <Compile Include="..\Services\IAppLauncher.cs" Link="Services\IAppLauncher.cs" />
     <Compile Include="..\Services\IShortcutResolver.cs" Link="Services\IShortcutResolver.cs" />
     <Compile Include="..\Services\IProcessStarter.cs" Link="Services\IProcessStarter.cs" />
