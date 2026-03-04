@@ -37,6 +37,7 @@ dotnet test Launchbox.Tests/Launchbox.Tests.csproj --filter "FullyQualifiedName~
 - **`SettingsWindow.xaml(.cs)`** — Secondary window for settings. Instantiates its own `SettingsViewModel`; disposes on close.
 - **`ViewModels/MainViewModel.cs`** — Business logic: scanning shortcuts, filtering extensions, launching apps. Uses only interfaces, no WinUI types.
 - **`ViewModels/SettingsViewModel.cs`** — Settings page logic: shortcuts path, hotkey configuration, startup toggle.
+- **`ViewModels/ViewModelBase.cs`** — Base class for ViewModels with shared infrastructure.
 - **`Models/AppItem.cs`** — Shortcut model. Uses `object` for Icon to stay WinUI-free (enables testing).
 
 ### Service Abstraction
@@ -46,10 +47,18 @@ All platform-specific operations are behind interfaces in `Services/` to enable 
 Key services:
 - **`WindowService`** (`IWindowService`) — Window positioning, hotkey registration via `RegisterHotKey`/`WndProc`, toggle visibility, auto-hide on deactivation.
 - **`SettingsService`** — Central settings coordinator; raises `PropertyChanged` to trigger reloads and hotkey re-registration.
-- **`IconService`** — Icon extraction pipeline with caching (`IconCacheEntry`) and `.icons/` directory support.
-- **`ShortcutService`** — Discovers shortcut files by allowed extensions.
-- **`BackdropService`** (`IBackdropService`) — Handles DWM Blur Glass backdrop effects.
+- **`IconService`** (`IIconService`) — Icon extraction pipeline with caching (`IconCacheEntry`) and `.icons/` directory support.
+- **`ShortcutService`** (`IShortcutService`) — Discovers shortcut files by allowed extensions.
+- **`BackdropService`** (`IBackdropService`) — Handles DWM Blur Glass backdrop effects. Uses `BackdropWindowWrapper` (`IBackdropWindowWrapper`).
 - **`WindowPositionManager`** — Manages window position persistence via `ISettingsStore`.
+- **`ProcessStarter`** (`IProcessStarter`) — Wraps `Process.Start` with input sanitization.
+- **`ProcessService`** (`IProcessService`) — Higher-level process operations.
+- **`WinUILauncher`** (`IAppLauncher`) — App launching logic.
+- **`WindowsShortcutResolver`** (`IShortcutResolver`) — Resolves `.lnk` shortcut targets via `ShellLink` COM interop.
+- **`WinUIDispatcher`** (`IDispatcher`) — UI thread dispatching abstraction.
+- **`WinUIImageFactory`** (`IImageFactory`) — Image creation abstraction for testability.
+- **`FileSystem`** (`IFileSystem`) — File system operations.
+- **`LocalSettingsStore`** (`ISettingsStore`, `ISettingsContainer`) — Windows `ApplicationData.LocalSettings` wrapper.
 - **`VisualTreeFinder`** (`IVisualTreeService`) — Visual tree traversal utility.
 - **`NativeMethods.cs`** — All P/Invoke declarations centralized here. All declarations must have `SetLastError = true`.
 
@@ -58,6 +67,8 @@ Key services:
 `Helpers/` contains shared utilities:
 - **`Constants.cs`** — Global constants: window dimensions, hotkey modifiers (`MOD_ALT`, `MOD_CONTROL`, `MOD_SHIFT`, `MOD_WIN`), key codes, icon sizes, allowed extensions.
 - **`SimpleCommand` / `AsyncSimpleCommand`** — `ICommand` implementations for MVVM binding.
+- **`ObservableObject`** — Base `INotifyPropertyChanged` implementation.
+- **`BulkObservableCollection`** — `ObservableCollection` with batch-update support (suppresses per-item notifications).
 - **`PathSecurity`** — Path traversal validation.
 - **`IconHelper`** — Icon extraction helpers.
 - **`ImageHeaderParser`** — Image format detection from file headers.
@@ -75,7 +86,7 @@ Key services:
 
 ### Testing Pattern
 
-`Launchbox.Tests` uses **file-linking** (`<Compile Include="..\ClassName.cs" Link="..." />`) instead of a `<ProjectReference>` to include production code without pulling in the WinUI application host. When adding a new testable class, add a `<Compile Include>` entry to `Launchbox.Tests/Launchbox.Tests.csproj`. Use existing mocks (`MockFileSystem`, `MockSettingsStore`, `MockWindowService`, `MockStartupService`, `MockFilePickerService`) or create new ones implementing the relevant interface.
+`Launchbox.Tests` uses **file-linking** (`<Compile Include="..\ClassName.cs" Link="..." />`) instead of a `<ProjectReference>` to include production code without pulling in the WinUI application host. When adding a new testable class, add a `<Compile Include>` entry to `Launchbox.Tests/Launchbox.Tests.csproj`. Use existing mocks (`MockFileSystem`, `MockSettingsStore`, `MockWindowService`, `MockStartupService`, `MockFilePickerService`, `MockIconService`, `MockAppLauncher`, `MockDispatcher`, `MockImageFactory`, `MockProcessService`, `MockProcessStarter`, `MockShortcutResolver`, `MockShortcutService`, `MockBackdropWindowWrapper`) or create new ones implementing the relevant interface.
 
 ### CI Pipeline
 
