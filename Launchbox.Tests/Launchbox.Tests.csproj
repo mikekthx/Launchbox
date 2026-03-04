@@ -46,6 +46,7 @@
     <Compile Include="..\Services\IShortcutResolver.cs" Link="Services\IShortcutResolver.cs" />
     <Compile Include="..\Services\IProcessStarter.cs" Link="Services\IProcessStarter.cs" />
     <Compile Include="..\Services\WinUILauncher.cs" Link="Services\WinUILauncher.cs" />
+    <Compile Include="..\Services\WinUIDispatcher.cs" Link="Services\WinUIDispatcher.cs" />
     <Compile Include="..\Services\WindowsShortcutResolver.cs" Link="Services\WindowsShortcutResolver.cs" />
     <Compile Include="..\Services\ProcessStarter.cs" Link="Services\ProcessStarter.cs" />
     <Compile Include="..\Services\ShellLink.cs" Link="Services\ShellLink.cs" />

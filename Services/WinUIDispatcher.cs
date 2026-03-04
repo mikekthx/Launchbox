@@ -15,14 +15,14 @@ public class WinUIDispatcher : IDispatcher
 
     public void TryEnqueue(Action action)
     {
-        _dispatcherQueue.TryEnqueue(() => action());
+        TryEnqueueInternal(() => action());
     }
 
     public Task EnqueueAsync(Func<Task> action)
     {
         var tcs = new TaskCompletionSource();
 
-        if (!_dispatcherQueue.TryEnqueue(async () =>
+        if (!TryEnqueueInternal(async () =>
         {
             try
             {
@@ -39,5 +39,10 @@ public class WinUIDispatcher : IDispatcher
         }
 
         return tcs.Task;
+    }
+
+    protected virtual bool TryEnqueueInternal(Action callback)
+    {
+        return _dispatcherQueue?.TryEnqueue(new Microsoft.UI.Dispatching.DispatcherQueueHandler(callback)) ?? false;
     }
 }
