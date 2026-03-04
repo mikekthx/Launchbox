@@ -1,6 +1,6 @@
+using Launchbox.Models;
 using System.ComponentModel;
 using Xunit;
-using Launchbox.Models;
 
 namespace Launchbox.Tests;
 
