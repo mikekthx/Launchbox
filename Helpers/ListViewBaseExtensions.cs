@@ -6,7 +6,7 @@ namespace Launchbox.Helpers;
 
 public static class ListViewBaseExtensions
 {
-    public static readonly DependencyProperty CommandProperty =
+    public static readonly DependencyProperty COMMAND_PROPERTY =
         DependencyProperty.RegisterAttached(
             "Command",
             typeof(ICommand),
@@ -15,12 +15,12 @@ public static class ListViewBaseExtensions
 
     public static void SetCommand(DependencyObject d, ICommand value)
     {
-        d.SetValue(CommandProperty, value);
+        d.SetValue(COMMAND_PROPERTY, value);
     }
 
     public static ICommand GetCommand(DependencyObject d)
     {
-        return (ICommand)d.GetValue(CommandProperty);
+        return (ICommand)d.GetValue(COMMAND_PROPERTY);
     }
 
     private static void OnCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
