@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using Xunit;
 using Launchbox.Helpers;
+using Xunit;
 
 namespace Launchbox.Tests;
 
