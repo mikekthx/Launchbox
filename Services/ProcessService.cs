@@ -6,14 +6,20 @@ public class ProcessService : IProcessService
 {
     public bool IsProcessRunning(string processName)
     {
-        var processes = Process.GetProcessesByName(processName);
+        Process[] processes = System.Array.Empty<Process>();
         try
         {
+            processes = GetProcessesByName(processName);
             return processes.Length > 0;
         }
         finally
         {
             foreach (var p in processes) p.Dispose();
         }
+    }
+
+    protected virtual Process[] GetProcessesByName(string processName)
+    {
+        return Process.GetProcessesByName(processName);
     }
 }
