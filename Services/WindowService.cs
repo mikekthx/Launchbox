@@ -190,11 +190,6 @@ public class WindowService : IWindowService, IDisposable
         }
     }
 
-    public void Cleanup()
-    {
-        Dispose();
-    }
-
     private bool _disposed;
 
     ~WindowService()
