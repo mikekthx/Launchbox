@@ -1,8 +1,9 @@
+using System;
 using Microsoft.UI.Xaml;
 
 namespace Launchbox.Services;
 
-public interface IWindowService
+public interface IWindowService : IDisposable
 {
     /// <summary>
     /// Initializes the window service, setting up the window handle, app window, hotkeys, and window procedure hook.
@@ -24,11 +25,6 @@ public interface IWindowService
     /// Resets the window position to the center of the screen and saves the position.
     /// </summary>
     void ResetPosition();
-
-    /// <summary>
-    /// Cleans up resources, unregisters hotkeys, and restores the original window procedure.
-    /// </summary>
-    void Cleanup();
 
     /// <summary>
     /// Hides the window.

@@ -36,7 +36,7 @@
 - [ ] SettingsWindow not closed on app exit -- orphaned window remains (MainWindow.xaml.cs:190-195)
 - [ ] Missing PointerCaptureLost handler: _isDraggingWindow stays true if capture lost unexpectedly (MainWindow.xaml.cs:69-71)
 - [ ] WindowService.Dispose() missing _disposed guard and finalizer despite managing unmanaged resources (WindowService.cs:172-206)
-- [ ] IWindowService does not extend IDisposable; Cleanup() duplicates Dispose() (IWindowService.cs, WindowService.cs:167)
+- [x] IWindowService does not extend IDisposable; Cleanup() duplicates Dispose() (IWindowService.cs, WindowService.cs:167)
 
 ### Security
 - [x] PathSecurity.IsUnsafePath: catch blocks return false (safe) on parse failure -- should default to true (unsafe) (PathSecurity.cs:39-52)
