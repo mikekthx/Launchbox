@@ -20,7 +20,7 @@ public class WinUIStartupService : IStartupService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to get StartupTask state: {ex.Message}");
+            Trace.WriteLine($"Failed to get StartupTask state: {Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
             return false;
         }
     }
@@ -35,7 +35,7 @@ public class WinUIStartupService : IStartupService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to enable StartupTask: {ex.Message}");
+            Trace.WriteLine($"Failed to enable StartupTask: {Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
             return false;
         }
     }
@@ -49,7 +49,7 @@ public class WinUIStartupService : IStartupService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to disable StartupTask: {ex.Message}");
+            Trace.WriteLine($"Failed to disable StartupTask: {Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 }

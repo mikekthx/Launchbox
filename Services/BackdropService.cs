@@ -65,7 +65,7 @@ public class BackdropService : IBackdropService
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Error checking for DWMBlurGlass: {ex.Message}");
+            Trace.WriteLine($"Error checking for DWMBlurGlass: {PathSecurity.GetSafeExceptionMessage(ex)}");
             // Fallback to default
             if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
             {

@@ -24,7 +24,7 @@ public class AsyncSimpleCommand : ICommand
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"AsyncSimpleCommand failed: {ex.Message}");
+            Trace.WriteLine($"AsyncSimpleCommand failed: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -51,7 +51,7 @@ public class AsyncSimpleCommand<T> : ICommand
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"AsyncSimpleCommand<{typeof(T).Name}> failed: {ex.Message}");
+            Trace.WriteLine($"AsyncSimpleCommand<{typeof(T).Name}> failed: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 

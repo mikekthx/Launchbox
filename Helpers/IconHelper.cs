@@ -34,7 +34,7 @@ public static class IconHelper
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to create BitmapImage: {ex.Message}");
+            Trace.WriteLine($"Failed to create BitmapImage: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
     }

@@ -130,7 +130,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to toggle window visibility: {ex.Message}");
+            Trace.WriteLine($"Failed to toggle window visibility: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -143,7 +143,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to hide window: {ex.Message}");
+            Trace.WriteLine($"Failed to hide window: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -168,7 +168,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Error opening settings: {ex.Message}");
+            Trace.WriteLine($"Error opening settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -186,7 +186,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to reset window position: {ex.Message}");
+            Trace.WriteLine($"Failed to reset window position: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -233,7 +233,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Error during exit: {ex.Message}");
+            Trace.WriteLine($"Error during exit: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
 
         _disposed = true;
@@ -253,7 +253,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to center window: {ex.Message}");
+            Trace.WriteLine($"Failed to center window: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -269,7 +269,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to save window position: {ex.Message}");
+            Trace.WriteLine($"Failed to save window position: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -292,7 +292,7 @@ public class WindowService : IWindowService, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to restore window position: {ex.Message}");
+            Trace.WriteLine($"Failed to restore window position: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
         return false;
     }
