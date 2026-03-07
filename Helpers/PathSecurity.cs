@@ -19,9 +19,14 @@ public static class PathSecurity
         int qIndex = path.IndexOf('?');
         if (qIndex >= 0)
         {
+            const int expectedQuestionMarkIndex = 2;
+            const int startSearchIndexForExtraQuestionMarks = 3;
+
             // If ? is present, it must be the 3rd char (index 2) AND path must start with \\?\
             // Also ensure there are no *other* question marks later in the path
-            if (qIndex != 2 || !path.StartsWith(@"\\?\", StringComparison.Ordinal) || path.IndexOf('?', 3) >= 0)
+            if (qIndex != expectedQuestionMarkIndex ||
+                !path.StartsWith(@"\\?\", StringComparison.Ordinal) ||
+                (path.Length > startSearchIndexForExtraQuestionMarks && path.IndexOf('?', startSearchIndexForExtraQuestionMarks) >= 0))
             {
                 return true;
             }
