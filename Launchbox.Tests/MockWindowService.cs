@@ -28,10 +28,13 @@ public class MockWindowService : IWindowService
     }
 
     public void ResetPosition() { }
-    public void Dispose() { }
     public void Hide()
     {
         HideCalled = true;
+    }
+
+    public void Dispose()
+    {
     }
 
     public void Exit()
