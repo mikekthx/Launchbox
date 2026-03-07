@@ -62,7 +62,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to initialize settings: {ex.Message}");
+            Trace.WriteLine($"Failed to initialize settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
@@ -74,7 +74,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to set run at startup: {ex.Message}");
+            Trace.WriteLine($"Failed to set run at startup: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
