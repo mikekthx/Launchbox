@@ -170,7 +170,7 @@ public sealed partial class MainWindow : Window
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
-        _windowService.Cleanup();
+        _windowService.Dispose();
         TrayIcon?.Dispose();
         ViewModel?.Dispose();
     }

@@ -28,7 +28,7 @@ public class MockWindowService : IWindowService
     }
 
     public void ResetPosition() { }
-    public void Cleanup() { }
+    public void Dispose() { }
     public void Hide()
     {
         HideCalled = true;
