@@ -50,7 +50,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to browse for folder: {ex.Message}");
+            Trace.WriteLine($"Failed to browse for folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 

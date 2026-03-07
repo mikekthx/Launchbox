@@ -23,7 +23,7 @@ public class WinUIFilePickerService : IFilePickerService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Error showing folder picker: {ex.Message}");
+            Trace.WriteLine($"Error showing folder picker: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
     }
