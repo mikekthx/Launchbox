@@ -33,6 +33,12 @@ public class FileSystem : IFileSystem
         return Directory.GetFiles(path);
     }
 
+    public System.Collections.Generic.IEnumerable<string> EnumerateFiles(string path)
+    {
+        if (PathSecurity.IsUnsafePath(path)) return Array.Empty<string>();
+        return Directory.EnumerateFiles(path);
+    }
+
     public string GetIniValue(string path, string section, string key)
     {
         if (PathSecurity.IsUnsafePath(path)) return string.Empty;
