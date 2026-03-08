@@ -55,9 +55,12 @@
   </PropertyGroup>
 
   <!-- Publish Properties -->
+  <!-- Thumbprint is supplied at build time via CERT_THUMBPRINT env var (CI) or /p:PackageCertificateThumbprint. -->
+  <!-- Signing is disabled automatically when no thumbprint is available (local dev builds). -->
   <PropertyGroup>
-    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>DFD96A970880F317C54EC45259DBCAD34D3CFA4C</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>$(CERT_THUMBPRINT)</PackageCertificateThumbprint>
+    <AppxPackageSigningEnabled Condition="'$(PackageCertificateThumbprint)' != ''">True</AppxPackageSigningEnabled>
+    <AppxPackageSigningEnabled Condition="'$(PackageCertificateThumbprint)' == ''">False</AppxPackageSigningEnabled>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' != 'Debug'">

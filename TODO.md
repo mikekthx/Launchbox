@@ -18,7 +18,7 @@
 - [x] No .editorconfig file -- dotnet format in CI enforces invisible rules; AGENTS.md formatting rules unenforceable
 - [x] Test packages severely outdated: xunit 2.6.3->2.9.x, xunit.runner.visualstudio 2.5.5->3.x, Microsoft.NET.Test.Sdk 17.8->17.13 (Tests.csproj:14-17)
 - [x] No tests for ImageHeaderParser (binary parsing with zero coverage) and BooleanToVisibilityConverter (not even linked in test project)
-- [ ] Certificate thumbprint hardcoded in source (Launchbox.csproj:59) -- should be parameterized
+- [x] Certificate thumbprint hardcoded in source (Launchbox.csproj:59) -- should be parameterized
 
 ## Medium
 
