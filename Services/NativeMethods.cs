@@ -9,7 +9,15 @@ public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, IntPtr wParam, Int
 public static class NativeMethods
 {
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern uint PrivateExtractIcons(string l, int n, int cx, int cy, ref IntPtr p, IntPtr id, uint ni, uint fl);
+    public static extern uint PrivateExtractIcons(
+        string szFileName,
+        int nIconIndex,
+        int cxIcon,
+        int cyIcon,
+        [Out] IntPtr[] phicon,
+        [Out] uint[] piconid,
+        uint nIcons,
+        uint flags);
 
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool DestroyIcon(IntPtr hIcon);
