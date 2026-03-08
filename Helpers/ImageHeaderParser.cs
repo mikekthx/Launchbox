@@ -40,7 +40,7 @@ public static class ImageHeaderParser
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to parse PNG dimensions: {ex.Message}");
+            Trace.WriteLine($"Failed to parse PNG dimensions: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
     }
@@ -100,7 +100,7 @@ public static class ImageHeaderParser
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to parse ICO dimensions: {ex.Message}");
+            Trace.WriteLine($"Failed to parse ICO dimensions: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
     }
