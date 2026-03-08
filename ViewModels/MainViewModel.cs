@@ -147,7 +147,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             {
                 try
                 {
-                    var iconBytes = _iconService.ExtractIconBytes(item.Path);
+                    var iconBytes = await Task.Run(() => _iconService.ExtractIconBytes(item.Path), token);
                     if (iconBytes != null && !token.IsCancellationRequested)
                     {
                         await _dispatcher.EnqueueAsync(async () =>

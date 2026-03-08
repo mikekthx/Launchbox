@@ -20,7 +20,7 @@ public class MainViewModelRedactionTests : IDisposable
     private readonly MockFileSystem _fileSystem;
     private readonly SettingsService _settingsService;
     private readonly MockWindowService _windowService;
-    private readonly StringWriter _traceOutput;
+    private readonly ThreadSafeStringWriter _traceOutput;
     private readonly TextWriterTraceListener _traceListener;
 
     public MainViewModelRedactionTests()
@@ -37,7 +37,7 @@ public class MainViewModelRedactionTests : IDisposable
         var startupService = new MockStartupService();
         _settingsService = new SettingsService(settingsStore, startupService);
 
-        _traceOutput = new StringWriter();
+        _traceOutput = new ThreadSafeStringWriter();
         _traceListener = new TextWriterTraceListener(_traceOutput);
         Trace.Listeners.Add(_traceListener);
     }
