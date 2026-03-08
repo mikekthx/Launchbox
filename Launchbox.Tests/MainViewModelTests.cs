@@ -203,4 +203,42 @@ public class MainViewModelTests
             throw new UnauthorizedAccessException("Access denied");
         }
     }
+
+    [Fact]
+    public async Task Dispose_DisposesCancellationTokenSource()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+
+        // Act
+        // Call LoadAppsAsync to ensure the _loadCts is initialized
+        await viewModel.LoadAppsAsync();
+
+        // At this point, _loadCts is initialized but not disposed, let's grab the actual Token to inspect
+        // The token is not publicly exposed, so we invoke Dispose() to test its effect
+        viewModel.Dispose();
+
+        // Assert
+        // 1. Verify CancellationTokenSource is disposed.
+        var loadCtsField = typeof(MainViewModel).GetField("_loadCts", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var cts = (System.Threading.CancellationTokenSource?)loadCtsField?.GetValue(viewModel);
+
+        Assert.NotNull(cts);
+        Assert.Throws<ObjectDisposedException>(() =>
+        {
+            // Accessing WaitHandle on a disposed CancellationTokenSource throws ObjectDisposedException
+            var handle = cts.Token.WaitHandle;
+        });
+
+        // 2. Verify SettingsService event is unsubscribed.
+        // After disposal, modifying the ShortcutsPath should not trigger LoadAppsAsync().
+        // We can observe this by clearing the Apps collection, triggering the change,
+        // and waiting to see if it populates.
+        viewModel.Apps.Clear();
+        _settingsService.ShortcutsPath = "C:\\NewPath";
+
+        // Dispatcher operations enqueue async tasks. We can await EnqueueAsync in our MockDispatcher.
+        // But since MockDispatcher runs synchronously, the change would have happened immediately if subscribed.
+        Assert.Empty(viewModel.Apps);
+    }
 }
