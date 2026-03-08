@@ -63,7 +63,7 @@
     <AppxPackageSigningEnabled Condition="'$(PackageCertificateThumbprint)' == ''">False</AppxPackageSigningEnabled>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' != 'Debug' and '$(RuntimeIdentifier)' != ''">
+  <PropertyGroup Condition="'$(Configuration)' != 'Debug' and '$(RuntimeIdentifier)' != '' and '$(GenerateAppxPackageOnBuild)' != 'true'">
     <PublishReadyToRun>True</PublishReadyToRun>
     <PublishTrimmed>True</PublishTrimmed>
     <TrimMode>partial</TrimMode>
