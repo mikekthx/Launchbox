@@ -22,6 +22,11 @@ public class WindowService : IWindowService, IDisposable
 
     public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService)
     {
+        ArgumentNullException.ThrowIfNull(window);
+        ArgumentNullException.ThrowIfNull(positionManager);
+        ArgumentNullException.ThrowIfNull(settingsService);
+        ArgumentNullException.ThrowIfNull(filePickerService);
+
         _window = window;
         _positionManager = positionManager;
         _settingsService = settingsService;
