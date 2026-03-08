@@ -13,6 +13,7 @@ public class WindowService : IWindowService, IDisposable
     private readonly WindowPositionManager _positionManager;
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
+    private readonly IDispatcher _dispatcher;
     private AppWindow? _appWindow;
     private IntPtr _hWnd;
     private IntPtr _oldWndProc;
@@ -20,17 +21,19 @@ public class WindowService : IWindowService, IDisposable
     private bool _hasPositioned;
     private SettingsWindow? _settingsWindow;
 
-    public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService)
+    public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService, IDispatcher dispatcher)
     {
         ArgumentNullException.ThrowIfNull(window);
         ArgumentNullException.ThrowIfNull(positionManager);
         ArgumentNullException.ThrowIfNull(settingsService);
         ArgumentNullException.ThrowIfNull(filePickerService);
+        ArgumentNullException.ThrowIfNull(dispatcher);
 
         _window = window;
         _positionManager = positionManager;
         _settingsService = settingsService;
         _filePickerService = filePickerService;
+        _dispatcher = dispatcher;
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
     }
@@ -68,13 +71,8 @@ public class WindowService : IWindowService, IDisposable
         if (e.PropertyName == nameof(SettingsService.HotkeyModifiers) ||
             e.PropertyName == nameof(SettingsService.HotkeyKey))
         {
-            // Update on UI thread if needed? RegisterHotKey is thread-affine?
-            // Usually RegisterHotKey must be called on the thread that created the window.
-            // PropertyChanged might come from any thread?
-            // SettingsService.PropertyChanged likely from UI thread if set from UI.
-            // If set from background (e.g. startup check), hotkey not involved.
-            // Assuming UI thread for now.
-            UpdateHotkey();
+            // RegisterHotKey is thread-affine and must be called on the thread that created the window.
+            _dispatcher.TryEnqueue(() => UpdateHotkey());
         }
     }
 
