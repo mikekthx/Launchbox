@@ -1,6 +1,7 @@
 using Launchbox.Helpers;
 using System;
 using System.Buffers;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -33,7 +34,7 @@ public class FileSystem : IFileSystem
         return Directory.GetFiles(path);
     }
 
-    public System.Collections.Generic.IEnumerable<string> EnumerateFiles(string path)
+    public IEnumerable<string> EnumerateFiles(string path)
     {
         if (PathSecurity.IsUnsafePath(path)) return Array.Empty<string>();
         return Directory.EnumerateFiles(path);
