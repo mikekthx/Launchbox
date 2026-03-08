@@ -16,6 +16,15 @@ public class FileSystemSecurityTests
     [Theory]
     [InlineData(@"\\attacker\share\file.txt")]
     [InlineData(@"//attacker/share/file.txt")]
+    public void FileSystem_EnumerateFiles_ReturnsEmpty_ForUnsafePath(string unsafePath)
+    {
+        var result = _fileSystem.EnumerateFiles(unsafePath);
+        Assert.Empty(result);
+    }
+
+    [Theory]
+    [InlineData(@"\\attacker\share\file.txt")]
+    [InlineData(@"//attacker/share/file.txt")]
     [InlineData(@"/\attacker/share/file.txt")]
     [InlineData(@"\/attacker/share/file.txt")]
     [InlineData(@"\\?\UNC\attacker\share\file.txt")]

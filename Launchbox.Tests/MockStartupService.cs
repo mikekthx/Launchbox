@@ -8,6 +8,7 @@ public class MockStartupService : IStartupService
 {
     public bool IsEnabled { get; set; } = false;
     public bool ShouldFail { get; set; } = false;
+    public bool Success { get; set; } = true;
     public bool IsSupported { get; set; } = true;
 
     public Task<bool> IsRunAtStartupEnabledAsync()
@@ -19,6 +20,7 @@ public class MockStartupService : IStartupService
     public Task<bool> TryEnableStartupAsync()
     {
         if (ShouldFail) throw new Exception("Enable startup failed");
+        if (!Success) return Task.FromResult(false);
         IsEnabled = true;
         return Task.FromResult(true);
     }
