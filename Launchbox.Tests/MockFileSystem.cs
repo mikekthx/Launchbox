@@ -95,7 +95,7 @@ public class MockFileSystem : IFileSystem
         return Array.Empty<string>();
     }
 
-    public IEnumerable<string> EnumerateFiles(string path)
+    public virtual IEnumerable<string> EnumerateFiles(string path)
     {
         if (_files.TryGetValue(path, out var files))
         {
