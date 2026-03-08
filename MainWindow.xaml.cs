@@ -153,8 +153,11 @@ public sealed partial class MainWindow : Window
 
     private void RootGrid_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
     {
-        _isDraggingWindow = false;
-        e.Handled = true;
+        if (_isDraggingWindow)
+        {
+            _isDraggingWindow = false;
+            e.Handled = true;
+        }
     }
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
