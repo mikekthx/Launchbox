@@ -46,10 +46,10 @@
 ### Architecture & Code Quality
 - [x] Missing IIconService and IShortcutService interfaces -- breaks consistent abstraction pattern (IconService.cs, ShortcutService.cs)
 - [ ] Magic strings for modifier keys duplicated in 3 places -- use a dictionary (SettingsViewModel.cs:24,118-131)
-- [ ] Constants.ALLOWED_EXTENSIONS array is mutable at runtime -- use IReadOnlyList<string> (Constants.cs:25)
+- [x] Constants.ALLOWED_EXTENSIONS array is mutable at runtime -- use IReadOnlyList<string> (Constants.cs:25)
 - [x] AppItem.Name/Path don't raise PropertyChanged -- should be { get; init; } to enforce set-once intent (AppItem.cs:10-11)
 - [x] PrivateExtractIcons has obfuscated param names (l, n, cx, p) and incorrect types for general use (NativeMethods.cs:12)
-- [ ] Debug.WriteLine used instead of Trace.WriteLine per coding standards (MainWindow.xaml.cs:82,84)
+- [x] Debug.WriteLine used instead of Trace.WriteLine per coding standards (MainWindow.xaml.cs:82,84)
 
 ### UI/UX
 - [x] Empty-state StackPanel and GridView overlap -- no mutual exclusion in XAML (MainWindow.xaml:34-97)
@@ -60,7 +60,7 @@
 - [ ] ARM64 excluded from MSIX bundle despite being a declared target platform (dotnet-desktop.yml:155)
 - [ ] Missing ImplicitUsings in main project but enabled in test project -- file-linked sources may behave differently
 - [x] Solution AnyCPU maps silently to x86 (Launchbox.sln:19-22)
-- [ ] No code coverage collection in CI despite coverlet.collector being a dependency
+- [x] No code coverage collection in CI despite coverlet.collector being a dependency
 - [ ] No Directory.Build.props for centralized project configuration (nullable, TFM, warnings)
 
 ### Tests
@@ -78,7 +78,7 @@
 - [ ] Missing test coverage: AppItem PropertyChanged, MainViewModel.Dispose, LaunchApp with invalid params
 - [ ] No [Trait] categorization on tests -- performance/security tests can't be filtered (PerformanceBenchmarkTests)
 - [ ] Duplicated CreatePng/CreateIco helpers in IconServiceTests and PerformanceBenchmarkTests -- extract to shared TestDataHelpers
-- [ ] BooleanToVisibilityConverter.ConvertBack throws NotImplementedException -- should return DependencyProperty.UnsetValue
+- [x] BooleanToVisibilityConverter.ConvertBack throws NotImplementedException -- should return DependencyProperty.UnsetValue
 - [ ] ImageHeaderParser: no IHDR chunk validation for PNG, no upper bound on ICO entry count
 - [ ] No version auto-increment in CI -- every build is 1.0.0.0 (Package.appxmanifest:14)
-- [ ] Launchbox.Tests.csproj has inconsistent indentation -- mix of tabs and spaces (Tests.csproj:6,10)
+- [x] Launchbox.Tests.csproj has inconsistent indentation -- mix of tabs and spaces (Tests.csproj:6,10)

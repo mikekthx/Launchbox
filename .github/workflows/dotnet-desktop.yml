@@ -118,7 +118,7 @@ jobs:
 
     # Execute all unit tests in the specific test project
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx"
+      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
 
     # Turn that TRX file into a beautiful UI report in GitHub
     - name: Publish Test Report

@@ -79,9 +79,9 @@ public sealed partial class MainWindow : Window
             {
                 _internalScrollViewer.VerticalScrollMode = ScrollMode.Enabled;
                 _internalScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                Debug.WriteLine($"ScrollViewer found! Scrollable height: {_internalScrollViewer.ScrollableHeight}");
+                Trace.WriteLine($"ScrollViewer found! Scrollable height: {_internalScrollViewer.ScrollableHeight}");
             }
-            Debug.WriteLine($"AppGrid loaded. Scrollable height: {_internalScrollViewer?.ScrollableHeight ?? 0}");
+            Trace.WriteLine($"AppGrid loaded. Scrollable height: {_internalScrollViewer?.ScrollableHeight ?? 0}");
         };
 
         // 5. EVENT HOOKS

@@ -12,7 +12,7 @@ public class MockShortcutService : IShortcutService
         _files = files;
     }
 
-    public string[]? GetShortcutFiles(string folderPath, string[] allowedExtensions)
+    public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions)
     {
         return _files;
     }

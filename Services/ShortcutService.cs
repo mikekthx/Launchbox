@@ -13,7 +13,7 @@ public class ShortcutService : IShortcutService
         _fileSystem = fileSystem;
     }
 
-    public string[]? GetShortcutFiles(string folderPath, string[] allowedExtensions)
+    public string[]? GetShortcutFiles(string folderPath, System.Collections.Generic.IReadOnlyList<string> allowedExtensions)
     {
         if (allowedExtensions == null || !_fileSystem.DirectoryExists(folderPath))
         {

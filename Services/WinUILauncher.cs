@@ -8,7 +8,7 @@ namespace Launchbox.Services;
 
 public class WinUILauncher : IAppLauncher
 {
-    private static readonly string[] ALLOWED_EXTENSIONS = Constants.ALLOWED_EXTENSIONS;
+    private static readonly System.Collections.Generic.IReadOnlyList<string> ALLOWED_EXTENSIONS = Constants.ALLOWED_EXTENSIONS;
     private readonly IShortcutResolver _shortcutResolver;
     private readonly IProcessStarter _processStarter;
     private readonly IFileSystem _fileSystem;

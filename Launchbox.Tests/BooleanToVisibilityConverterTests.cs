@@ -1,6 +1,5 @@
 using Launchbox.Helpers;
 using Microsoft.UI.Xaml;
-using System;
 using Xunit;
 
 namespace Launchbox.Tests;
@@ -55,15 +54,22 @@ public class BooleanToVisibilityConverterTests
         Assert.Equal(Visibility.Collapsed, result);
     }
 
+    [Fact]
+    public void ConvertBack_Visible_ReturnsTrue()
+    {
+        var converter = new BooleanToVisibilityConverter();
+        var result = converter.ConvertBack(Visibility.Visible, typeof(bool), null!, "en-US");
+        Assert.Equal(true, result);
+    }
+
     [Theory]
-    [InlineData(Visibility.Visible)]
     [InlineData(Visibility.Collapsed)]
     [InlineData(null)]
     [InlineData("random string")]
-    public void ConvertBack_AlwaysThrowsNotImplementedException(object? value)
+    public void ConvertBack_NonVisible_ReturnsFalse(object? value)
     {
         var converter = new BooleanToVisibilityConverter();
-        Assert.Throws<NotImplementedException>(() =>
-            converter.ConvertBack(value!, typeof(bool), null!, "en-US"));
+        var result = converter.ConvertBack(value!, typeof(bool), null!, "en-US");
+        Assert.Equal(false, result);
     }
 }
