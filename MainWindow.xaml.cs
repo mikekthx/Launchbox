@@ -34,14 +34,14 @@ public sealed partial class MainWindow : Window
         _settingsService = new SettingsService(settingsStore, startupService);
         _filePickerService = new WinUIFilePickerService();
 
+        var dispatcher = new WinUIDispatcher(this.DispatcherQueue);
         var windowPositionManager = new WindowPositionManager(settingsStore);
-        _windowService = new WindowService(this, windowPositionManager, _settingsService, _filePickerService);
+        _windowService = new WindowService(this, windowPositionManager, _settingsService, _filePickerService, dispatcher);
 
         var fileSystem = new FileSystem();
         var shortcutService = new ShortcutService(fileSystem);
         var iconService = new IconService(fileSystem);
         var imageFactory = new WinUIImageFactory();
-        var dispatcher = new WinUIDispatcher(this.DispatcherQueue);
         var shortcutResolver = new WindowsShortcutResolver(fileSystem);
         var processStarter = new ProcessStarter();
         var launcher = new WinUILauncher(shortcutResolver, processStarter, fileSystem);
