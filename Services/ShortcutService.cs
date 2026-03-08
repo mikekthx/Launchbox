@@ -27,7 +27,12 @@ public class ShortcutService : IShortcutService
                 .OrderBy(f => Path.GetFileName(f))
                 .ToArray();
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException || ex is IOException)
+        catch (UnauthorizedAccessException ex)
+        {
+            System.Diagnostics.Trace.WriteLine($"Failed to access shortcut folder {Launchbox.Helpers.PathSecurity.RedactPath(folderPath)}: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+            return null;
+        }
+        catch (IOException ex)
         {
             System.Diagnostics.Trace.WriteLine($"Failed to access shortcut folder {Launchbox.Helpers.PathSecurity.RedactPath(folderPath)}: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
