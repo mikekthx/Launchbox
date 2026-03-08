@@ -20,6 +20,9 @@ public class WindowService : IWindowService, IDisposable
     private WndProcDelegate? _wndProcDelegate;
     private bool _hasPositioned;
     private SettingsWindow? _settingsWindow;
+    private int _currentMod;
+    private int _currentKey;
+    private bool _isHotkeyRegistered;
 
     public bool IsVisible => _window.Visible;
 
@@ -88,15 +91,36 @@ public class WindowService : IWindowService, IDisposable
 
     private void UpdateHotkey()
     {
-        // Unregister existing first
-        NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
-
         int mod = _settingsService.HotkeyModifiers;
         int key = _settingsService.HotkeyKey;
 
-        Trace.WriteLine(!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key)
-            ? $"Failed to register hotkey: {mod}+{key}"
-            : $"Registered hotkey: {mod}+{key}");
+        // Unregister existing first
+        NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
+
+        if (!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key))
+        {
+            Trace.WriteLine($"Failed to register hotkey: {mod}+{key}");
+
+            if (_isHotkeyRegistered)
+            {
+                if (NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)_currentMod, (uint)_currentKey))
+                {
+                    Trace.WriteLine($"Restored previous hotkey: {_currentMod}+{_currentKey}");
+                }
+                else
+                {
+                    Trace.WriteLine($"Failed to restore previous hotkey: {_currentMod}+{_currentKey}");
+                    _isHotkeyRegistered = false;
+                }
+            }
+        }
+        else
+        {
+            Trace.WriteLine($"Registered hotkey: {mod}+{key}");
+            _currentMod = mod;
+            _currentKey = key;
+            _isHotkeyRegistered = true;
+        }
     }
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
