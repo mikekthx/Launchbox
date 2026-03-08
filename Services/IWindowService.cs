@@ -16,6 +16,11 @@ public interface IWindowService : IDisposable
     event EventHandler<bool>? VisibilityChanged;
 
     /// <summary>
+    /// Occurs when registering a global hotkey fails.
+    /// </summary>
+    event EventHandler<string>? HotkeyRegistrationFailed;
+
+    /// <summary>
     /// Initializes the window service, setting up the window handle, app window, hotkeys, and window procedure hook.
     /// </summary>
     void Initialize();
