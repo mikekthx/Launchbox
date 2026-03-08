@@ -48,4 +48,31 @@ public class WindowsShortcutResolverTests
             Assert.Null(result);
         }
     }
+
+    [Fact]
+    public void ResolveTarget_Expands_EnvironmentVariables_From_UrlFile()
+    {
+        string shortcutPath = @"C:\shortcuts\app.url";
+        string envVar = "RESOLVER_TEST_ENV_VAR";
+        string envValue = @"C:\ResolvedTarget";
+
+        // Environment.ExpandEnvironmentVariables uses %VAR% syntax on all .NET platforms
+        string targetUrl = $@"%{envVar}%\app.exe";
+        string expectedUrl = $@"{envValue}\app.exe";
+
+        System.Environment.SetEnvironmentVariable(envVar, envValue);
+
+        try
+        {
+            _fileSystem.SetIniValue(shortcutPath, "InternetShortcut", "URL", targetUrl);
+
+            string? result = _resolver.ResolveTarget(shortcutPath);
+
+            Assert.Equal(expectedUrl, result);
+        }
+        finally
+        {
+            System.Environment.SetEnvironmentVariable(envVar, null);
+        }
+    }
 }

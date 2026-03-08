@@ -91,4 +91,45 @@ public class ShortcutServiceTests
 
         Assert.Null(result);
     }
+
+    [Fact]
+    public void GetShortcutFiles_ReturnsNull_WhenUnauthorizedAccessExceptionThrown()
+    {
+        var exception = new UnauthorizedAccessException("Access denied");
+        var mockFileSystem = new ExceptionThrowingFileSystem(exception);
+        mockFileSystem.AddDirectory(SHORTCUT_FOLDER);
+        var service = new ShortcutService(mockFileSystem);
+
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void GetShortcutFiles_ReturnsNull_WhenIOExceptionThrown()
+    {
+        var exception = new IOException("I/O error");
+        var mockFileSystem = new ExceptionThrowingFileSystem(exception);
+        mockFileSystem.AddDirectory(SHORTCUT_FOLDER);
+        var service = new ShortcutService(mockFileSystem);
+
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+
+        Assert.Null(result);
+    }
+
+    private class ExceptionThrowingFileSystem : MockFileSystem
+    {
+        private readonly Exception _exceptionToThrow;
+
+        public ExceptionThrowingFileSystem(Exception exceptionToThrow)
+        {
+            _exceptionToThrow = exceptionToThrow;
+        }
+
+        public override IEnumerable<string> EnumerateFiles(string path)
+        {
+            throw _exceptionToThrow;
+        }
+    }
 }

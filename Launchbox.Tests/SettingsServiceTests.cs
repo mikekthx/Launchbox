@@ -19,6 +19,19 @@ public class SettingsServiceTests
     }
 
     [Fact]
+    public async Task SetRunAtStartupAsync_Reverts_WhenEnableFails()
+    {
+        var settingsStore = new MockSettingsStore();
+        var startupService = new MockStartupService { Success = false };
+        var service = new SettingsService(settingsStore, startupService);
+
+        await service.SetRunAtStartupAsync(true);
+
+        Assert.False(service.IsRunAtStartup);
+        Assert.False(startupService.IsEnabled);
+    }
+
+    [Fact]
     public void ShortcutsPath_SavesAndRetrievesValue()
     {
         var settingsStore = new MockSettingsStore();
@@ -94,7 +107,9 @@ public class SettingsServiceTests
         var startupService = new MockStartupService { ShouldFail = true };
         var service = new SettingsService(settingsStore, startupService);
 
-        await service.InitializeAsync();
+        // This should not throw if the issue is fixed
+        var exception = await Record.ExceptionAsync(() => service.InitializeAsync());
+        Assert.Null(exception);
         Assert.False(service.IsRunAtStartup);
     }
 

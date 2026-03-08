@@ -95,6 +95,15 @@ public class MockFileSystem : IFileSystem
         return Array.Empty<string>();
     }
 
+    public virtual IEnumerable<string> EnumerateFiles(string path)
+    {
+        if (_files.TryGetValue(path, out var files))
+        {
+            return files;
+        }
+        return Enumerable.Empty<string>();
+    }
+
     public virtual string GetIniValue(string path, string section, string key)
     {
         OperationsLog.Add($"GetIniValue: {path}");

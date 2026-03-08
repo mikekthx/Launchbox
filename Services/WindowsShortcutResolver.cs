@@ -75,6 +75,13 @@ public class WindowsShortcutResolver : IShortcutResolver
     {
         // .url files are INI files
         string url = _fileSystem.GetIniValue(path, Constants.INTERNET_SHORTCUT_SECTION, "URL");
-        return string.IsNullOrWhiteSpace(url) ? null : url;
+        if (string.IsNullOrWhiteSpace(url)) return null;
+
+        if (url.Contains('%') || url.Contains('$'))
+        {
+            return Environment.ExpandEnvironmentVariables(url);
+        }
+
+        return url;
     }
 }
