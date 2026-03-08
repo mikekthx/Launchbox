@@ -1,6 +1,6 @@
 # Launchbox
 
-Launchbox is a modern, lightweight Windows desktop application launcher built with **WinUI 3** and **.NET 8**. It integrates seamlessly with your system tray, providing instant access to your favorite shortcuts with a global hotkey.
+Launchbox is a modern, lightweight Windows desktop application launcher built with **WinUI 3** and **.NET 10**. It integrates seamlessly with your system tray, providing instant access to your favorite shortcuts with a global hotkey.
 
 [![Build Status](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml/badge.svg)](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen)](https://github.com/mikekthx/Launchbox/security/code-scanning)
@@ -36,7 +36,7 @@ To build and run Launchbox locally, follow these steps:
 *   **Visual Studio 2022** (17.8 or later) with the following workloads:
     *   .NET Desktop Development
     *   Universal Windows Platform development (optional, but recommended for WinUI templates)
-*   **.NET 8.0 SDK**
+*   **.NET 10.0 SDK**
 
 ### Building from Source
 

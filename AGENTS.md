@@ -6,7 +6,7 @@ Guidance for AI coding agents working on this codebase.
 
 **Launchbox** is a Windows desktop app launcher built with:
 - **Framework:** WinUI 3 (Windows App SDK 1.8)
-- **Language:** C# on .NET 8.0
+- **Language:** C# on .NET 10.0
 - **Platform:** Windows 10/11 (x86, x64, ARM64)
 
 The app displays shortcuts from `Desktop\Shortcuts` in a grid, lives in the system tray, and toggles visibility via **Alt+S** global hotkey.
@@ -33,7 +33,7 @@ dotnet clean Launchbox.csproj
 ## Testing
 
 **Test framework configured: xUnit.**
-- Project: `Launchbox.Tests` (net8.0-windows10.0.19041.0)
+- Project: `Launchbox.Tests` (net10.0-windows10.0.19041.0)
 - Run: `dotnet test Launchbox.Tests/Launchbox.Tests.csproj`
 - Single test: `dotnet test --filter "FullyQualifiedName~TestMethodName"`
 

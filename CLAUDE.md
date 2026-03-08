@@ -29,7 +29,7 @@ dotnet test Launchbox.Tests/Launchbox.Tests.csproj --filter "FullyQualifiedName~
 
 ## Architecture
 
-**Launchbox** is a WinUI 3 / .NET 8 Windows desktop app launcher. It lives in the system tray and toggles a shortcut grid via a global hotkey (default `Alt+S`).
+**Launchbox** is a WinUI 3 / .NET 10 Windows desktop app launcher. It lives in the system tray and toggles a shortcut grid via a global hotkey (default `Alt+S`).
 
 ### MVVM Pattern
 
