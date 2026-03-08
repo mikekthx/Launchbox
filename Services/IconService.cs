@@ -193,7 +193,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
                 {
                     try
                     {
-                        var fileList = _fileSystem.GetFiles(dir);
+                        var fileList = _fileSystem.EnumerateFiles(dir);
                         files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
                     }
                     catch
