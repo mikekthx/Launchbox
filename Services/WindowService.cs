@@ -229,6 +229,7 @@ public class WindowService : IWindowService, IDisposable
 
     private bool _disposed;
 
+    // Finalizer to clean up unmanaged resources
     ~WindowService()
     {
         Dispose(false);
@@ -236,6 +237,7 @@ public class WindowService : IWindowService, IDisposable
 
     public void Dispose()
     {
+        if (_disposed) return;
         Dispose(true);
         GC.SuppressFinalize(this);
     }
