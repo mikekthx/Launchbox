@@ -8,6 +8,7 @@ public class MockWindowService : IWindowService
 {
     public bool IsVisible { get; set; }
     public event EventHandler<bool>? VisibilityChanged;
+    public event EventHandler<string>? HotkeyRegistrationFailed;
 
     public void RaiseVisibilityChanged(bool isVisible)
     {

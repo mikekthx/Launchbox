@@ -87,6 +87,7 @@ public sealed partial class MainWindow : Window
         // 5. EVENT HOOKS
         this.Activated += MainWindow_Activated;
         this.Closed += MainWindow_Closed;
+        _windowService.HotkeyRegistrationFailed += WindowService_HotkeyRegistrationFailed;
 
         // 6. LOAD APPS
         AppGrid.ItemsSource = ViewModel.Apps;
@@ -171,8 +172,17 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void WindowService_HotkeyRegistrationFailed(object? sender, string e)
+    {
+        this.DispatcherQueue.TryEnqueue(() =>
+        {
+            TrayIcon?.ShowNotification("Launchbox Error", e);
+        });
+    }
+
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
+        _windowService.HotkeyRegistrationFailed -= WindowService_HotkeyRegistrationFailed;
         _windowService.Dispose();
         TrayIcon?.Dispose();
         ViewModel?.Dispose();

@@ -27,6 +27,7 @@ public class WindowService : IWindowService, IDisposable
     public bool IsVisible => _window.Visible;
 
     public event EventHandler<bool>? VisibilityChanged;
+    public event EventHandler<string>? HotkeyRegistrationFailed;
 
     public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService, IDispatcher dispatcher)
     {
@@ -99,7 +100,9 @@ public class WindowService : IWindowService, IDisposable
 
         if (!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key))
         {
-            Trace.WriteLine($"Failed to register hotkey: {mod}+{key}");
+            var errorMessage = $"Failed to register hotkey: {mod}+{key}";
+            Trace.WriteLine(errorMessage);
+            HotkeyRegistrationFailed?.Invoke(this, errorMessage);
 
             if (_isHotkeyRegistered)
             {
