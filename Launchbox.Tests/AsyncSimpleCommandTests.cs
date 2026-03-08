@@ -122,7 +122,7 @@ public class AsyncSimpleCommandTests
         command.Execute("TestParameter");
 
         var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000));
-        Assert.Equal(tcs.Task, completedTask);
+        Assert.Same(tcs.Task, completedTask);
         Assert.Equal("TestParameter", await tcs.Task);
     }
 

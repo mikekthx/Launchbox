@@ -110,7 +110,7 @@ public class SettingsService : ObservableObject
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to initialize settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            Trace.WriteLine($"Failed to initialize settings (StartupService): {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
