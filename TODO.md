@@ -27,7 +27,7 @@
 - [ ] No user-facing feedback when RegisterHotKey fails -- only Trace.WriteLine (WindowService.cs:80-83)
 - [ ] OpenShortcutsFolder and LaunchApp have no try/catch -- exceptions propagate unhandled (MainViewModel.cs:171-188)
 - [ ] ShortcutService.GetShortcutFiles has no error handling for UnauthorizedAccessException (ShortcutService.cs:16-27)
-- [ ] SettingsService.InitializeAsync has no try-catch; callers use fire-and-forget (SettingsService.cs:101-107)
+- [x] SettingsService.InitializeAsync has no try-catch; callers use fire-and-forget (SettingsService.cs:101-107)
 - [ ] Parallel.ForEachAsync without bounded parallelism -- could exhaust GDI handles on many-core systems (MainViewModel.cs:137)
 - [ ] CancellationToken from Parallel.ForEachAsync never forwarded to inner async operations (MainViewModel.cs:137-159)
 - [ ] WindowService constructor has no null guards on parameters -- inconsistent with all other services (WindowService.cs:20-24)
