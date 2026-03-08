@@ -111,6 +111,18 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void ToggleWindowText_UpdatesWhenVisibilityChanges()
+    {
+        var viewModel = CreateViewModel();
+
+        _windowService.RaiseVisibilityChanged(false);
+        Assert.Equal("Show", viewModel.ToggleWindowText);
+
+        _windowService.RaiseVisibilityChanged(true);
+        Assert.Equal("Hide", viewModel.ToggleWindowText);
+    }
+
+    [Fact]
     public async Task LoadAppsAsync_SetsIsEmptyToTrue_WhenNoAppsFound()
     {
         var viewModel = CreateViewModel();

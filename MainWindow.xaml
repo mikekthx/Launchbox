@@ -22,7 +22,7 @@
                         LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}">
+                    <MenuFlyoutItem Text="{Binding ViewModel.ToggleWindowText, Mode=OneWay}" Command="{Binding ViewModel.ToggleWindowCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="View" />
                         </MenuFlyoutItem.Icon>

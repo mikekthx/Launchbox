@@ -24,6 +24,10 @@ public class WindowService : IWindowService, IDisposable
     private int _currentKey;
     private bool _isHotkeyRegistered;
 
+    public bool IsVisible => _window.Visible;
+
+    public event EventHandler<bool>? VisibilityChanged;
+
     public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService, IDispatcher dispatcher)
     {
         ArgumentNullException.ThrowIfNull(window);
@@ -38,7 +42,13 @@ public class WindowService : IWindowService, IDisposable
         _filePickerService = filePickerService;
         _dispatcher = dispatcher;
 
+        _window.VisibilityChanged += Window_VisibilityChanged;
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
+    }
+
+    private void Window_VisibilityChanged(object sender, WindowVisibilityChangedEventArgs args)
+    {
+        VisibilityChanged?.Invoke(this, args.Visible);
     }
 
     public void Initialize()
@@ -237,6 +247,7 @@ public class WindowService : IWindowService, IDisposable
         if (disposing)
         {
             // Unsubscribe managed events
+            _window.VisibilityChanged -= Window_VisibilityChanged;
             _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
 
             if (_appWindow != null)
