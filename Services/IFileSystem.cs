@@ -9,6 +9,7 @@ public interface IFileSystem
     bool DirectoryExists(string path);
     bool FileExists(string path);
     string[] GetFiles(string path);
+    System.Collections.Generic.IEnumerable<string> EnumerateFiles(string path);
     string GetIniValue(string path, string section, string key);
     byte[] ReadAllBytes(string path);
     Stream OpenRead(string path);

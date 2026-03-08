@@ -22,7 +22,7 @@ public class ShortcutService : IShortcutService
 
         try
         {
-            return _fileSystem.GetFiles(folderPath)
+            return _fileSystem.EnumerateFiles(folderPath)
                 .Where(f => allowedExtensions.Contains(Path.GetExtension(f) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderBy(f => Path.GetFileName(f))
                 .ToArray();
