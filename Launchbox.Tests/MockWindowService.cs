@@ -1,3 +1,4 @@
+using System;
 using Launchbox.Services;
 using Microsoft.UI.Xaml;
 
@@ -5,6 +6,15 @@ namespace Launchbox.Tests;
 
 public class MockWindowService : IWindowService
 {
+    public bool IsVisible { get; set; }
+    public event EventHandler<bool>? VisibilityChanged;
+
+    public void RaiseVisibilityChanged(bool isVisible)
+    {
+        IsVisible = isVisible;
+        VisibilityChanged?.Invoke(this, isVisible);
+    }
+
     public bool HideCalled { get; private set; }
     public bool ToggleVisibilityCalled { get; private set; }
     public bool InitializeCalled { get; private set; }

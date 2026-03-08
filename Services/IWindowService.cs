@@ -6,6 +6,16 @@ namespace Launchbox.Services;
 public interface IWindowService : IDisposable
 {
     /// <summary>
+    /// Gets a value indicating whether the window is currently visible.
+    /// </summary>
+    bool IsVisible { get; }
+
+    /// <summary>
+    /// Occurs when the window visibility changes.
+    /// </summary>
+    event EventHandler<bool>? VisibilityChanged;
+
+    /// <summary>
     /// Initializes the window service, setting up the window handle, app window, hotkeys, and window procedure hook.
     /// </summary>
     void Initialize();

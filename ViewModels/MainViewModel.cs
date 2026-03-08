@@ -34,6 +34,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         private set => SetProperty(ref _isEmpty, value);
     }
 
+    public string ToggleWindowText => _windowService.IsVisible ? "Hide" : "Show";
+
     public ICommand LoadAppsCommand { get; }
     public ICommand LaunchAppCommand { get; }
     public ICommand OpenShortcutsFolderCommand { get; }
@@ -61,6 +63,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
+        _windowService.VisibilityChanged += WindowService_VisibilityChanged;
 
         LoadAppsCommand = new AsyncSimpleCommand(LoadAppsAsync);
         LaunchAppCommand = new SimpleCommand(LaunchApp);
@@ -77,6 +80,11 @@ public class MainViewModel : ViewModelBase, IDisposable
             // Reload apps when folder path changes
             _ = LoadAppsAsync();
         }
+    }
+
+    private void WindowService_VisibilityChanged(object? sender, bool e)
+    {
+        OnPropertyChanged(nameof(ToggleWindowText));
     }
 
     public async Task LoadAppsAsync()
@@ -129,7 +137,13 @@ public class MainViewModel : ViewModelBase, IDisposable
                 return Task.CompletedTask;
             });
 
-            await Parallel.ForEachAsync(localAppItems, ct, async (item, token) =>
+            var parallelOptions = new ParallelOptions
+            {
+                CancellationToken = ct,
+                MaxDegreeOfParallelism = 2 // Bound parallelism to prevent ThreadPool starvation with GDI+ locks
+            };
+
+            await Parallel.ForEachAsync(localAppItems, parallelOptions, async (item, token) =>
             {
                 try
                 {
@@ -201,6 +215,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         _loadCts?.Cancel();
         _loadCts?.Dispose();
         _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
+        _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
         GC.SuppressFinalize(this);
     }
 }

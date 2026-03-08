@@ -19,11 +19,10 @@
         <tb:TaskbarIcon x:Name="TrayIcon"
                         ToolTipText="Launchbox (Alt+S)"
                         IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
-                        LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}"
-                        DoubleClickCommand="{Binding ViewModel.ToggleWindowCommand}">
+                        LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="Show" Command="{Binding ViewModel.ToggleWindowCommand}">
+                    <MenuFlyoutItem Text="{Binding ViewModel.ToggleWindowText, Mode=OneWay}" Command="{Binding ViewModel.ToggleWindowCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="View" />
                         </MenuFlyoutItem.Icon>
@@ -77,6 +76,7 @@
                   Background="Transparent"
                   SelectionMode="None" 
                   IsItemClickEnabled="True" 
+                  Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"
                   ScrollViewer.VerticalScrollMode="Enabled"
