@@ -331,7 +331,11 @@ public class IconService(IFileSystem fileSystem) : IIconService
 
             // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
             // saving ~43% processing time compared to 128x128.
-            NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, ref hIcon, IntPtr.Zero, 1, 0);
+            IntPtr[] phicon = new IntPtr[1];
+            uint[] piconid = new uint[1];
+            NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, phicon, piconid, 1, 0);
+
+            hIcon = phicon[0];
             if (hIcon == IntPtr.Zero) return null;
 
             lock (GDI_LOCK)
