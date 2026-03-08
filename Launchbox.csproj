@@ -62,6 +62,8 @@
   <PropertyGroup Condition="'$(Configuration)' != 'Debug'">
     <PublishReadyToRun>True</PublishReadyToRun>
     <PublishTrimmed>True</PublishTrimmed>
+    <TrimMode>partial</TrimMode>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <SelfContained>True</SelfContained>
   </PropertyGroup>
 </Project>
