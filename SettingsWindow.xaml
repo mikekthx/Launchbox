@@ -29,6 +29,7 @@
                 <StackPanel Spacing="8">
                     <TextBlock Text="General" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <ToggleSwitch Header="Run at Startup" IsOn="{x:Bind ViewModel.RunAtStartup, Mode=TwoWay}"
+                                  AutomationProperties.Name="Run at Startup"
                                   ToolTipService.ToolTip="Automatically launch Launchbox when you sign in to Windows" />
                 </StackPanel>
 
@@ -67,6 +68,7 @@
                 <StackPanel Spacing="8">
                     <TextBlock Text="Window Management" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <Button Content="Reset Window Position" Command="{x:Bind ViewModel.ResetPositionCommand}"
+                            AutomationProperties.Name="Reset Window Position"
                             ToolTipService.ToolTip="Moves the main window to the center of the screen" />
                 </StackPanel>
             </StackPanel>

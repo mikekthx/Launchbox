@@ -72,6 +72,7 @@
         </StackPanel>
 
         <GridView x:Name="AppGrid" 
+                  AutomationProperties.Name="Shortcuts Grid"
                   Padding="20"
                   Background="Transparent"
                   SelectionMode="None" 
