@@ -1,6 +1,6 @@
 using System;
-using Microsoft.UI.Xaml;
 using Launchbox.Services;
+using Microsoft.UI.Xaml;
 
 namespace Launchbox.Tests;
 
