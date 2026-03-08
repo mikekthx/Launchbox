@@ -16,6 +16,11 @@ public class MockWindowService : IWindowService
         VisibilityChanged?.Invoke(this, isVisible);
     }
 
+    public void RaiseHotkeyRegistrationFailed(string message)
+    {
+        HotkeyRegistrationFailed?.Invoke(this, message);
+    }
+
     public bool HideCalled { get; private set; }
     public bool ToggleVisibilityCalled { get; private set; }
     public bool InitializeCalled { get; private set; }

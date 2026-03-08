@@ -51,7 +51,7 @@ public class AsyncSimpleCommandTests
         command.Execute(null);
 
         // Wait for completion with timeout to avoid hanging if it fails
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000));
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000, TestContext.Current.CancellationToken));
 
         if (completedTask == tcs.Task)
         {
@@ -97,7 +97,7 @@ public class AsyncSimpleCommandTests
         command.Execute(null);
 
         // Give it a moment to fail if it's going to fail
-        await Task.Delay(100);
+        await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // If we reached here, it didn't crash.
         Assert.True(true);
@@ -121,7 +121,7 @@ public class AsyncSimpleCommandTests
 
         command.Execute("TestParameter");
 
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000));
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000, TestContext.Current.CancellationToken));
         Assert.Same(tcs.Task, completedTask);
         Assert.Equal("TestParameter", await tcs.Task);
     }

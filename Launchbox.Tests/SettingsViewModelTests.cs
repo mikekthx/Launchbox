@@ -57,7 +57,7 @@ public class SettingsViewModelTests
         var timeout = DateTime.Now.AddSeconds(1);
         while (!service.IsRunAtStartup && DateTime.Now < timeout)
         {
-            await Task.Delay(10);
+            await Task.Delay(10, TestContext.Current.CancellationToken);
         }
 
         Assert.True(service.IsRunAtStartup);
@@ -137,7 +137,7 @@ public class SettingsViewModelTests
         var timeout = DateTime.Now.AddSeconds(1);
         while (vm.ShortcutsPath != @"C:\PickedFolder" && DateTime.Now < timeout)
         {
-            await Task.Delay(10);
+            await Task.Delay(10, TestContext.Current.CancellationToken);
         }
 
         Assert.Equal(@"C:\PickedFolder", vm.ShortcutsPath);
@@ -153,7 +153,7 @@ public class SettingsViewModelTests
         vm.BrowseFolderCommand.Execute(new object());
 
         // Wait briefly to ensure it didn't change
-        await Task.Delay(50);
+        await Task.Delay(50, TestContext.Current.CancellationToken);
 
         Assert.Equal(oldPath, vm.ShortcutsPath);
     }

@@ -1,6 +1,5 @@
 using Launchbox.Services;
 using System.IO;
-using System.Linq;
 using Xunit;
 
 namespace Launchbox.Tests;
@@ -118,7 +117,7 @@ public class IconServiceSecurityTests
         // Assert
         // We verify that GetIniValue was NOT called for the unsafe path.
         // The mock logs "GetIniValue: {path}"
-        Assert.Empty(_mockFileSystem.OperationsLog.Where(op => op.Contains(unsafePath)));
+        Assert.DoesNotContain(_mockFileSystem.OperationsLog, op => op.Contains(unsafePath));
 
         // It should return the path itself (as it failed to resolve or was blocked)
         Assert.Equal(unsafePath, result);
