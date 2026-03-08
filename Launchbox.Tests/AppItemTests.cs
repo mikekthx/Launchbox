@@ -61,6 +61,46 @@ public class AppItemTests
     }
 
     [Fact]
+    public void Name_Set_FiresPropertyChangedEvent()
+    {
+        // Arrange
+        var item = new AppItem();
+        var expectedName = "New App Name";
+        string? propertyName = null;
+
+        item.PropertyChanged += (sender, e) =>
+        {
+            propertyName = e.PropertyName;
+        };
+
+        // Act
+        item.Name = expectedName;
+
+        // Assert
+        Assert.Equal(nameof(AppItem.Name), propertyName);
+    }
+
+    [Fact]
+    public void Path_Set_FiresPropertyChangedEvent()
+    {
+        // Arrange
+        var item = new AppItem();
+        var expectedPath = @"C:\New\Path.exe";
+        string? propertyName = null;
+
+        item.PropertyChanged += (sender, e) =>
+        {
+            propertyName = e.PropertyName;
+        };
+
+        // Act
+        item.Path = expectedPath;
+
+        // Assert
+        Assert.Equal(nameof(AppItem.Path), propertyName);
+    }
+
+    [Fact]
     public void Icon_Set_FiresPropertyChangedEvent()
     {
         // Arrange
@@ -95,26 +135,6 @@ public class AppItemTests
 
         // Act
         item.Icon = expectedIcon;
-
-        // Assert
-        Assert.False(eventFired);
-    }
-
-    [Fact]
-    public void NameAndPath_DoNotFirePropertyChangedEvent()
-    {
-        // Arrange
-        var item = new AppItem();
-        bool eventFired = false;
-
-        item.PropertyChanged += (sender, e) =>
-        {
-            eventFired = true;
-        };
-
-        // Act
-        item.Name = "New Name";
-        item.Path = "New Path";
 
         // Assert
         Assert.False(eventFired);

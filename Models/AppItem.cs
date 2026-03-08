@@ -4,10 +4,21 @@ namespace Launchbox.Models;
 
 public class AppItem : ObservableObject
 {
+    private string _name = string.Empty;
+    private string _path = string.Empty;
     private object? _icon;
 
-    public string Name { get; set; } = string.Empty;
-    public string Path { get; set; } = string.Empty;
+    public string Name
+    {
+        get => _name;
+        set => SetProperty(ref _name, value);
+    }
+
+    public string Path
+    {
+        get => _path;
+        set => SetProperty(ref _path, value);
+    }
 
     public object? Icon
     {
