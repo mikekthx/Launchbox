@@ -129,8 +129,7 @@ public class MainViewModel : ViewModelBase, IDisposable
                 return Task.CompletedTask;
             });
 
-            var parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount, CancellationToken = ct };
-            await Parallel.ForEachAsync(localAppItems, parallelOptions, async (item, token) =>
+            await Parallel.ForEachAsync(localAppItems, ct, async (item, token) =>
             {
                 try
                 {

@@ -101,9 +101,16 @@ public class SettingsService : ObservableObject
 
     public async Task InitializeAsync()
     {
-        if (_startupService.IsSupported)
+        try
         {
-            IsRunAtStartup = await _startupService.IsRunAtStartupEnabledAsync();
+            if (_startupService.IsSupported)
+            {
+                IsRunAtStartup = await _startupService.IsRunAtStartupEnabledAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to initialize settings (StartupService): {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 

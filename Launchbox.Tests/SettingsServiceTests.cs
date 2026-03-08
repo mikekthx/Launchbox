@@ -87,6 +87,17 @@ public class SettingsServiceTests
         Assert.True(service.IsRunAtStartup);
     }
 
+    [Fact]
+    public async Task InitializeAsync_HandlesException_WhenStartupServiceFails()
+    {
+        var settingsStore = new MockSettingsStore();
+        var startupService = new MockStartupService { ShouldFail = true };
+        var service = new SettingsService(settingsStore, startupService);
+
+        await service.InitializeAsync();
+        Assert.False(service.IsRunAtStartup);
+    }
+
     [Theory]
     [InlineData(@"\\attacker\share")]
     [InlineData(@"\\?\UNC\attacker\share")]
