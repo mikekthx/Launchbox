@@ -4,3 +4,7 @@
 ## 2026-01-14 - WinRT Stream Optimization
 **Learning:** `InMemoryRandomAccessStream` coupled with `DataWriter` incurs unnecessary double-copying and overhead when wrapping an existing `byte[]`.
 **Action:** Use `System.IO.MemoryStream` (wrapping the byte array) combined with the `.AsRandomAccessStream()` extension method for significantly faster and lighter stream creation when feeding `BitmapImage.SetSourceAsync`.
+
+## 2026-03-08 - Prevent ThreadPool Starvation in MainViewModel
+**Learning:** In bounded concurrent loops (`Parallel.ForEachAsync` with a low `MaxDegreeOfParallelism`), executing synchronous blocking I/O calls directly within the loop body can severely starve the thread pool. This happens because the worker threads are blocked entirely waiting for I/O instead of yielding back to the async state machine to schedule continuations or other application tasks.
+**Action:** When forced to use synchronous I/O within async loops, wrap the blocking call (e.g., `_iconService.ExtractIconBytes`) inside an `await Task.Run(...)`. This offloads the blocking work to background threads, yielding the worker thread and ensuring responsiveness in the UI dispatcher.
