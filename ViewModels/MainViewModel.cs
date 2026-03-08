@@ -129,7 +129,13 @@ public class MainViewModel : ViewModelBase, IDisposable
                 return Task.CompletedTask;
             });
 
-            await Parallel.ForEachAsync(localAppItems, ct, async (item, token) =>
+            var parallelOptions = new ParallelOptions
+            {
+                CancellationToken = ct,
+                MaxDegreeOfParallelism = 2 // Bound parallelism to prevent ThreadPool starvation with GDI+ locks
+            };
+
+            await Parallel.ForEachAsync(localAppItems, parallelOptions, async (item, token) =>
             {
                 try
                 {
