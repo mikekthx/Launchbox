@@ -182,6 +182,15 @@ public sealed partial class MainWindow : Window
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
+        RootGrid.PointerPressed -= RootGrid_PointerPressed;
+        RootGrid.PointerMoved -= RootGrid_PointerMoved;
+        RootGrid.PointerReleased -= RootGrid_PointerReleased;
+        RootGrid.PointerCanceled -= RootGrid_PointerReleased;
+        RootGrid.PointerCaptureLost -= RootGrid_PointerCaptureLost;
+
+        this.Activated -= MainWindow_Activated;
+        this.Closed -= MainWindow_Closed;
+
         _windowService.HotkeyRegistrationFailed -= WindowService_HotkeyRegistrationFailed;
         _windowService.Dispose();
         TrayIcon?.Dispose();
