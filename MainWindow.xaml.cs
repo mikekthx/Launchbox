@@ -16,7 +16,6 @@ public sealed partial class MainWindow : Window
 {
     public MainViewModel ViewModel { get; }
 
-    private ScrollViewer? _internalScrollViewer;
     private readonly IWindowService _windowService;
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService _filePickerService;
@@ -70,27 +69,12 @@ public sealed partial class MainWindow : Window
         RootGrid.PointerCanceled += RootGrid_PointerReleased;
         RootGrid.PointerCaptureLost += RootGrid_PointerCaptureLost;
 
-        // 3. SCROLL SHOULD WORK NATIVELY NOW
-        AppGrid.Loaded += (s, e) =>
-        {
-            var finder = new VisualTreeFinder(new WinUIVisualTreeService());
-            _internalScrollViewer = finder.FindFirstDescendant<ScrollViewer>(AppGrid);
-            if (_internalScrollViewer != null)
-            {
-                _internalScrollViewer.VerticalScrollMode = ScrollMode.Enabled;
-                _internalScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
-                Trace.WriteLine($"ScrollViewer found! Scrollable height: {_internalScrollViewer.ScrollableHeight}");
-            }
-            Trace.WriteLine($"AppGrid loaded. Scrollable height: {_internalScrollViewer?.ScrollableHeight ?? 0}");
-        };
-
         // 5. EVENT HOOKS
         this.Activated += MainWindow_Activated;
         this.Closed += MainWindow_Closed;
         _windowService.HotkeyRegistrationFailed += WindowService_HotkeyRegistrationFailed;
 
         // 6. LOAD APPS
-        AppGrid.ItemsSource = ViewModel.Apps;
         if (ViewModel.LoadAppsCommand.CanExecute(null))
         {
             ViewModel.LoadAppsCommand.Execute(null);
