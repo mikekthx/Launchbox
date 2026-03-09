@@ -46,7 +46,7 @@ public class MockFileSystem : IFileSystem
 
         if (!_files.ContainsKey(directory))
         {
-            _files[directory] = new List<string>();
+            _files[directory] = [];
         }
         if (!_files[directory].Contains(fullPath))
         {

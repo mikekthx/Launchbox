@@ -68,7 +68,7 @@ public class IconServiceTests
         string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
         string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
         string pngPath = Path.Combine(iconsDir, "App.png");
-        byte[] expectedBytes = { 1, 2, 3 };
+        byte[] expectedBytes = [1, 2, 3];
 
         _mockFileSystem.AddFile(shortcutPath);
         _mockFileSystem.AddDirectory(iconsDir);
@@ -85,7 +85,7 @@ public class IconServiceTests
         string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
         string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
         string icoPath = Path.Combine(iconsDir, "App.ico");
-        byte[] expectedBytes = { 4, 5, 6 };
+        byte[] expectedBytes = [4, 5, 6];
 
         _mockFileSystem.AddFile(shortcutPath);
         _mockFileSystem.AddDirectory(iconsDir);
@@ -177,7 +177,7 @@ public class IconServiceTests
         string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
         string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
         string pngPath = Path.Combine(iconsDir, "App.png");
-        byte[] pngBytes = { 1, 2, 3 };
+        byte[] pngBytes = [1, 2, 3];
 
         _mockFileSystem.AddFile(shortcutPath);
         _mockFileSystem.AddDirectory(iconsDir);
@@ -188,7 +188,7 @@ public class IconServiceTests
         Assert.Equal(pngBytes, result1);
 
         // Update file with newer timestamp
-        byte[] newBytes = { 9, 9, 9 };
+        byte[] newBytes = [9, 9, 9];
         _mockFileSystem.AddFile(pngPath, content: newBytes, lastWriteTime: DateTime.Now);
 
         // Force cache clear to verify it picks up changes (since we have 2s cache now)
@@ -209,7 +209,7 @@ public class IconServiceTests
         string shortcutPath = Path.Combine("C:", "Shortcuts", "App.lnk");
         string iconsDir = Path.Combine("C:", "Shortcuts", ".icons");
         string pngPath = Path.Combine(iconsDir, "App.png");
-        byte[] pngBytes = { 1, 2, 3 };
+        byte[] pngBytes = [1, 2, 3];
         var time = DateTime.Now;
 
         _mockFileSystem.AddFile(shortcutPath);
@@ -258,8 +258,8 @@ public class IconServiceTests
         _mockFileSystem.AddFile(shortcutPath2);
         _mockFileSystem.AddDirectory(iconsDir);
         // Mock custom icons to avoid NativeMethods P/Invoke on Linux
-        _mockFileSystem.AddFile(pngPath1, content: new byte[] { 1 });
-        _mockFileSystem.AddFile(pngPath2, content: new byte[] { 2 });
+        _mockFileSystem.AddFile(pngPath1, content: [1]);
+        _mockFileSystem.AddFile(pngPath2, content: [2]);
 
         // Populate cache
         _iconService.ExtractIconBytes(shortcutPath1);

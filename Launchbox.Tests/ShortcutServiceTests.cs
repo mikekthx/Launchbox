@@ -10,7 +10,7 @@ namespace Launchbox.Tests;
 public class ShortcutServiceTests
 {
     private static readonly string SHORTCUT_FOLDER = Path.Combine("Shortcuts");
-    private static readonly string[] ALLOWED_EXTENSIONS = { ".lnk", ".url" };
+    private static readonly string[] ALLOWED_EXTENSIONS = [".lnk", ".url"];
 
     [Fact]
     public void GetShortcutFiles_ReturnsNull_WhenDirectoryDoesNotExist()
