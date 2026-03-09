@@ -119,6 +119,18 @@ using WinIcon = System.Drawing.Icon;
 - Use `var` when type is obvious
 - Use modern syntax: `new()`, `[]`
 
+### Modern .NET 10 / C# 12+ Coding Standards
+Always prefer modern language features and idioms throughout the codebase:
+- **Collection expressions** (C# 12): Use `[]` for empty collections and `[item1, item2]` for initialized collections instead of `new List<T>()` or `new T[] { ... }`
+- **Primary constructors** (C# 12): Prefer primary constructors for simple types where appropriate
+- **`nameof`**: Use `nameof(...)` instead of hardcoded string literals for member names
+- **Pattern matching**: Prefer `is` patterns, switch expressions, and property patterns over `is`/`as` casts
+- **`using` declarations**: Use `using var` (C# 8+) instead of `using () { }` blocks where the scope is the enclosing method
+- **Target-typed `new`**: Use `new()` when the type is already apparent from context
+- **File-scoped namespaces**: Always use file-scoped `namespace Foo;` declarations (one per file)
+- **Raw string literals**: Use `"""..."""` for multiline or embedded-quote strings
+- Avoid legacy constructs such as `ArrayList`, non-generic collections, or old-style array initializers (`new int[] { 1, 2, 3 }` → `[1, 2, 3]`)
+
 ### Async/Await
 - Suffix with `Async`: `LoadAppsAsync()`
 - Fire-and-forget: `_ = LoadAppsAsync();`
