@@ -19,18 +19,25 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        Trace.WriteLine($"UNHANDLED EXCEPTION (UI thread): {e.Exception}");
+        Trace.WriteLine($"UNHANDLED EXCEPTION (UI thread): {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(e.Exception)}");
         e.Handled = true;
     }
 
     private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
     {
-        Trace.WriteLine($"FATAL (background thread): {e.ExceptionObject}");
+        if (e.ExceptionObject is Exception ex)
+        {
+            Trace.WriteLine($"FATAL (background thread): {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+        else
+        {
+            Trace.WriteLine("FATAL (background thread): [Unknown Error]");
+        }
     }
 
     private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        Trace.WriteLine($"UNOBSERVED TASK: {e.Exception}");
+        Trace.WriteLine($"UNOBSERVED TASK: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(e.Exception)}");
         e.SetObserved();
     }
 
