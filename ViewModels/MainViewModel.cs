@@ -87,6 +87,11 @@ public class MainViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(ToggleWindowText));
     }
 
+    /// <summary>
+    /// Loads shortcuts from the configured folder and concurrently extracts their icons.
+    /// Utilizes Parallel.ForEachAsync with bounded parallelism to prevent ThreadPool starvation
+    /// during blocking GDI+ extraction operations, while gracefully handling cancellation.
+    /// </summary>
     public async Task LoadAppsAsync()
     {
         // Cancel any in-flight load
