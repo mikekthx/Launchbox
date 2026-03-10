@@ -192,6 +192,15 @@ public class WindowService : IWindowService, IDisposable
         _window.Close();
     }
 
+    private void SettingsWindow_Closed(object sender, WindowEventArgs args)
+    {
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Closed -= SettingsWindow_Closed;
+            _settingsWindow = null;
+        }
+    }
+
     public void OpenSettings()
     {
         if (_settingsWindow != null)
@@ -203,7 +212,7 @@ public class WindowService : IWindowService, IDisposable
         try
         {
             _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService);
-            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+            _settingsWindow.Closed += SettingsWindow_Closed;
             _settingsWindow.Activate();
         }
         catch (Exception ex)
@@ -260,7 +269,12 @@ public class WindowService : IWindowService, IDisposable
                 _appWindow.Changed -= AppWindow_Changed;
             }
 
-            _settingsWindow?.Close();
+            if (_settingsWindow != null)
+            {
+                _settingsWindow.Closed -= SettingsWindow_Closed;
+                _settingsWindow.Close();
+                _settingsWindow = null;
+            }
         }
 
         // Clean up unmanaged resources

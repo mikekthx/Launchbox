@@ -18,6 +18,12 @@ public sealed partial class SettingsWindow : Window
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
 
-        this.Closed += (s, e) => ViewModel.Dispose();
+        this.Closed += SettingsWindow_Closed;
+    }
+
+    private void SettingsWindow_Closed(object sender, WindowEventArgs args)
+    {
+        this.Closed -= SettingsWindow_Closed;
+        ViewModel.Dispose();
     }
 }
