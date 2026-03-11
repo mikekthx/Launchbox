@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Restore the application
-        run: msbuild $env:Solution_Name /t:Restore /p:Configuration=Debug
+        run: dotnet restore $env:Solution_Name
 
       - name: Pre-create Source Generator Folders
         run: |
@@ -59,7 +59,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "obj\Gen\WinRT.SourceGenerator\Generator.WinRTSourceGenerator"
 
       - name: Build the application for CodeQL
-        run: msbuild $env:Solution_Name /p:Configuration=Debug /p:EmitCompilerGeneratedFiles=true /p:CompilerGeneratedFilesOutputPath=obj\Gen /p:AppxPackageSigningEnabled=false
+        run: dotnet build $env:Solution_Name --configuration Debug -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputPath=obj\Gen -p:AppxPackageSigningEnabled=false
 
       - name: Perform Analysis
         uses: github/codeql-action/analyze@v4
