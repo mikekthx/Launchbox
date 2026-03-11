@@ -17,23 +17,30 @@
         </Grid.Resources>
 
         <tb:TaskbarIcon x:Name="TrayIcon"
+                        AutomationProperties.Name="Launchbox System Tray Icon"
                         ToolTipText="Launchbox (Alt+S)"
                         IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
                         LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
-                    <MenuFlyoutItem Text="{Binding ViewModel.ToggleWindowText, Mode=OneWay}" Command="{Binding ViewModel.ToggleWindowCommand}">
+                    <MenuFlyoutItem Text="{Binding ViewModel.ToggleWindowText, Mode=OneWay}"
+                                    AutomationProperties.Name="{Binding ViewModel.ToggleWindowText, Mode=OneWay}"
+                                    Command="{Binding ViewModel.ToggleWindowCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="View" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
-                    <MenuFlyoutItem Text="Settings" Command="{Binding ViewModel.OpenSettingsCommand}">
+                    <MenuFlyoutItem Text="Settings"
+                                    AutomationProperties.Name="Settings"
+                                    Command="{Binding ViewModel.OpenSettingsCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="Setting" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Exit" Command="{Binding ViewModel.ExitCommand}">
+                    <MenuFlyoutItem Text="Exit"
+                                    AutomationProperties.Name="Exit"
+                                    Command="{Binding ViewModel.ExitCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="Cancel" />
                         </MenuFlyoutItem.Icon>
