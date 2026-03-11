@@ -17,6 +17,11 @@ public class SettingsService : ObservableObject
         _startupService = startupService ?? throw new ArgumentNullException(nameof(startupService));
     }
 
+    /// <summary>
+    /// Gets or sets the path to the folder containing application shortcuts.
+    /// When getting, environment variables in the path are automatically expanded.
+    /// The path is continuously verified for security boundaries; accessing or setting an unsafe path is blocked and logged.
+    /// </summary>
     public string ShortcutsPath
     {
         get

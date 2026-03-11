@@ -108,25 +108,25 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets or sets the modifier key for the global hotkey (e.g., Ctrl, Shift, Win, Alt).
+    /// </summary>
     public string SelectedModifier
     {
-        get
+        get => _settingsService.HotkeyModifiers switch
         {
-            var mod = _settingsService.HotkeyModifiers;
-            if (mod == Constants.MOD_CONTROL) return "Ctrl";
-            if (mod == Constants.MOD_SHIFT) return "Shift";
-            if (mod == Constants.MOD_WIN) return "Win";
-            return "Alt";
-        }
-        set
+            Constants.MOD_CONTROL => "Ctrl",
+            Constants.MOD_SHIFT => "Shift",
+            Constants.MOD_WIN => "Win",
+            _ => "Alt"
+        };
+        set => _settingsService.HotkeyModifiers = value switch
         {
-            int mod = Constants.MOD_ALT;
-            if (value == "Ctrl") mod = Constants.MOD_CONTROL;
-            else if (value == "Shift") mod = Constants.MOD_SHIFT;
-            else if (value == "Win") mod = Constants.MOD_WIN;
-
-            _settingsService.HotkeyModifiers = mod;
-        }
+            "Ctrl" => Constants.MOD_CONTROL,
+            "Shift" => Constants.MOD_SHIFT,
+            "Win" => Constants.MOD_WIN,
+            _ => Constants.MOD_ALT
+        };
     }
 
     public string HotkeyKeyString
