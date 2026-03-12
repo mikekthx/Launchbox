@@ -146,27 +146,43 @@ public class WindowService : IWindowService, IDisposable
         return NativeMethods.CallWindowProc(_oldWndProc, hWnd, msg, wParam, lParam);
     }
 
+    /// <summary>
+    /// Toggles the main window's visibility, restoring its previous position or centering it if displayed for the first time.
+    /// Also restores the window state if it was minimized (iconic) and brings it to the foreground.
+    /// </summary>
     public void ToggleVisibility()
     {
         if (_appWindow == null) return;
 
         try
         {
-            if (_window.Visible && _hasPositioned)
+            bool isWindowCurrentlyVisible = _window.Visible && _hasPositioned;
+
+            if (isWindowCurrentlyVisible)
             {
                 _appWindow.Hide();
+                return;
             }
-            else
+
+            if (!_hasPositioned)
             {
-                if (!_hasPositioned)
+                _hasPositioned = true;
+                bool positionRestored = RestoreWindowPosition();
+
+                if (!positionRestored)
                 {
-                    _hasPositioned = true;
-                    if (!RestoreWindowPosition()) CenterWindow();
+                    CenterWindow();
                 }
-                _appWindow.Show();
-                if (NativeMethods.IsIconic(_hWnd)) NativeMethods.ShowWindow(_hWnd, NativeMethods.SW_RESTORE);
-                NativeMethods.SetForegroundWindow(_hWnd);
             }
+
+            _appWindow.Show();
+
+            if (NativeMethods.IsIconic(_hWnd))
+            {
+                NativeMethods.ShowWindow(_hWnd, NativeMethods.SW_RESTORE);
+            }
+
+            NativeMethods.SetForegroundWindow(_hWnd);
         }
         catch (Exception ex)
         {
