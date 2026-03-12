@@ -56,6 +56,23 @@ public class WinUILauncher : IAppLauncher
                 }
                 Trace.WriteLine($"Shortcut target validated: {PathSecurity.RedactPath(targetPath)}");
             }
+
+            if (extension == ".lnk")
+            {
+                string? args = _shortcutResolver.ResolveArguments(path);
+                if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
+                {
+                    Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
+                    return;
+                }
+
+                string? workingDir = _shortcutResolver.ResolveWorkingDirectory(path);
+                if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
+                {
+                    Trace.WriteLine($"Blocked execution of shortcut with unsafe working directory: {PathSecurity.RedactPath(path)}");
+                    return;
+                }
+            }
         }
 
         try

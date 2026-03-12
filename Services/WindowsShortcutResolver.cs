@@ -42,6 +42,48 @@ public class WindowsShortcutResolver : IShortcutResolver
         }
     }
 
+    public string? ResolveArguments(string shortcutPath)
+    {
+        if (string.IsNullOrWhiteSpace(shortcutPath) || Path.GetExtension(shortcutPath).ToLowerInvariant() != ".lnk")
+            return null;
+
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return null;
+
+        IShellLinkW? link = null;
+        try
+        {
+            link = (IShellLinkW)new ShellLink();
+            ((IPersistFile)link).Load(shortcutPath, 0);
+            var sb = new StringBuilder(1024);
+            link.GetArguments(sb, sb.Capacity);
+            return sb.ToString();
+        }
+        catch (COMException) { return null; }
+        finally { if (link != null) Marshal.ReleaseComObject(link); }
+    }
+
+    public string? ResolveWorkingDirectory(string shortcutPath)
+    {
+        if (string.IsNullOrWhiteSpace(shortcutPath) || Path.GetExtension(shortcutPath).ToLowerInvariant() != ".lnk")
+            return null;
+
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return null;
+
+        IShellLinkW? link = null;
+        try
+        {
+            link = (IShellLinkW)new ShellLink();
+            ((IPersistFile)link).Load(shortcutPath, 0);
+            var sb = new StringBuilder(260); // MAX_PATH
+            link.GetWorkingDirectory(sb, sb.Capacity);
+            return sb.ToString();
+        }
+        catch (COMException) { return null; }
+        finally { if (link != null) Marshal.ReleaseComObject(link); }
+    }
+
     private string? ResolveLnk(string path)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
