@@ -15,4 +15,7 @@ public class MockShortcutResolver : IShortcutResolver
     {
         return _target;
     }
+
+    public string? ResolveArguments(string shortcutPath) => null;
+    public string? ResolveWorkingDirectory(string shortcutPath) => null;
 }
