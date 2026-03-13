@@ -5,5 +5,6 @@ namespace Launchbox.Services;
 
 public interface IFilePickerService
 {
-    Task<string?> PickSingleFolderAsync(object window);
+    object? OwnerWindow { get; set; }
+    Task<string?> PickSingleFolderAsync();
 }

@@ -7,15 +7,23 @@ namespace Launchbox.Services;
 
 public class WinUIFilePickerService : IFilePickerService
 {
-    public async Task<string?> PickSingleFolderAsync(object window)
+    public object? OwnerWindow { get; set; }
+
+    public async Task<string?> PickSingleFolderAsync()
     {
+        if (OwnerWindow == null)
+        {
+            Trace.WriteLine("Error showing folder picker: OwnerWindow is null.");
+            return null;
+        }
+
         try
         {
             var picker = new FolderPicker();
             picker.SuggestedStartLocation = PickerLocationId.Desktop;
             picker.FileTypeFilter.Add("*");
 
-            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(OwnerWindow);
             WinRT.Interop.InitializeWithWindow.Initialize(picker, hWnd);
 
             var folder = await picker.PickSingleFolderAsync();

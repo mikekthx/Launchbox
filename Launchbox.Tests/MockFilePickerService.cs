@@ -6,8 +6,9 @@ namespace Launchbox.Tests;
 public class MockFilePickerService : IFilePickerService
 {
     public string? SelectedFolder { get; set; }
+    public object? OwnerWindow { get; set; }
 
-    public Task<string?> PickSingleFolderAsync(object window)
+    public Task<string?> PickSingleFolderAsync()
     {
         return Task.FromResult(SelectedFolder);
     }
