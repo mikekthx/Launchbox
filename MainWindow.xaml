@@ -70,6 +70,7 @@
                     HorizontalAlignment="Center"
                     Style="{ThemeResource AccentButtonStyle}"
                     Margin="0,8,0,0"
+                    ToolTipService.ToolTip="Open your configured shortcuts folder"
                     AutomationProperties.Name="Open Shortcuts Folder">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <SymbolIcon Symbol="Folder" />
