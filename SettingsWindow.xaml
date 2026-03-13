@@ -40,7 +40,7 @@
                         <TextBox Text="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}" IsReadOnly="True" Width="300"
                                  ToolTipService.ToolTip="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}"
                                  AutomationProperties.Name="Shortcuts folder path" />
-                        <Button Grid.Column="1" Content="Browse..." Command="{x:Bind ViewModel.BrowseFolderCommand}" CommandParameter="{x:Bind}"
+                        <Button Grid.Column="1" Content="Browse..." Command="{x:Bind ViewModel.BrowseFolderCommand}"
                                 ToolTipService.ToolTip="Select a new folder for shortcuts"
                                 AutomationProperties.Name="Browse for shortcuts folder" />
                     </Grid>

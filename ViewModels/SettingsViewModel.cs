@@ -33,16 +33,14 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         _ = InitializeSettingsAsync();
 
         ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());
-        BrowseFolderCommand = new AsyncSimpleCommand<object?>(BrowseFolderAsync);
+        BrowseFolderCommand = new AsyncSimpleCommand(BrowseFolderAsync);
     }
 
-    private async Task BrowseFolderAsync(object? parameter)
+    private async Task BrowseFolderAsync()
     {
-        if (parameter == null) return; // Need window handle
-
         try
         {
-            var folder = await _filePickerService.PickSingleFolderAsync(parameter);
+            var folder = await _filePickerService.PickSingleFolderAsync();
             if (!string.IsNullOrEmpty(folder))
             {
                 ShortcutsPath = folder;

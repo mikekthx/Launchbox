@@ -11,15 +11,17 @@ public class WinUIFilePickerServiceTests
     public async Task PickSingleFolderAsync_InvalidWindow_CatchesExceptionAndReturnsNull()
     {
         var service = new WinUIFilePickerService();
-        var result = await service.PickSingleFolderAsync(new object());
+        service.OwnerWindow = new object();
+        var result = await service.PickSingleFolderAsync();
         Assert.Null(result);
     }
 
     [Fact]
-    public async Task PickSingleFolderAsync_NullWindow_CatchesExceptionAndReturnsNull()
+    public async Task PickSingleFolderAsync_NullWindow_ReturnsNull()
     {
         var service = new WinUIFilePickerService();
-        var result = await service.PickSingleFolderAsync(null!);
+        service.OwnerWindow = null;
+        var result = await service.PickSingleFolderAsync();
         Assert.Null(result);
     }
 }

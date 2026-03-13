@@ -10,6 +10,7 @@ public sealed partial class SettingsWindow : Window
 
     public SettingsWindow(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
     {
+        filePickerService.OwnerWindow = this;
         ViewModel = new SettingsViewModel(settingsService, windowService, filePickerService);
 
         this.InitializeComponent();
