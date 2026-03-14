@@ -152,7 +152,7 @@ jobs:
       run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:GenerateAppxPackageOnBuild=true /p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT /p:NoWarn=APPX0107
       env:
         Appx_Bundle: Always
-        Appx_Bundle_Platforms: x86|x64
+        Appx_Bundle_Platforms: x86|x64|arm64
         Appx_Package_Build_Mode: StoreUpload
         Configuration: ${{ matrix.configuration }}
 

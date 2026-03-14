@@ -17,6 +17,18 @@ public class MockFileSystem : IFileSystem
 
     public List<string> OperationsLog { get; } = new();
 
+    /// <summary>When set, <see cref="EnumerateFiles"/> and <see cref="GetFiles"/> throw this exception.</summary>
+    public Exception? EnumerateFilesException { get; set; }
+
+    /// <summary>When set, <see cref="ReadAllBytes"/> and <see cref="OpenRead"/> throw this exception.</summary>
+    public Exception? ReadException { get; set; }
+
+    /// <summary>When set, <see cref="GetIniValue"/> throws this exception.</summary>
+    public Exception? GetIniValueException { get; set; }
+
+    /// <summary>When set, <see cref="CreateDirectory"/> throws this exception.</summary>
+    public Exception? CreateDirectoryException { get; set; }
+
     public void AddDirectory(string path)
     {
         _directories.Add(path);
@@ -73,6 +85,7 @@ public class MockFileSystem : IFileSystem
 
     public virtual void CreateDirectory(string path)
     {
+        if (CreateDirectoryException != null) throw CreateDirectoryException;
         _directories.Add(path);
     }
 
@@ -88,6 +101,7 @@ public class MockFileSystem : IFileSystem
 
     public string[] GetFiles(string path)
     {
+        if (EnumerateFilesException != null) throw EnumerateFilesException;
         if (_files.TryGetValue(path, out var files))
         {
             return files.ToArray();
@@ -97,6 +111,7 @@ public class MockFileSystem : IFileSystem
 
     public virtual IEnumerable<string> EnumerateFiles(string path)
     {
+        if (EnumerateFilesException != null) throw EnumerateFilesException;
         if (_files.TryGetValue(path, out var files))
         {
             return files;
@@ -106,6 +121,7 @@ public class MockFileSystem : IFileSystem
 
     public virtual string GetIniValue(string path, string section, string key)
     {
+        if (GetIniValueException != null) throw GetIniValueException;
         OperationsLog.Add($"GetIniValue: {path}");
         if (_iniValues.TryGetValue($"{path}|{section}|{key}", out var val))
             return val;
@@ -114,6 +130,7 @@ public class MockFileSystem : IFileSystem
 
     public virtual byte[] ReadAllBytes(string path)
     {
+        if (ReadException != null) throw ReadException;
         if (_fileContents.TryGetValue(path, out var content))
             return content;
         return Array.Empty<byte>();
@@ -121,6 +138,7 @@ public class MockFileSystem : IFileSystem
 
     public Stream OpenRead(string path)
     {
+        if (ReadException != null) throw ReadException;
         if (_fileContents.TryGetValue(path, out var content))
             return new MemoryStream(content);
         throw new FileNotFoundException(path);

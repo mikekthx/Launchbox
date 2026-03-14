@@ -1,9 +1,10 @@
 using Launchbox.Helpers;
 using Launchbox.Services;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.System;
@@ -19,7 +20,15 @@ public class SettingsViewModel : ViewModelBase, IDisposable
     public ICommand ResetPositionCommand { get; }
     public ICommand BrowseFolderCommand { get; }
 
-    public ObservableCollection<string> Modifiers { get; } = new() { "Alt", "Ctrl", "Shift", "Win" };
+    private static readonly Dictionary<string, int> ModifierMap = new()
+    {
+        { "Alt", Constants.MOD_ALT },
+        { "Ctrl", Constants.MOD_CONTROL },
+        { "Shift", Constants.MOD_SHIFT },
+        { "Win", Constants.MOD_WIN },
+    };
+
+    public IReadOnlyList<string> Modifiers { get; } = [.. ModifierMap.Keys];
 
     public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
     {
@@ -111,20 +120,12 @@ public class SettingsViewModel : ViewModelBase, IDisposable
     /// </summary>
     public string SelectedModifier
     {
-        get => _settingsService.HotkeyModifiers switch
+        get => ModifierMap.FirstOrDefault(kv => kv.Value == _settingsService.HotkeyModifiers).Key ?? "Alt";
+        set
         {
-            Constants.MOD_CONTROL => "Ctrl",
-            Constants.MOD_SHIFT => "Shift",
-            Constants.MOD_WIN => "Win",
-            _ => "Alt"
-        };
-        set => _settingsService.HotkeyModifiers = value switch
-        {
-            "Ctrl" => Constants.MOD_CONTROL,
-            "Shift" => Constants.MOD_SHIFT,
-            "Win" => Constants.MOD_WIN,
-            _ => Constants.MOD_ALT
-        };
+            if (ModifierMap.TryGetValue(value, out var modifier))
+                _settingsService.HotkeyModifiers = modifier;
+        }
     }
 
     public string HotkeyKeyString

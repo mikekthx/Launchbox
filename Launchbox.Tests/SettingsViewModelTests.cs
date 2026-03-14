@@ -51,14 +51,16 @@ public class SettingsViewModelTests
     {
         var (service, startup, _, vm) = CreateViewModel();
 
+        var tcs = new TaskCompletionSource();
+        service.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsService.IsRunAtStartup))
+                tcs.TrySetResult();
+        };
+
         vm.RunAtStartup = true;
 
-        // Wait for async void property setter to propagate
-        var timeout = DateTime.Now.AddSeconds(1);
-        while (!service.IsRunAtStartup && DateTime.Now < timeout)
-        {
-            await Task.Delay(10, TestContext.Current.CancellationToken);
-        }
+        await tcs.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
         Assert.True(service.IsRunAtStartup);
         Assert.True(startup.IsEnabled);
@@ -130,15 +132,16 @@ public class SettingsViewModelTests
         var (_, _, picker, vm) = CreateViewModel();
         picker.SelectedFolder = @"C:\PickedFolder";
 
-        // Pass a dummy object as window
+        var tcs = new TaskCompletionSource();
+        vm.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsViewModel.ShortcutsPath))
+                tcs.TrySetResult();
+        };
+
         vm.BrowseFolderCommand.Execute(new object());
 
-        // Wait for async void
-        var timeout = DateTime.Now.AddSeconds(1);
-        while (vm.ShortcutsPath != @"C:\PickedFolder" && DateTime.Now < timeout)
-        {
-            await Task.Delay(10, TestContext.Current.CancellationToken);
-        }
+        await tcs.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
         Assert.Equal(@"C:\PickedFolder", vm.ShortcutsPath);
     }
