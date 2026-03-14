@@ -103,9 +103,9 @@ public class MainViewModel : ViewModelBase, IDisposable
         }
         else if (e.PropertyName == nameof(SettingsService.GridSize))
         {
-            OnPropertyChanged(nameof(IconSize));
-            OnPropertyChanged(nameof(ItemHeight));
             OnPropertyChanged(nameof(ItemWidth));
+            OnPropertyChanged(nameof(ItemHeight));
+            OnPropertyChanged(nameof(IconSize));
         }
     }
 

@@ -3,6 +3,7 @@ using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -233,12 +234,14 @@ public class MainViewModelTests
     public void ItemWidth_WhenGridSizeChanges_RaisesPropertyChanged()
     {
         var vm = CreateViewModel();
-        string? changedProperty = null;
-        vm.PropertyChanged += (_, e) => changedProperty = e.PropertyName;
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
 
         _settingsService.GridSize = GridSize.Large;
 
-        Assert.Equal(nameof(MainViewModel.ItemWidth), changedProperty);
+        Assert.Contains(nameof(MainViewModel.ItemWidth), changed);
+        Assert.Contains(nameof(MainViewModel.ItemHeight), changed);
+        Assert.Contains(nameof(MainViewModel.IconSize), changed);
     }
 
     private class ThrowingFileSystem : MockFileSystem
