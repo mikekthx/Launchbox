@@ -16,6 +16,8 @@ public class AsyncSimpleCommand : ICommand
 
     public bool CanExecute(object? parameter) => true;
 
+    // async void is required by ICommand.Execute's synchronous contract. Exceptions
+    // are caught internally; they must not propagate to the caller's synchronous context.
     public async void Execute(object? parameter)
     {
         try
@@ -28,6 +30,8 @@ public class AsyncSimpleCommand : ICommand
         }
     }
 
+    // This command always returns true from CanExecute, so raising CanExecuteChanged
+    // is never needed. The event stubs satisfy the ICommand interface contract.
     public event EventHandler? CanExecuteChanged { add { } remove { } }
 }
 
@@ -42,6 +46,8 @@ public class AsyncSimpleCommand<T> : ICommand
 
     public bool CanExecute(object? parameter) => true;
 
+    // async void is required by ICommand.Execute's synchronous contract. Exceptions
+    // are caught internally; they must not propagate to the caller's synchronous context.
     public async void Execute(object? parameter)
     {
         try
@@ -55,5 +61,7 @@ public class AsyncSimpleCommand<T> : ICommand
         }
     }
 
+    // This command always returns true from CanExecute, so raising CanExecuteChanged
+    // is never needed. The event stubs satisfy the ICommand interface contract.
     public event EventHandler? CanExecuteChanged { add { } remove { } }
 }

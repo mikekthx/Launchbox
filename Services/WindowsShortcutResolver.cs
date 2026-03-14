@@ -55,10 +55,13 @@ public class WindowsShortcutResolver : IShortcutResolver
         {
             link = (IShellLinkW)new ShellLink();
             ((IPersistFile)link).Load(shortcutPath, 0);
+            // Arguments can be longer than MAX_PATH (260); use a larger buffer.
             var sb = new StringBuilder(1024);
             link.GetArguments(sb, sb.Capacity);
             return sb.ToString();
         }
+        // COM resolution can fail for shortcuts pointing to nonexistent or inaccessible targets.
+        // Swallow and return null — a single bad .lnk should not break the entire loading pipeline.
         catch (COMException) { return null; }
         finally { if (link != null) Marshal.ReleaseComObject(link); }
     }
@@ -100,6 +103,8 @@ public class WindowsShortcutResolver : IShortcutResolver
             link.GetPath(sb, sb.Capacity, IntPtr.Zero, 0);
             return sb.ToString();
         }
+        // COM resolution can fail for shortcuts pointing to nonexistent or inaccessible targets.
+        // Swallow and return null — a single bad .lnk should not break the entire loading pipeline.
         catch (COMException)
         {
             return null;

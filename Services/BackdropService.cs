@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Launchbox.Services;
 
+// DWMBlurGlass is a third-party tool that applies custom window blur effects.
+// When active, it conflicts with WinUI's system acrylic backdrop, so we detect it
+// and skip applying our own backdrop to let DWMBlurGlass handle transparency.
 public class BackdropService : IBackdropService
 {
     private readonly IBackdropWindowWrapper _windowWrapper;
@@ -56,7 +59,7 @@ public class BackdropService : IBackdropService
             }
             else
             {
-                // Default behavior
+                // DWMBlurGlass not running — apply system acrylic backdrop.
                 if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
                 {
                     _windowWrapper.SetDesktopAcrylicBackdrop();
@@ -66,7 +69,7 @@ public class BackdropService : IBackdropService
         catch (Exception ex)
         {
             Trace.WriteLine($"Error checking for DWMBlurGlass: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            // Fallback to default
+            // Acrylic not available on this system — no backdrop applied.
             if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
             {
                 _windowWrapper.SetDesktopAcrylicBackdrop();

@@ -48,10 +48,7 @@ public class SettingsService : ObservableObject
 
             if (ShortcutsPath != value)
             {
-                if (!PathSecurity.IsUnsafePath(value))
-                {
-                    _store.SetValue(nameof(ShortcutsPath), value);
-                }
+                _store.SetValue(nameof(ShortcutsPath), value);
                 OnPropertyChanged();
             }
         }
@@ -153,7 +150,7 @@ public class SettingsService : ObservableObject
             }
             else
             {
-                // Revert if failed
+                // Revert: OS denied the startup enable request, so reset the toggle to false.
                 IsRunAtStartup = false;
             }
         }

@@ -4,6 +4,10 @@ using System.Windows.Input;
 
 namespace Launchbox.Helpers;
 
+/// <summary>
+/// Attached property that routes <see cref="ListViewBase.ItemClick"/> to an
+/// <see cref="ICommand"/>, enabling MVVM-style item-click binding without code-behind.
+/// </summary>
 public static class ListViewBaseExtensions
 {
     public static readonly DependencyProperty COMMAND_PROPERTY =
@@ -27,6 +31,7 @@ public static class ListViewBaseExtensions
     {
         if (d is ListViewBase listViewBase)
         {
+            // Unsubscribe first to prevent duplicate handler registration if the command changes.
             listViewBase.ItemClick -= OnItemClick;
 
             if (e.NewValue is ICommand)

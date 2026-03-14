@@ -7,6 +7,8 @@ namespace Launchbox.Services;
 
 public class WinUIStartupService : IStartupService
 {
+    // Must match the Id attribute of <uap:StartupTask> in Package.appxmanifest.
+    // If these diverge, startup registration silently fails.
     private const string TASK_ID = "LaunchboxStartup";
 
     public bool IsSupported => true;

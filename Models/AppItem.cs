@@ -20,6 +20,11 @@ public class AppItem : ObservableObject
         set => SetProperty(ref _path, value);
     }
 
+    /// <summary>
+    /// The extracted icon image. Typed as <see cref="object"/> to keep this model WinUI-free,
+    /// enabling unit testing without a WinUI application host. The view casts it to
+    /// <c>ImageSource</c> via <c>{x:Bind (media:ImageSource)Icon}</c>.
+    /// </summary>
     public object? Icon
     {
         get => _icon;

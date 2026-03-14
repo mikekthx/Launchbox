@@ -18,6 +18,8 @@ public class WindowService : IWindowService, IDisposable
     private IntPtr _hWnd;
     private IntPtr _oldWndProc;
     private WndProcDelegate? _wndProcDelegate;
+    // True once the window has been shown at a real screen position (not the initial -10000,-10000).
+    // Prevents treating the off-screen start position as a valid saved position.
     private bool _hasPositioned;
     private SettingsWindow? _settingsWindow;
     private int _currentMod;
@@ -141,6 +143,8 @@ public class WindowService : IWindowService, IDisposable
             ToggleVisibility();
             return IntPtr.Zero;
         }
+        // Suppress: prevents the default double-click-title-bar maximize behavior.
+        // Launchbox has no title bar and maximizing would break the layout.
         if (msg == NativeMethods.WM_NCLBUTTONDBLCLK) return IntPtr.Zero;
 
         return NativeMethods.CallWindowProc(_oldWndProc, hWnd, msg, wParam, lParam);
@@ -355,6 +359,8 @@ public class WindowService : IWindowService, IDisposable
             if (_positionManager.TryGetWindowPosition(out int x, out int y, out int w, out int h))
             {
                 var rect = new Windows.Graphics.RectInt32(x, y, w, h);
+                // Fallback.None returns null if the saved position is off all connected displays
+                // (e.g., after disconnecting a monitor). We detect this and center the window instead.
                 var displayArea = DisplayArea.GetFromRect(rect, DisplayAreaFallback.None);
                 if (displayArea != null)
                 {

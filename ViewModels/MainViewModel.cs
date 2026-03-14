@@ -111,6 +111,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
         _windowService.VisibilityChanged += WindowService_VisibilityChanged;
 
+        // FilteredApps and HasNoMatches are computed from Apps. WinUI data binding
+        // won't re-evaluate them automatically when Apps changes, so we notify explicitly.
         Apps.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(FilteredApps));
@@ -152,7 +154,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// </summary>
     public async Task LoadAppsAsync()
     {
-        // Cancel any in-flight load
+        // Debounce: cancel any in-flight load so only the latest call wins.
         _loadCts?.Cancel();
         _loadCts?.Dispose();
         var cts = new CancellationTokenSource();

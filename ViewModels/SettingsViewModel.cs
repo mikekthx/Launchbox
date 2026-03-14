@@ -50,7 +50,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable
 
         _settingsService.PropertyChanged += OnServicePropertyChanged;
 
-        // Ensure startup status is fresh
+        // Read the OS startup task state asynchronously — cannot be done synchronously at construction time.
         _ = InitializeSettingsAsync();
 
         ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());

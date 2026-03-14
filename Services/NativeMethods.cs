@@ -31,7 +31,6 @@ public static class NativeMethods
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetPrivateProfileString(string s, string k, string d, ref char r, int z, string f);
 
-    // From MainWindow.xaml.cs
     public const int SW_RESTORE = 9;
 
     /// <summary>
@@ -67,6 +66,8 @@ public static class NativeMethods
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
+    // SetWindowLongPtr is SetWindowLong on 32-bit and SetWindowLongPtr on 64-bit.
+    // We provide both and let the runtime select via the marshaller.
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "SetWindowLongPtr", CharSet = CharSet.Unicode)]
     private static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong);
 

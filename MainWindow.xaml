@@ -86,6 +86,7 @@
             </Button>
         </StackPanel>
 
+        <!-- Tag relays ViewModel into the DataTemplate (x:DataType=AppItem blocks direct ViewModel binding) -->
         <GridView x:Name="AppGrid"
                   Grid.Row="0"
                   AutomationProperties.Name="Shortcuts Grid"

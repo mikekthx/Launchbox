@@ -21,6 +21,7 @@ public class WinUIFilePickerService : IFilePickerService
         {
             var picker = new FolderPicker();
             picker.SuggestedStartLocation = PickerLocationId.Desktop;
+            // FolderPicker requires at least one FileTypeFilter entry; without it the dialog will not open.
             picker.FileTypeFilter.Add("*");
 
             var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(OwnerWindow);

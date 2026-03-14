@@ -5,6 +5,12 @@ using System.ComponentModel;
 
 namespace Launchbox.Helpers;
 
+/// <summary>
+/// An <see cref="ObservableCollection{T}"/> that suppresses per-item
+/// <see cref="CollectionChanged"/> notifications during batch operations,
+/// firing a single <c>Reset</c> notification at the end. This prevents
+/// O(n) UI updates when loading large shortcut collections.
+/// </summary>
 public class BulkObservableCollection<T> : ObservableCollection<T>
 {
     private bool _isSuppressingNotifications;

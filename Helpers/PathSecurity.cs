@@ -98,7 +98,8 @@ public static class PathSecurity
             // We manually split by backslash if running on non-Windows (or just always for safety)
             // to ensure we get just the filename.
 
-            // Normalize separators first? No, string manipulation is safer.
+            // String manipulation is used directly rather than normalizing separators first
+            // to avoid introducing new path traversal vectors via the normalization step itself.
             int lastSlash = path.LastIndexOfAny(new[] { '\\', '/' });
             string fileName;
 

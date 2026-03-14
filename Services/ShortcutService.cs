@@ -17,7 +17,7 @@ public class ShortcutService : IShortcutService
     {
         if (allowedExtensions == null || !_fileSystem.DirectoryExists(folderPath))
         {
-            return null;
+            return null; // Folder does not exist (distinct from empty: no shortcuts in folder)
         }
 
         try

@@ -52,7 +52,11 @@ public sealed partial class MainWindow : Window
         _backdropService = new BackdropService(processService, backdropWrapper);
 
         this.InitializeComponent();
+        // DataContext required for {Binding} on out-of-tree elements (TrayIcon, ContextFlyout)
+        // that cannot use {x:Bind} because they are not in the visual tree.
         RootGrid.DataContext = this;
+        // AppGrid.Tag relays ViewModel to the DataTemplate, which cannot reach ViewModel directly
+        // because x:DataType="models:AppItem" restricts the binding context to AppItem.
         AppGrid.Tag = ViewModel;
 
         _ = _backdropService.UpdateBackdropAsync();
@@ -70,12 +74,12 @@ public sealed partial class MainWindow : Window
         RootGrid.PointerCanceled += RootGrid_PointerReleased;
         RootGrid.PointerCaptureLost += RootGrid_PointerCaptureLost;
 
-        // 5. EVENT HOOKS
+        // 3. EVENT HOOKS
         this.Activated += MainWindow_Activated;
         this.Closed += MainWindow_Closed;
         _windowService.HotkeyRegistrationFailed += WindowService_HotkeyRegistrationFailed;
 
-        // 6. LOAD APPS
+        // 4. LOAD APPS
         if (ViewModel.LoadAppsCommand.CanExecute(null))
         {
             ViewModel.LoadAppsCommand.Execute(null);
