@@ -75,7 +75,7 @@
 - [x] Tray context menu 'Show' label is static -- should toggle to 'Hide' when visible (MainWindow.xaml:26)
 - [x] SettingsWindow has no explicit size -- may render poorly on some displays
 - [x] No AppItem.ToString() override for debugging/logging (AppItem.cs)
-- [ ] Missing test coverage: AppItem PropertyChanged, MainViewModel.Dispose, LaunchApp with invalid params
+- [x] Missing test coverage: AppItem PropertyChanged, MainViewModel.Dispose, LaunchApp with invalid params
 - [x] No [Trait] categorization on tests -- performance/security tests can't be filtered (PerformanceBenchmarkTests)
 - [x] Duplicated CreatePng/CreateIco helpers in IconServiceTests and PerformanceBenchmarkTests -- extract to shared TestDataHelpers
 - [x] BooleanToVisibilityConverter.ConvertBack throws NotImplementedException -- should return DependencyProperty.UnsetValue
