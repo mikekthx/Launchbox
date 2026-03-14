@@ -97,6 +97,27 @@ public class SettingsService : ObservableObject
         }
     }
 
+    public GridSize GridSize
+    {
+        get
+        {
+            if (_store.TryGetValue(nameof(GridSize), out var val) && val is string s
+                && Enum.TryParse<GridSize>(s, out var parsed))
+            {
+                return parsed;
+            }
+            return GridSize.Medium;
+        }
+        set
+        {
+            if (GridSize != value)
+            {
+                _store.SetValue(nameof(GridSize), value.ToString());
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private bool _isRunAtStartup;
     public bool IsRunAtStartup
     {

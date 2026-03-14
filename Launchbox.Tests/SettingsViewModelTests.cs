@@ -160,4 +160,37 @@ public class SettingsViewModelTests
 
         Assert.Equal(oldPath, vm.ShortcutsPath);
     }
+
+    [Fact]
+    public void GridSize_Default_IsMedium()
+    {
+        var store = new MockSettingsStore();
+        var service = new SettingsService(store, new MockStartupService());
+        Assert.Equal(GridSize.Medium, service.GridSize);
+    }
+
+    [Fact]
+    public void GridSize_WhenSet_Persists()
+    {
+        var store = new MockSettingsStore();
+        var service = new SettingsService(store, new MockStartupService());
+        service.GridSize = GridSize.Large;
+
+        // Re-read from same store
+        var service2 = new SettingsService(store, new MockStartupService());
+        Assert.Equal(GridSize.Large, service2.GridSize);
+    }
+
+    [Fact]
+    public void GridSize_WhenSet_RaisesPropertyChanged()
+    {
+        var store = new MockSettingsStore();
+        var service = new SettingsService(store, new MockStartupService());
+        string? changedProperty = null;
+        service.PropertyChanged += (_, e) => changedProperty = e.PropertyName;
+
+        service.GridSize = GridSize.Small;
+
+        Assert.Equal(nameof(SettingsService.GridSize), changedProperty);
+    }
 }
