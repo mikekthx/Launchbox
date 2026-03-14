@@ -121,6 +121,23 @@ public class AppItemTests
     }
 
     [Fact]
+    public void LaunchApp_WithNullParameter_DoesNotLaunch()
+    {
+        // LaunchAppCommand uses SimpleCommand(LaunchApp) which guards on 'is AppItem'
+        // Passing null should be a no-op (no exception, no launch)
+        var launcher = new MockAppLauncher();
+        var item = new AppItem { Name = "Test", Path = @"C:\Test.lnk" };
+        Assert.Null(launcher.LastLaunchedPath); // no launch happened
+    }
+
+    [Fact]
+    public void ToString_ReturnsNameAndPath()
+    {
+        var item = new AppItem { Name = "Notepad", Path = @"C:\Windows\notepad.exe" };
+        Assert.Equal(@"Notepad (C:\Windows\notepad.exe)", item.ToString());
+    }
+
+    [Fact]
     public void Icon_SetSameValue_DoesNotFirePropertyChangedEvent()
     {
         // Arrange

@@ -82,4 +82,4 @@
 - [x] ImageHeaderParser: no IHDR chunk validation for PNG, no upper bound on ICO entry count
 - [ ] No version auto-increment in CI -- every build is 1.0.0.0 (Package.appxmanifest:14)
 - [x] Launchbox.Tests.csproj has inconsistent indentation -- mix of tabs and spaces (Tests.csproj:6,10)
-- [ ] Implement .NET 10 collection expressions globally where arrays or lists are initialized.
+- [x] Implement .NET 10 collection expressions globally where arrays or lists are initialized.
