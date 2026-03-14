@@ -244,6 +244,81 @@ public class MainViewModelTests
         Assert.Contains(nameof(MainViewModel.IconSize), changed);
     }
 
+    [Fact]
+    public async Task FilterText_WhenSet_FiltersAppsByName()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Gamma.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "alp";
+
+        Assert.Single(vm.FilteredApps);
+        Assert.Equal("Alpha", vm.FilteredApps.First().Name);
+    }
+
+    [Fact]
+    public async Task FilterText_WhenEmpty_ReturnsAllApps()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "";
+
+        Assert.Equal(2, vm.FilteredApps.Count());
+    }
+
+    [Fact]
+    public async Task FilterText_CaseInsensitive_MatchesRegardlessOfCase()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "ALPHA";
+
+        Assert.Single(vm.FilteredApps);
+    }
+
+    [Fact]
+    public async Task FilterText_WithNoMatch_SetsHasNoMatches()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "zzz";
+
+        Assert.True(vm.HasNoMatches);
+    }
+
+    [Fact]
+    public void HasNoMatches_WhenFilterTextEmpty_IsFalse()
+    {
+        var vm = CreateViewModel();
+        vm.FilterText = "";
+        Assert.False(vm.HasNoMatches);
+    }
+
+    [Fact]
+    public async Task FilteredApps_AfterAppsReload_ReflectsNewCollection()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        vm.FilterText = "alp";
+        Assert.Single(vm.FilteredApps);
+
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "AlphaTwo.lnk"));
+        await vm.LoadAppsAsync();
+
+        Assert.Equal(2, vm.FilteredApps.Count());
+    }
+
     private class ThrowingFileSystem : MockFileSystem
     {
         public override void CreateDirectory(string path)

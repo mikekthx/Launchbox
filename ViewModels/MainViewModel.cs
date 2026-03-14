@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -33,6 +34,30 @@ public class MainViewModel : ViewModelBase, IDisposable
         get => _isEmpty;
         private set => SetProperty(ref _isEmpty, value);
     }
+
+    private string _filterText = string.Empty;
+    public string FilterText
+    {
+        get => _filterText;
+        set
+        {
+            if (_filterText != value)
+            {
+                _filterText = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FilteredApps));
+                OnPropertyChanged(nameof(HasNoMatches));
+            }
+        }
+    }
+
+    public IEnumerable<AppItem> FilteredApps =>
+        string.IsNullOrEmpty(_filterText)
+            ? Apps
+            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase));
+
+    public bool HasNoMatches =>
+        !string.IsNullOrEmpty(_filterText) && !FilteredApps.Any();
 
     public int ItemWidth => _settingsService.GridSize switch
     {
@@ -85,6 +110,12 @@ public class MainViewModel : ViewModelBase, IDisposable
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
         _windowService.VisibilityChanged += WindowService_VisibilityChanged;
+
+        Apps.CollectionChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(FilteredApps));
+            OnPropertyChanged(nameof(HasNoMatches));
+        };
 
         LoadAppsCommand = new AsyncSimpleCommand(LoadAppsAsync);
         LaunchAppCommand = new SimpleCommand(LaunchApp);
