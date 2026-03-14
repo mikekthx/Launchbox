@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Launchbox.Helpers;
 using Launchbox.Models;
 using Launchbox.Services;
@@ -10,11 +12,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace Launchbox.ViewModels;
 
-public class MainViewModel : ViewModelBase, IDisposable
+public partial class MainViewModel : ObservableObject, IDisposable
 {
     private readonly IShortcutService _shortcutService;
     private readonly IIconService _iconService;
@@ -41,10 +42,8 @@ public class MainViewModel : ViewModelBase, IDisposable
         get => _filterText;
         set
         {
-            if (_filterText != value)
+            if (SetProperty(ref _filterText, value))
             {
-                _filterText = value;
-                OnPropertyChanged();
                 OnPropertyChanged(nameof(FilteredApps));
                 OnPropertyChanged(nameof(HasNoMatches));
             }
@@ -82,13 +81,6 @@ public class MainViewModel : ViewModelBase, IDisposable
 
     public string ToggleWindowText => _windowService.IsVisible ? "Hide" : "Show";
 
-    public ICommand LoadAppsCommand { get; }
-    public ICommand LaunchAppCommand { get; }
-    public ICommand OpenShortcutsFolderCommand { get; }
-    public ICommand ToggleWindowCommand { get; }
-    public ICommand ExitCommand { get; }
-    public ICommand OpenSettingsCommand { get; }
-
     public MainViewModel(
         IShortcutService shortcutService,
         IIconService iconService,
@@ -119,12 +111,6 @@ public class MainViewModel : ViewModelBase, IDisposable
             OnPropertyChanged(nameof(HasNoMatches));
         };
 
-        LoadAppsCommand = new AsyncSimpleCommand(LoadAppsAsync);
-        LaunchAppCommand = new SimpleCommand(LaunchApp);
-        OpenShortcutsFolderCommand = new SimpleCommand(OpenShortcutsFolder);
-        ToggleWindowCommand = new SimpleCommand(() => _windowService.ToggleVisibility());
-        ExitCommand = new SimpleCommand(() => _windowService.Exit());
-        OpenSettingsCommand = new SimpleCommand(() => _windowService.OpenSettings());
     }
 
     private void SettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -152,6 +138,7 @@ public class MainViewModel : ViewModelBase, IDisposable
     /// Utilizes Parallel.ForEachAsync with bounded parallelism to prevent ThreadPool starvation
     /// during blocking GDI+ extraction operations, while gracefully handling cancellation.
     /// </summary>
+    [RelayCommand(AllowConcurrentExecutions = true)]
     public async Task LoadAppsAsync()
     {
         // Debounce: cancel any in-flight load so only the latest call wins.
@@ -242,6 +229,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         }
     }
 
+    [RelayCommand]
     private void LaunchApp(object? parameter)
     {
         if (parameter is AppItem app)
@@ -258,6 +246,7 @@ public class MainViewModel : ViewModelBase, IDisposable
         }
     }
 
+    [RelayCommand]
     private void OpenShortcutsFolder()
     {
         try
@@ -274,6 +263,15 @@ public class MainViewModel : ViewModelBase, IDisposable
             Trace.WriteLine($"Failed to open shortcuts folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
+
+    [RelayCommand]
+    private void ToggleWindow() => _windowService.ToggleVisibility();
+
+    [RelayCommand]
+    private void Exit() => _windowService.Exit();
+
+    [RelayCommand]
+    private void OpenSettings() => _windowService.OpenSettings();
 
     public void Dispose()
     {

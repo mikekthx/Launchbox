@@ -4,9 +4,13 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
+    <!-- Disable CsWinRT AOT source generator to prevent duplicate partial class members
+         when CommunityToolkit.Mvvm source generators run on file-linked ViewModels. -->
+    <CsWinRTAotOptimizerEnabled>false</CsWinRTAotOptimizerEnabled>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
@@ -22,8 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Helpers\SimpleCommand.cs" Link="Helpers\SimpleCommand.cs" />
-    <Compile Include="..\Helpers\AsyncSimpleCommand.cs" Link="Helpers\AsyncSimpleCommand.cs" />
     <Compile Include="..\Helpers\PathSecurity.cs" Link="Helpers\PathSecurity.cs" />
     <Compile Include="..\Services\ISettingsStore.cs" Link="Services\ISettingsStore.cs" />
     <Compile Include="..\Services\ISettingsContainer.cs" Link="Services\ISettingsContainer.cs" />
@@ -66,8 +68,7 @@
     <Compile Include="..\ViewModels\SettingsViewModel.cs" Link="ViewModels\SettingsViewModel.cs" />
     <Compile Include="..\Helpers\BooleanToVisibilityConverter.cs" Link="Helpers\BooleanToVisibilityConverter.cs" />
     <Compile Include="..\Helpers\BulkObservableCollection.cs" Link="Helpers\BulkObservableCollection.cs" />
-    <Compile Include="..\Helpers\ObservableObject.cs" Link="Helpers\ObservableObject.cs" />
-    <Compile Include="..\ViewModels\ViewModelBase.cs" Link="ViewModels\ViewModelBase.cs" />
+
     <Compile Include="..\Services\BackdropService.cs" Link="Services\BackdropService.cs" />
     <Compile Include="..\Services\IBackdropService.cs" Link="Services\IBackdropService.cs" />
     <Compile Include="..\Services\IProcessService.cs" Link="Services\IProcessService.cs" />

@@ -1,4 +1,4 @@
-using Launchbox.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Launchbox.Models;
 

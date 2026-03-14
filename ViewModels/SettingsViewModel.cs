@@ -1,3 +1,5 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Launchbox.Helpers;
 using Launchbox.Services;
 using System;
@@ -6,19 +8,15 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Windows.System;
 
 namespace Launchbox.ViewModels;
 
-public class SettingsViewModel : ViewModelBase, IDisposable
+public partial class SettingsViewModel : ObservableObject, IDisposable
 {
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
     private readonly IFilePickerService _filePickerService;
-
-    public ICommand ResetPositionCommand { get; }
-    public ICommand BrowseFolderCommand { get; }
 
     private static readonly Dictionary<string, int> MODIFIER_MAP = new()
     {
@@ -52,11 +50,9 @@ public class SettingsViewModel : ViewModelBase, IDisposable
 
         // Read the OS startup task state asynchronously — cannot be done synchronously at construction time.
         _ = InitializeSettingsAsync();
-
-        ResetPositionCommand = new SimpleCommand(() => _windowService.ResetPosition());
-        BrowseFolderCommand = new AsyncSimpleCommand(BrowseFolderAsync);
     }
 
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task BrowseFolderAsync()
     {
         try
@@ -185,6 +181,9 @@ public class SettingsViewModel : ViewModelBase, IDisposable
             OnPropertyChanged(nameof(HotkeyKeyString));
         }
     }
+
+    [RelayCommand]
+    private void ResetPosition() => _windowService.ResetPosition();
 
     public void Dispose()
     {

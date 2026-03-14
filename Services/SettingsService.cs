@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Launchbox.Helpers;
 using System;
 using System.Diagnostics;
