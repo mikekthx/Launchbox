@@ -102,7 +102,7 @@ public class SettingsService : ObservableObject
         get
         {
             if (_store.TryGetValue(nameof(GridSize), out var val) && val is string s
-                && Enum.TryParse<GridSize>(s, out var parsed))
+                && Enum.TryParse<GridSize>(s, ignoreCase: true, out var parsed))
             {
                 return parsed;
             }
