@@ -57,12 +57,17 @@ Launchbox/
 ├── SettingsWindow.xaml(.cs)    # Settings dialog UI
 ├── Launchbox.csproj            # Project configuration
 ├── Helpers/                    # Utility classes and constants
+│   ├── AsyncSimpleCommand.cs   # Async ICommand implementation
+│   ├── BooleanToVisibilityConverter.cs
+│   ├── BulkObservableCollection.cs # ObservableCollection with batch-update support
 │   ├── Constants.cs            # Global constants (hotkey, window size, etc.)
+│   ├── GridSize.cs             # Small/Medium/Large grid size enum
 │   ├── IconHelper.cs           # Icon extraction helpers
 │   ├── ImageHeaderParser.cs    # Image format detection
+│   ├── ListViewBaseExtensions.cs # Attached property for ItemClick → ICommand binding
+│   ├── ObservableObject.cs     # Base INotifyPropertyChanged implementation
 │   ├── PathSecurity.cs         # Path validation and sanitization
-│   ├── SimpleCommand.cs        # ICommand implementation
-│   └── BooleanToVisibilityConverter.cs
+│   └── SimpleCommand.cs        # ICommand implementation
 ├── Models/                     # Data models
 │   └── AppItem.cs              # Application shortcut model
 ├── Services/                   # Platform-agnostic interfaces and implementations
@@ -78,6 +83,7 @@ Launchbox/
 │   ├── IWindowService.cs       # Window management abstraction
 │   └── ...                     # WinUI implementations (WinUI*.cs)
 ├── ViewModels/                 # MVVM ViewModels
+│   ├── ViewModelBase.cs        # Base class for ViewModels
 │   ├── MainViewModel.cs        # Core application logic (loading/launching apps)
 │   └── SettingsViewModel.cs    # Settings page logic
 ├── Launchbox.Tests/            # xUnit test project (file-linked)
@@ -103,10 +109,13 @@ Launchbox/
 | Parameters/Locals          | camelCase        | `sender`, `displayArea`       |
 
 ### Imports Order
-1. `Microsoft.UI.*` namespaces
-2. `System.*` namespaces
-3. `Windows.*` namespaces
-4. Third-party, then project namespaces
+
+Alphabetical by namespace (enforced by `dotnet format`):
+
+1. `Launchbox.*` (project namespaces)
+2. `Microsoft.UI.*`
+3. `System.*`
+4. `Windows.*`
 
 Use type aliases for disambiguation:
 ```csharp

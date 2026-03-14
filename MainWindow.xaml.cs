@@ -164,6 +164,7 @@ public sealed partial class MainWindow : Window
         if (args.WindowActivationState != WindowActivationState.Deactivated)
         {
             _ = _backdropService.UpdateBackdropAsync();
+            ViewModel.FilterText = string.Empty;
             SearchBox.Focus(FocusState.Programmatic);
         }
     }
