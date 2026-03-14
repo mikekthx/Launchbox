@@ -305,6 +305,15 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void HasNoMatches_WhenAppsEmptyAndFilterActive_IsFalse()
+    {
+        // No files added — Apps is empty
+        var vm = CreateViewModel();
+        vm.FilterText = "anything";
+        Assert.False(vm.HasNoMatches);
+    }
+
+    [Fact]
     public async Task FilteredApps_AfterAppsReload_ReflectsNewCollection()
     {
         _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));

@@ -57,7 +57,7 @@ public class MainViewModel : ViewModelBase, IDisposable
             : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase));
 
     public bool HasNoMatches =>
-        !string.IsNullOrEmpty(_filterText) && !FilteredApps.Any();
+        Apps.Count > 0 && !string.IsNullOrEmpty(_filterText) && !FilteredApps.Any();
 
     public int ItemWidth => _settingsService.GridSize switch
     {

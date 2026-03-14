@@ -141,7 +141,7 @@
 
         <TextBox x:Name="SearchBox"
                  Grid.Row="1"
-                 Text="{x:Bind ViewModel.FilterText, Mode=TwoWay}"
+                 Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  PlaceholderText="Search..."
                  BorderThickness="0"
                  KeyDown="SearchBox_KeyDown" />
