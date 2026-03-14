@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Superpowers brainstorm session files
+.superpowers/
+
 # dotenv files
 .env
 
