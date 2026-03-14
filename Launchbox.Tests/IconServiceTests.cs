@@ -142,34 +142,8 @@ public class IconServiceTests
         Assert.Equal(pngBytes, result);
     }
 
-    private byte[] CreatePng(int width, int height)
-    {
-        var header = new byte[]
-        {
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // Sig
-            0x00, 0x00, 0x00, 0x0D, // IHDR Len
-            0x49, 0x48, 0x44, 0x52, // IHDR Type
-            0, 0, 0, (byte)width,   // Width (Big Endian - simplified for test)
-            0, 0, 0, (byte)height   // Height
-        };
-        // Pad to > 24 bytes
-        var result = new byte[30];
-        Array.Copy(header, result, header.Length);
-        return result;
-    }
-
-    private byte[] CreateIco(int width, int height)
-    {
-        var header = new byte[]
-        {
-            0, 0, // Reserved
-            1, 0, // Type 1 (Icon)
-            1, 0, // Count 1
-            (byte)width, (byte)height, // Entry 1: W, H
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 // Rest of entry (14 bytes needed)
-        };
-        return header;
-    }
+    private static byte[] CreatePng(int width, int height) => TestDataHelpers.CreatePng(width, height);
+    private static byte[] CreateIco(int width, int height) => TestDataHelpers.CreateIco(width, height);
 
     [Fact]
     public void ExtractIconBytes_RefreshesCache_WhenFileUpdated()

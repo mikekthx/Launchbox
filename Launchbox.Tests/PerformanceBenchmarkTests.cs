@@ -51,37 +51,5 @@ public class PerformanceBenchmarkTests
         Assert.True(elapsedMs < 500, $"ImageHeaderParser is too slow! Took {elapsedMs}ms for {iterations} iterations.");
     }
 
-    private byte[] CreatePng(int width, int height)
-    {
-        var header = new byte[]
-        {
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // Sig
-            0x00, 0x00, 0x00, 0x0D, // IHDR Len
-            0x49, 0x48, 0x44, 0x52  // IHDR Type
-            // ... (Width/Height set below)
-        };
-
-        // Pad to > 24 bytes
-        var result = new byte[100];
-        Array.Copy(header, result, header.Length);
-
-        // Header layout:
-        // 0-7: Sig
-        // 8-11: Len
-        // 12-15: Type (IHDR)
-        // 16-19: Width (Big Endian)
-        // 20-23: Height (Big Endian)
-
-        result[16] = (byte)((width >> 24) & 0xFF);
-        result[17] = (byte)((width >> 16) & 0xFF);
-        result[18] = (byte)((width >> 8) & 0xFF);
-        result[19] = (byte)(width & 0xFF);
-
-        result[20] = (byte)((height >> 24) & 0xFF);
-        result[21] = (byte)((height >> 16) & 0xFF);
-        result[22] = (byte)((height >> 8) & 0xFF);
-        result[23] = (byte)(height & 0xFF);
-
-        return result;
-    }
+    private static byte[] CreatePng(int width, int height) => TestDataHelpers.CreatePng(width, height);
 }

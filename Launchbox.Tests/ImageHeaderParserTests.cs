@@ -26,7 +26,7 @@ public class ImageHeaderParserTests
     public void GetPngDimensions_ReturnsCorrectDimensions_ForLargeMultiByteDimensions()
     {
         // 1920x1080 — requires all 4 bytes of big-endian encoding
-        var data = CreatePngMultiByte(1920, 1080);
+        var data = CreatePng(1920, 1080);
         using var stream = new MemoryStream(data);
 
         var result = ImageHeaderParser.GetPngDimensions(stream);
@@ -240,47 +240,8 @@ public class ImageHeaderParserTests
 
     // --- Helper methods ---
 
-    private static byte[] CreatePng(int width, int height)
-    {
-        byte[] header =
-        [
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
-            0x00, 0x00, 0x00, 0x0D,                             // IHDR chunk length
-            0x49, 0x48, 0x44, 0x52,                             // IHDR chunk type
-            0, 0, 0, (byte)width,                               // Width (big-endian)
-            0, 0, 0, (byte)height,                              // Height (big-endian)
-        ];
-        var result = new byte[30];
-        Array.Copy(header, result, header.Length);
-        return result;
-    }
-
-    private static byte[] CreatePngMultiByte(int width, int height)
-    {
-        byte[] header =
-        [
-            0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, // PNG signature
-            0x00, 0x00, 0x00, 0x0D,                             // IHDR chunk length
-            0x49, 0x48, 0x44, 0x52,                             // IHDR chunk type
-            (byte)(width >> 24), (byte)(width >> 16), (byte)(width >> 8), (byte)width,
-            (byte)(height >> 24), (byte)(height >> 16), (byte)(height >> 8), (byte)height,
-        ];
-        var result = new byte[30];
-        Array.Copy(header, result, header.Length);
-        return result;
-    }
-
-    private static byte[] CreateIco(int width, int height)
-    {
-        byte[] data =
-        [
-            0, 0,                                                   // Reserved
-            1, 0,                                                   // Type = Icon
-            1, 0,                                                   // Count = 1
-            (byte)width, (byte)height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Entry (16 bytes)
-        ];
-        return data;
-    }
+    private static byte[] CreatePng(int width, int height) => TestDataHelpers.CreatePng(width, height);
+    private static byte[] CreateIco(int width, int height) => TestDataHelpers.CreateIco(width, height);
 
     private static byte[] CreateMultiEntryIco(params (int Width, int Height)[] entries)
     {
