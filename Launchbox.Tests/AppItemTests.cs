@@ -123,7 +123,7 @@ public class AppItemTests
     [Fact]
     public void LaunchApp_WithNullParameter_DoesNotLaunch()
     {
-        // LaunchAppCommand uses SimpleCommand(LaunchApp) which guards on 'is AppItem'
+        // LaunchAppCommand uses RelayCommand(LaunchApp) which guards on 'is AppItem'
         // Passing null should be a no-op (no exception, no launch)
         var launcher = new MockAppLauncher();
         var item = new AppItem { Name = "Test", Path = @"C:\Test.lnk" };

@@ -66,8 +66,7 @@ Key services:
 
 `Helpers/` contains shared utilities:
 - **`Constants.cs`** — Global constants: window dimensions, hotkey modifiers (`MOD_ALT`, `MOD_CONTROL`, `MOD_SHIFT`, `MOD_WIN`), key codes, icon sizes, allowed extensions.
-- **`SimpleCommand` / `AsyncSimpleCommand`** — `ICommand` implementations for MVVM binding.
-- **`ObservableObject`** — Base `INotifyPropertyChanged` implementation.
+- **CommunityToolkit.Mvvm** — Provides `ObservableObject` base class and `[RelayCommand]` / `[ObservableProperty]` source generators. New commands should use `[RelayCommand]` on a private method.
 - **`BulkObservableCollection`** — `ObservableCollection` with batch-update support (suppresses per-item notifications).
 - **`PathSecurity`** — Path traversal validation.
 - **`IconHelper`** — Icon extraction helpers.

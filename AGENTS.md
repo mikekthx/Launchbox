@@ -57,7 +57,6 @@ Launchbox/
 ├── SettingsWindow.xaml(.cs)    # Settings dialog UI
 ├── Launchbox.csproj            # Project configuration
 ├── Helpers/                    # Utility classes and constants
-│   ├── AsyncSimpleCommand.cs   # Async ICommand implementation
 │   ├── BooleanToVisibilityConverter.cs
 │   ├── BulkObservableCollection.cs # ObservableCollection with batch-update support
 │   ├── Constants.cs            # Global constants (hotkey, window size, etc.)
@@ -65,9 +64,7 @@ Launchbox/
 │   ├── IconHelper.cs           # Icon extraction helpers
 │   ├── ImageHeaderParser.cs    # Image format detection
 │   ├── ListViewBaseExtensions.cs # Attached property for ItemClick → ICommand binding
-│   ├── ObservableObject.cs     # Base INotifyPropertyChanged implementation
-│   ├── PathSecurity.cs         # Path validation and sanitization
-│   └── SimpleCommand.cs        # ICommand implementation
+│   └── PathSecurity.cs         # Path validation and sanitization
 ├── Models/                     # Data models
 │   └── AppItem.cs              # Application shortcut model
 ├── Services/                   # Platform-agnostic interfaces and implementations
@@ -82,8 +79,7 @@ Launchbox/
 │   ├── IVisualTreeService.cs   # Visual tree traversal abstraction
 │   ├── IWindowService.cs       # Window management abstraction
 │   └── ...                     # WinUI implementations (WinUI*.cs)
-├── ViewModels/                 # MVVM ViewModels
-│   ├── ViewModelBase.cs        # Base class for ViewModels
+├── ViewModels/                 # MVVM ViewModels (use CommunityToolkit.Mvvm source generators)
 │   ├── MainViewModel.cs        # Core application logic (loading/launching apps)
 │   └── SettingsViewModel.cs    # Settings page logic
 ├── Launchbox.Tests/            # xUnit test project (file-linked)
@@ -251,6 +247,7 @@ settings["Key"] = value;
 | -------------------------------- | ----------------------- |
 | Microsoft.WindowsAppSDK 1.8      | WinUI 3 framework       |
 | Microsoft.Windows.SDK.BuildTools | Windows SDK build tools |
+| CommunityToolkit.Mvvm 8.4.x      | MVVM source generators  |
 | H.NotifyIcon.WinUI               | System tray support     |
 | System.Drawing.Common            | Icon extraction         |
 
@@ -259,7 +256,7 @@ settings["Key"] = value;
 ### MVVM Pattern
 The application follows the Model-View-ViewModel (MVVM) pattern:
 - **View (`MainWindow.xaml`):** Handles UI layout, window management, hotkeys, and tray icon. Binds to `MainViewModel`.
-- **ViewModel (`MainViewModel.cs`):** Encapsulates business logic (scanning shortcuts, filtering extensions, launching apps). It is platform-agnostic and uses interfaces for platform services.
+- **ViewModel (`MainViewModel.cs`):** Encapsulates business logic (scanning shortcuts, filtering extensions, launching apps). It is platform-agnostic and uses interfaces for platform services. Commands use `[RelayCommand]` source generators from CommunityToolkit.Mvvm.
 - **Model (`Models/AppItem.cs`):** Represents an application shortcut. Uses `object` for the Icon property to avoid dependency on WinUI types, allowing for easier testing.
 
 ### Service Abstraction
