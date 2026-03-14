@@ -15,6 +15,10 @@
         <Grid.Resources>
             <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
         <tb:TaskbarIcon x:Name="TrayIcon"
                         AutomationProperties.Name="Launchbox System Tray Icon"
@@ -50,7 +54,9 @@
             </tb:TaskbarIcon.ContextFlyout>
         </tb:TaskbarIcon>
 
-        <StackPanel HorizontalAlignment="Center"
+        <StackPanel Grid.Row="0"
+                    Grid.RowSpan="2"
+                    HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
                     Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -80,15 +86,16 @@
             </Button>
         </StackPanel>
 
-        <GridView x:Name="AppGrid" 
+        <GridView x:Name="AppGrid"
+                  Grid.Row="0"
                   AutomationProperties.Name="Shortcuts Grid"
                   Padding="20"
                   Background="Transparent"
-                  SelectionMode="None" 
-                  IsItemClickEnabled="True" 
+                  SelectionMode="None"
+                  IsItemClickEnabled="True"
                   Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
-                  ItemsSource="{x:Bind ViewModel.Apps, Mode=OneWay}"
+                  ItemsSource="{x:Bind ViewModel.FilteredApps, Mode=OneWay}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True">
@@ -131,5 +138,21 @@
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
+
+        <TextBox x:Name="SearchBox"
+                 Grid.Row="1"
+                 Text="{x:Bind ViewModel.FilterText, Mode=TwoWay}"
+                 PlaceholderText="Search..."
+                 BorderThickness="0"
+                 KeyDown="SearchBox_KeyDown" />
+
+        <TextBlock Grid.Row="0"
+                   Grid.RowSpan="2"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontSize="16"
+                   FontWeight="SemiBold"
+                   Text="No matches"
+                   Visibility="{Binding ViewModel.HasNoMatches, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </Window>
