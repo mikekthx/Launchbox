@@ -16,7 +16,7 @@ public class BulkObservableCollectionTests
         var collection = new BulkObservableCollection<int>();
         var collectionChangedCount = 0;
         var propertyChangedCount = 0;
-        var propertiesChanged = new List<string?>();
+        List<string?> propertiesChanged = [];
 
         collection.CollectionChanged += (s, e) =>
         {
@@ -52,7 +52,7 @@ public class BulkObservableCollectionTests
         var collection = new BulkObservableCollection<int> { 1, 2, 3 };
         var collectionChangedCount = 0;
         var propertyChangedCount = 0;
-        var propertiesChanged = new List<string?>();
+        List<string?> propertiesChanged = [];
 
         collection.CollectionChanged += (s, e) =>
         {
@@ -90,7 +90,7 @@ public class BulkObservableCollectionTests
         collection.CollectionChanged += (s, e) => collectionChangedCount++;
 
         // Act
-        collection.AddRange(Array.Empty<int>());
+        collection.AddRange([]);
 
         // Assert
         Assert.Empty(collection);
@@ -107,7 +107,7 @@ public class BulkObservableCollectionTests
         collection.CollectionChanged += (s, e) => collectionChangedCount++;
 
         // Act
-        collection.ReplaceAll(Array.Empty<int>());
+        collection.ReplaceAll([]);
 
         // Assert
         Assert.Empty(collection);

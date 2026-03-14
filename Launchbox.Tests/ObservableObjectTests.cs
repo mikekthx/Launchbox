@@ -36,7 +36,7 @@ public class ObservableObjectTests
     {
         // Arrange
         var obj = new TestObservableObject();
-        var firedProperties = new List<string?>();
+        List<string?> firedProperties = [];
         obj.PropertyChanged += (s, e) => firedProperties.Add(e.PropertyName);
 
         // Act
@@ -54,7 +54,7 @@ public class ObservableObjectTests
     {
         // Arrange
         var obj = new TestObservableObject { TestProperty = "SameValue" };
-        var firedProperties = new List<string?>();
+        List<string?> firedProperties = [];
         obj.PropertyChanged += (s, e) => firedProperties.Add(e.PropertyName);
 
         // Act
@@ -71,7 +71,7 @@ public class ObservableObjectTests
     {
         // Arrange
         var obj = new TestObservableObject();
-        var firedProperties = new List<string?>();
+        List<string?> firedProperties = [];
         obj.PropertyChanged += (s, e) => firedProperties.Add(e.PropertyName);
 
         // Act
@@ -88,7 +88,7 @@ public class ObservableObjectTests
     {
         // Arrange
         var obj = new TestObservableObject { TestProperty = "InitialValue" };
-        var firedProperties = new List<string?>();
+        List<string?> firedProperties = [];
         obj.PropertyChanged += (s, e) => firedProperties.Add(e.PropertyName);
 
         // Act
@@ -103,7 +103,7 @@ public class ObservableObjectTests
     {
         // Arrange
         var obj = new TestObservableObject();
-        var firedProperties = new List<string?>();
+        List<string?> firedProperties = [];
         obj.PropertyChanged += (s, e) => firedProperties.Add(e.PropertyName);
 
         // Act
@@ -119,7 +119,7 @@ public class ObservableObjectTests
     {
         // Arrange
         var obj = new TestObservableObject();
-        var firedProperties = new List<string?>();
+        List<string?> firedProperties = [];
         obj.PropertyChanged += (s, e) => firedProperties.Add(e.PropertyName);
 
         // Act

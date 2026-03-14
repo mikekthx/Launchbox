@@ -106,7 +106,7 @@ public class MockFileSystem : IFileSystem
         {
             return files.ToArray();
         }
-        return Array.Empty<string>();
+        return [];
     }
 
     public virtual IEnumerable<string> EnumerateFiles(string path)
@@ -116,7 +116,7 @@ public class MockFileSystem : IFileSystem
         {
             return files;
         }
-        return Enumerable.Empty<string>();
+        return [];
     }
 
     public virtual string GetIniValue(string path, string section, string key)
@@ -133,7 +133,7 @@ public class MockFileSystem : IFileSystem
         if (ReadException != null) throw ReadException;
         if (_fileContents.TryGetValue(path, out var content))
             return content;
-        return Array.Empty<byte>();
+        return [];
     }
 
     public Stream OpenRead(string path)

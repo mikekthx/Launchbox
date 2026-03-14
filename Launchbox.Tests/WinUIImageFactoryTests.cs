@@ -12,7 +12,7 @@ public class WinUIImageFactoryTests
     {
         // Arrange
         var factory = new WinUIImageFactory();
-        var bytes = Array.Empty<byte>();
+        byte[] bytes = [];
 
         // Act
         var result = await factory.CreateImageAsync(bytes);
@@ -63,7 +63,7 @@ public class WinUIImageFactoryTests
     {
         // Arrange
         var factory = new WinUIImageFactory();
-        var bytes = new byte[] { 0x01, 0x02, 0x03, 0x04 };
+        byte[] bytes = [0x01, 0x02, 0x03, 0x04];
 
         // Act
         var result = await factory.CreateImageAsync(bytes);

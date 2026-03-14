@@ -6,7 +6,7 @@ public class ProcessService : IProcessService
 {
     public bool IsProcessRunning(string processName)
     {
-        Process[] processes = System.Array.Empty<Process>();
+        Process[] processes = [];
         try
         {
             processes = GetProcessesByName(processName);

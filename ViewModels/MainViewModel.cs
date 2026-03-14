@@ -110,7 +110,7 @@ public class MainViewModel : ViewModelBase, IDisposable
 
             _iconService.PruneCache(files ?? []);
 
-            var localAppItems = new List<AppItem>();
+            List<AppItem> localAppItems = [];
 
             if (files != null)
             {

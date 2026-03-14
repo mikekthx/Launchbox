@@ -166,7 +166,7 @@ public class IconServiceTests
         _mockFileSystem.AddFile(pngPath, content: newBytes, lastWriteTime: DateTime.Now);
 
         // Force cache clear to verify it picks up changes (since we have 2s cache now)
-        _iconService.PruneCache(System.Array.Empty<string>());
+        _iconService.PruneCache([]);
 
         // Second call: Should detect timestamp change and reload
         var result2 = _iconService.ExtractIconBytes(shortcutPath);
@@ -246,7 +246,7 @@ public class IconServiceTests
         Assert.Equal(1, removedCount);
 
         // Verify removing everything
-        removedCount = _iconService.PruneCache(System.Array.Empty<string>());
+        removedCount = _iconService.PruneCache([]);
         Assert.Equal(1, removedCount);
     }
 }

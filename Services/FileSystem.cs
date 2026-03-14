@@ -30,13 +30,13 @@ public class FileSystem : IFileSystem
 
     public string[] GetFiles(string path)
     {
-        if (PathSecurity.IsUnsafePath(path)) return Array.Empty<string>();
+        if (PathSecurity.IsUnsafePath(path)) return [];
         return Directory.GetFiles(path);
     }
 
     public IEnumerable<string> EnumerateFiles(string path)
     {
-        if (PathSecurity.IsUnsafePath(path)) return Array.Empty<string>();
+        if (PathSecurity.IsUnsafePath(path)) return [];
         return Directory.EnumerateFiles(path);
     }
 

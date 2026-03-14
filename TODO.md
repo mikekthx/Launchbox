@@ -70,7 +70,7 @@
 
 ## Low
 
-- [ ] Icon size mismatch: extracted at 96px, displayed at 56 DIPs -- blurry on high-DPI (Constants.cs:17, MainWindow.xaml:85)
+- [x] Icon size mismatch: extracted at 96px, displayed at 56 DIPs -- blurry on high-DPI (Constants.cs:17, MainWindow.xaml:85)
 - [x] No TreatWarningsAsErrors in either project -- nullable warnings pass CI silently
 - [x] Tray context menu 'Show' label is static -- should toggle to 'Hide' when visible (MainWindow.xaml:26)
 - [x] SettingsWindow has no explicit size -- may render poorly on some displays
@@ -79,7 +79,7 @@
 - [x] No [Trait] categorization on tests -- performance/security tests can't be filtered (PerformanceBenchmarkTests)
 - [x] Duplicated CreatePng/CreateIco helpers in IconServiceTests and PerformanceBenchmarkTests -- extract to shared TestDataHelpers
 - [x] BooleanToVisibilityConverter.ConvertBack throws NotImplementedException -- should return DependencyProperty.UnsetValue
-- [ ] ImageHeaderParser: no IHDR chunk validation for PNG, no upper bound on ICO entry count
+- [x] ImageHeaderParser: no IHDR chunk validation for PNG, no upper bound on ICO entry count
 - [ ] No version auto-increment in CI -- every build is 1.0.0.0 (Package.appxmanifest:14)
 - [x] Launchbox.Tests.csproj has inconsistent indentation -- mix of tabs and spaces (Tests.csproj:6,10)
 - [ ] Implement .NET 10 collection expressions globally where arrays or lists are initialized.
