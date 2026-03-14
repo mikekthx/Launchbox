@@ -172,6 +172,54 @@ Use section comments in large files:
 - When adding commands or variables to out-of-tree UI elements (such as TaskbarIcon, ContextFlyout, or MenuFlyout), always use standard {Binding} instead of {x:Bind} to avoid CS1503 casting errors during compilation. Ensure `RootGrid.DataContext = this;` is set in the code-behind.
 - Semantic names: `RootGrid`, `AppGrid`, `TrayIcon`
 
+### Comment Style
+
+**Principle:** Comments explain *why*, not *what*. Code should be readable enough that restating it in English adds no value.
+
+**When to add a comment:**
+- The reason for a decision is non-obvious (e.g., a workaround, a threading constraint, a Win32 quirk)
+- Omitting a step would look like a bug to a future reader
+- A security or correctness invariant must be preserved
+
+**When NOT to add a comment:**
+- The code already names the operation clearly (`LoadAppsAsync`, `IsUnsafePath`)
+- The comment would just repeat the method/property name in prose
+
+**Formats used in this codebase:**
+
+`//` line comments — for inline rationale, section labels, and non-obvious decisions:
+```csharp
+// RegisterHotKey is thread-affine: must be called on the window's creating thread.
+// Suppress: prevents default maximize on title-bar double-click (Launchbox has no title bar).
+// Security: limit file size to prevent DoS via large files.
+// Defense-in-depth: validate shortcut target even though the launcher already checked it.
+```
+
+`///` XML doc comments — only for public or internal members whose contract is not obvious from the name and signature alone:
+```csharp
+/// <summary>
+/// Loads shortcuts from the configured folder and concurrently extracts their icons.
+/// Cancels any previous in-flight load (debounce behavior).
+/// </summary>
+```
+
+**No `/* */` block comments.** Use `//` for multi-line explanations instead.
+
+**Section labels** in large constructors or files (sparingly):
+```csharp
+// 1. WINDOW SETUP
+// 2. SERVICES
+// 3. EVENT HOOKS
+```
+
+**Security annotations** — always label security-relevant decisions:
+```csharp
+// Security: prevent symlink redirection attacks on INI files.
+// (Defense-in-depth) validate even though caller already checked.
+```
+
+**No boilerplate/template placeholder comments** — remove Visual Studio template comments like `<!-- Other merged dictionaries here -->` when they add no information.
+
 ## WinUI 3 Patterns
 
 ```csharp
