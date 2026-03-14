@@ -1,8 +1,10 @@
+using Launchbox.Helpers;
 using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -194,6 +196,49 @@ public class MainViewModelTests
         var exception = Record.Exception(() => viewModel.OpenShortcutsFolderCommand.Execute(null));
 
         Assert.Null(exception);
+    }
+
+    [Fact]
+    public void ItemWidth_Default_Is110()
+    {
+        var vm = CreateViewModel();
+        Assert.Equal(110, vm.ItemWidth);
+    }
+
+    [Fact]
+    public void ItemWidth_WhenGridSizeSmall_Is80()
+    {
+        _settingsService.GridSize = GridSize.Small;
+        var vm = CreateViewModel();
+        Assert.Equal(80, vm.ItemWidth);
+    }
+
+    [Fact]
+    public void ItemHeight_WhenGridSizeLarge_Is165()
+    {
+        _settingsService.GridSize = GridSize.Large;
+        var vm = CreateViewModel();
+        Assert.Equal(165, vm.ItemHeight);
+    }
+
+    [Fact]
+    public void IconSize_WhenGridSizeSmall_Is32()
+    {
+        _settingsService.GridSize = GridSize.Small;
+        var vm = CreateViewModel();
+        Assert.Equal(32, vm.IconSize);
+    }
+
+    [Fact]
+    public void ItemWidth_WhenGridSizeChanges_RaisesPropertyChanged()
+    {
+        var vm = CreateViewModel();
+        string? changedProperty = null;
+        vm.PropertyChanged += (_, e) => changedProperty = e.PropertyName;
+
+        _settingsService.GridSize = GridSize.Large;
+
+        Assert.Equal(nameof(MainViewModel.ItemWidth), changedProperty);
     }
 
     private class ThrowingFileSystem : MockFileSystem

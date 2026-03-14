@@ -34,6 +34,27 @@ public class MainViewModel : ViewModelBase, IDisposable
         private set => SetProperty(ref _isEmpty, value);
     }
 
+    public int ItemWidth => _settingsService.GridSize switch
+    {
+        GridSize.Small => 80,
+        GridSize.Large => 140,
+        _ => 110,
+    };
+
+    public int ItemHeight => _settingsService.GridSize switch
+    {
+        GridSize.Small => 96,
+        GridSize.Large => 165,
+        _ => 130,
+    };
+
+    public int IconSize => _settingsService.GridSize switch
+    {
+        GridSize.Small => 32,
+        GridSize.Large => 72,
+        _ => 56,
+    };
+
     public string ToggleWindowText => _windowService.IsVisible ? "Hide" : "Show";
 
     public ICommand LoadAppsCommand { get; }
@@ -79,6 +100,12 @@ public class MainViewModel : ViewModelBase, IDisposable
         {
             // Reload apps when folder path changes
             _ = LoadAppsAsync();
+        }
+        else if (e.PropertyName == nameof(SettingsService.GridSize))
+        {
+            OnPropertyChanged(nameof(IconSize));
+            OnPropertyChanged(nameof(ItemHeight));
+            OnPropertyChanged(nameof(ItemWidth));
         }
     }
 

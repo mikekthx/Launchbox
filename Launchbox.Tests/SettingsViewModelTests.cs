@@ -162,6 +162,48 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void SelectedGridSize_Default_IsMedium()
+    {
+        var store = new MockSettingsStore();
+        var settingsService = new SettingsService(store, new MockStartupService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        Assert.Equal("Medium", vm.SelectedGridSize);
+    }
+
+    [Fact]
+    public void SelectedGridSize_WhenSet_UpdatesSettingsService()
+    {
+        var store = new MockSettingsStore();
+        var settingsService = new SettingsService(store, new MockStartupService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        vm.SelectedGridSize = "Large";
+        Assert.Equal(GridSize.Large, settingsService.GridSize);
+    }
+
+    [Fact]
+    public void SelectedGridSize_WhenServiceChanges_RaisesPropertyChanged()
+    {
+        var store = new MockSettingsStore();
+        var settingsService = new SettingsService(store, new MockStartupService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+
+        string? changed = null;
+        vm.PropertyChanged += (_, e) => changed = e.PropertyName;
+        settingsService.GridSize = GridSize.Small;
+
+        Assert.Equal(nameof(SettingsViewModel.SelectedGridSize), changed);
+    }
+
+    [Fact]
+    public void GridSizeOptions_ContainsThreeEntries()
+    {
+        var store = new MockSettingsStore();
+        var settingsService = new SettingsService(store, new MockStartupService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        Assert.Equal(["Small", "Medium", "Large"], vm.GridSizeOptions);
+    }
+
+    [Fact]
     public void GridSize_Default_IsMedium()
     {
         var store = new MockSettingsStore();

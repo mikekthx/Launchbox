@@ -105,17 +105,24 @@
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:AppItem">
-                    <StackPanel Width="110" Height="130" Spacing="4" 
-                                HorizontalAlignment="Center" 
+                    <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
+                                Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
+                                Spacing="4"
+                                HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 ToolTipService.ToolTip="{x:Bind Name}"
                                 AutomationProperties.Name="{x:Bind Name}">
 
-                        <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}" Width="56" Height="56" Margin="0,10,0,0" AutomationProperties.AccessibilityView="Raw" x:Phase="1"/>
+                        <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
+                               Width="{Binding Tag.IconSize, ElementName=AppGrid}"
+                               Height="{Binding Tag.IconSize, ElementName=AppGrid}"
+                               Margin="0,10,0,0"
+                               AutomationProperties.AccessibilityView="Raw"
+                               x:Phase="1"/>
 
-                        <TextBlock Text="{x:Bind Name}" 
-                                   TextAlignment="Center" 
-                                   TextWrapping="Wrap" 
+                        <TextBlock Text="{x:Bind Name}"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"
                                    MaxLines="3"
                                    TextTrimming="CharacterEllipsis"
                                    FontSize="12"

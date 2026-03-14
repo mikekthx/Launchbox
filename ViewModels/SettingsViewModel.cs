@@ -30,6 +30,18 @@ public class SettingsViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<string> Modifiers { get; } = [.. MODIFIER_MAP.Keys];
 
+    public IReadOnlyList<string> GridSizeOptions { get; } = ["Small", "Medium", "Large"];
+
+    public string SelectedGridSize
+    {
+        get => _settingsService.GridSize.ToString();
+        set
+        {
+            if (Enum.TryParse<GridSize>(value, out var g))
+                _settingsService.GridSize = g;
+        }
+    }
+
     public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
@@ -95,6 +107,8 @@ public class SettingsViewModel : ViewModelBase, IDisposable
             OnPropertyChanged(nameof(SelectedModifier));
         else if (e.PropertyName == nameof(SettingsService.HotkeyKey))
             OnPropertyChanged(nameof(HotkeyKeyString));
+        else if (e.PropertyName == nameof(SettingsService.GridSize))
+            OnPropertyChanged(nameof(SelectedGridSize));
     }
 
     public string ShortcutsPath

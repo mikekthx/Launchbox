@@ -53,6 +53,7 @@ public sealed partial class MainWindow : Window
 
         this.InitializeComponent();
         RootGrid.DataContext = this;
+        AppGrid.Tag = ViewModel;
 
         _ = _backdropService.UpdateBackdropAsync();
 
