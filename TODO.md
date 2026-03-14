@@ -77,7 +77,7 @@
 - [x] No AppItem.ToString() override for debugging/logging (AppItem.cs)
 - [ ] Missing test coverage: AppItem PropertyChanged, MainViewModel.Dispose, LaunchApp with invalid params
 - [x] No [Trait] categorization on tests -- performance/security tests can't be filtered (PerformanceBenchmarkTests)
-- [ ] Duplicated CreatePng/CreateIco helpers in IconServiceTests and PerformanceBenchmarkTests -- extract to shared TestDataHelpers
+- [x] Duplicated CreatePng/CreateIco helpers in IconServiceTests and PerformanceBenchmarkTests -- extract to shared TestDataHelpers
 - [x] BooleanToVisibilityConverter.ConvertBack throws NotImplementedException -- should return DependencyProperty.UnsetValue
 - [ ] ImageHeaderParser: no IHDR chunk validation for PNG, no upper bound on ICO entry count
 - [ ] No version auto-increment in CI -- every build is 1.0.0.0 (Package.appxmanifest:14)

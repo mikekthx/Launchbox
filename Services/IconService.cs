@@ -329,8 +329,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         {
             resolvedPath = ResolveIconPath(path);
 
-            // Optimized size: 96x96 is sufficient for UI (56x56) at up to ~170% DPI scaling,
-            // saving ~43% processing time compared to 128x128.
+            // 256x256 ensures sharp icons at up to ~457% DPI when displayed at 56 DIPs.
             IntPtr[] phicon = new IntPtr[1];
             uint[] piconid = new uint[1];
             NativeMethods.PrivateExtractIcons(resolvedPath, 0, Constants.ICON_SIZE, Constants.ICON_SIZE, phicon, piconid, 1, 0);

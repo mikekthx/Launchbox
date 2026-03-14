@@ -26,9 +26,12 @@ public static class ImageHeaderParser
                 return null;
             }
 
-            // IHDR Chunk starts at byte 12 (Length 4 bytes, Type 4 bytes, then Data)
-            // Length should be 13 (0x0000000D)
-            // Type should be "IHDR" (0x49484452)
+            // IHDR Chunk starts at byte 8: Length (4 bytes) + Type (4 bytes) + Data
+            // Length must be exactly 13 (0x0000000D), Type must be "IHDR" (0x49484452)
+            if (header[8] != 0x00 || header[9] != 0x00 || header[10] != 0x00 || header[11] != 0x0D)
+                return null;
+            if (header[12] != 0x49 || header[13] != 0x48 || header[14] != 0x44 || header[15] != 0x52)
+                return null;
 
             // Width is at byte 16 (4 bytes, Big Endian)
             // Height is at byte 20 (4 bytes, Big Endian)
@@ -61,9 +64,10 @@ public static class ImageHeaderParser
             // Type (2 bytes) must be 1 for Icon (2 for Cursor)
             if (header[2] != 1 || header[3] != 0) return null;
 
-            // Count (2 bytes)
+            // Count (2 bytes) — cap at 256 to prevent reading unbounded data from a malformed file
             int count = header[4] | (header[5] << 8);
             if (count == 0) return null;
+            if (count > 256) count = 256;
 
             int maxWidth = 0;
             int maxHeight = 0;

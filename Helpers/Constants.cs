@@ -15,8 +15,8 @@ public static class Constants
     public const int VK_S = 0x53;
     public const int HOTKEY_ID = 9000;
 
-    // Icon constants
-    public const int ICON_SIZE = 96;
+    // Icon constants — 256 covers up to ~457% DPI when displayed at 56 DIPs
+    public const int ICON_SIZE = 256;
     public const int MIN_VALID_YEAR = 1900;
     public const long MAX_ICON_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 

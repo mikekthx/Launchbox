@@ -31,7 +31,7 @@ public class ConstantsTests
     [Fact]
     public void IconConstants_HaveExpectedValues()
     {
-        Assert.Equal(96, Constants.ICON_SIZE);
+        Assert.Equal(256, Constants.ICON_SIZE);
         Assert.Equal(1900, Constants.MIN_VALID_YEAR);
         Assert.Equal(5 * 1024 * 1024, Constants.MAX_ICON_FILE_SIZE_BYTES);
     }
