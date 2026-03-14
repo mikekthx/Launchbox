@@ -25,4 +25,6 @@ public class AppItem : ObservableObject
         get => _icon;
         set => SetProperty(ref _icon, value);
     }
+
+    public override string ToString() => $"{Name} ({Path})";
 }

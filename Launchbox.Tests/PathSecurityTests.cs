@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Trait("Category", "Security")]
 public class PathSecurityTests
 {
     [Theory]

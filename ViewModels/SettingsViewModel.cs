@@ -20,7 +20,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable
     public ICommand ResetPositionCommand { get; }
     public ICommand BrowseFolderCommand { get; }
 
-    private static readonly Dictionary<string, int> ModifierMap = new()
+    private static readonly Dictionary<string, int> MODIFIER_MAP = new()
     {
         { "Alt", Constants.MOD_ALT },
         { "Ctrl", Constants.MOD_CONTROL },
@@ -28,7 +28,7 @@ public class SettingsViewModel : ViewModelBase, IDisposable
         { "Win", Constants.MOD_WIN },
     };
 
-    public IReadOnlyList<string> Modifiers { get; } = [.. ModifierMap.Keys];
+    public IReadOnlyList<string> Modifiers { get; } = [.. MODIFIER_MAP.Keys];
 
     public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
     {
@@ -120,10 +120,10 @@ public class SettingsViewModel : ViewModelBase, IDisposable
     /// </summary>
     public string SelectedModifier
     {
-        get => ModifierMap.FirstOrDefault(kv => kv.Value == _settingsService.HotkeyModifiers).Key ?? "Alt";
+        get => MODIFIER_MAP.FirstOrDefault(kv => kv.Value == _settingsService.HotkeyModifiers).Key ?? "Alt";
         set
         {
-            if (ModifierMap.TryGetValue(value, out var modifier))
+            if (MODIFIER_MAP.TryGetValue(value, out var modifier))
                 _settingsService.HotkeyModifiers = modifier;
         }
     }

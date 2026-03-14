@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Trait("Category", "Performance")]
 public class PerformanceBenchmarkTests
 {
     private readonly ITestOutputHelper _output;

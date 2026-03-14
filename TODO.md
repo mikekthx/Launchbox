@@ -45,7 +45,7 @@
 
 ### Architecture & Code Quality
 - [x] Missing IIconService and IShortcutService interfaces -- breaks consistent abstraction pattern (IconService.cs, ShortcutService.cs)
-- [ ] Magic strings for modifier keys duplicated in 3 places -- use a dictionary (SettingsViewModel.cs:24,118-131)
+- [x] Magic strings for modifier keys duplicated in 3 places -- use a dictionary (SettingsViewModel.cs:24,118-131)
 - [x] Constants.ALLOWED_EXTENSIONS array is mutable at runtime -- use IReadOnlyList<string> (Constants.cs:25)
 - [x] AppItem.Name/Path don't raise PropertyChanged -- should be { get; init; } to enforce set-once intent (AppItem.cs:10-11)
 - [x] PrivateExtractIcons has obfuscated param names (l, n, cx, p) and incorrect types for general use (NativeMethods.cs:12)
@@ -53,20 +53,20 @@
 
 ### UI/UX
 - [x] Empty-state StackPanel and GridView overlap -- no mutual exclusion in XAML (MainWindow.xaml:34-97)
-- [ ] Double-click on tray icon fires show-then-hide (single+double click both toggle) (MainWindow.xaml:22-23)
+- [x] Double-click on tray icon fires show-then-hide (single+double click both toggle) (MainWindow.xaml:22-23)
 - [x] Missing accessibility labels on Settings form controls (SettingsWindow.xaml) and main grid (MainWindow.xaml:57)
 
 ### Build & CI
-- [ ] ARM64 excluded from MSIX bundle despite being a declared target platform (dotnet-desktop.yml:155)
-- [ ] Missing ImplicitUsings in main project but enabled in test project -- file-linked sources may behave differently
+- [x] ARM64 excluded from MSIX bundle despite being a declared target platform (dotnet-desktop.yml:155)
+- [x] Missing ImplicitUsings in main project but enabled in test project -- file-linked sources may behave differently
 - [x] Solution AnyCPU maps silently to x86 (Launchbox.sln:19-22)
 - [x] No code coverage collection in CI despite coverlet.collector being a dependency
-- [ ] No Directory.Build.props for centralized project configuration (nullable, TFM, warnings)
+- [x] No Directory.Build.props for centralized project configuration (nullable, TFM, warnings)
 
 ### Tests
-- [ ] SettingsViewModelTests use fragile async polling with DateTime timeout -- should use event-driven waiting
+- [x] SettingsViewModelTests use fragile async polling with DateTime timeout -- should use event-driven waiting
 - [x] Mock classes (MockSettingsStore, MockImageFactory, etc.) scattered inside unrelated test files -- extract to own files
-- [ ] MockFileSystem has no error simulation capability unlike other mocks (MockStartupService has ShouldFail)
+- [x] MockFileSystem has no error simulation capability unlike other mocks (MockStartupService has ShouldFail)
 
 ## Low
 

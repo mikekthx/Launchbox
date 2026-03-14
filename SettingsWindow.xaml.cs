@@ -1,6 +1,8 @@
 using Launchbox.Services;
 using Launchbox.ViewModels;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Windows.Graphics;
 
 namespace Launchbox;
 
@@ -18,6 +20,11 @@ public sealed partial class SettingsWindow : Window
         this.Title = "Launchbox Settings";
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
+
+        var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(hWnd);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+        appWindow.Resize(new SizeInt32(560, 480));
 
         this.Closed += SettingsWindow_Closed;
     }

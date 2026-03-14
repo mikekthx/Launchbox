@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Trait("Category", "Performance")]
 public class FileSystemPerformanceTests
 {
     private readonly ITestOutputHelper _output;

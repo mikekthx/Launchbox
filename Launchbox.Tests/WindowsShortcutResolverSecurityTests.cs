@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Trait("Category", "Security")]
 public class WindowsShortcutResolverSecurityTests : IDisposable
 {
     private readonly StringBuilder _traceOutput = new();

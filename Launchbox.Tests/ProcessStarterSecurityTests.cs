@@ -5,6 +5,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Trait("Category", "Security")]
 public class ProcessStarterSecurityTests
 {
     private readonly ProcessStarter _processStarter;
