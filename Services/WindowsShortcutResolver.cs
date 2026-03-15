@@ -21,13 +21,11 @@ public class WindowsShortcutResolver : IShortcutResolver
 
         try
         {
-            string extension = Path.GetExtension(shortcutPath).ToLowerInvariant();
-
-            if (extension == ".lnk")
+            if (shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             {
                 return ResolveLnk(shortcutPath);
             }
-            else if (extension == ".url")
+            else if (shortcutPath.EndsWith(".url", StringComparison.OrdinalIgnoreCase))
             {
                 return ResolveUrl(shortcutPath);
             }
@@ -44,7 +42,7 @@ public class WindowsShortcutResolver : IShortcutResolver
 
     public string? ResolveArguments(string shortcutPath)
     {
-        if (string.IsNullOrWhiteSpace(shortcutPath) || Path.GetExtension(shortcutPath).ToLowerInvariant() != ".lnk")
+        if (string.IsNullOrWhiteSpace(shortcutPath) || !shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             return null;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -68,7 +66,7 @@ public class WindowsShortcutResolver : IShortcutResolver
 
     public string? ResolveWorkingDirectory(string shortcutPath)
     {
-        if (string.IsNullOrWhiteSpace(shortcutPath) || Path.GetExtension(shortcutPath).ToLowerInvariant() != ".lnk")
+        if (string.IsNullOrWhiteSpace(shortcutPath) || !shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             return null;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -126,9 +124,19 @@ public class WindowsShortcutResolver : IShortcutResolver
 
         if (url.Contains('%') || url.Contains('$'))
         {
-            return Environment.ExpandEnvironmentVariables(url);
+            url = Environment.ExpandEnvironmentVariables(url);
         }
 
-        return url;
+        // Security: Ensure URL scheme is safe (restricted to http/https).
+        // This prevents .url files from being used to execute local files (file://) or other unsafe schemes.
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+        {
+            if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+            {
+                return url;
+            }
+        }
+
+        return null;
     }
 }

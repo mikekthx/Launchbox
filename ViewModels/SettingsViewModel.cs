@@ -47,9 +47,6 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         _filePickerService = filePickerService ?? throw new ArgumentNullException(nameof(filePickerService));
 
         _settingsService.PropertyChanged += OnServicePropertyChanged;
-
-        // Read the OS startup task state asynchronously — cannot be done synchronously at construction time.
-        _ = InitializeSettingsAsync();
     }
 
     [RelayCommand]
@@ -66,18 +63,6 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to browse for folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
-    }
-
-    private async Task InitializeSettingsAsync()
-    {
-        try
-        {
-            await _settingsService.InitializeAsync();
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Failed to initialize settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 

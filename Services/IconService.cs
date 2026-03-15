@@ -31,11 +31,11 @@ public class IconService(IFileSystem fileSystem) : IIconService
         var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
 
-        foreach (var key in _iconCache.Keys)
+        foreach (var kvp in _iconCache)
         {
-            if (!activeSet.Contains(key))
+            if (!activeSet.Contains(kvp.Key))
             {
-                if (_iconCache.TryRemove(key, out _))
+                if (_iconCache.TryRemove(kvp.Key, out _))
                 {
                     removedCount++;
                 }

@@ -26,6 +26,27 @@ public class WindowsShortcutResolverSecurityTests : IDisposable
         _listener.Dispose();
     }
 
+    [Theory]
+    [InlineData("file://C:/Windows/System32/calc.exe")]
+    [InlineData("ftp://attacker.com/malware.exe")]
+    [InlineData("javascript:alert(1)")]
+    [InlineData(@"C:\Windows\System32\cmd.exe")]
+    [InlineData("mailto:victim@example.com")]
+    public void ResolveTarget_BlocksUnsafeUrlSchemes(string unsafeUrl)
+    {
+        // Arrange
+        var fileSystem = new MockFileSystem();
+        var resolver = new WindowsShortcutResolver(fileSystem);
+        string shortcutPath = @"C:\shortcuts\unsafe.url";
+        fileSystem.SetIniValue(shortcutPath, "InternetShortcut", "URL", unsafeUrl);
+
+        // Act
+        var result = resolver.ResolveTarget(shortcutPath);
+
+        // Assert
+        Assert.Null(result);
+    }
+
     [Fact]
     public void ResolveTarget_RedactsExceptionMessage()
     {
