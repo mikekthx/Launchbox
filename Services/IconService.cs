@@ -48,7 +48,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
     {
         if (path.Contains('%') || path.Contains('$'))
         {
-            return _expandedPathCache.GetOrAdd(path, p => Environment.ExpandEnvironmentVariables(p));
+            return _expandedPathCache.GetOrAdd(path, static p => Environment.ExpandEnvironmentVariables(p));
         }
         return path;
     }
@@ -185,15 +185,15 @@ public class IconService(IFileSystem fileSystem) : IIconService
         // Loop to handle potential race conditions during cache expiration
         while (true)
         {
-            var lazyEntry = _directoryCache.GetOrAdd(directoryPath, dir => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() =>
+            var lazyEntry = _directoryCache.GetOrAdd(directoryPath, static (dir, fs) => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() =>
             {
-                bool exists = _fileSystem.DirectoryExists(dir);
+                bool exists = fs.DirectoryExists(dir);
                 HashSet<string>? files = null;
                 if (exists)
                 {
                     try
                     {
-                        var fileList = _fileSystem.EnumerateFiles(dir);
+                        var fileList = fs.EnumerateFiles(dir);
                         files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
                     }
                     catch
@@ -202,7 +202,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
                     }
                 }
                 return (exists, files, DateTime.UtcNow);
-            }));
+            }), _fileSystem);
 
             var dirEntry = lazyEntry.Value;
 
@@ -222,10 +222,10 @@ public class IconService(IFileSystem fileSystem) : IIconService
     {
         while (true)
         {
-            var lazyEntry = _fileTimestampCache.GetOrAdd(path, p => new Lazy<(DateTime, DateTime)>(() =>
+            var lazyEntry = _fileTimestampCache.GetOrAdd(path, static (p, fs) => new Lazy<(DateTime, DateTime)>(() =>
             {
-                return (_fileSystem.GetLastWriteTime(p), DateTime.UtcNow);
-            }));
+                return (fs.GetLastWriteTime(p), DateTime.UtcNow);
+            }), _fileSystem);
 
             try
             {
