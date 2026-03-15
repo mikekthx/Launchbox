@@ -52,3 +52,8 @@
 **Vulnerability:** `ProcessStarter` only checked `FileName` for unsafe paths, but `Arguments` and `WorkingDirectory` could contain UNC paths, allowing attackers to leak NTLM credentials or execute arbitrary code (e.g., passing a malicious UNC payload to a safe executable like `cmd.exe`). Additionally, shortcuts (`.lnk`) passed to `Process.Start` via `ShellExecute` were missing extraction and validation of embedded arguments and working directories.
 **Learning:** Checking the main executable path is insufficient for security; all parameters that can influence execution (arguments, working directory) or are embedded in shortcut formats must be validated against path security policies.
 **Prevention:** Always validate `startInfo.Arguments` and `startInfo.WorkingDirectory` in `Process.Start` wrappers, and extract/validate shortcut arguments before execution using `IShellLinkW`.
+
+## 2026-03-15 - Unsafe URL Schemes in .url Files
+**Vulnerability:** `WindowsShortcutResolver.ResolveUrl` returned the raw URL string from `.url` files after expanding environment variables, without validating the scheme. This allowed `.url` files to be used to execute local files (via `file://`) or other unsafe protocols, bypassing extension-based restrictions.
+**Learning:** Validating file extensions is not enough when the file content can specify a protocol that redirects execution to unintended targets. For `.url` files, the resulting URI must be explicitly whitelisted to safe schemes.
+**Prevention:** For any shortcut format that resolves to a URI, always validate the resulting absolute URI scheme against a strict whitelist (e.g., `http` and `https`) before returning it for execution.

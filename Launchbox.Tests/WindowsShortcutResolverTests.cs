@@ -54,11 +54,11 @@ public class WindowsShortcutResolverTests
     {
         string shortcutPath = @"C:\shortcuts\app.url";
         string envVar = "RESOLVER_TEST_ENV_VAR";
-        string envValue = @"C:\ResolvedTarget";
+        string envValue = "https://example.com";
 
         // Environment.ExpandEnvironmentVariables uses %VAR% syntax on all .NET platforms
-        string targetUrl = $@"%{envVar}%\app.exe";
-        string expectedUrl = $@"{envValue}\app.exe";
+        string targetUrl = $"%{envVar}%/path";
+        string expectedUrl = $"{envValue}/path";
 
         System.Environment.SetEnvironmentVariable(envVar, envValue);
 
