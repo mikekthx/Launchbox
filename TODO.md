@@ -71,7 +71,7 @@
 ## Medium (New)
 
 ### Performance
-- [ ] FilteredApps double enumeration: HasNoMatches calls FilteredApps.Any() which re-runs the LINQ Where on every keystroke -- cache as materialized list (MainViewModel.cs:53-59)
+- [x] FilteredApps double enumeration: HasNoMatches calls FilteredApps.Any() which re-runs the LINQ Where on every keystroke -- cache as materialized list (MainViewModel.cs:53-59)
 
 ### UI/UX
 - [ ] SearchBox has no visual polish: missing Background, Padding, Margin, CornerRadius -- looks like an unstyled floating field against the backdrop (MainWindow.xaml:143-148)
