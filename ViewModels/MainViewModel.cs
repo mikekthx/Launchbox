@@ -37,6 +37,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     private string _filterText = string.Empty;
+    private IReadOnlyList<AppItem>? _cachedFilteredApps;
+
     public string FilterText
     {
         get => _filterText;
@@ -44,19 +46,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             if (SetProperty(ref _filterText, value))
             {
+                _cachedFilteredApps = null;
                 OnPropertyChanged(nameof(FilteredApps));
                 OnPropertyChanged(nameof(HasNoMatches));
             }
         }
     }
 
-    public IEnumerable<AppItem> FilteredApps =>
-        string.IsNullOrEmpty(_filterText)
+    public IReadOnlyList<AppItem> FilteredApps =>
+        _cachedFilteredApps ??= string.IsNullOrEmpty(_filterText)
             ? Apps
-            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase));
+            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase)).ToList();
 
     public bool HasNoMatches =>
-        Apps.Count > 0 && !string.IsNullOrEmpty(_filterText) && !FilteredApps.Any();
+        Apps.Count > 0 && !string.IsNullOrEmpty(_filterText) && FilteredApps.Count == 0;
 
     public int ItemWidth => _settingsService.GridSize switch
     {
@@ -107,6 +110,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // won't re-evaluate them automatically when Apps changes, so we notify explicitly.
         Apps.CollectionChanged += (_, _) =>
         {
+            _cachedFilteredApps = null;
             OnPropertyChanged(nameof(FilteredApps));
             OnPropertyChanged(nameof(HasNoMatches));
         };
