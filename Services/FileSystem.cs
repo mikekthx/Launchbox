@@ -28,12 +28,6 @@ public class FileSystem : IFileSystem
         return File.Exists(path);
     }
 
-    public string[] GetFiles(string path)
-    {
-        if (PathSecurity.IsUnsafePath(path)) return [];
-        return Directory.GetFiles(path);
-    }
-
     public IEnumerable<string> EnumerateFiles(string path)
     {
         if (PathSecurity.IsUnsafePath(path)) return [];

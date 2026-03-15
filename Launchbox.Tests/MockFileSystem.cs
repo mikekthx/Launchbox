@@ -99,16 +99,6 @@ public class MockFileSystem : IFileSystem
         return _files.Values.Any(list => list.Contains(path));
     }
 
-    public string[] GetFiles(string path)
-    {
-        if (EnumerateFilesException != null) throw EnumerateFilesException;
-        if (_files.TryGetValue(path, out var files))
-        {
-            return files.ToArray();
-        }
-        return [];
-    }
-
     public virtual IEnumerable<string> EnumerateFiles(string path)
     {
         if (EnumerateFilesException != null) throw EnumerateFilesException;

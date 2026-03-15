@@ -49,15 +49,6 @@ public class FileSystemSecurityTests
     [Theory]
     [InlineData(@"\\attacker\share\file.txt")]
     [InlineData(@"//attacker/share/file.txt")]
-    public void FileSystem_GetFiles_ReturnsEmptyArray_ForUnsafePath(string unsafePath)
-    {
-        string[] result = _fileSystem.GetFiles(unsafePath);
-        Assert.Empty(result);
-    }
-
-    [Theory]
-    [InlineData(@"\\attacker\share\file.txt")]
-    [InlineData(@"//attacker/share/file.txt")]
     public void FileSystem_GetIniValue_ReturnsEmptyString_ForUnsafePath(string unsafePath)
     {
         string result = _fileSystem.GetIniValue(unsafePath, "Section", "Key");

@@ -27,7 +27,6 @@ public class IconServiceOptimizationTests
         public void CreateDirectory(string path) => _inner.CreateDirectory(path);
         public bool DirectoryExists(string path) => _inner.DirectoryExists(path);
         public bool FileExists(string path) => _inner.FileExists(path);
-        public string[] GetFiles(string path) => _inner.GetFiles(path);
         public System.Collections.Generic.IEnumerable<string> EnumerateFiles(string path) => _inner.EnumerateFiles(path);
         public string GetIniValue(string path, string section, string key) => _inner.GetIniValue(path, section, key);
         public byte[] ReadAllBytes(string path) => _inner.ReadAllBytes(path);
