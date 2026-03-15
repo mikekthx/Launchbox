@@ -126,9 +126,19 @@ public class WindowsShortcutResolver : IShortcutResolver
 
         if (url.Contains('%') || url.Contains('$'))
         {
-            return Environment.ExpandEnvironmentVariables(url);
+            url = Environment.ExpandEnvironmentVariables(url);
         }
 
-        return url;
+        // Security: Ensure URL scheme is safe (restricted to http/https).
+        // This prevents .url files from being used to execute local files (file://) or other unsafe schemes.
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+        {
+            if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
+            {
+                return url;
+            }
+        }
+
+        return null;
     }
 }
