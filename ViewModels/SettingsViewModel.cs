@@ -52,7 +52,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         _ = InitializeSettingsAsync();
     }
 
-    [RelayCommand(AllowConcurrentExecutions = true)]
+    [RelayCommand]
     private async Task BrowseFolderAsync()
     {
         try
