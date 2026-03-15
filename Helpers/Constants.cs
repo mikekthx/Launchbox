@@ -25,5 +25,7 @@ public static class Constants
     public const string ICON_FILE_KEY = "IconFile";
     public const string ICONS_DIR = ".icons";
 
+    public const string INVERT_STRING = "Invert";
+
     public static readonly IReadOnlyList<string> ALLOWED_EXTENSIONS = [".lnk", ".url"];
 }
