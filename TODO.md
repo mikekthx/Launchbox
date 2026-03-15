@@ -68,6 +68,21 @@
 - [x] Mock classes (MockSettingsStore, MockImageFactory, etc.) scattered inside unrelated test files -- extract to own files
 - [x] MockFileSystem has no error simulation capability unlike other mocks (MockStartupService has ShouldFail)
 
+## Medium (New)
+
+### Performance
+- [ ] FilteredApps double enumeration: HasNoMatches calls FilteredApps.Any() which re-runs the LINQ Where on every keystroke -- cache as materialized list (MainViewModel.cs:53-59)
+
+### UI/UX
+- [ ] SearchBox has no visual polish: missing Background, Padding, Margin, CornerRadius -- looks like an unstyled floating field against the backdrop (MainWindow.xaml:143-148)
+- [ ] Window height not clamped to work area: WINDOW_HEIGHT=700 fixed constant can exceed display on small screens like Surface Pro at 150% scaling (Constants.cs, WindowService.cs)
+
+### Features
+- [ ] Keyboard navigation: arrow keys to move through the grid, Enter to launch -- essential for a keyboard-first launcher
+- [ ] Window height auto-sizing: detect work area and clamp/resize on activation
+- [ ] Custom icon support UI: the .icons/ directory feature exists but there's no UI to set custom icons (users must manually place files)
+- [ ] Multi-folder shortcut sources: support multiple folders instead of just one
+
 ## Low
 
 - [x] Icon size mismatch: extracted at 96px, displayed at 56 DIPs -- blurry on high-DPI (Constants.cs:17, MainWindow.xaml:85)
