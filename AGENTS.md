@@ -87,6 +87,19 @@ Launchbox/
 └── Properties/                 # Launch/publish profiles
 ```
 
+## Start Here
+
+When starting a new task, inspect these files first:
+- `MainWindow.xaml.cs` - app composition, window lifecycle, tray integration, hotkey wiring
+- `ViewModels/MainViewModel.cs` - core launcher behavior, app loading, search/filter, command flow
+- `Services/WindowService.cs` - visibility toggling, hotkey registration, persisted window position
+- `Services/SettingsService.cs` - settings coordination and change notifications
+- `Services/IconService.cs` - icon extraction, caching, `.icons` override behavior
+
+For settings-related tasks, also inspect:
+- `SettingsWindow.xaml.cs`
+- `ViewModels/SettingsViewModel.cs`
+
 ## Code Style
 
 ### Formatting
@@ -285,6 +298,13 @@ Key non-interface services:
 - System tray icon required for operation
 - Global hotkey Alt+S via Win32 RegisterHotKey
 
+### Preserve These Behaviors
+- The tray icon is operationally required; avoid changes that allow the app to start without it
+- Initial off-screen startup is intentional; do not replace it with a visible initial show without explicit product intent
+- Auto-hide on deactivation is core launcher behavior, not incidental UI polish
+- Hotkey registration and re-registration are thread-affine; keep registration work on the window-owning/UI thread
+- Window position persistence must remain compatible with existing LocalSettings-based storage
+
 ### Dependency Composition
 All dependencies are composed **manually** in the `MainWindow` constructor (no DI container). `SettingsService`, `WindowService`, and `LocalSettingsStore` are shared singleton instances passed to both `MainViewModel` and `SettingsViewModel`. When adding a new service, wire it up in the `MainWindow` constructor.
 
@@ -313,6 +333,25 @@ All dependencies are composed **manually** in the `MainWindow` constructor (no D
 2. Create a test file in `Launchbox.Tests/` following the `ClassNameTests.cs` naming convention
 3. Use existing mock classes (`MockFileSystem`, `MockSettingsStore`, etc.) or create new ones implementing the relevant interface
 4. Run: `dotnet test Launchbox.Tests/Launchbox.Tests.csproj`
+
+## Verification Guidance
+
+Choose verification based on the type of change:
+- UI/XAML-only change: run `dotnet build Launchbox.csproj -p:Platform=x64`
+- ViewModel or service logic change: run targeted tests first, then broaden to `dotnet test Launchbox.Tests/Launchbox.Tests.csproj` if impact is wider
+- Binding, converter, or markup contract change: run both `dotnet build Launchbox.csproj -p:Platform=x64` and relevant tests
+- Non-trivial C# or XAML edits before commit: run `dotnet format Launchbox.sln`
+
+Prefer the smallest verification set that meaningfully exercises the affected behavior, but do not skip the app build for changes that can break WinUI compilation.
+
+## Known Sharp Edges
+
+- The test project uses file-linking, not `<ProjectReference>`; new production files under test must be linked manually in `Launchbox.Tests/Launchbox.Tests.csproj`
+- `AppItem.Icon` intentionally uses `object`; replacing it with a WinUI-specific type will make testing harder and spread UI coupling
+- Out-of-tree XAML elements such as tray and flyout content must use `{Binding}` rather than `{x:Bind}` to avoid compile-time binding/casting failures
+- Service wiring is manual in `MainWindow`; adding a new service in only one code path will create inconsistent runtime behavior
+- `NativeMethods.cs` is the central location for P/Invoke declarations; avoid scattering Win32 imports into feature files
+- Hotkey, tray, and auto-hide behavior span both window code and services; regressions often come from changing one side without tracing the full event flow
 
 ## Date Awareness
 When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.
