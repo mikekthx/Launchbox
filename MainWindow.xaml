@@ -94,7 +94,7 @@
                   Background="Transparent"
                   SelectionMode="None"
                   IsItemClickEnabled="True"
-                  Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                  Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ItemsSource="{x:Bind ViewModel.FilteredApps, Mode=OneWay}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
