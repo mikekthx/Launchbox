@@ -31,6 +31,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
 
+        // Iterating over the dictionary directly instead of .Keys prevents snapshot allocation
         foreach (var kvp in _iconCache)
         {
             if (!activeSet.Contains(kvp.Key))
