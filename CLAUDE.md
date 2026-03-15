@@ -59,7 +59,6 @@ Key services:
 - **`WinUIImageFactory`** (`IImageFactory`) — Image creation abstraction for testability.
 - **`FileSystem`** (`IFileSystem`) — File system operations.
 - **`LocalSettingsStore`** (`ISettingsStore`, `ISettingsContainer`) — Windows `ApplicationData.LocalSettings` wrapper.
-- **`VisualTreeFinder`** (`IVisualTreeService`) — Visual tree traversal utility.
 - **`NativeMethods.cs`** — All P/Invoke declarations centralized here. All declarations must have `SetLastError = true`.
 
 ### Helpers

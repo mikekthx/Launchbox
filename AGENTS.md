@@ -76,7 +76,6 @@ Launchbox/
 │   ├── IImageFactory.cs        # Image creation from bytes
 │   ├── ISettingsStore.cs       # Settings persistence abstraction
 │   ├── IStartupService.cs      # Startup registration abstraction
-│   ├── IVisualTreeService.cs   # Visual tree traversal abstraction
 │   ├── IWindowService.cs       # Window management abstraction
 │   └── ...                     # WinUI implementations (WinUI*.cs)
 ├── ViewModels/                 # MVVM ViewModels (use CommunityToolkit.Mvvm source generators)
@@ -269,7 +268,6 @@ Platform-specific operations are abstracted behind interfaces in `Services/` to 
 - `IImageFactory`: Creates UI images (e.g., `BitmapImage`) from raw bytes.
 - `ISettingsStore`: Abstracts settings persistence (LocalSettings).
 - `IStartupService`: Manages app startup registration.
-- `IVisualTreeService`: Abstracts visual tree traversal for UI elements.
 - `IWindowService`: Abstracts window management operations.
 
 Key non-interface services:
