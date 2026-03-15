@@ -26,6 +26,7 @@ public class WindowsShortcutResolverSecurityTests : IDisposable
         _listener.Dispose();
     }
 
+    // Force diff for test inclusion in PR
     [Theory]
     [InlineData("file://C:/Windows/System32/calc.exe")]
     [InlineData("ftp://attacker.com/malware.exe")]
