@@ -108,13 +108,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         // FilteredApps and HasNoMatches are computed from Apps. WinUI data binding
         // won't re-evaluate them automatically when Apps changes, so we notify explicitly.
-        Apps.CollectionChanged += (_, _) =>
-        {
-            _cachedFilteredApps = null;
-            OnPropertyChanged(nameof(FilteredApps));
-            OnPropertyChanged(nameof(HasNoMatches));
-        };
+        Apps.CollectionChanged += Apps_CollectionChanged;
+    }
 
+    private void Apps_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        _cachedFilteredApps = null;
+        OnPropertyChanged(nameof(FilteredApps));
+        OnPropertyChanged(nameof(HasNoMatches));
     }
 
     private void SettingsService_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -283,6 +284,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _loadCts?.Dispose();
         _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
+        Apps.CollectionChanged -= Apps_CollectionChanged;
         GC.SuppressFinalize(this);
     }
 }
