@@ -1,4 +1,7 @@
+using Launchbox.Helpers;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -13,7 +16,7 @@ public class ShortcutService : IShortcutService
         _fileSystem = fileSystem;
     }
 
-    public string[]? GetShortcutFiles(string folderPath, System.Collections.Generic.IReadOnlyList<string> allowedExtensions)
+    public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions)
     {
         if (allowedExtensions == null || !_fileSystem.DirectoryExists(folderPath))
         {
@@ -29,12 +32,12 @@ public class ShortcutService : IShortcutService
         }
         catch (UnauthorizedAccessException ex)
         {
-            System.Diagnostics.Trace.WriteLine($"Failed to access shortcut folder {Launchbox.Helpers.PathSecurity.RedactPath(folderPath)}: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+            Trace.WriteLine($"Failed to access shortcut folder {PathSecurity.RedactPath(folderPath)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
         catch (IOException ex)
         {
-            System.Diagnostics.Trace.WriteLine($"Failed to access shortcut folder {Launchbox.Helpers.PathSecurity.RedactPath(folderPath)}: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+            Trace.WriteLine($"Failed to access shortcut folder {PathSecurity.RedactPath(folderPath)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return null;
         }
     }
