@@ -77,6 +77,11 @@
 - [ ] SearchBox has no visual polish: missing Background, Padding, Margin, CornerRadius -- looks like an unstyled floating field against the backdrop (MainWindow.xaml:143-148)
 - [ ] Window height not clamped to work area: WINDOW_HEIGHT=700 fixed constant can exceed display on small screens like Surface Pro at 150% scaling (Constants.cs, WindowService.cs)
 
+### Reliability
+- [ ] VisualTree 5-file abstraction stack (VisualTreeFinder, IVisualTreeService, WinUIVisualTreeService, IVisualTreeHelperWrapper, VisualTreeHelperWrapper) is unused in production -- MainWindow uses VisualTreeHelper.GetParent directly. Remove or consolidate.
+- [ ] Double call to SettingsService.InitializeAsync() -- called from MainWindow constructor and again from SettingsViewModel constructor when Settings window opens. Harmless but redundant with asymmetric error handling.
+- [ ] _loadCts race condition with AllowConcurrentExecutions=true is theoretically unsafe -- all current callers are on the UI thread, but the attribute signals concurrent safety that doesn't exist. Document or fix with Interlocked.Exchange.
+
 ### Features
 - [ ] Keyboard navigation: arrow keys to move through the grid, Enter to launch -- essential for a keyboard-first launcher
 - [ ] Window height auto-sizing: detect work area and clamp/resize on activation
