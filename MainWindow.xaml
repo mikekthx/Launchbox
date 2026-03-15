@@ -59,7 +59,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
-                    Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
@@ -94,7 +94,7 @@
                   Background="Transparent"
                   SelectionMode="None"
                   IsItemClickEnabled="True"
-                  Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=Invert}"
+                  Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter='Invert'}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ItemsSource="{x:Bind ViewModel.FilteredApps, Mode=OneWay}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
@@ -154,6 +154,6 @@
                    FontSize="16"
                    FontWeight="SemiBold"
                    Text="No matches"
-                   Visibility="{Binding ViewModel.HasNoMatches, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                   Visibility="{x:Bind ViewModel.HasNoMatches, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </Window>
