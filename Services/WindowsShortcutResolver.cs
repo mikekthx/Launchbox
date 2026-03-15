@@ -21,13 +21,11 @@ public class WindowsShortcutResolver : IShortcutResolver
 
         try
         {
-            string extension = Path.GetExtension(shortcutPath).ToLowerInvariant();
-
-            if (extension == ".lnk")
+            if (shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             {
                 return ResolveLnk(shortcutPath);
             }
-            else if (extension == ".url")
+            else if (shortcutPath.EndsWith(".url", StringComparison.OrdinalIgnoreCase))
             {
                 return ResolveUrl(shortcutPath);
             }
@@ -44,7 +42,7 @@ public class WindowsShortcutResolver : IShortcutResolver
 
     public string? ResolveArguments(string shortcutPath)
     {
-        if (string.IsNullOrWhiteSpace(shortcutPath) || Path.GetExtension(shortcutPath).ToLowerInvariant() != ".lnk")
+        if (string.IsNullOrWhiteSpace(shortcutPath) || !shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             return null;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -68,7 +66,7 @@ public class WindowsShortcutResolver : IShortcutResolver
 
     public string? ResolveWorkingDirectory(string shortcutPath)
     {
-        if (string.IsNullOrWhiteSpace(shortcutPath) || Path.GetExtension(shortcutPath).ToLowerInvariant() != ".lnk")
+        if (string.IsNullOrWhiteSpace(shortcutPath) || !shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             return null;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
