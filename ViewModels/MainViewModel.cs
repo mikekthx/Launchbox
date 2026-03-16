@@ -278,8 +278,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void OpenSettings() => _windowService.OpenSettings();
 
-    [RelayCommand]
-    private void ClearFilter() => FilterText = string.Empty;
+    public void ClearFilter() => FilterText = string.Empty;
 
     public void Dispose()
     {

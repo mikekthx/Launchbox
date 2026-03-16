@@ -146,7 +146,7 @@
                  PlaceholderText="Search..."
                  BorderThickness="0">
             <TextBox.KeyboardAccelerators>
-                <KeyboardAccelerator Key="Escape" Command="{x:Bind ViewModel.ClearFilterCommand}" />
+                <KeyboardAccelerator Key="Escape" Invoked="{x:Bind ViewModel.ClearFilter}" />
             </TextBox.KeyboardAccelerators>
         </TextBox>
 
