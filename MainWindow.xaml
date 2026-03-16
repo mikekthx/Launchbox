@@ -144,8 +144,11 @@
                  Grid.Row="1"
                  Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  PlaceholderText="Search..."
-                 BorderThickness="0"
-                 KeyDown="SearchBox_KeyDown" />
+                 BorderThickness="0">
+            <TextBox.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Escape" Command="{x:Bind ViewModel.ClearFilterCommand}" />
+            </TextBox.KeyboardAccelerators>
+        </TextBox>
 
         <TextBlock Grid.Row="0"
                    Grid.RowSpan="2"

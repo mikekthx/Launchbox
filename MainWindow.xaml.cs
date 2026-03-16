@@ -150,12 +150,6 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key == Windows.System.VirtualKey.Escape)
-            ViewModel.FilterText = string.Empty;
-    }
-
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
         _windowService.OnActivated(args);
