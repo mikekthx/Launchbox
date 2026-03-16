@@ -39,9 +39,6 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Setup MSBuild.exe
-        uses: microsoft/setup-msbuild@v2
-
       - name: Cache NuGet packages
         uses: actions/cache@v5
         with:
@@ -90,10 +87,6 @@ jobs:
       with:
         global-json-file: global.json
 
-    # Add MSBuild to the PATH
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v2
-
     # Check if the code follows your style rules
     - name: Verify Code Format
       run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
@@ -131,7 +124,7 @@ jobs:
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: dotnet restore $env:Solution_Name
       env:
         Configuration: ${{ matrix.configuration }}
 
@@ -149,7 +142,7 @@ jobs:
     # Create the app package by building and packaging the single-project MSIX
     - name: Create the app package
       if: github.event_name != 'pull_request'
-      run: msbuild $env:Project_Path /p:Configuration=$env:Configuration /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:GenerateAppxPackageOnBuild=true /p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT /p:NoWarn=APPX0107 /p:AppxPackageVersion=1.0.0.${{ github.run_number }}
+      run: dotnet build $env:Project_Path --configuration $env:Configuration -p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode -p:AppxBundle=$env:Appx_Bundle -p:GenerateAppxPackageOnBuild=true -p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT -p:NoWarn=APPX0107 -p:AppxPackageVersion=1.0.0.${{ github.run_number }}
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x86|x64|arm64
