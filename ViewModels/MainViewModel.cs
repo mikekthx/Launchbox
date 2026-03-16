@@ -278,6 +278,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void OpenSettings() => _windowService.OpenSettings();
 
+    public void ClearFilter() => FilterText = string.Empty;
+
     public void Dispose()
     {
         _loadCts?.Cancel();
