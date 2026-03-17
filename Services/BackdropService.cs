@@ -68,11 +68,20 @@ public class BackdropService : IBackdropService
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Error checking for DWMBlurGlass: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            // Acrylic not available on this system — no backdrop applied.
-            if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
+            Trace.WriteLine($"Error updating backdrop: {PathSecurity.GetSafeExceptionMessage(ex)}");
+
+            // Attempt acrylic as a fallback, but isolate this so a second failure
+            // (e.g., unsupported system) doesn't propagate out of the method.
+            try
             {
-                _windowWrapper.SetDesktopAcrylicBackdrop();
+                if (!_windowWrapper.IsDesktopAcrylicBackdropSet)
+                {
+                    _windowWrapper.SetDesktopAcrylicBackdrop();
+                }
+            }
+            catch (Exception fallbackEx)
+            {
+                Trace.WriteLine($"Fallback backdrop also failed: {PathSecurity.GetSafeExceptionMessage(fallbackEx)}");
             }
         }
     }
