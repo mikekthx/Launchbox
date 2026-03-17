@@ -176,8 +176,9 @@ public class IconService(IFileSystem fileSystem) : IIconService
     }
 
     /// <summary>
-    /// Encapsulates the while(true) retry loop used to handle race conditions when cache entries expire.
-    /// Safely cleans up the cache entry and retries if the entry is expired or throws an exception during value generation.
+    /// Gets a cached value for <paramref name="key"/>, retrying after removing the entry if it
+    /// has expired or if its value factory threw. Optionally recovers from factory exceptions
+    /// via <paramref name="errorHandler"/>; rethrows if no handler is provided.
     /// </summary>
     private TValue GetWithExpirationRetry<TKey, TValue, TArg>(
         ConcurrentDictionary<TKey, Lazy<TValue>> cache,
@@ -201,16 +202,16 @@ public class IconService(IFileSystem fileSystem) : IIconService
                 }
 
                 // Cache expired, try to remove and retry
-                cache.TryRemove(key, out _);
+                cache.TryRemove(new KeyValuePair<TKey, Lazy<TValue>>(key, lazyEntry));
             }
             catch (Exception ex)
             {
-                cache.TryRemove(key, out _);
+                cache.TryRemove(new KeyValuePair<TKey, Lazy<TValue>>(key, lazyEntry));
                 if (errorHandler != null)
                 {
                     return errorHandler(ex);
                 }
-                throw; // Rethrow if no handler provided
+                throw;
             }
         }
     }
