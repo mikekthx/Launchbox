@@ -37,7 +37,6 @@ dotnet test Launchbox.Tests/Launchbox.Tests.csproj --filter "FullyQualifiedName~
 - **`SettingsWindow.xaml(.cs)`** — Secondary window for settings. Instantiates its own `SettingsViewModel`; disposes on close.
 - **`ViewModels/MainViewModel.cs`** — Business logic: scanning shortcuts, filtering extensions, launching apps. Uses only interfaces, no WinUI types.
 - **`ViewModels/SettingsViewModel.cs`** — Settings page logic: shortcuts path, hotkey configuration, startup toggle.
-- **`ViewModels/ViewModelBase.cs`** — Base class for ViewModels with shared infrastructure.
 - **`Models/AppItem.cs`** — Shortcut model. Uses `object` for Icon to stay WinUI-free (enables testing).
 
 ### Service Abstraction
@@ -97,7 +96,7 @@ CI runs on push/PR to `main` (`.github/workflows/dotnet-desktop.yml`):
 
 ## Code Style
 
-- 4-space indentation, **Allman** brace style, ~120 char line width
+- 4-space indentation (2-space for XAML/XML/csproj), **Allman** brace style, ~120 char line width
 - File-scoped namespaces, one class per file
 - **Nullable reference types enabled** — use `?` suffix everywhere
 - `string.Empty` not `""`, `var` when type is obvious, modern syntax (`new()`, `[]`)
