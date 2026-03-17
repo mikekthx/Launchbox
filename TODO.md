@@ -99,6 +99,7 @@
 
 ### Performance
 - [ ] Blocking I/O on UI thread: `GetShortcutFiles` runs synchronously before the first `await` in `LoadAppsAsync` -- blocks the message pump if the shortcuts folder is on a slow or sleeping drive. Wrap in `Task.Run`. (MainViewModel.cs:103) [Gemini]
+- [ ] WindowsShortcutResolver creates 3 separate COM objects per `.lnk` launch: `ResolveTarget`, `ResolveArguments`, and `ResolveWorkingDirectory` each independently create a new ShellLink and call `IPersistFile.Load` -- should resolve once and return all metadata (WindowsShortcutResolver.cs:43-117) [Claude]
 
 ### Reliability
 - [ ] Startup toggle race v2: rapid opposite toggles (true→false) can be dropped because `RunAtStartup` setter compares against current persisted state, not latest in-flight intent -- second toggle is skipped when `IsRunAtStartup` hasn't updated yet (SettingsViewModel.cs:108-117) [Codex]
@@ -112,6 +113,18 @@
 
 ### Architecture & Code Quality
 - [ ] Duplicate COM interop: WinUILauncher resolves `.lnk` target/args/workdir for validation, then ProcessStarter resolves the same metadata again -- doubles COM work on every launch and creates two policy implementations that can drift (WinUILauncher.cs:53-64, ProcessStarter.cs:25-30) [Gemini+Codex]
+- [ ] IWindowService depends on WinUI type `WindowActivatedEventArgs` in `OnActivated()` -- couples the interface and its mock to `Microsoft.UI.Xaml`, undermining the abstraction pattern used by all other services (IWindowService.cs:30) [Claude]
+
+### Security
+- [ ] `PathSecurity.IsUnsafePath` returns false (safe) for null/empty/whitespace paths -- `Process.Start("")` with `UseShellExecute=true` opens the working directory in Explorer; callers do not separately guard against blank paths (PathSecurity.cs:10) [Claude]
+
+### Reliability
+- [ ] `IsRecoverable` defaults to non-recoverable for most exceptions: `NullReferenceException`, `InvalidOperationException`, binding errors, etc. all trigger `MessageBox + Environment.Exit(1)` -- should default to recoverable for non-catastrophic exceptions and only return false for OOM/SOF/SEH/AV (App.xaml.cs:43-53) [Claude]
+- [ ] SettingsWindow mutates shared `IFilePickerService.OwnerWindow` without restoring it -- after SettingsWindow closes, `OwnerWindow` still references the disposed window (SettingsWindow.xaml.cs:15) [Claude]
+- [ ] IconService cache retry methods (`GetCachedDirectoryInfo`, `GetCachedLastWriteTime`) use `while (true)` with no iteration limit -- if the Lazy factory consistently takes longer than `CACHE_DURATION` (2s), the loop spins indefinitely (IconService.cs:186-255) [Claude]
+
+### Resource Leaks & Lifecycle
+- [ ] `MainWindow_Closed` does not dispose `SettingsService`, `BackdropService`, or other services created in the constructor -- event subscriptions can keep objects rooted (MainWindow.xaml.cs:174-189) [Claude]
 
 ### Features
 - [ ] Keyboard navigation: arrow keys to move through the grid, Enter to launch -- essential for a keyboard-first launcher
@@ -139,3 +152,7 @@
 - [x] Implement .NET 10 collection expressions globally where arrays or lists are initialized.
 - [ ] Window can appear off-screen horizontally after monitor disconnect: `ClampToWorkArea` only checks height, not whether the window's X position is still on a connected display (WindowService.cs:363-382) [Gemini]
 - [ ] Tests don't cover `SetValue` bool return behavior: `LocalSettingsStoreTests` verifies "does not throw" instead of return value, `WindowPositionManagerTests` models failure as exceptions not `false` returns (LocalSettingsStoreTests.cs:82, WindowPositionManagerTests.cs:77) [Codex]
+- [ ] WinUILauncher argument validation heuristic (`args.Contains("\\\\") || args.Contains("//")`) can false-positive on legitimate args like `https://` URLs and false-negative on creative UNC encoding -- same pattern duplicated in ProcessStarter (WinUILauncher.cs:75-76, ProcessStarter.cs:28) [Claude]
+- [ ] Missing null guards on `BackdropService`, `WinUILauncher`, and `ShortcutService` constructor parameters -- inconsistent with all other services (BackdropService.cs:21-29, WinUILauncher.cs:16-21, ShortcutService.cs:10) [Claude]
+- [ ] Dead test infrastructure: `MockWindowService` tracks `InitializeCalled`, `OnActivatedCalled`, `ExitCalled`, and has `RaiseHotkeyRegistrationFailed` but none are asserted in any test (MockWindowService.cs:11,27-29) [Claude]
+- [ ] `ProcessStarter.Start` returns null for null `startInfo` instead of throwing `ArgumentNullException` -- callers with a null bug get silent failure (ProcessStarter.cs:17-56) [Claude]
