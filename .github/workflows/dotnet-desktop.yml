@@ -122,6 +122,10 @@ jobs:
         path: "**/test-results.trx"
         reporter: dotnet-trx
 
+    # Build the full WinUI app to catch XAML/binding compile errors (tests only link a subset of files)
+    - name: Build the application
+      run: dotnet build $env:Project_Path --configuration ${{ matrix.configuration }} -p:AppxPackageSigningEnabled=false
+
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: dotnet restore $env:Solution_Name
