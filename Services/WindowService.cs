@@ -1,5 +1,6 @@
 using Launchbox;
 using Launchbox.Helpers;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
@@ -25,6 +26,7 @@ public class WindowService : IWindowService, IDisposable
     private int _currentMod;
     private int _currentKey;
     private bool _isHotkeyRegistered;
+    private DispatcherQueueTimer? _savePositionTimer;
 
     public bool IsVisible => _window.Visible;
 
@@ -69,6 +71,12 @@ public class WindowService : IWindowService, IDisposable
         _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT));
         _appWindow.Move(new Windows.Graphics.PointInt32(-10000, -10000));
         _appWindow.Changed += AppWindow_Changed;
+
+        // Debounce timer for window position persistence — saves after 500ms of no movement
+        _savePositionTimer = _window.DispatcherQueue.CreateTimer();
+        _savePositionTimer.Interval = TimeSpan.FromMilliseconds(500);
+        _savePositionTimer.IsRepeating = false;
+        _savePositionTimer.Tick += (_, _) => SaveWindowPosition();
 
         // Hotkey
         UpdateHotkey();
@@ -132,7 +140,9 @@ public class WindowService : IWindowService, IDisposable
     {
         if (_hasPositioned && (args.DidPositionChange || args.DidSizeChange))
         {
-            SaveWindowPosition();
+            // Reset the debounce timer — only persists after 500ms of no movement
+            _savePositionTimer?.Stop();
+            _savePositionTimer?.Start();
         }
     }
 
@@ -289,6 +299,16 @@ public class WindowService : IWindowService, IDisposable
                 _appWindow.Changed -= AppWindow_Changed;
             }
 
+            if (_savePositionTimer != null)
+            {
+                if (_savePositionTimer.IsRunning)
+                {
+                    _savePositionTimer.Stop();
+                    SaveWindowPosition();
+                }
+                _savePositionTimer = null;
+            }
+
             if (_settingsWindow != null)
             {
                 _settingsWindow.Closed -= SettingsWindow_Closed;
@@ -380,6 +400,12 @@ public class WindowService : IWindowService, IDisposable
     {
         if (_appWindow != null && args.WindowActivationState == WindowActivationState.Deactivated)
         {
+            // Flush any pending debounced save before hiding
+            if (_savePositionTimer != null && _savePositionTimer.IsRunning)
+            {
+                _savePositionTimer.Stop();
+                SaveWindowPosition();
+            }
             _appWindow.Hide();
         }
     }
