@@ -1,6 +1,6 @@
-# AGENTS.md - Launchbox
+# Launchbox — Agent Guide
 
-Guidance for AI coding agents working on this codebase.
+Guidance for AI coding agents working on this codebase. This is the single source of truth — CLAUDE.md and GEMINI.md are symlinks to this file.
 
 ## Project Overview
 
@@ -42,10 +42,14 @@ Note: Both the main project and test project have WinUI dependencies. `dotnet te
 The test project uses **file-linking** (`<Compile Include="..\ClassName.cs" Link="..." />`) instead of a `<ProjectReference>` to include production code. This avoids pulling in the WinUI application host while testing real production classes. When adding a new testable class, add a corresponding `<Compile Include>` entry to `Launchbox.Tests/Launchbox.Tests.csproj`.
 
 ### CI/CD
-- CI runs `dotnet format --verify-no-changes` -- run `dotnet format Launchbox.sln` locally before committing
-- Tests run in both **Debug** and **Release** configurations
-- **CodeQL** security scan runs on every push/PR
-- MSIX packages are built and signed on non-PR builds
+
+CI runs on push/PR to `main` (`.github/workflows/dotnet-desktop.yml`):
+1. **Code format** — `dotnet format --verify-no-changes` (run `dotnet format Launchbox.sln` locally before committing)
+2. **App build** — `dotnet build` of the full WinUI app to catch XAML/binding compile errors
+3. **Unit tests** — `dotnet test` on both Debug and Release configurations
+4. **CodeQL** — Security scanning for C# vulnerabilities
+5. **MSIX packaging** — Signed package build (push to `main` only)
+6. **Artifact attestation** — Build provenance for published packages
 
 ## Project Structure
 
@@ -65,6 +69,8 @@ Launchbox/
 │   ├── ImageHeaderParser.cs    # Image format detection
 │   ├── ListViewBaseExtensions.cs # Attached property for ItemClick → ICommand binding
 │   └── PathSecurity.cs         # Path validation and sanitization
+│   # CommunityToolkit.Mvvm provides ObservableObject base class,
+│   # [RelayCommand] and [ObservableProperty] source generators
 ├── Models/                     # Data models
 │   └── AppItem.cs              # Application shortcut model
 ├── Services/                   # Platform-agnostic interfaces and implementations
@@ -102,7 +108,7 @@ For settings-related tasks, also inspect:
 ## Code Style
 
 ### Formatting
-- 4-space indentation, Allman brace style
+- 4-space indentation for C# (2-space for XAML/XML/csproj per `.editorconfig`), Allman brace style
 - ~120 char line length
 - File-scoped namespaces preferred
 - One class per file (helper classes inline OK)
@@ -169,9 +175,10 @@ catch (Exception ex)
 - Use `finally` for cleanup
 
 ### P/Invoke
-All P/Invoke declarations are centralized in `Services/NativeMethods.cs`. Use single-line format:
+All P/Invoke declarations are centralized in `Services/NativeMethods.cs`. All declarations must include `SetLastError = true`:
 ```csharp
-[DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr hWnd);
+[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+public static extern bool SetForegroundWindow(IntPtr hWnd);
 ```
 
 ### Code Organization
@@ -183,7 +190,7 @@ Use section comments in large files:
 ```
 
 ### XAML
-- 4-space indentation
+- 2-space indentation (per `.editorconfig`)
 - Multi-line attributes for complex elements
 - Use `x:Bind` (compiled bindings) for simple properties. For dynamic types (e.g. `AppItem.Icon`), use `x:Bind` with a cast: `{x:Bind (media:ImageSource)Icon}`.
 - When adding commands or variables to out-of-tree UI elements (such as TaskbarIcon, ContextFlyout, or MenuFlyout), always use standard {Binding} instead of {x:Bind} to avoid CS1503 casting errors during compilation. Ensure `RootGrid.DataContext = this;` is set in the code-behind.
@@ -283,11 +290,16 @@ Platform-specific operations are abstracted behind interfaces in `Services/` to 
 - `IStartupService`: Manages app startup registration.
 - `IWindowService`: Abstracts window management operations.
 
-Key non-interface services:
+Additional services:
 - `SettingsService`: Central settings coordinator. Raises `PropertyChanged` events that trigger app reloads and hotkey re-registration.
-- `IconService`: Icon extraction pipeline with caching, custom icon support (`.icons/` directory), and resolution comparison.
-- `ShortcutService`: Discovers and filters shortcut files by allowed extensions.
-- `NativeMethods`: Centralized P/Invoke declarations (user32, kernel32).
+- `IconService` (`IIconService`): Icon extraction pipeline with caching, custom icon support (`.icons/` directory), and resolution comparison.
+- `ShortcutService` (`IShortcutService`): Discovers and filters shortcut files by allowed extensions.
+- `ProcessStarter` (`IProcessStarter`): Wraps `Process.Start` with input sanitization.
+- `ProcessService` (`IProcessService`): Higher-level process operations.
+- `WinUILauncher` (`IAppLauncher`): App launching logic with shortcut validation.
+- `WindowsShortcutResolver` (`IShortcutResolver`): Resolves `.lnk` shortcut targets via ShellLink COM interop.
+- `WindowPositionManager`: Manages window position persistence via `ISettingsStore`.
+- `NativeMethods`: Centralized P/Invoke declarations (user32, kernel32). All declarations must have `SetLastError = true`.
 
 ### Window Behavior
 - App starts **hidden off-screen**, positions on first Alt+S press
