@@ -80,8 +80,8 @@
 - [x] FilteredApps double enumeration: HasNoMatches calls FilteredApps.Any() which re-runs the LINQ Where on every keystroke -- cache as materialized list (MainViewModel.cs:53-59)
 
 ### UI/UX
-- [ ] SearchBox has no visual polish: missing Background, Padding, Margin, CornerRadius -- looks like an unstyled floating field against the backdrop (MainWindow.xaml:143-148)
-- [ ] Window height not clamped to work area: WINDOW_HEIGHT=700 fixed constant can exceed display on small screens like Surface Pro at 150% scaling (Constants.cs, WindowService.cs)
+- [x] SearchBox has no visual polish: missing Background, Padding, Margin, CornerRadius -- looks like an unstyled floating field against the backdrop (MainWindow.xaml:143-148)
+- [x] Window height not clamped to work area: WINDOW_HEIGHT=700 fixed constant can exceed display on small screens like Surface Pro at 150% scaling (Constants.cs, WindowService.cs)
 
 ### Performance
 - [x] Window position saved on every drag frame: `AppWindow_Changed` calls `SaveWindowPosition()` on every position/size change with no debounce -- causes heavy disk I/O during drag operations (WindowService.cs:131-136) [Gemini]
@@ -92,10 +92,10 @@
 ### Reliability
 - [x] Hotkey values not validated from storage: corrupt or hostile local settings can persist invalid modifier/key codes, causing repeated registration failures every startup with no recovery path (SettingsService.cs:58, WindowService.cs:95) [Codex]
 - [x] Window hides before launch attempt: MainViewModel hides the window before `Launch()` -- if the shortcut is broken or blocked, the UI is already gone and failures are invisible (MainViewModel.cs:242) [Codex]
-- [ ] Settings writes fail silently: `LocalSettingsStore.SetValue` only logs on exception but callers raise `PropertyChanged` and proceed as if persistence succeeded -- settings appear saved in-session but are lost after restart (LocalSettingsStore.cs:35, SettingsService.cs:50) [Codex]
+- [x] Settings writes fail silently: `LocalSettingsStore.SetValue` only logs on exception but callers raise `PropertyChanged` and proceed as if persistence succeeded -- settings appear saved in-session but are lost after restart (LocalSettingsStore.cs:35, SettingsService.cs:50) [Codex]
 - [x] VisualTree 5-file abstraction stack (VisualTreeFinder, IVisualTreeService, WinUIVisualTreeService, IVisualTreeHelperWrapper, VisualTreeHelperWrapper) is unused in production -- MainWindow uses VisualTreeHelper.GetParent directly. Remove or consolidate.
-- [ ] Double call to SettingsService.InitializeAsync() -- called from MainWindow constructor and again from SettingsViewModel constructor when Settings window opens. Harmless but redundant with asymmetric error handling.
-- [ ] _loadCts race condition with AllowConcurrentExecutions=true is theoretically unsafe -- all current callers are on the UI thread, but the attribute signals concurrent safety that doesn't exist. Document or fix with Interlocked.Exchange.
+- [x] Double call to SettingsService.InitializeAsync() -- called from MainWindow constructor and again from SettingsViewModel constructor when Settings window opens. Harmless but redundant with asymmetric error handling. (No longer reproducible — only one call site exists in MainWindow.xaml.cs)
+- [x] _loadCts race condition with AllowConcurrentExecutions=true is theoretically unsafe -- all current callers are on the UI thread, but the attribute signals concurrent safety that doesn't exist. Document or fix with Interlocked.Exchange.
 
 ### Features
 - [ ] Keyboard navigation: arrow keys to move through the grid, Enter to launch -- essential for a keyboard-first launcher
@@ -105,7 +105,7 @@
 
 ## Low
 
-- [ ] Tray tooltip hardcoded to "Alt+S" despite configurable hotkey -- becomes misleading once the user changes the shortcut (MainWindow.xaml:25) [Codex]
+- [x] Tray tooltip hardcoded to "Alt+S" despite configurable hotkey -- becomes misleading once the user changes the shortcut (MainWindow.xaml:25) [Codex]
 - [x] .editorconfig enforces 2-space XAML/XML indentation but CLAUDE.md documents 4-space -- contributors and formatting tools receive conflicting guidance (.editorconfig:20, CLAUDE.md) [Codex]
 - [x] CLAUDE.md references non-existent `ViewModels/ViewModelBase.cs` -- stale after CommunityToolkit.Mvvm migration removed the file (CLAUDE.md:40) [Codex]
 - [x] Icon size mismatch: extracted at 96px, displayed at 56 DIPs -- blurry on high-DPI (Constants.cs:17, MainWindow.xaml:85)
