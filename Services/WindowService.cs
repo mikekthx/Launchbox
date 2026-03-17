@@ -189,6 +189,7 @@ public class WindowService : IWindowService, IDisposable
                 }
             }
 
+            ClampToWorkArea();
             _appWindow.Show();
 
             if (NativeMethods.IsIconic(_hWnd))
@@ -343,14 +344,40 @@ public class WindowService : IWindowService, IDisposable
         try
         {
             var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
-            _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT));
+            int height = Math.Min(Constants.WINDOW_HEIGHT, displayArea.WorkArea.Height - 40);
+            _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
             var x = (displayArea.WorkArea.Width - Constants.WINDOW_WIDTH) / 2;
-            var y = (displayArea.WorkArea.Height - Constants.WINDOW_HEIGHT) / 2;
+            var y = (displayArea.WorkArea.Height - height) / 2;
             _appWindow.Move(new Windows.Graphics.PointInt32(x, y));
         }
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to center window: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+    }
+
+    /// <summary>
+    /// Ensures the window fits within the current display's work area,
+    /// shrinking its height if needed (e.g., small screen at high DPI scaling).
+    /// </summary>
+    private void ClampToWorkArea()
+    {
+        if (_appWindow == null) return;
+
+        try
+        {
+            var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
+            var size = _appWindow.Size;
+            int maxHeight = displayArea.WorkArea.Height - 40;
+
+            if (size.Height > maxHeight)
+            {
+                _appWindow.Resize(new Windows.Graphics.SizeInt32(size.Width, maxHeight));
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to clamp window to work area: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
