@@ -241,8 +241,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             try
             {
-                _windowService.Hide();
                 _appLauncher.Launch(app.Path);
+                _windowService.Hide();
             }
             catch (Exception ex)
             {
