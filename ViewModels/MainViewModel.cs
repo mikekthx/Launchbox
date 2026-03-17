@@ -84,6 +84,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public string ToggleWindowText => _windowService.IsVisible ? "Hide" : "Show";
 
+    public string TrayToolTipText
+    {
+        get
+        {
+            int mod = _settingsService.HotkeyModifiers;
+            int key = _settingsService.HotkeyKey;
+
+            var parts = new List<string>();
+            if ((mod & Constants.MOD_CONTROL) != 0) parts.Add("Ctrl");
+            if ((mod & Constants.MOD_ALT) != 0) parts.Add("Alt");
+            if ((mod & Constants.MOD_SHIFT) != 0) parts.Add("Shift");
+            if ((mod & Constants.MOD_WIN) != 0) parts.Add("Win");
+
+            var vk = (Windows.System.VirtualKey)key;
+            string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
+                ? ((char)key).ToString()
+                : vk.ToString();
+            parts.Add(keyName);
+
+            return $"Launchbox ({string.Join("+", parts)})";
+        }
+    }
+
     public MainViewModel(
         IShortcutService shortcutService,
         IIconService iconService,
@@ -130,6 +153,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ItemWidth));
             OnPropertyChanged(nameof(ItemHeight));
             OnPropertyChanged(nameof(IconSize));
+        }
+        else if (e.PropertyName is nameof(SettingsService.HotkeyModifiers) or nameof(SettingsService.HotkeyKey))
+        {
+            OnPropertyChanged(nameof(TrayToolTipText));
         }
     }
 

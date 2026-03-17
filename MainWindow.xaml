@@ -22,7 +22,7 @@
 
         <tb:TaskbarIcon x:Name="TrayIcon"
                         AutomationProperties.Name="Launchbox System Tray Icon"
-                        ToolTipText="Launchbox (Alt+S)"
+                        ToolTipText="{Binding ViewModel.TrayToolTipText, Mode=OneWay}"
                         IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
                         LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}"
                         DoubleClickCommand="{Binding ViewModel.ToggleWindowCommand}">
