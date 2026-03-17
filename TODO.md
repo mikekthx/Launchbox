@@ -97,6 +97,22 @@
 - [x] Double call to SettingsService.InitializeAsync() -- called from MainWindow constructor and again from SettingsViewModel constructor when Settings window opens. Harmless but redundant with asymmetric error handling. (No longer reproducible — only one call site exists in MainWindow.xaml.cs)
 - [x] _loadCts race condition with AllowConcurrentExecutions=true is theoretically unsafe -- all current callers are on the UI thread, but the attribute signals concurrent safety that doesn't exist. Document or fix with Interlocked.Exchange.
 
+### Performance
+- [ ] Blocking I/O on UI thread: `GetShortcutFiles` runs synchronously before the first `await` in `LoadAppsAsync` -- blocks the message pump if the shortcuts folder is on a slow or sleeping drive. Wrap in `Task.Run`. (MainViewModel.cs:103) [Gemini]
+
+### Reliability
+- [ ] Startup toggle race v2: rapid opposite toggles (true→false) can be dropped because `RunAtStartup` setter compares against current persisted state, not latest in-flight intent -- second toggle is skipped when `IsRunAtStartup` hasn't updated yet (SettingsViewModel.cs:108-117) [Codex]
+- [ ] SemaphoreSlim disposed mid-flight: closing the Settings window while a fire-and-forget startup toggle is waiting on `_startupToggleLock` produces `ObjectDisposedException` from `WaitAsync()` or `Release()` (SettingsViewModel.cs:71, 180) [Codex]
+- [ ] WindowPositionManager ignores `SetValue` bool return: partial write failures can persist a mixed X/Y/W/H tuple with no signal to the caller -- stale coordinates with new size values or vice versa (WindowPositionManager.cs:64-69) [Codex]
+- [ ] WindowService finalizer touches thread-affine APIs (`UnregisterHotKey`, `SetWindowLongPtr`) from the GC finalizer thread -- if `Dispose()` is missed, the finalizer can operate on an invalid or destroyed HWND (WindowService.cs:275-335) [Codex]
+
+### UI/UX
+- [ ] Window dragging drift: `GetCurrentPoint(null)` returns window-relative coordinates that shift after `AppWindow.Move`, causing the delta calculation to reference a stale anchor -- window drifts or jitters during drag (MainWindow.xaml.cs:113-131) [Gemini]
+- [ ] ClampToWorkArea only shrinks height: if the window is shown on a small display, the reduced height is saved back and never restored when later shown on a larger display (WindowService.cs:363-382, 390) [Codex]
+
+### Architecture & Code Quality
+- [ ] Duplicate COM interop: WinUILauncher resolves `.lnk` target/args/workdir for validation, then ProcessStarter resolves the same metadata again -- doubles COM work on every launch and creates two policy implementations that can drift (WinUILauncher.cs:53-64, ProcessStarter.cs:25-30) [Gemini+Codex]
+
 ### Features
 - [ ] Keyboard navigation: arrow keys to move through the grid, Enter to launch -- essential for a keyboard-first launcher
 - [ ] Window height auto-sizing: detect work area and clamp/resize on activation
@@ -121,3 +137,5 @@
 - [x] No version auto-increment in CI -- every build is 1.0.0.0 (Package.appxmanifest:14)
 - [x] Launchbox.Tests.csproj has inconsistent indentation -- mix of tabs and spaces (Tests.csproj:6,10)
 - [x] Implement .NET 10 collection expressions globally where arrays or lists are initialized.
+- [ ] Window can appear off-screen horizontally after monitor disconnect: `ClampToWorkArea` only checks height, not whether the window's X position is still on a connected display (WindowService.cs:363-382) [Gemini]
+- [ ] Tests don't cover `SetValue` bool return behavior: `LocalSettingsStoreTests` verifies "does not throw" instead of return value, `WindowPositionManagerTests` models failure as exceptions not `false` returns (LocalSettingsStoreTests.cs:82, WindowPositionManagerTests.cs:77) [Codex]
