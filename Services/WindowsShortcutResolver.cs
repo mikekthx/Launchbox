@@ -15,7 +15,7 @@ public class WindowsShortcutResolver : IShortcutResolver
         _fileSystem = fileSystem;
     }
 
-    public string? ResolveTarget(string shortcutPath)
+    public ShortcutMetadata? Resolve(string shortcutPath)
     {
         if (string.IsNullOrWhiteSpace(shortcutPath)) return null;
 
@@ -23,15 +23,15 @@ public class WindowsShortcutResolver : IShortcutResolver
         {
             if (shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             {
-                return ResolveLnk(shortcutPath);
+                return ResolveLnkAll(shortcutPath);
             }
             else if (shortcutPath.EndsWith(".url", StringComparison.OrdinalIgnoreCase))
             {
-                return ResolveUrl(shortcutPath);
+                return new ShortcutMetadata(ResolveUrl(shortcutPath), null, null);
             }
 
             // Not a shortcut
-            return shortcutPath;
+            return new ShortcutMetadata(shortcutPath, null, null);
         }
         catch (Exception ex)
         {
@@ -40,52 +40,22 @@ public class WindowsShortcutResolver : IShortcutResolver
         }
     }
 
+    public string? ResolveTarget(string shortcutPath)
+    {
+        return Resolve(shortcutPath)?.Target;
+    }
+
     public string? ResolveArguments(string shortcutPath)
     {
-        if (string.IsNullOrWhiteSpace(shortcutPath) || !shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
-            return null;
-
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return null;
-
-        IShellLinkW? link = null;
-        try
-        {
-            link = (IShellLinkW)new ShellLink();
-            ((IPersistFile)link).Load(shortcutPath, 0);
-            // Arguments can be longer than MAX_PATH (260); use a larger buffer.
-            var sb = new StringBuilder(1024);
-            link.GetArguments(sb, sb.Capacity);
-            return sb.ToString();
-        }
-        // COM resolution can fail for shortcuts pointing to nonexistent or inaccessible targets.
-        // Swallow and return null — a single bad .lnk should not break the entire loading pipeline.
-        catch (COMException) { return null; }
-        finally { if (link != null) Marshal.ReleaseComObject(link); }
+        return Resolve(shortcutPath)?.Arguments;
     }
 
     public string? ResolveWorkingDirectory(string shortcutPath)
     {
-        if (string.IsNullOrWhiteSpace(shortcutPath) || !shortcutPath.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
-            return null;
-
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return null;
-
-        IShellLinkW? link = null;
-        try
-        {
-            link = (IShellLinkW)new ShellLink();
-            ((IPersistFile)link).Load(shortcutPath, 0);
-            var sb = new StringBuilder(260); // MAX_PATH
-            link.GetWorkingDirectory(sb, sb.Capacity);
-            return sb.ToString();
-        }
-        catch (COMException) { return null; }
-        finally { if (link != null) Marshal.ReleaseComObject(link); }
+        return Resolve(shortcutPath)?.WorkingDirectory;
     }
 
-    private string? ResolveLnk(string path)
+    private ShortcutMetadata? ResolveLnkAll(string path)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -97,9 +67,17 @@ public class WindowsShortcutResolver : IShortcutResolver
         {
             link = (IShellLinkW)new ShellLink();
             ((IPersistFile)link).Load(path, 0);
-            var sb = new StringBuilder(260); // MAX_PATH
-            link.GetPath(sb, sb.Capacity, IntPtr.Zero, 0);
-            return sb.ToString();
+
+            var pathSb = new StringBuilder(260); // MAX_PATH
+            link.GetPath(pathSb, pathSb.Capacity, IntPtr.Zero, 0);
+
+            var argsSb = new StringBuilder(1024);
+            link.GetArguments(argsSb, argsSb.Capacity);
+
+            var dirSb = new StringBuilder(260); // MAX_PATH
+            link.GetWorkingDirectory(dirSb, dirSb.Capacity);
+
+            return new ShortcutMetadata(pathSb.ToString(), argsSb.ToString(), dirSb.ToString());
         }
         // COM resolution can fail for shortcuts pointing to nonexistent or inaccessible targets.
         // Swallow and return null — a single bad .lnk should not break the entire loading pipeline.

@@ -44,7 +44,8 @@ public class WinUILauncher : IAppLauncher
         // Validate shortcut target (Defense-in-depth)
         if (extension == ".lnk" || extension == ".url")
         {
-            string? targetPath = _shortcutResolver.ResolveTarget(path);
+            var metadata = _shortcutResolver.Resolve(path);
+            string? targetPath = metadata?.Target;
 
             // .url files MUST resolve to a safe scheme (http/https). A null result means
             // the resolver rejected the scheme, so block execution to prevent shell-executing
@@ -71,14 +72,14 @@ public class WinUILauncher : IAppLauncher
 
             if (extension == ".lnk")
             {
-                string? args = _shortcutResolver.ResolveArguments(path);
+                string? args = metadata?.Arguments;
                 if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
                     return;
                 }
 
-                string? workingDir = _shortcutResolver.ResolveWorkingDirectory(path);
+                string? workingDir = metadata?.WorkingDirectory;
                 if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe working directory: {PathSecurity.RedactPath(path)}");
