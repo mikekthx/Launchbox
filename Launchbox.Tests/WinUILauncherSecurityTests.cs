@@ -92,4 +92,46 @@ public class WinUILauncherSecurityTests
 
         Assert.True(_processStarter.WasStarted);
     }
+
+    [Fact]
+    public void Launch_Blocks_UrlFile_When_ResolveTarget_Returns_Null()
+    {
+        // Setup: resolver returns null (unsafe scheme like file://, ms-settings://, etc.)
+        var shortcutResolver = new MockShortcutResolver(target: null);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\malicious.url");
+
+        launcher.Launch(@"C:\safe\malicious.url");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Allows_UrlFile_When_ResolveTarget_Returns_SafeUrl()
+    {
+        var shortcutResolver = new MockShortcutResolver("https://example.com");
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\website.url");
+
+        launcher.Launch(@"C:\safe\website.url");
+
+        Assert.True(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Allows_LnkFile_When_ResolveTarget_Returns_Null()
+    {
+        // .lnk files with null resolution are allowed — COM may fail for valid shortcuts
+        // that the shell can still handle
+        var shortcutResolver = new MockShortcutResolver(target: null);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.True(_processStarter.WasStarted);
+    }
 }

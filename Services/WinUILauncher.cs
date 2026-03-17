@@ -46,8 +46,20 @@ public class WinUILauncher : IAppLauncher
         {
             string? targetPath = _shortcutResolver.ResolveTarget(path);
 
-            // If we can resolve it, check if the target is safe (Defense-in-depth)
-            if (!string.IsNullOrEmpty(targetPath))
+            // .url files MUST resolve to a safe scheme (http/https). A null result means
+            // the resolver rejected the scheme, so block execution to prevent shell-executing
+            // arbitrary URI schemes (file://, ms-settings://, custom handlers, etc.).
+            // .lnk files may return null from COM resolution for valid shortcuts the shell
+            // can still handle, so only .url null-resolution is treated as a security block.
+            if (string.IsNullOrEmpty(targetPath))
+            {
+                if (extension == ".url")
+                {
+                    Trace.WriteLine($"Blocked execution of .url with unresolvable or unsafe scheme: {PathSecurity.RedactPath(path)}");
+                    return;
+                }
+            }
+            else
             {
                 if (PathSecurity.IsUnsafePath(targetPath))
                 {
