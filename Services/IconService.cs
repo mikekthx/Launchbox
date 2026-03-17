@@ -176,16 +176,57 @@ public class IconService(IFileSystem fileSystem) : IIconService
     }
 
     /// <summary>
+    /// Gets a cached value for <paramref name="key"/>, retrying after removing the entry if it
+    /// has expired or if its value factory threw. Optionally recovers from factory exceptions
+    /// via <paramref name="errorHandler"/>; rethrows if no handler is provided.
+    /// </summary>
+    private TValue GetWithExpirationRetry<TKey, TValue, TArg>(
+        ConcurrentDictionary<TKey, Lazy<TValue>> cache,
+        TKey key,
+        Func<TKey, TArg, Lazy<TValue>> valueFactory,
+        TArg factoryArgument,
+        Func<TValue, bool> isExpired,
+        Func<Exception, TValue>? errorHandler = null) where TKey : notnull
+    {
+        while (true)
+        {
+            var lazyEntry = cache.GetOrAdd(key, valueFactory, factoryArgument);
+
+            try
+            {
+                var entry = lazyEntry.Value;
+
+                if (!isExpired(entry))
+                {
+                    return entry;
+                }
+
+                // Cache expired, try to remove and retry
+                cache.TryRemove(new KeyValuePair<TKey, Lazy<TValue>>(key, lazyEntry));
+            }
+            catch (Exception ex)
+            {
+                cache.TryRemove(new KeyValuePair<TKey, Lazy<TValue>>(key, lazyEntry));
+                if (errorHandler != null)
+                {
+                    return errorHandler(ex);
+                }
+                throw;
+            }
+        }
+    }
+
+    /// <summary>
     /// Retrieves cached directory information (existence and file list) with a short expiration.
     /// </summary>
     /// <param name="directoryPath">The directory path to query.</param>
     /// <returns>A tuple containing a boolean indicating existence and a HashSet of file paths if successful.</returns>
     private (bool Exists, HashSet<string>? Files) GetCachedDirectoryInfo(string directoryPath)
     {
-        // Loop to handle potential race conditions during cache expiration
-        while (true)
-        {
-            var lazyEntry = _directoryCache.GetOrAdd(directoryPath, static (dir, fs) => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() =>
+        var result = GetWithExpirationRetry(
+            _directoryCache,
+            directoryPath,
+            static (dir, fs) => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() =>
             {
                 bool exists = fs.DirectoryExists(dir);
                 HashSet<string>? files = null;
@@ -202,56 +243,33 @@ public class IconService(IFileSystem fileSystem) : IIconService
                     }
                 }
                 return (exists, files, DateTime.UtcNow);
-            }), _fileSystem);
+            }),
+            _fileSystem,
+            static entry => (DateTime.UtcNow - entry.Timestamp) >= CACHE_DURATION
+        );
 
-            var dirEntry = lazyEntry.Value;
-
-            if ((DateTime.UtcNow - dirEntry.Timestamp) < CACHE_DURATION)
-            {
-                return (dirEntry.Exists, dirEntry.Files);
-            }
-            else
-            {
-                // Cache expired, try to remove and retry
-                _directoryCache.TryRemove(directoryPath, out _);
-            }
-        }
+        return (result.Exists, result.Files);
     }
 
     private DateTime GetCachedLastWriteTime(string path)
     {
-        while (true)
-        {
-            var lazyEntry = _fileTimestampCache.GetOrAdd(path, static (p, fs) => new Lazy<(DateTime, DateTime)>(() =>
+        var result = GetWithExpirationRetry(
+            _fileTimestampCache,
+            path,
+            static (p, fs) => new Lazy<(DateTime Timestamp, DateTime CacheTime)>(() =>
             {
                 return (fs.GetLastWriteTime(p), DateTime.UtcNow);
-            }), _fileSystem);
+            }),
+            _fileSystem,
+            static entry => (DateTime.UtcNow - entry.CacheTime) >= CACHE_DURATION,
+            // If the lazy value factory threw an exception (e.g., GetLastWriteTime failed),
+            // remove the faulty entry so subsequent calls can retry instead of getting the cached exception.
+            // Return a safe default to prevent crashing the caller.
+            // Using MinValue signals "very old" or "invalid", which is generally safe for timestamp checks.
+            static _ => (Timestamp: DateTime.MinValue, CacheTime: DateTime.MinValue)
+        );
 
-            try
-            {
-                var entry = lazyEntry.Value;
-
-                if ((DateTime.UtcNow - entry.CacheTime) < CACHE_DURATION)
-                {
-                    return entry.Timestamp;
-                }
-                else
-                {
-                    // Cache expired, try to remove and retry
-                    _fileTimestampCache.TryRemove(path, out _);
-                }
-            }
-            catch
-            {
-                // If the lazy value factory threw an exception (e.g., GetLastWriteTime failed),
-                // remove the faulty entry so subsequent calls can retry instead of getting the cached exception.
-                _fileTimestampCache.TryRemove(path, out _);
-
-                // Return a safe default to prevent crashing the caller.
-                // Using MinValue signals "very old" or "invalid", which is generally safe for timestamp checks.
-                return DateTime.MinValue;
-            }
-        }
+        return result.Timestamp;
     }
 
     /// <summary>
