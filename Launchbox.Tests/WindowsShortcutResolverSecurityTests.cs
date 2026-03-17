@@ -41,7 +41,7 @@ public class WindowsShortcutResolverSecurityTests : IDisposable
         fileSystem.SetIniValue(shortcutPath, "InternetShortcut", "URL", unsafeUrl);
 
         // Act
-        var result = resolver.ResolveTarget(shortcutPath);
+        var result = resolver.Resolve(shortcutPath)?.Target;
 
         // Assert
         Assert.Null(result);
@@ -59,7 +59,7 @@ public class WindowsShortcutResolverSecurityTests : IDisposable
         faultyFileSystem.SetExceptionToThrow(new IOException(sensitiveMessage));
 
         // Act
-        var result = resolver.ResolveTarget(sensitivePath);
+        var result = resolver.Resolve(sensitivePath)?.Target;
 
         // Assert
         _listener.Flush();

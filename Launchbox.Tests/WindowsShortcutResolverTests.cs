@@ -23,7 +23,7 @@ public class WindowsShortcutResolverTests
 
         _fileSystem.SetIniValue(shortcutPath, "InternetShortcut", "URL", targetUrl);
 
-        string? result = _resolver.ResolveTarget(shortcutPath);
+        string? result = _resolver.Resolve(shortcutPath)?.Target;
 
         Assert.Equal(targetUrl, result);
     }
@@ -33,7 +33,7 @@ public class WindowsShortcutResolverTests
     {
         string shortcutPath = @"C:\shortcuts\empty.url";
 
-        string? result = _resolver.ResolveTarget(shortcutPath);
+        string? result = _resolver.Resolve(shortcutPath)?.Target;
 
         Assert.Null(result);
     }
@@ -44,7 +44,7 @@ public class WindowsShortcutResolverTests
         if (!System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
         {
             string shortcutPath = @"C:\shortcuts\app.lnk";
-            string? result = _resolver.ResolveTarget(shortcutPath);
+            string? result = _resolver.Resolve(shortcutPath)?.Target;
             Assert.Null(result);
         }
     }
@@ -66,7 +66,7 @@ public class WindowsShortcutResolverTests
         {
             _fileSystem.SetIniValue(shortcutPath, "InternetShortcut", "URL", targetUrl);
 
-            string? result = _resolver.ResolveTarget(shortcutPath);
+            string? result = _resolver.Resolve(shortcutPath)?.Target;
 
             Assert.Equal(expectedUrl, result);
         }

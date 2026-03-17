@@ -40,21 +40,6 @@ public class WindowsShortcutResolver : IShortcutResolver
         }
     }
 
-    public string? ResolveTarget(string shortcutPath)
-    {
-        return Resolve(shortcutPath)?.Target;
-    }
-
-    public string? ResolveArguments(string shortcutPath)
-    {
-        return Resolve(shortcutPath)?.Arguments;
-    }
-
-    public string? ResolveWorkingDirectory(string shortcutPath)
-    {
-        return Resolve(shortcutPath)?.WorkingDirectory;
-    }
-
     private ShortcutMetadata? ResolveLnkAll(string path)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
