@@ -91,4 +91,10 @@ public static class NativeMethods
         if (IntPtr.Size == 8) return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
         else return SetWindowLong32(hWnd, nIndex, dwNewLong);
     }
+
+    public const uint MB_OK = 0x0;
+    public const uint MB_ICONERROR = 0x10;
+
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    public static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
 }

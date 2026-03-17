@@ -1,6 +1,8 @@
+using Launchbox.Services;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Launchbox;
@@ -20,7 +22,34 @@ public partial class App : Application
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         Trace.WriteLine($"UNHANDLED EXCEPTION (UI thread): {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(e.Exception)}");
+
+        if (IsRecoverable(e.Exception))
+        {
+            e.Handled = true;
+            return;
+        }
+
+        // Prevent the default ungraceful crash, then exit cleanly.
+        // WinUI's rendering thread may be dead, so use a native MessageBox.
         e.Handled = true;
+        NativeMethods.MessageBox(
+            IntPtr.Zero,
+            "Launchbox encountered a critical error and needs to close.",
+            "Launchbox",
+            NativeMethods.MB_OK | NativeMethods.MB_ICONERROR);
+        Environment.Exit(1);
+    }
+
+    private static bool IsRecoverable(Exception ex)
+    {
+        if (ex is OutOfMemoryException or StackOverflowException or SEHException or AccessViolationException)
+            return false;
+
+        // Transient COM disconnection during WinUI layout passes (RPC_E_DISCONNECTED)
+        if (ex is COMException comEx && comEx.HResult == unchecked((int)0x80010108))
+            return true;
+
+        return false;
     }
 
     private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
