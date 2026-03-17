@@ -19,7 +19,7 @@ public class MockSettingsStore : ISettingsStore
         return _store.TryGetValue(key, out value);
     }
 
-    public void SetValue(string key, object? value)
+    public bool SetValue(string key, object? value)
     {
         if (ShouldThrow)
         {
@@ -34,5 +34,6 @@ public class MockSettingsStore : ISettingsStore
         {
             _store.Remove(key);
         }
+        return true;
     }
 }

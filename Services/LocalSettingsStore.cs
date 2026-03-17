@@ -32,15 +32,17 @@ public class LocalSettingsStore : ISettingsStore
         }
     }
 
-    public void SetValue(string key, object? value)
+    public bool SetValue(string key, object? value)
     {
         try
         {
             _settings.SetValue(key, value);
+            return true;
         }
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to write setting {key}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return false;
         }
     }
 

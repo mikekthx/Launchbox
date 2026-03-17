@@ -47,9 +47,8 @@ public class SettingsService : ObservableObject
                 return;
             }
 
-            if (ShortcutsPath != value)
+            if (ShortcutsPath != value && _store.SetValue(nameof(ShortcutsPath), value))
             {
-                _store.SetValue(nameof(ShortcutsPath), value);
                 OnPropertyChanged();
             }
         }
@@ -71,9 +70,8 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (HotkeyModifiers != value)
+            if (HotkeyModifiers != value && _store.SetValue(nameof(HotkeyModifiers), value))
             {
-                _store.SetValue(nameof(HotkeyModifiers), value);
                 OnPropertyChanged();
             }
         }
@@ -93,9 +91,8 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (HotkeyKey != value)
+            if (HotkeyKey != value && _store.SetValue(nameof(HotkeyKey), value))
             {
-                _store.SetValue(nameof(HotkeyKey), value);
                 OnPropertyChanged();
             }
         }
@@ -114,9 +111,8 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (GridSize != value)
+            if (GridSize != value && _store.SetValue(nameof(GridSize), value.ToString()))
             {
-                _store.SetValue(nameof(GridSize), value.ToString());
                 OnPropertyChanged();
             }
         }
