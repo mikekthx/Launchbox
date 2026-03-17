@@ -4,9 +4,13 @@
 
 - [x] SettingsViewModel memory leak: subscribes to SettingsService.PropertyChanged but never unsubscribes / missing IDisposable (SettingsViewModel.cs:30)
 - [x] async void lambda via SimpleCommand(Action) in MainViewModel creates unobservable crash risk (MainViewModel.cs:69) -- create AsyncSimpleCommand accepting Func<Task>
+- [ ] `.url` shortcut security bypass: WinUILauncher falls through to `Process.Start(UseShellExecute=true)` when `ResolveTarget` returns null for unsafe schemes -- crafted `.url` files using `file:`, `ms-settings:`, or custom URI handlers bypass validation entirely (WinUILauncher.cs:45-58) [Gemini+Codex consensus]
 
 ## High
 
+- [ ] App.xaml.cs swallows all UI-thread exceptions: `e.Handled = true` suppresses every crash, allowing the process to continue in a corrupted state with missing windows or broken event wiring -- should only handle known-recoverable exceptions or fail fast (App.xaml.cs:20-23) [Codex]
+- [ ] BackdropService retry in catch block: `SetDesktopAcrylicBackdrop()` is retried inside its own catch -- if the backdrop API threw, it re-throws as an unobserved task fault on unsupported systems (BackdropService.cs:69-76) [Codex]
+- [ ] Startup toggle race condition: rapid user toggles fire-and-forget `SetRunAtStartupSafeAsync` concurrently -- whichever call finishes last wins, not necessarily the user's final choice (SettingsViewModel.cs:101-108) [Codex]
 - [x] DPI-unaware window dragging: delta in DIPs applied to physical-pixel position causes lag on >100% DPI (MainWindow.xaml.cs:128-141)
 - [x] No reentrancy protection on LoadAppsAsync -- concurrent calls race on Apps collection (MainViewModel.cs:80,84) -- add CancellationTokenSource or SemaphoreSlim
 - [x] Missing null guards on all 8 MainViewModel constructor parameters, inconsistent with SettingsViewModel pattern (MainViewModel.cs:48-65)
@@ -57,6 +61,7 @@
 - [x] Missing accessibility labels on Settings form controls (SettingsWindow.xaml) and main grid (MainWindow.xaml:57)
 
 ### Build & CI
+- [ ] PR CI only builds test project, not the full WinUI app: XAML/binding/WinUI compile regressions can merge undetected since the test project links only a subset of production files (dotnet-desktop.yml:112) [Codex]
 - [x] ARM64 excluded from MSIX bundle despite being a declared target platform (dotnet-desktop.yml:155)
 - [x] Missing ImplicitUsings in main project but enabled in test project -- file-linked sources may behave differently
 - [x] Solution AnyCPU maps silently to x86 (Launchbox.sln:19-22)
@@ -64,6 +69,7 @@
 - [x] No Directory.Build.props for centralized project configuration (nullable, TFM, warnings)
 
 ### Tests
+- [ ] No launcher-level test for `.url` execution bypass: resolver tests verify scheme rejection, but no test asserts that WinUILauncher blocks `.url` files when resolution returns null (WinUILauncherSecurityTests.cs) [Codex]
 - [x] SettingsViewModelTests use fragile async polling with DateTime timeout -- should use event-driven waiting
 - [x] Mock classes (MockSettingsStore, MockImageFactory, etc.) scattered inside unrelated test files -- extract to own files
 - [x] MockFileSystem has no error simulation capability unlike other mocks (MockStartupService has ShouldFail)
@@ -77,7 +83,16 @@
 - [ ] SearchBox has no visual polish: missing Background, Padding, Margin, CornerRadius -- looks like an unstyled floating field against the backdrop (MainWindow.xaml:143-148)
 - [ ] Window height not clamped to work area: WINDOW_HEIGHT=700 fixed constant can exceed display on small screens like Surface Pro at 150% scaling (Constants.cs, WindowService.cs)
 
+### Performance
+- [ ] Window position saved on every drag frame: `AppWindow_Changed` calls `SaveWindowPosition()` on every position/size change with no debounce -- causes heavy disk I/O during drag operations (WindowService.cs:131-136) [Gemini]
+
+### Architecture & Code Quality
+- [ ] ProcessStarter hardcodes `new WindowsShortcutResolver(new FileSystem())` inline, violating DI and bypassing mocks in tests (ProcessStarter.cs:20) [Gemini]
+
 ### Reliability
+- [ ] Hotkey values not validated from storage: corrupt or hostile local settings can persist invalid modifier/key codes, causing repeated registration failures every startup with no recovery path (SettingsService.cs:58, WindowService.cs:95) [Codex]
+- [ ] Window hides before launch attempt: MainViewModel hides the window before `Launch()` -- if the shortcut is broken or blocked, the UI is already gone and failures are invisible (MainViewModel.cs:242) [Codex]
+- [ ] Settings writes fail silently: `LocalSettingsStore.SetValue` only logs on exception but callers raise `PropertyChanged` and proceed as if persistence succeeded -- settings appear saved in-session but are lost after restart (LocalSettingsStore.cs:35, SettingsService.cs:50) [Codex]
 - [x] VisualTree 5-file abstraction stack (VisualTreeFinder, IVisualTreeService, WinUIVisualTreeService, IVisualTreeHelperWrapper, VisualTreeHelperWrapper) is unused in production -- MainWindow uses VisualTreeHelper.GetParent directly. Remove or consolidate.
 - [ ] Double call to SettingsService.InitializeAsync() -- called from MainWindow constructor and again from SettingsViewModel constructor when Settings window opens. Harmless but redundant with asymmetric error handling.
 - [ ] _loadCts race condition with AllowConcurrentExecutions=true is theoretically unsafe -- all current callers are on the UI thread, but the attribute signals concurrent safety that doesn't exist. Document or fix with Interlocked.Exchange.
@@ -90,6 +105,9 @@
 
 ## Low
 
+- [ ] Tray tooltip hardcoded to "Alt+S" despite configurable hotkey -- becomes misleading once the user changes the shortcut (MainWindow.xaml:25) [Codex]
+- [ ] .editorconfig enforces 2-space XAML/XML indentation but CLAUDE.md documents 4-space -- contributors and formatting tools receive conflicting guidance (.editorconfig:20, CLAUDE.md) [Codex]
+- [ ] CLAUDE.md references non-existent `ViewModels/ViewModelBase.cs` -- stale after CommunityToolkit.Mvvm migration removed the file (CLAUDE.md:40) [Codex]
 - [x] Icon size mismatch: extracted at 96px, displayed at 56 DIPs -- blurry on high-DPI (Constants.cs:17, MainWindow.xaml:85)
 - [x] No TreatWarningsAsErrors in either project -- nullable warnings pass CI silently
 - [x] Tray context menu 'Show' label is static -- should toggle to 'Hide' when visible (MainWindow.xaml:26)
