@@ -146,11 +146,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand(AllowConcurrentExecutions = true)]
     public async Task LoadAppsAsync()
     {
-        // Debounce: cancel any in-flight load so only the latest call wins.
-        _loadCts?.Cancel();
-        _loadCts?.Dispose();
+        // Debounce: atomically swap the CTS so only the latest call wins.
+        // Interlocked.Exchange is safe even if called from multiple threads.
         var cts = new CancellationTokenSource();
-        _loadCts = cts;
+        var old = Interlocked.Exchange(ref _loadCts, cts);
+        old?.Cancel();
+        old?.Dispose();
         var ct = cts.Token;
 
         try
