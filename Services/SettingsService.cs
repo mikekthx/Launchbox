@@ -55,11 +55,15 @@ public class SettingsService : ObservableObject
         }
     }
 
+    // Valid modifier flags: any combination of MOD_ALT (1), MOD_CONTROL (2), MOD_SHIFT (4), MOD_WIN (8)
+    private const int VALID_MODIFIER_MASK = Constants.MOD_ALT | Constants.MOD_CONTROL | Constants.MOD_SHIFT | Constants.MOD_WIN;
+
     public int HotkeyModifiers
     {
         get
         {
-            if (_store.TryGetValue(nameof(HotkeyModifiers), out var val) && val is int mod)
+            if (_store.TryGetValue(nameof(HotkeyModifiers), out var val) && val is int mod
+                && mod > 0 && (mod & ~VALID_MODIFIER_MASK) == 0)
             {
                 return mod;
             }
@@ -79,7 +83,9 @@ public class SettingsService : ObservableObject
     {
         get
         {
-            if (_store.TryGetValue(nameof(HotkeyKey), out var val) && val is int key)
+            // Virtual key codes range from 0x01 to 0xFE
+            if (_store.TryGetValue(nameof(HotkeyKey), out var val) && val is int key
+                && key >= 0x01 && key <= 0xFE)
             {
                 return key;
             }
