@@ -11,7 +11,7 @@ public class ProcessStarterTests
 
     public ProcessStarterTests()
     {
-        _processStarter = new ProcessStarter();
+        _processStarter = new ProcessStarter(new MockShortcutResolver());
     }
 
     [Fact]

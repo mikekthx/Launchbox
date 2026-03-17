@@ -12,7 +12,7 @@ public class ProcessStarterSecurityTests
 
     public ProcessStarterSecurityTests()
     {
-        _processStarter = new ProcessStarter();
+        _processStarter = new ProcessStarter(new MockShortcutResolver());
     }
 
     [Theory]

@@ -6,6 +6,13 @@ namespace Launchbox.Services;
 
 public class ProcessStarter : IProcessStarter
 {
+    private readonly IShortcutResolver _shortcutResolver;
+
+    public ProcessStarter(IShortcutResolver shortcutResolver)
+    {
+        _shortcutResolver = shortcutResolver;
+    }
+
     public Process? Start(ProcessStartInfo startInfo)
     {
         if (startInfo != null)
@@ -17,14 +24,13 @@ public class ProcessStarter : IProcessStarter
 
             if (startInfo.UseShellExecute && startInfo.FileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             {
-                var resolver = new WindowsShortcutResolver(new FileSystem());
-                string? args = resolver.ResolveArguments(startInfo.FileName);
+                string? args = _shortcutResolver.ResolveArguments(startInfo.FileName);
                 if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
                 {
                     throw new UnauthorizedAccessException("Execution with unsafe arguments is denied.");
                 }
 
-                string? workingDir = resolver.ResolveWorkingDirectory(startInfo.FileName);
+                string? workingDir = _shortcutResolver.ResolveWorkingDirectory(startInfo.FileName);
                 if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
                 {
                     throw new UnauthorizedAccessException("Execution with unsafe working directory is denied.");

@@ -42,7 +42,7 @@ public sealed partial class MainWindow : Window
         var iconService = new IconService(fileSystem);
         var imageFactory = new WinUIImageFactory();
         var shortcutResolver = new WindowsShortcutResolver(fileSystem);
-        var processStarter = new ProcessStarter();
+        var processStarter = new ProcessStarter(shortcutResolver);
         var launcher = new WinUILauncher(shortcutResolver, processStarter, fileSystem);
 
         ViewModel = new MainViewModel(shortcutService, iconService, imageFactory, dispatcher, launcher, fileSystem, _settingsService, _windowService);
