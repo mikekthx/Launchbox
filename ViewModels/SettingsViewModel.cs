@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.System;
 
@@ -17,6 +18,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
     private readonly IFilePickerService _filePickerService;
+    private readonly SemaphoreSlim _startupToggleLock = new(1, 1);
 
     private static readonly Dictionary<string, int> MODIFIER_MAP = new()
     {
@@ -68,6 +70,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private async Task SetRunAtStartupSafeAsync(bool value)
     {
+        await _startupToggleLock.WaitAsync();
         try
         {
             await _settingsService.SetRunAtStartupAsync(value);
@@ -75,6 +78,10 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to set run at startup: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+        finally
+        {
+            _startupToggleLock.Release();
         }
     }
 
@@ -173,6 +180,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _settingsService.PropertyChanged -= OnServicePropertyChanged;
+        _startupToggleLock.Dispose();
         GC.SuppressFinalize(this);
     }
 }
