@@ -1,8 +1,8 @@
 namespace Launchbox.Services;
 
+public record ShortcutMetadata(string? Target, string? Arguments, string? WorkingDirectory);
+
 public interface IShortcutResolver
 {
-    string? ResolveTarget(string shortcutPath);
-    string? ResolveArguments(string shortcutPath);
-    string? ResolveWorkingDirectory(string shortcutPath);
+    ShortcutMetadata? Resolve(string shortcutPath);
 }

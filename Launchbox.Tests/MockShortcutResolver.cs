@@ -11,11 +11,8 @@ public class MockShortcutResolver : IShortcutResolver
         _target = target;
     }
 
-    public string? ResolveTarget(string shortcutPath)
+    public ShortcutMetadata? Resolve(string shortcutPath)
     {
-        return _target;
+        return new ShortcutMetadata(_target, null, null);
     }
-
-    public string? ResolveArguments(string shortcutPath) => null;
-    public string? ResolveWorkingDirectory(string shortcutPath) => null;
 }

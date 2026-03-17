@@ -24,13 +24,14 @@ public class ProcessStarter : IProcessStarter
 
             if (startInfo.UseShellExecute && startInfo.FileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
             {
-                string? args = _shortcutResolver.ResolveArguments(startInfo.FileName);
+                var metadata = _shortcutResolver.Resolve(startInfo.FileName);
+                string? args = metadata?.Arguments;
                 if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
                 {
                     throw new UnauthorizedAccessException("Execution with unsafe arguments is denied.");
                 }
 
-                string? workingDir = _shortcutResolver.ResolveWorkingDirectory(startInfo.FileName);
+                string? workingDir = metadata?.WorkingDirectory;
                 if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
                 {
                     throw new UnauthorizedAccessException("Execution with unsafe working directory is denied.");

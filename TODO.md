@@ -99,7 +99,7 @@
 
 ### Performance
 - [ ] Blocking I/O on UI thread: `GetShortcutFiles` runs synchronously before the first `await` in `LoadAppsAsync` -- blocks the message pump if the shortcuts folder is on a slow or sleeping drive. Wrap in `Task.Run`. (MainViewModel.cs:103) [Gemini]
-- [ ] WindowsShortcutResolver creates 3 separate COM objects per `.lnk` launch: `ResolveTarget`, `ResolveArguments`, and `ResolveWorkingDirectory` each independently create a new ShellLink and call `IPersistFile.Load` -- should resolve once and return all metadata (WindowsShortcutResolver.cs:43-117) [Claude]
+- [x] WindowsShortcutResolver creates 3 separate COM objects per `.lnk` launch: `ResolveTarget`, `ResolveArguments`, and `ResolveWorkingDirectory` each independently create a new ShellLink and call `IPersistFile.Load` -- should resolve once and return all metadata (WindowsShortcutResolver.cs:43-117) [Claude]
 
 ### Reliability
 - [ ] Startup toggle race v2: rapid opposite toggles (true→false) can be dropped because `RunAtStartup` setter compares against current persisted state, not latest in-flight intent -- second toggle is skipped when `IsRunAtStartup` hasn't updated yet (SettingsViewModel.cs:108-117) [Codex]
