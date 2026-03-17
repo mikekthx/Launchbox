@@ -124,7 +124,7 @@ jobs:
 
     # Build the full WinUI app to catch XAML/binding compile errors (tests only link a subset of files)
     - name: Build the application
-      run: dotnet build $env:Project_Path --configuration ${{ matrix.configuration }} -p:AppxPackageSigningEnabled=false
+      run: dotnet build $env:Project_Path --configuration ${{ matrix.configuration }} -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
