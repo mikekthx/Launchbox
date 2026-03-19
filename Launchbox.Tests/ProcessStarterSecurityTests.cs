@@ -29,6 +29,12 @@ public class ProcessStarterSecurityTests
         Assert.Contains("Execution of unsafe path", exception.Message);
     }
 
+    [Fact]
+    public void Start_ThrowsArgumentNullException_ForNullStartInfo()
+    {
+        Assert.Throws<ArgumentNullException>(() => _processStarter.Start(null!));
+    }
+
     [Theory]
     [InlineData(@"\\server\share\payload")]
     [InlineData("//server/share/payload")]
