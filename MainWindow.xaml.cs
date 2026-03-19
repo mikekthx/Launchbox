@@ -21,10 +21,11 @@ public sealed partial class MainWindow : Window
     private readonly IFilePickerService _filePickerService;
     private readonly IBackdropService _backdropService;
 
-    // Window dragging state
+    // Window dragging state — uses screen-relative cursor coordinates (via GetCursorPos)
+    // to avoid drift caused by window-relative coordinates shifting after AppWindow.Move.
     private bool _isDraggingWindow = false;
     private Windows.Graphics.PointInt32 _dragStartWindowPos;
-    private Windows.Foundation.Point _dragStartPointerPos;
+    private NativeMethods.POINT _dragStartCursorPos;
 
     public MainWindow()
     {
@@ -111,10 +112,10 @@ public sealed partial class MainWindow : Window
             }
         }
 
-        // Start dragging - capture pointer and record initial positions
+        // Start dragging - capture pointer and record initial screen-relative cursor position
         _isDraggingWindow = true;
         _dragStartWindowPos = this.AppWindow.Position;
-        _dragStartPointerPos = e.GetCurrentPoint(null).Position;
+        NativeMethods.GetCursorPos(out _dragStartCursorPos);
         RootGrid.CapturePointer(e.Pointer);
         e.Handled = true;
     }
@@ -123,10 +124,11 @@ public sealed partial class MainWindow : Window
     {
         if (!_isDraggingWindow) return;
 
-        var currentPointerPos = e.GetCurrentPoint(null).Position;
-        var scale = RootGrid.XamlRoot?.RasterizationScale ?? 1.0;
-        var deltaX = (int)((currentPointerPos.X - _dragStartPointerPos.X) * scale);
-        var deltaY = (int)((currentPointerPos.Y - _dragStartPointerPos.Y) * scale);
+        // Use screen-relative cursor coordinates to compute delta. Window-relative
+        // coordinates from GetCurrentPoint(null) shift after AppWindow.Move, causing drift.
+        NativeMethods.GetCursorPos(out var currentCursorPos);
+        var deltaX = currentCursorPos.X - _dragStartCursorPos.X;
+        var deltaY = currentCursorPos.Y - _dragStartCursorPos.Y;
 
         var newX = _dragStartWindowPos.X + deltaX;
         var newY = _dragStartWindowPos.Y + deltaY;
