@@ -423,9 +423,9 @@ public class WindowService : IWindowService, IDisposable
         return false;
     }
 
-    public void OnActivated(WindowActivatedEventArgs args)
+    public void OnActivated(bool isDeactivated)
     {
-        if (_appWindow != null && args.WindowActivationState == WindowActivationState.Deactivated)
+        if (_appWindow != null && isDeactivated)
         {
             // Flush any pending debounced save before hiding
             if (_savePositionTimer != null && _savePositionTimer.IsRunning)

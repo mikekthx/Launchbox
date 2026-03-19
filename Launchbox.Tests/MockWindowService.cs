@@ -1,5 +1,4 @@
 using Launchbox.Services;
-using Microsoft.UI.Xaml;
 using System;
 
 namespace Launchbox.Tests;
@@ -8,7 +7,10 @@ public class MockWindowService : IWindowService
 {
     public bool IsVisible { get; set; }
     public event EventHandler<bool>? VisibilityChanged;
+    // Suppress CS0067: event is required by IWindowService but not raised in most tests
+#pragma warning disable CS0067
     public event EventHandler<string>? HotkeyRegistrationFailed;
+#pragma warning restore CS0067
 
     public void RaiseVisibilityChanged(bool isVisible)
     {
@@ -16,27 +18,13 @@ public class MockWindowService : IWindowService
         VisibilityChanged?.Invoke(this, isVisible);
     }
 
-    public void RaiseHotkeyRegistrationFailed(string message)
-    {
-        HotkeyRegistrationFailed?.Invoke(this, message);
-    }
-
     public bool HideCalled { get; private set; }
     public bool ToggleVisibilityCalled { get; private set; }
-    public bool InitializeCalled { get; private set; }
-    public bool OnActivatedCalled { get; private set; }
-    public bool ExitCalled { get; private set; }
     public bool OpenSettingsCalled { get; private set; }
 
-    public void Initialize()
-    {
-        InitializeCalled = true;
-    }
+    public void Initialize() { }
 
-    public void OnActivated(WindowActivatedEventArgs args)
-    {
-        OnActivatedCalled = true;
-    }
+    public void OnActivated(bool isDeactivated) { }
 
     public void ToggleVisibility()
     {
@@ -49,14 +37,9 @@ public class MockWindowService : IWindowService
         HideCalled = true;
     }
 
-    public void Dispose()
-    {
-    }
+    public void Dispose() { }
 
-    public void Exit()
-    {
-        ExitCalled = true;
-    }
+    public void Exit() { }
 
     public void OpenSettings()
     {

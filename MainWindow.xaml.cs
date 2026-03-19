@@ -156,7 +156,7 @@ public sealed partial class MainWindow : Window
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
-        _windowService.OnActivated(args);
+        _windowService.OnActivated(args.WindowActivationState == WindowActivationState.Deactivated);
 
         // Re-check backdrop on activation in case DWMBlurGlass started after Launchbox
         if (args.WindowActivationState != WindowActivationState.Deactivated)
