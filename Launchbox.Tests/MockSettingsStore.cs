@@ -10,6 +10,11 @@ public class MockSettingsStore : ISettingsStore
 
     public bool ShouldThrow { get; set; }
 
+    /// <summary>
+    /// When set, <see cref="SetValue"/> returns false for the specified keys instead of writing.
+    /// </summary>
+    public HashSet<string> FailSetValueKeys { get; } = new(StringComparer.OrdinalIgnoreCase);
+
     public bool TryGetValue(string key, out object? value)
     {
         if (ShouldThrow)
@@ -24,6 +29,11 @@ public class MockSettingsStore : ISettingsStore
         if (ShouldThrow)
         {
             throw new Exception("Settings store failure");
+        }
+
+        if (FailSetValueKeys.Contains(key))
+        {
+            return false;
         }
 
         if (value != null)

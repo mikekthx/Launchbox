@@ -74,6 +74,59 @@ public class WindowPositionManagerTests
     }
 
     [Fact]
+    public void SaveWindowPosition_ReturnsTrue_WhenAllWritesSucceed()
+    {
+        var settings = new MockSettingsStore();
+        var manager = new WindowPositionManager(settings);
+
+        bool result = manager.SaveWindowPosition(10, 20, 300, 400);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void SaveWindowPosition_ReturnsFalse_WhenSetValueFails()
+    {
+        var settings = new MockSettingsStore();
+        settings.FailSetValueKeys.Add("WinW");
+        var manager = new WindowPositionManager(settings);
+
+        bool result = manager.SaveWindowPosition(10, 20, 300, 400);
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void SaveWindowPosition_RollsBackPartialWrites_WhenSetValueFails()
+    {
+        var settings = new MockSettingsStore();
+        // Pre-populate with old values
+        settings.SetValue("WinX", 1);
+        settings.SetValue("WinY", 2);
+        settings.SetValue("WinW", 3);
+        settings.SetValue("WinH", 4);
+
+        // Fail on the third write (WinW) so X and Y get written but must be rolled back
+        settings.FailSetValueKeys.Add("WinW");
+        var manager = new WindowPositionManager(settings);
+
+        bool result = manager.SaveWindowPosition(10, 20, 300, 400);
+
+        Assert.False(result);
+
+        // Verify old values were restored (rollback succeeded)
+        Assert.True(settings.TryGetValue("WinX", out var x));
+        Assert.Equal(1, x);
+        Assert.True(settings.TryGetValue("WinY", out var y));
+        Assert.Equal(2, y);
+        // WinW was never written (it failed), so it should still have the old value
+        Assert.True(settings.TryGetValue("WinW", out var w));
+        Assert.Equal(3, w);
+        Assert.True(settings.TryGetValue("WinH", out var h));
+        Assert.Equal(4, h);
+    }
+
+    [Fact]
     public void SaveWindowPosition_PropagatesException_WhenStoreFails()
     {
         var settings = new MockSettingsStore { ShouldThrow = true };
