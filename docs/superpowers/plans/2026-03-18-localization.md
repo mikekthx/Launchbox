@@ -525,32 +525,27 @@ internal sealed class ResourceStringProvider : IStringProvider
 }
 ```
 
-- [ ] **Step 4: Update Localization helper to use ResourceStringProvider**
+- [ ] **Step 4: Keep DefaultStringProvider as static default in Localization.cs**
 
-Replace the `DefaultStringProvider` inner class in `Helpers/Localization.cs` with `ResourceStringProvider` as the default:
+Do NOT change `Localization.cs` to default to `ResourceStringProvider`. The `ResourceLoader` constructor throws `COMException` (0x80073D54: "The process has no package identity") when called from an unpackaged test runner. Since the test project file-links `Localization.cs`, the static field initializer runs in the test context and would cause a fatal `TypeInitializationException`.
+
+Instead, keep `Localization.cs` exactly as created in Task 1 (with `DefaultStringProvider` that returns the key itself). The production app will initialize the real provider explicitly at startup.
+
+- [ ] **Step 5: Initialize ResourceStringProvider in App.xaml.cs**
+
+In `App.xaml.cs`, add to the `App()` constructor (after `this.InitializeComponent();`):
 
 ```csharp
+Localization.SetProvider(new ResourceStringProvider());
+```
+
+Add these imports:
+```csharp
+using Launchbox.Helpers;
 using Launchbox.Services;
-
-namespace Launchbox.Helpers;
-
-internal static class Localization
-{
-    private static IStringProvider _provider = new ResourceStringProvider();
-
-    internal static void SetProvider(IStringProvider provider) => _provider = provider;
-
-    public static string GetString(string key) => _provider.GetString(key);
-}
 ```
 
-- [ ] **Step 5: Add ResourceStringProvider file link to test project**
-
-The test project file-links `Localization.cs`, which now references `ResourceStringProvider`. Add to `Launchbox.Tests/Launchbox.Tests.csproj`:
-
-```xml
-<Compile Include="..\Services\ResourceStringProvider.cs" Link="Services\ResourceStringProvider.cs" />
-```
+This ensures the production app uses `ResourceLoader` while tests use `DefaultStringProvider` (or `MockStringProvider` when explicitly set).
 
 - [ ] **Step 6: Build the app to verify resource file is picked up**
 
@@ -565,7 +560,7 @@ Expected: All existing tests pass. `LocalizationTests` still pass because they i
 - [ ] **Step 8: Commit**
 
 ```bash
-git add Strings/en-US/Resources.resw Services/ResourceStringProvider.cs Helpers/Localization.cs Launchbox.csproj Launchbox.Tests/Launchbox.Tests.csproj
+git add Strings/en-US/Resources.resw Services/ResourceStringProvider.cs App.xaml.cs Launchbox.csproj
 git commit -m "feat: add English resource file and ResourceStringProvider"
 ```
 
@@ -1231,7 +1226,7 @@ TrayIcon?.ShowNotification(Localization.GetString("Error_NotificationTitle"), e)
 
 - [ ] **Step 3: Localize critical error handler in App.xaml.cs**
 
-Change lines 35-39 in `App.xaml.cs` from:
+`App.xaml.cs` already has `using Launchbox.Helpers;` from Task 3 Step 5. Change lines 35-39 from:
 ```csharp
 NativeMethods.MessageBox(
     IntPtr.Zero,
@@ -1259,8 +1254,6 @@ NativeMethods.MessageBox(
     title,
     NativeMethods.MB_OK | NativeMethods.MB_ICONERROR);
 ```
-
-Add `using Launchbox.Helpers;` to `App.xaml.cs` imports.
 
 - [ ] **Step 4: Build the app**
 
@@ -1323,9 +1316,9 @@ Verify every locale has exactly the same `name` attributes as `en-US`. No missin
 
 Run a quick validation (check that all files have the same count of `<data name=` entries):
 ```bash
-for dir in Strings/*/; do echo "$dir: $(grep -c '<data name=' "$dir/Resources.resw")"; done
+for dir in Strings/*/; do echo "$dir: $(grep -c 'data name=' "$dir/Resources.resw")"; done
 ```
-Expected: All directories show the same count.
+Expected: All directories show the same count. (Note: the shell is bash on Windows per the environment config.)
 
 - [ ] **Step 4: Build the app**
 
