@@ -112,7 +112,7 @@
 - [ ] ClampToWorkArea only shrinks height: if the window is shown on a small display, the reduced height is saved back and never restored when later shown on a larger display (WindowService.cs:363-382, 390) [Codex]
 
 ### Architecture & Code Quality
-- [ ] Duplicate COM interop: WinUILauncher resolves `.lnk` target/args/workdir for validation, then ProcessStarter resolves the same metadata again -- doubles COM work on every launch and creates two policy implementations that can drift (WinUILauncher.cs:53-64, ProcessStarter.cs:25-30) [Gemini+Codex]
+- [x] Duplicate COM interop: WinUILauncher resolves `.lnk` target/args/workdir for validation, then ProcessStarter resolves the same metadata again -- doubles COM work on every launch and creates two policy implementations that can drift (WinUILauncher.cs:53-64, ProcessStarter.cs:25-30) [Gemini+Codex]
 - [ ] IWindowService depends on WinUI type `WindowActivatedEventArgs` in `OnActivated()` -- couples the interface and its mock to `Microsoft.UI.Xaml`, undermining the abstraction pattern used by all other services (IWindowService.cs:30) [Claude]
 
 ### Security
