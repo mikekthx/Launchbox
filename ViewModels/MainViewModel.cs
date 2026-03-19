@@ -190,11 +190,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         try
         {
             var shortcutFolder = _settingsService.ShortcutsPath;
-            var files = _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS);
+
+            // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS), ct);
 
             ct.ThrowIfCancellationRequested();
 
-            _iconService.PruneCache(files ?? []);
+            await Task.Run(() => _iconService.PruneCache(files ?? []), ct);
 
             List<AppItem> localAppItems = [];
 
