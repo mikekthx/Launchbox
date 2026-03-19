@@ -68,6 +68,8 @@ Launchbox/
 │   ├── IconHelper.cs           # Icon extraction helpers
 │   ├── ImageHeaderParser.cs    # Image format detection
 │   ├── ListViewBaseExtensions.cs # Attached property for ItemClick → ICommand binding
+│   ├── Localization.cs         # Static accessor for localized strings (IStringProvider seam)
+│   ├── LocalizedOption.cs      # Record pairing English storage key with localized display name
 │   └── PathSecurity.cs         # Path validation and sanitization
 │   # CommunityToolkit.Mvvm provides ObservableObject base class,
 │   # [RelayCommand] and [ObservableProperty] source generators
@@ -82,11 +84,22 @@ Launchbox/
 │   ├── IImageFactory.cs        # Image creation from bytes
 │   ├── ISettingsStore.cs       # Settings persistence abstraction
 │   ├── IStartupService.cs      # Startup registration abstraction
+│   ├── IStringProvider.cs      # Localized string access abstraction
 │   ├── IWindowService.cs       # Window management abstraction
+│   ├── ResourceStringProvider.cs # Production IStringProvider using ResourceLoader
 │   └── ...                     # WinUI implementations (WinUI*.cs)
 ├── ViewModels/                 # MVVM ViewModels (use CommunityToolkit.Mvvm source generators)
 │   ├── MainViewModel.cs        # Core application logic (loading/launching apps)
 │   └── SettingsViewModel.cs    # Settings page logic
+├── Strings/                    # Localization resources (.resw)
+│   ├── en-US/Resources.resw    # English (fallback)
+│   ├── es/Resources.resw       # Spanish
+│   ├── fr/Resources.resw       # French
+│   ├── de/Resources.resw       # German
+│   ├── ja/Resources.resw       # Japanese
+│   ├── zh-Hans/Resources.resw  # Simplified Chinese
+│   ├── ko/Resources.resw       # Korean
+│   └── pt-BR/Resources.resw    # Brazilian Portuguese
 ├── Launchbox.Tests/            # xUnit test project (file-linked)
 ├── Assets/                     # Application icons
 └── Properties/                 # Launch/publish profiles
@@ -294,10 +307,10 @@ Additional services:
 - `SettingsService`: Central settings coordinator. Raises `PropertyChanged` events that trigger app reloads and hotkey re-registration.
 - `IconService` (`IIconService`): Icon extraction pipeline with caching, custom icon support (`.icons/` directory), and resolution comparison.
 - `ShortcutService` (`IShortcutService`): Discovers and filters shortcut files by allowed extensions.
-- `ProcessStarter` (`IProcessStarter`): Wraps `Process.Start` with input sanitization.
+- `ProcessStarter` (`IProcessStarter`): Wraps `Process.Start` with `ProcessStartInfo`-level validation (unsafe FileName, Arguments, WorkingDirectory). Does NOT resolve shortcuts — that's `WinUILauncher`'s job.
 - `ProcessService` (`IProcessService`): Higher-level process operations.
-- `WinUILauncher` (`IAppLauncher`): App launching logic with shortcut validation.
-- `WindowsShortcutResolver` (`IShortcutResolver`): Resolves `.lnk` shortcut targets via ShellLink COM interop.
+- `WinUILauncher` (`IAppLauncher`): Sole owner of shortcut security validation. Resolves `.lnk`/`.url` metadata via `IShortcutResolver`, validates target/args/workingDir, then delegates to `IProcessStarter`.
+- `WindowsShortcutResolver` (`IShortcutResolver`): Resolves `.lnk` shortcut targets via ShellLink COM interop and `.url` files via INI parsing.
 - `WindowPositionManager`: Manages window position persistence via `ISettingsStore`.
 - `NativeMethods`: Centralized P/Invoke declarations (user32, kernel32). All declarations must have `SetLastError = true`.
 
@@ -314,6 +327,16 @@ Additional services:
 - Auto-hide on deactivation is core launcher behavior, not incidental UI polish
 - Hotkey registration and re-registration are thread-affine; keep registration work on the window-owning/UI thread
 - Window position persistence must remain compatible with existing LocalSettings-based storage
+
+### Localization
+The app uses WinUI 3 native `.resw` resource files with automatic Windows language detection across 8 locales (en-US, es, fr, de, ja, zh-Hans, ko, pt-BR).
+
+- **XAML strings:** Use `x:Uid` attributes on in-tree elements. The `.resw` keys follow the pattern `ElementName.Property` (e.g., `MainWindow_SearchBox.PlaceholderText`).
+- **Out-of-tree strings** (tray menu, flyout): ViewModel properties backed by `Localization.GetString()`, bound via `{Binding}`.
+- **Code-behind strings:** Use `Localization.GetString("KeyName")` directly.
+- **Settings storage:** Uses `LocalizedOption` records that pair an English storage key (`Value`) with a localized display name (`DisplayName`). Settings always persist the English key; display uses the localized name.
+- **Test seam:** `Localization` defaults to a `DefaultStringProvider` that returns the key itself. Tests inject `MockStringProvider` via `Localization.SetProvider()`. The production app initializes `ResourceStringProvider` in `App.xaml.cs`. This avoids `COMException` from `ResourceLoader` in unpackaged test contexts.
+- **Adding a new localized string:** Add the key to all 8 `Strings/*/Resources.resw` files. For XAML, add `x:Uid` to the element. For C#, call `Localization.GetString("KeyName")`.
 
 ### Dependency Composition
 All dependencies are composed **manually** in the `MainWindow` constructor (no DI container). `SettingsService`, `WindowService`, and `LocalSettingsStore` are shared singleton instances passed to both `MainViewModel` and `SettingsViewModel`. When adding a new service, wire it up in the `MainWindow` constructor.
@@ -362,6 +385,9 @@ Prefer the smallest verification set that meaningfully exercises the affected be
 - Service wiring is manual in `MainWindow`; adding a new service in only one code path will create inconsistent runtime behavior
 - `NativeMethods.cs` is the central location for P/Invoke declarations; avoid scattering Win32 imports into feature files
 - Hotkey, tray, and auto-hide behavior span both window code and services; regressions often come from changing one side without tracing the full event flow
+- `WinUILauncher` is the sole owner of shortcut security validation (target, args, workingDir via COM). `ProcessStarter` only validates `ProcessStartInfo` fields as defense-in-depth — do not add shortcut resolution back to `ProcessStarter`
+- Localized strings used in tests require `Localization.SetProvider(new MockStringProvider(...))` setup; without it, `Localization.GetString()` returns the key itself (via `DefaultStringProvider`). Test classes that mutate the static provider must use `[Collection("Localization")]` to prevent parallel execution conflicts
+- `.gitattributes` normalizes line endings to LF in the repo; without it, `core.autocrlf=true` on Windows causes phantom "modified" files in `git status`
 
 ## Date Awareness
 When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.
