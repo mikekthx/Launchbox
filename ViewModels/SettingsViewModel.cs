@@ -19,6 +19,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     private readonly IWindowService _windowService;
     private readonly IFilePickerService _filePickerService;
     private readonly SemaphoreSlim _startupToggleLock = new(1, 1);
+    private bool _pendingStartupValue;
 
     private static readonly Dictionary<string, int> MODIFIER_MAP = new()
     {
@@ -60,6 +61,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         _filePickerService = filePickerService ?? throw new ArgumentNullException(nameof(filePickerService));
 
+        _pendingStartupValue = _settingsService.IsRunAtStartup;
         _settingsService.PropertyChanged += OnServicePropertyChanged;
     }
 
@@ -82,7 +84,16 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private async Task SetRunAtStartupSafeAsync(bool value)
     {
-        await _startupToggleLock.WaitAsync();
+        try
+        {
+            await _startupToggleLock.WaitAsync();
+        }
+        catch (ObjectDisposedException)
+        {
+            // Window is closing and Dispose() was called — operation is moot.
+            return;
+        }
+
         try
         {
             await _settingsService.SetRunAtStartupAsync(value);
@@ -93,7 +104,14 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            _startupToggleLock.Release();
+            try
+            {
+                _startupToggleLock.Release();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Window closed between WaitAsync and Release — safe to ignore.
+            }
         }
     }
 
@@ -122,8 +140,9 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         get => _settingsService.IsRunAtStartup;
         set
         {
-            if (_settingsService.IsRunAtStartup != value)
+            if (_pendingStartupValue != value)
             {
+                _pendingStartupValue = value;
                 _ = SetRunAtStartupSafeAsync(value);
             }
         }

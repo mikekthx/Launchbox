@@ -308,4 +308,52 @@ public class SettingsViewModelTests
 
         Assert.Equal(Constants.MOD_CONTROL, service.HotkeyModifiers);
     }
+
+    [Fact]
+    public async Task RunAtStartup_RapidToggle_FinalStateMatchesLastToggle()
+    {
+        var (service, startup, _, vm) = CreateViewModel();
+
+        // Rapidly toggle true then false — both should fire, not be dropped
+        vm.RunAtStartup = true;
+        vm.RunAtStartup = false;
+
+        // Wait for both in-flight operations to complete
+        await Task.Delay(200, TestContext.Current.CancellationToken);
+
+        Assert.False(service.IsRunAtStartup);
+        Assert.False(startup.IsEnabled);
+    }
+
+    [Fact]
+    public async Task RunAtStartup_RapidToggle_TrueFalseTrueEndTrue()
+    {
+        var (service, startup, _, vm) = CreateViewModel();
+
+        vm.RunAtStartup = true;
+        vm.RunAtStartup = false;
+        vm.RunAtStartup = true;
+
+        await Task.Delay(200, TestContext.Current.CancellationToken);
+
+        Assert.True(service.IsRunAtStartup);
+        Assert.True(startup.IsEnabled);
+    }
+
+    [Fact]
+    public async Task Dispose_WhileToggleInFlight_DoesNotThrow()
+    {
+        var (_, _, _, vm) = CreateViewModel();
+
+        // Fire a toggle that will be in-flight
+        vm.RunAtStartup = true;
+
+        // Dispose immediately while the toggle may still be running
+        vm.Dispose();
+
+        // Give time for any in-flight async work to complete or fail
+        await Task.Delay(100, TestContext.Current.CancellationToken);
+
+        // If we get here without an unobserved exception, the test passes
+    }
 }
