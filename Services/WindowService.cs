@@ -27,6 +27,9 @@ public class WindowService : IWindowService, IDisposable
     private int _currentKey;
     private bool _isHotkeyRegistered;
     private DispatcherQueueTimer? _savePositionTimer;
+    // Suppresses position persistence during display-time clamping so that a
+    // temporarily reduced size on a small display is not saved as the user's intent.
+    private bool _suppressSave;
 
     public bool IsVisible => _window.Visible;
 
@@ -138,6 +141,8 @@ public class WindowService : IWindowService, IDisposable
 
     private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
     {
+        if (_suppressSave) return;
+
         if (_hasPositioned && (args.DidPositionChange || args.DidSizeChange))
         {
             // Reset the debounce timer — only persists after 500ms of no movement
@@ -342,8 +347,10 @@ public class WindowService : IWindowService, IDisposable
     }
 
     /// <summary>
-    /// Ensures the window fits within the current display's work area,
-    /// shrinking its height if needed (e.g., small screen at high DPI scaling).
+    /// Ensures the window fits within the current display's work area.
+    /// Shrinks height if needed and repositions if the window is off-screen horizontally
+    /// (e.g., after a monitor disconnect). Clamped changes are display-time only and
+    /// are not persisted, so the user's preferred size restores on a larger display.
     /// </summary>
     private void ClampToWorkArea()
     {
@@ -352,17 +359,52 @@ public class WindowService : IWindowService, IDisposable
         try
         {
             var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
+            var workArea = displayArea.WorkArea;
+            var pos = _appWindow.Position;
             var size = _appWindow.Size;
-            int maxHeight = displayArea.WorkArea.Height - 40;
 
-            if (size.Height > maxHeight)
+            int maxHeight = workArea.Height - 40;
+            bool needsResize = size.Height > maxHeight;
+            int clampedHeight = needsResize ? maxHeight : size.Height;
+
+            // Check if the window's left edge is beyond the right edge of the work area,
+            // or the right edge is before the left edge of the work area (entirely off-screen).
+            bool offScreenHorizontally = pos.X >= workArea.X + workArea.Width
+                                         || pos.X + size.Width <= workArea.X;
+
+            if (!needsResize && !offScreenHorizontally) return;
+
+            // Suppress save so clamped dimensions are not persisted
+            _suppressSave = true;
+            try
             {
-                _appWindow.Resize(new Windows.Graphics.SizeInt32(size.Width, maxHeight));
+                if (needsResize)
+                {
+                    _appWindow.Resize(new Windows.Graphics.SizeInt32(size.Width, clampedHeight));
+                }
+
+                if (offScreenHorizontally)
+                {
+                    // Center horizontally on the primary display
+                    int newX = workArea.X + (workArea.Width - size.Width) / 2;
+                    int newY = pos.Y;
+                    // Also clamp vertically if needed
+                    if (newY < workArea.Y || newY + clampedHeight > workArea.Y + workArea.Height)
+                    {
+                        newY = workArea.Y + (workArea.Height - clampedHeight) / 2;
+                    }
+                    _appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
+                }
+            }
+            finally
+            {
+                _suppressSave = false;
             }
         }
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to clamp window to work area: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            _suppressSave = false;
         }
     }
 
