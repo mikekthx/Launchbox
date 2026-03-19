@@ -28,16 +28,28 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         { "Win", Constants.MOD_WIN },
     };
 
-    public IReadOnlyList<string> Modifiers { get; } = [.. MODIFIER_MAP.Keys];
+    public IReadOnlyList<LocalizedOption> Modifiers { get; } =
+    [
+        new("Alt", Localization.GetString("Modifier_Alt")),
+        new("Ctrl", Localization.GetString("Modifier_Ctrl")),
+        new("Shift", Localization.GetString("Modifier_Shift")),
+        new("Win", Localization.GetString("Modifier_Win")),
+    ];
 
-    public IReadOnlyList<string> GridSizeOptions { get; } = ["Small", "Medium", "Large"];
+    public IReadOnlyList<LocalizedOption> GridSizeOptions { get; } =
+    [
+        new("Small", Localization.GetString("GridSize_Small")),
+        new("Medium", Localization.GetString("GridSize_Medium")),
+        new("Large", Localization.GetString("GridSize_Large")),
+    ];
 
-    public string SelectedGridSize
+    public LocalizedOption SelectedGridSize
     {
-        get => _settingsService.GridSize.ToString();
+        get => GridSizeOptions.FirstOrDefault(o => o.Value == _settingsService.GridSize.ToString())
+            ?? GridSizeOptions[1]; // Default to Medium
         set
         {
-            if (Enum.TryParse<GridSize>(value, out var g))
+            if (Enum.TryParse<GridSize>(value.Value, out var g))
                 _settingsService.GridSize = g;
         }
     }
@@ -120,12 +132,16 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     /// <summary>
     /// Gets or sets the modifier key for the global hotkey (e.g., Ctrl, Shift, Win, Alt).
     /// </summary>
-    public string SelectedModifier
+    public LocalizedOption SelectedModifier
     {
-        get => MODIFIER_MAP.FirstOrDefault(kv => kv.Value == _settingsService.HotkeyModifiers).Key ?? "Alt";
+        get
+        {
+            var key = MODIFIER_MAP.FirstOrDefault(kv => kv.Value == _settingsService.HotkeyModifiers).Key ?? "Alt";
+            return Modifiers.FirstOrDefault(o => o.Value == key) ?? Modifiers[0];
+        }
         set
         {
-            if (MODIFIER_MAP.TryGetValue(value, out var modifier))
+            if (MODIFIER_MAP.TryGetValue(value.Value, out var modifier))
                 _settingsService.HotkeyModifiers = modifier;
         }
     }

@@ -2,16 +2,28 @@ using Launchbox.Helpers;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.System;
 using Xunit;
 
 namespace Launchbox.Tests;
 
+[Collection("Localization")]
 public class SettingsViewModelTests
 {
     private (SettingsService, MockStartupService, MockFilePickerService, SettingsViewModel) CreateViewModel()
     {
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "Modifier_Alt", "Alt" },
+            { "Modifier_Ctrl", "Ctrl" },
+            { "Modifier_Shift", "Shift" },
+            { "Modifier_Win", "Win" },
+            { "GridSize_Small", "Small" },
+            { "GridSize_Medium", "Medium" },
+            { "GridSize_Large", "Large" },
+        }));
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
         var settingsService = new SettingsService(settingsStore, startupService);
@@ -71,13 +83,13 @@ public class SettingsViewModelTests
     {
         var (service, _, _, vm) = CreateViewModel();
 
-        vm.SelectedModifier = "Ctrl";
+        vm.SelectedModifier = vm.Modifiers.First(o => o.Value == "Ctrl");
         Assert.Equal(Constants.MOD_CONTROL, service.HotkeyModifiers);
 
-        vm.SelectedModifier = "Win";
+        vm.SelectedModifier = vm.Modifiers.First(o => o.Value == "Win");
         Assert.Equal(Constants.MOD_WIN, service.HotkeyModifiers);
 
-        vm.SelectedModifier = "Alt";
+        vm.SelectedModifier = vm.Modifiers.First(o => o.Value == "Alt");
         Assert.Equal(Constants.MOD_ALT, service.HotkeyModifiers);
     }
 
@@ -164,25 +176,40 @@ public class SettingsViewModelTests
     [Fact]
     public void SelectedGridSize_Default_IsMedium()
     {
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "GridSize_Small", "Small" }, { "GridSize_Medium", "Medium" }, { "GridSize_Large", "Large" },
+            { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
+        }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService());
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
-        Assert.Equal("Medium", vm.SelectedGridSize);
+        Assert.Equal("Medium", vm.SelectedGridSize.Value);
     }
 
     [Fact]
     public void SelectedGridSize_WhenSet_UpdatesSettingsService()
     {
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "GridSize_Small", "Small" }, { "GridSize_Medium", "Medium" }, { "GridSize_Large", "Large" },
+            { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
+        }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService());
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
-        vm.SelectedGridSize = "Large";
+        vm.SelectedGridSize = vm.GridSizeOptions.First(o => o.Value == "Large");
         Assert.Equal(GridSize.Large, settingsService.GridSize);
     }
 
     [Fact]
     public void SelectedGridSize_WhenServiceChanges_RaisesPropertyChanged()
     {
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "GridSize_Small", "Small" }, { "GridSize_Medium", "Medium" }, { "GridSize_Large", "Large" },
+            { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
+        }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService());
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
@@ -197,10 +224,18 @@ public class SettingsViewModelTests
     [Fact]
     public void GridSizeOptions_ContainsThreeEntries()
     {
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "GridSize_Small", "Small" }, { "GridSize_Medium", "Medium" }, { "GridSize_Large", "Large" },
+            { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
+        }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService());
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
-        Assert.Equal(["Small", "Medium", "Large"], vm.GridSizeOptions);
+        Assert.Equal(3, vm.GridSizeOptions.Count);
+        Assert.Equal("Small", vm.GridSizeOptions[0].Value);
+        Assert.Equal("Medium", vm.GridSizeOptions[1].Value);
+        Assert.Equal("Large", vm.GridSizeOptions[2].Value);
     }
 
     [Fact]
@@ -234,5 +269,43 @@ public class SettingsViewModelTests
         service.GridSize = GridSize.Small;
 
         Assert.Equal(nameof(SettingsService.GridSize), changedProperty);
+    }
+
+    [Fact]
+    public void GridSizeOptions_AreLocalizedOptions()
+    {
+        var (_, _, _, vm) = CreateViewModel();
+
+        Assert.Equal("Small", vm.GridSizeOptions[0].Value);
+        Assert.Equal("Small", vm.GridSizeOptions[0].DisplayName);
+    }
+
+    [Fact]
+    public void SelectedGridSize_PersistsEnglishValue()
+    {
+        var (service, _, _, vm) = CreateViewModel();
+
+        vm.SelectedGridSize = vm.GridSizeOptions.First(o => o.Value == "Medium");
+
+        Assert.Equal(GridSize.Medium, service.GridSize);
+    }
+
+    [Fact]
+    public void Modifiers_AreLocalizedOptions()
+    {
+        var (_, _, _, vm) = CreateViewModel();
+
+        Assert.Equal("Alt", vm.Modifiers[0].Value);
+    }
+
+    [Fact]
+    public void SelectedModifier_PersistsEnglishValue()
+    {
+        var (service, _, _, vm) = CreateViewModel();
+
+        var ctrlOption = vm.Modifiers.First(o => o.Value == "Ctrl");
+        vm.SelectedModifier = ctrlOption;
+
+        Assert.Equal(Constants.MOD_CONTROL, service.HotkeyModifiers);
     }
 }
