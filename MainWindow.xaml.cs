@@ -189,8 +189,25 @@ public sealed partial class MainWindow : Window
         this.Closed -= MainWindow_Closed;
 
         _windowService.HotkeyRegistrationFailed -= WindowService_HotkeyRegistrationFailed;
-        _windowService.Dispose();
-        TrayIcon?.Dispose();
-        ViewModel?.Dispose();
+
+        // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
+        // so that a failure in one does not prevent the others from being cleaned up.
+        DisposeService(_windowService);
+        DisposeService(TrayIcon);
+        DisposeService(ViewModel);
+        DisposeService(_backdropService as IDisposable);
+        DisposeService(_settingsService as IDisposable);
+    }
+
+    private static void DisposeService(IDisposable? service)
+    {
+        try
+        {
+            service?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Error disposing {service?.GetType().Name}: {ex.Message}");
+        }
     }
 }
