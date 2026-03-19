@@ -1,3 +1,4 @@
+using Launchbox.Helpers;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using Microsoft.UI.Windowing;
@@ -17,7 +18,7 @@ public sealed partial class SettingsWindow : Window
 
         this.InitializeComponent();
 
-        this.Title = "Launchbox Settings";
+        this.Title = Localization.GetString("SettingsWindow_Title");
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(AppTitleBar);
 

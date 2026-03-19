@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Launchbox"
-    xmlns:viewmodels="using:Launchbox.ViewModels"
-    Title="Launchbox Settings">
+    xmlns:viewmodels="using:Launchbox.ViewModels">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
@@ -17,7 +16,7 @@
                 <Image Source="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
                        Width="16" Height="16"
                        AutomationProperties.AccessibilityView="Raw"/>
-                <TextBlock Text="Launchbox Settings"
+                <TextBlock x:Uid="Settings_TitleText"
                            Style="{ThemeResource CaptionTextBlockStyle}"
                            VerticalAlignment="Center"/>
             </StackPanel>
@@ -27,62 +26,49 @@
             <StackPanel Padding="24" Spacing="20" HorizontalAlignment="Left" MaxWidth="500">
                 <!-- General -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="General" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-                    <ToggleSwitch Header="Run at Startup" IsOn="{x:Bind ViewModel.RunAtStartup, Mode=TwoWay}"
-                                  AutomationProperties.Name="Run at Startup"
-                                  ToolTipService.ToolTip="Automatically launch Launchbox when you sign in to Windows" />
+                    <TextBlock x:Uid="Settings_GeneralHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <ToggleSwitch x:Uid="Settings_StartupToggle" IsOn="{x:Bind ViewModel.RunAtStartup, Mode=TwoWay}" />
                 </StackPanel>
 
                 <!-- Shortcuts -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Shortcuts Folder" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Uid="Settings_ShortcutsHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                        <TextBox Text="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}" IsReadOnly="True" Width="300"
-                                 ToolTipService.ToolTip="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}"
-                                 AutomationProperties.Name="Shortcuts folder path" />
-                        <Button Grid.Column="1" Content="Browse..." Command="{x:Bind ViewModel.BrowseFolderCommand}"
-                                ToolTipService.ToolTip="Select a new folder for shortcuts"
-                                AutomationProperties.Name="Browse for shortcuts folder" />
+                        <TextBox x:Uid="Settings_ShortcutsPath" Text="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}" IsReadOnly="True" Width="300"
+                                 ToolTipService.ToolTip="{x:Bind ViewModel.ShortcutsPath, Mode=OneWay}" />
+                        <Button x:Uid="Settings_BrowseButton" Grid.Column="1" Command="{x:Bind ViewModel.BrowseFolderCommand}" />
                     </Grid>
-                    <TextBlock Text="Changes will be applied immediately."
+                    <TextBlock x:Uid="Settings_ChangesNote"
                                Style="{ThemeResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                 </StackPanel>
 
                 <!-- Hotkey -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Global Hotkey" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <ComboBox ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100"
-                                  AutomationProperties.Name="Hotkey modifier"
-                                  ToolTipService.ToolTip="Select a modifier key (e.g., Alt)" />
+                        <ComboBox x:Uid="Settings_HotkeyModifier" ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
                         <TextBlock Text="+" VerticalAlignment="Center"/>
-                        <TextBox Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center"
-                                 AutomationProperties.Name="Hotkey key"
-                                 PlaceholderText="Key"
-                                 ToolTipService.ToolTip="Enter a key (e.g., S, F1, Home)" />
+                        <TextBox x:Uid="Settings_HotkeyKey" Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Appearance -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Appearance" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Uid="Settings_AppearanceHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <TextBlock Text="Icon size" VerticalAlignment="Center"/>
-                        <ComboBox ItemsSource="{x:Bind ViewModel.GridSizeOptions}"
+                        <TextBlock x:Uid="Settings_IconSizeLabel" VerticalAlignment="Center"/>
+                        <ComboBox x:Uid="Settings_IconSizeCombo"
+                                  ItemsSource="{x:Bind ViewModel.GridSizeOptions}"
                                   SelectedItem="{x:Bind ViewModel.SelectedGridSize, Mode=TwoWay}"
-                                  Width="120"
-                                  AutomationProperties.Name="Icon size"
-                                  ToolTipService.ToolTip="Set the size of icons in the launcher grid" />
+                                  Width="120" />
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Window -->
                 <StackPanel Spacing="8">
-                    <TextBlock Text="Window Management" Style="{ThemeResource SubtitleTextBlockStyle}"/>
-                    <Button Content="Reset Window Position" Command="{x:Bind ViewModel.ResetPositionCommand}"
-                            AutomationProperties.Name="Reset Window Position"
-                            ToolTipService.ToolTip="Moves the main window to the center of the screen" />
+                    <TextBlock x:Uid="Settings_WindowHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <Button x:Uid="Settings_ResetPosition" Command="{x:Bind ViewModel.ResetPositionCommand}" />
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
