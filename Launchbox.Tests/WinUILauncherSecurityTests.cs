@@ -134,4 +134,69 @@ public class WinUILauncherSecurityTests
 
         Assert.True(_processStarter.WasStarted);
     }
+
+    [Theory]
+    [InlineData(@"\\server\share\file")]
+    [InlineData("//server/share/file")]
+    [InlineData(@"\/server/share/file")]
+    [InlineData(@"/\server/share/file")]
+    public void Launch_Blocks_Lnk_With_UnsafeArguments(string unsafeArgs)
+    {
+        var shortcutResolver = new MockShortcutResolver(
+            target: @"C:\Program Files\App.exe",
+            arguments: unsafeArgs);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Blocks_Lnk_With_UnsafeWorkingDirectory()
+    {
+        var shortcutResolver = new MockShortcutResolver(
+            target: @"C:\Program Files\App.exe",
+            workingDirectory: @"\\attacker\share");
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Allows_Lnk_With_SafeArgumentsAndWorkingDirectory()
+    {
+        var shortcutResolver = new MockShortcutResolver(
+            target: @"C:\Program Files\App.exe",
+            arguments: @"--verbose --output C:\temp",
+            workingDirectory: @"C:\Program Files");
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.True(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Blocks_Lnk_With_NullTarget_But_UnsafeArguments()
+    {
+        var shortcutResolver = new MockShortcutResolver(
+            target: null,
+            arguments: @"\\attacker\share\payload");
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.False(_processStarter.WasStarted);
+    }
 }
