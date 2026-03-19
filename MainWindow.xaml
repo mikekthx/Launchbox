@@ -21,7 +21,6 @@
         </Grid.RowDefinitions>
 
         <tb:TaskbarIcon x:Name="TrayIcon"
-                        AutomationProperties.Name="Launchbox System Tray Icon"
                         ToolTipText="{Binding ViewModel.TrayToolTipText, Mode=OneWay}"
                         IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
                         LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}"
@@ -35,16 +34,16 @@
                             <SymbolIcon Symbol="View" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
-                    <MenuFlyoutItem Text="Settings"
-                                    AutomationProperties.Name="Settings"
+                    <MenuFlyoutItem Text="{Binding ViewModel.SettingsMenuText, Mode=OneWay}"
+                                    AutomationProperties.Name="{Binding ViewModel.SettingsMenuText, Mode=OneWay}"
                                     Command="{Binding ViewModel.OpenSettingsCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="Setting" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                     <MenuFlyoutSeparator />
-                    <MenuFlyoutItem Text="Exit"
-                                    AutomationProperties.Name="Exit"
+                    <MenuFlyoutItem Text="{Binding ViewModel.ExitMenuText, Mode=OneWay}"
+                                    AutomationProperties.Name="{Binding ViewModel.ExitMenuText, Mode=OneWay}"
                                     Command="{Binding ViewModel.ExitCommand}">
                         <MenuFlyoutItem.Icon>
                             <SymbolIcon Symbol="Cancel" />
@@ -66,30 +65,29 @@
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
                 </SymbolIcon.RenderTransform>
             </SymbolIcon>
-            <TextBlock Text="No shortcuts found"
+            <TextBlock x:Uid="MainWindow_NoShortcuts"
                        FontSize="16"
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center"/>
-            <TextBlock Text="Add shortcuts to your Desktop/Shortcuts folder"
+            <TextBlock x:Uid="MainWindow_AddShortcuts"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"/>
-            <Button Command="{x:Bind ViewModel.OpenShortcutsFolderCommand}"
+            <Button x:Uid="MainWindow_OpenFolder"
+                    Command="{x:Bind ViewModel.OpenShortcutsFolderCommand}"
                     HorizontalAlignment="Center"
                     Style="{ThemeResource AccentButtonStyle}"
-                    Margin="0,8,0,0"
-                    ToolTipService.ToolTip="Open your configured shortcuts folder"
-                    AutomationProperties.Name="Open Shortcuts Folder">
+                    Margin="0,8,0,0">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <SymbolIcon Symbol="Folder" />
-                    <TextBlock Text="Open Shortcuts Folder" />
+                    <TextBlock x:Uid="MainWindow_OpenFolderText" />
                 </StackPanel>
             </Button>
         </StackPanel>
 
         <!-- Tag relays ViewModel into the DataTemplate (x:DataType=AppItem blocks direct ViewModel binding) -->
-        <GridView x:Name="AppGrid"
+        <GridView x:Uid="MainWindow_ShortcutsGrid"
+                  x:Name="AppGrid"
                   Grid.Row="0"
-                  AutomationProperties.Name="Shortcuts Grid"
                   Padding="20"
                   Background="Transparent"
                   SelectionMode="None"
@@ -140,12 +138,10 @@
             </GridView.ItemTemplate>
         </GridView>
 
-        <TextBox x:Name="SearchBox"
+        <TextBox x:Uid="MainWindow_SearchBox"
+                 x:Name="SearchBox"
                  Grid.Row="1"
                  Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 PlaceholderText="Search..."
-                 AutomationProperties.Name="Search shortcuts"
-                 ToolTipService.ToolTip="Search shortcuts (Esc to clear)"
                  BorderThickness="0"
                  CornerRadius="8"
                  Padding="12,8"
@@ -156,13 +152,13 @@
             </TextBox.KeyboardAccelerators>
         </TextBox>
 
-        <TextBlock Grid.Row="0"
+        <TextBlock x:Uid="MainWindow_NoMatches"
+                   Grid.Row="0"
                    Grid.RowSpan="2"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Center"
                    FontSize="16"
                    FontWeight="SemiBold"
-                   Text="No matches"
                    Visibility="{Binding ViewModel.HasNoMatches, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </Window>

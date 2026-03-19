@@ -52,6 +52,10 @@ public sealed partial class MainWindow : Window
         _backdropService = new BackdropService(processService, backdropWrapper);
 
         this.InitializeComponent();
+        // Set tray icon accessibility name from localized resources
+        TrayIcon.SetValue(
+            Microsoft.UI.Xaml.Automation.AutomationProperties.NameProperty,
+            Localization.GetString("Tray_AutomationName"));
         // DataContext required for {Binding} on out-of-tree elements (TrayIcon, ContextFlyout)
         // that cannot use {x:Bind} because they are not in the visual tree.
         RootGrid.DataContext = this;
@@ -167,7 +171,7 @@ public sealed partial class MainWindow : Window
     {
         this.DispatcherQueue.TryEnqueue(() =>
         {
-            TrayIcon?.ShowNotification("Launchbox Error", e);
+            TrayIcon?.ShowNotification(Localization.GetString("Error_NotificationTitle"), e);
         });
     }
 
