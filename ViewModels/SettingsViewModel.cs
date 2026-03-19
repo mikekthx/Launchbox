@@ -49,7 +49,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             ?? GridSizeOptions[1]; // Default to Medium
         set
         {
-            if (Enum.TryParse<GridSize>(value.Value, out var g))
+            if (value is not null && Enum.TryParse<GridSize>(value.Value, out var g))
                 _settingsService.GridSize = g;
         }
     }
@@ -141,7 +141,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
         set
         {
-            if (MODIFIER_MAP.TryGetValue(value.Value, out var modifier))
+            if (value is not null && MODIFIER_MAP.TryGetValue(value.Value, out var modifier))
                 _settingsService.HotkeyModifiers = modifier;
         }
     }
