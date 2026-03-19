@@ -12,7 +12,7 @@ public class ProcessStarterSecurityTests
 
     public ProcessStarterSecurityTests()
     {
-        _processStarter = new ProcessStarter(new MockShortcutResolver());
+        _processStarter = new ProcessStarter();
     }
 
     [Theory]
@@ -27,5 +27,20 @@ public class ProcessStarterSecurityTests
 
         var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
         Assert.Contains("Execution of unsafe path", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(@"\\server\share\payload")]
+    [InlineData("//server/share/payload")]
+    public void Start_ThrowsUnauthorizedAccessException_ForUnsafeArguments(string unsafeArgs)
+    {
+        var startInfo = new ProcessStartInfo("cmd.exe")
+        {
+            Arguments = unsafeArgs,
+            UseShellExecute = false
+        };
+
+        var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
+        Assert.Contains("Execution with unsafe arguments", exception.Message);
     }
 }

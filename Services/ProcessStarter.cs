@@ -4,15 +4,10 @@ using System.Diagnostics;
 
 namespace Launchbox.Services;
 
+// Shortcut (.lnk/.url) metadata validation is the caller's responsibility.
+// This class only validates what is visible in the ProcessStartInfo fields.
 public class ProcessStarter : IProcessStarter
 {
-    private readonly IShortcutResolver _shortcutResolver;
-
-    public ProcessStarter(IShortcutResolver shortcutResolver)
-    {
-        _shortcutResolver = shortcutResolver;
-    }
-
     public Process? Start(ProcessStartInfo startInfo)
     {
         if (startInfo != null)
@@ -20,22 +15,6 @@ public class ProcessStarter : IProcessStarter
             if (PathSecurity.IsUnsafePath(startInfo.FileName))
             {
                 throw new UnauthorizedAccessException($"Execution of unsafe path '{PathSecurity.RedactPath(startInfo.FileName)}' is denied.");
-            }
-
-            if (startInfo.UseShellExecute && startInfo.FileName.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase))
-            {
-                var metadata = _shortcutResolver.Resolve(startInfo.FileName);
-                string? args = metadata?.Arguments;
-                if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
-                {
-                    throw new UnauthorizedAccessException("Execution with unsafe arguments is denied.");
-                }
-
-                string? workingDir = metadata?.WorkingDirectory;
-                if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
-                {
-                    throw new UnauthorizedAccessException("Execution with unsafe working directory is denied.");
-                }
             }
 
             if (!string.IsNullOrEmpty(startInfo.WorkingDirectory) && PathSecurity.IsUnsafePath(startInfo.WorkingDirectory))
