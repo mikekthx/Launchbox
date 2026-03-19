@@ -94,16 +94,30 @@ public class LocalSettingsStoreTests
     }
 
     [Fact]
-    public void SetValue_HandlesException_DoesNotThrow()
+    public void SetValue_ReturnsTrue_OnSuccess()
+    {
+        // Arrange
+        var mockContainer = new MockSettingsContainer();
+        var store = new LocalSettingsStore(mockContainer);
+
+        // Act
+        bool result = store.SetValue("TestKey", "TestValue");
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void SetValue_ReturnsFalse_OnException()
     {
         // Arrange
         var mockContainer = new MockSettingsContainer { ThrowOnWrite = true };
         var store = new LocalSettingsStore(mockContainer);
 
         // Act
-        var exception = Record.Exception(() => store.SetValue("TestKey", "TestValue"));
+        bool result = store.SetValue("TestKey", "TestValue");
 
         // Assert
-        Assert.Null(exception);
+        Assert.False(result);
     }
 }
