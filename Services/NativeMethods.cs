@@ -92,6 +92,16 @@ public static class NativeMethods
         else return SetWindowLong32(hWnd, nIndex, dwNewLong);
     }
 
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool GetCursorPos(out POINT lpPoint);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct POINT
+    {
+        public int X;
+        public int Y;
+    }
+
     public const uint MB_OK = 0x0;
     public const uint MB_ICONERROR = 0x10;
 

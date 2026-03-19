@@ -1,4 +1,3 @@
-using Microsoft.UI.Xaml;
 using System;
 
 namespace Launchbox.Services;
@@ -26,10 +25,10 @@ public interface IWindowService : IDisposable
     void Initialize();
 
     /// <summary>
-    /// Handles the window activated event, hiding the window when deactivated.
+    /// Handles the window activation state change, hiding the window when deactivated.
     /// </summary>
-    /// <param name="args">The window activation event arguments.</param>
-    void OnActivated(WindowActivatedEventArgs args);
+    /// <param name="isDeactivated">True when the window is losing focus (deactivated).</param>
+    void OnActivated(bool isDeactivated);
 
     /// <summary>
     /// Toggles the visibility of the window. Shows and activates it if hidden, or hides it if visible.
