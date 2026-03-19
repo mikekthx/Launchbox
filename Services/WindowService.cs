@@ -272,53 +272,40 @@ public class WindowService : IWindowService, IDisposable
 
     private bool _disposed;
 
-    // Finalizer to clean up unmanaged resources
-    ~WindowService()
-    {
-        Dispose(false);
-    }
-
     public void Dispose()
     {
         if (_disposed) return;
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+        _disposed = true;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
+        // Unsubscribe managed events
+        _window.VisibilityChanged -= Window_VisibilityChanged;
+        _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
 
-        if (disposing)
+        if (_appWindow != null)
         {
-            // Unsubscribe managed events
-            _window.VisibilityChanged -= Window_VisibilityChanged;
-            _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
-
-            if (_appWindow != null)
-            {
-                _appWindow.Changed -= AppWindow_Changed;
-            }
-
-            if (_savePositionTimer != null)
-            {
-                if (_savePositionTimer.IsRunning)
-                {
-                    _savePositionTimer.Stop();
-                    SaveWindowPosition();
-                }
-                _savePositionTimer = null;
-            }
-
-            if (_settingsWindow != null)
-            {
-                _settingsWindow.Closed -= SettingsWindow_Closed;
-                _settingsWindow.Close();
-                _settingsWindow = null;
-            }
+            _appWindow.Changed -= AppWindow_Changed;
         }
 
-        // Clean up unmanaged resources
+        if (_savePositionTimer != null)
+        {
+            if (_savePositionTimer.IsRunning)
+            {
+                _savePositionTimer.Stop();
+                SaveWindowPosition();
+            }
+            _savePositionTimer = null;
+        }
+
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Closed -= SettingsWindow_Closed;
+            _settingsWindow.Close();
+            _settingsWindow = null;
+        }
+
+        // UnregisterHotKey and SetWindowLongPtr are thread-affine Win32 APIs that must
+        // run on the window-owning thread. They belong here in Dispose() (called on the
+        // UI thread), not in a finalizer which runs on the GC thread.
         try
         {
             NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
@@ -333,8 +320,6 @@ public class WindowService : IWindowService, IDisposable
         {
             Trace.WriteLine($"Error during exit: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
-
-        _disposed = true;
     }
 
     private void CenterWindow()
