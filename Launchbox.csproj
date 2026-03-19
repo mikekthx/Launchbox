@@ -11,6 +11,7 @@
     <PublishProfile Condition="'$(Platform)' != 'AnyCPU'">win-$(Platform).pubxml</PublishProfile>
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
+    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
   <ItemGroup>

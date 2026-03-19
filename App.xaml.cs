@@ -1,3 +1,4 @@
+using Launchbox.Helpers;
 using Launchbox.Services;
 using Microsoft.UI.Xaml;
 using System;
@@ -14,6 +15,7 @@ public partial class App : Application
     public App()
     {
         this.InitializeComponent();
+        Localization.SetProvider(new ResourceStringProvider());
         this.UnhandledException += App_UnhandledException;
         AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
