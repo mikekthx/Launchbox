@@ -73,7 +73,7 @@ public class WinUILauncher : IAppLauncher
             if (extension == ".lnk")
             {
                 string? args = metadata?.Arguments;
-                if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
+                if (PathSecurity.ContainsUncPath(args))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
                     return;

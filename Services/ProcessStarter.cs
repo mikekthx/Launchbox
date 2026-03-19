@@ -22,9 +22,7 @@ public class ProcessStarter : IProcessStarter
             throw new UnauthorizedAccessException("Execution with unsafe working directory is denied.");
         }
 
-        if (!string.IsNullOrEmpty(startInfo.Arguments) &&
-            (startInfo.Arguments.Contains(@"\\") || startInfo.Arguments.Contains("//") ||
-             startInfo.Arguments.Contains(@"\/") || startInfo.Arguments.Contains(@"/\")))
+        if (PathSecurity.ContainsUncPath(startInfo.Arguments))
         {
             throw new UnauthorizedAccessException("Execution with unsafe arguments is denied.");
         }

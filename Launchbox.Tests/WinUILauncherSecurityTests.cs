@@ -185,6 +185,24 @@ public class WinUILauncherSecurityTests
         Assert.True(_processStarter.WasStarted);
     }
 
+    [Theory]
+    [InlineData("https://example.com")]
+    [InlineData("http://example.com")]
+    [InlineData("--url=https://example.com/path")]
+    public void Launch_Allows_Lnk_With_UrlArguments(string urlArgs)
+    {
+        var shortcutResolver = new MockShortcutResolver(
+            target: @"C:\Program Files\App.exe",
+            arguments: urlArgs);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.True(_processStarter.WasStarted);
+    }
+
     [Fact]
     public void Launch_Blocks_Lnk_With_NullTarget_But_UnsafeArguments()
     {

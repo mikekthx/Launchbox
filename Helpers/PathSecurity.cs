@@ -1,10 +1,41 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Launchbox.Helpers;
 
 public static class PathSecurity
 {
+    // Security: regex to strip URI scheme prefixes (e.g. "https://", "ftp://") from argument strings
+    // so that remaining "//" can be detected as UNC path indicators.
+    private static readonly Regex UriSchemePattern = new(@"[a-zA-Z][a-zA-Z0-9+\-.]*://", RegexOptions.Compiled);
+
+    /// <summary>
+    /// Detects UNC path patterns in argument strings while allowing legitimate URLs.
+    /// Blocks: \\server\share, //server/share, \/server, /\server
+    /// Allows: https://example.com, http://example.com, --url=https://example.com
+    /// </summary>
+    public static bool ContainsUncPath(string? args)
+    {
+        if (string.IsNullOrEmpty(args))
+        {
+            return false;
+        }
+
+        // Check for backslash-based UNC patterns: \\, \/, /\
+        // These never appear in legitimate URLs, so simple substring check is safe.
+        if (args.Contains(@"\\") || args.Contains(@"\/") || args.Contains(@"/\"))
+        {
+            return true;
+        }
+
+        // For //, we need to distinguish UNC paths (//server/share) from URLs (https://example.com).
+        // A legitimate URL has :// where the colon is part of the scheme. Strip those out and check
+        // if any remaining // exists.
+        string withoutSchemes = UriSchemePattern.Replace(args, "SCHEME_REMOVED");
+        return withoutSchemes.Contains("//");
+    }
+
     public static bool IsUnsafePath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path)) return false;
