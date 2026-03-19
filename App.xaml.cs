@@ -34,10 +34,22 @@ public partial class App : Application
         // Prevent the default ungraceful crash, then exit cleanly.
         // WinUI's rendering thread may be dead, so use a native MessageBox.
         e.Handled = true;
+        string title, message;
+        try
+        {
+            title = Localization.GetString("Error_CriticalTitle");
+            message = Localization.GetString("Error_CriticalMessage");
+        }
+        catch
+        {
+            // ResourceLoader may not be functional during critical failures
+            title = "Launchbox";
+            message = "Launchbox encountered a critical error and needs to close.";
+        }
         NativeMethods.MessageBox(
             IntPtr.Zero,
-            "Launchbox encountered a critical error and needs to close.",
-            "Launchbox",
+            message,
+            title,
             NativeMethods.MB_OK | NativeMethods.MB_ICONERROR);
         Environment.Exit(1);
     }
