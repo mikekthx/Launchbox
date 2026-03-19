@@ -70,6 +70,8 @@
     <Compile Include="..\Services\ProcessService.cs" Link="Services\ProcessService.cs" />
     <Compile Include="..\Services\IBackdropWindowWrapper.cs" Link="Services\IBackdropWindowWrapper.cs" />
     <Compile Include="..\Services\WinUIImageFactory.cs" Link="Services\WinUIImageFactory.cs" />
+    <Compile Include="..\Services\IStringProvider.cs" Link="Services\IStringProvider.cs" />
+    <Compile Include="..\Helpers\Localization.cs" Link="Helpers\Localization.cs" />
   </ItemGroup>
 
 </Project>
