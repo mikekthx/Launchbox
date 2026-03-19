@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- MainWindow.xaml — In-Tree Elements -->
+  <data name="MainWindow_NoShortcuts.Text" xml:space="preserve">
+    <value>ショートカットが見つかりません</value>
+  </data>
+  <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
+    <value>デスクトップの「Shortcuts」フォルダにショートカットを追加してください</value>
+  </data>
+  <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>設定されたショートカットフォルダを開く</value>
+  </data>
+  <data name="MainWindow_OpenFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>ショートカットフォルダを開く</value>
+  </data>
+  <data name="MainWindow_OpenFolderText.Text" xml:space="preserve">
+    <value>ショートカットフォルダを開く</value>
+  </data>
+  <data name="MainWindow_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>検索...</value>
+  </data>
+  <data name="MainWindow_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ショートカットを検索 (Escでクリア)</value>
+  </data>
+  <data name="MainWindow_SearchBox.AutomationProperties.Name" xml:space="preserve">
+    <value>ショートカットを検索</value>
+  </data>
+  <data name="MainWindow_NoMatches.Text" xml:space="preserve">
+    <value>一致する項目はありません</value>
+  </data>
+  <data name="MainWindow_ShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
+    <value>ショートカットグリッド</value>
+  </data>
+
+  <!-- SettingsWindow.xaml — In-Tree Elements -->
+  <data name="Settings_TitleText.Text" xml:space="preserve">
+    <value>Launchbox 設定</value>
+  </data>
+  <data name="Settings_GeneralHeader.Text" xml:space="preserve">
+    <value>全般</value>
+  </data>
+  <data name="Settings_StartupToggle.Header" xml:space="preserve">
+    <value>スタートアップ時に実行</value>
+  </data>
+  <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Windowsサインイン時にLaunchboxを自動的に起動する</value>
+  </data>
+  <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>スタートアップ時に実行</value>
+  </data>
+  <data name="Settings_ShortcutsHeader.Text" xml:space="preserve">
+    <value>ショートカットフォルダ</value>
+  </data>
+  <data name="Settings_BrowseButton.Content" xml:space="preserve">
+    <value>参照...</value>
+  </data>
+  <data name="Settings_BrowseButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ショートカット用の新しいフォルダを選択</value>
+  </data>
+  <data name="Settings_BrowseButton.AutomationProperties.Name" xml:space="preserve">
+    <value>ショートカットフォルダを参照</value>
+  </data>
+  <data name="Settings_ChangesNote.Text" xml:space="preserve">
+    <value>変更はすぐに適用されます。</value>
+  </data>
+  <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
+    <value>グローバルホットキー</value>
+  </data>
+  <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>修飾キーを選択 (例: Alt)</value>
+  </data>
+  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
+    <value>ホットキー修飾キー</value>
+  </data>
+  <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
+    <value>キー</value>
+  </data>
+  <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>キーを入力 (例: S, F1, Home)</value>
+  </data>
+  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
+    <value>ホットキーのキー</value>
+  </data>
+  <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
+    <value>外観</value>
+  </data>
+  <data name="Settings_IconSizeLabel.Text" xml:space="preserve">
+    <value>アイコンのサイズ</value>
+  </data>
+  <data name="Settings_IconSizeCombo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ランチャーグリッド内のアイコンサイズを設定</value>
+  </data>
+  <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
+    <value>アイコンのサイズ</value>
+  </data>
+  <data name="Settings_WindowHeader.Text" xml:space="preserve">
+    <value>ウィンドウ管理</value>
+  </data>
+  <data name="Settings_ResetPosition.Content" xml:space="preserve">
+    <value>ウィンドウ位置をリセット</value>
+  </data>
+  <data name="Settings_ResetPosition.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>メインウィンドウを画面中央に移動</value>
+  </data>
+  <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
+    <value>ウィンドウ位置をリセット</value>
+  </data>
+  <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
+    <value>ショートカットフォルダのパス</value>
+  </data>
+
+  <!-- C# Code Strings -->
+  <data name="Tray_TooltipFormat" xml:space="preserve">
+    <value>Launchbox ({0})</value>
+    <comment>{0} = hotkey combination like "Alt+S"</comment>
+  </data>
+  <data name="TrayMenu_Hide" xml:space="preserve">
+    <value>非表示</value>
+  </data>
+  <data name="TrayMenu_Show" xml:space="preserve">
+    <value>表示</value>
+  </data>
+  <data name="TrayMenu_Settings" xml:space="preserve">
+    <value>設定</value>
+  </data>
+  <data name="TrayMenu_Exit" xml:space="preserve">
+    <value>終了</value>
+  </data>
+  <data name="Tray_AutomationName" xml:space="preserve">
+    <value>Launchbox システムトレイアイコン</value>
+  </data>
+  <data name="Modifier_Alt" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Modifier_Ctrl" xml:space="preserve">
+    <value>Ctrl</value>
+  </data>
+  <data name="Modifier_Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Modifier_Win" xml:space="preserve">
+    <value>Win</value>
+  </data>
+  <data name="GridSize_Small" xml:space="preserve">
+    <value>小</value>
+  </data>
+  <data name="GridSize_Medium" xml:space="preserve">
+    <value>中</value>
+  </data>
+  <data name="GridSize_Large" xml:space="preserve">
+    <value>大</value>
+  </data>
+  <data name="Error_CriticalMessage" xml:space="preserve">
+    <value>Launchboxで致命的なエラーが発生したため、終了する必要があります。</value>
+  </data>
+  <data name="Error_CriticalTitle" xml:space="preserve">
+    <value>Launchbox</value>
+  </data>
+  <data name="Error_NotificationTitle" xml:space="preserve">
+    <value>Launchbox エラー</value>
+  </data>
+  <data name="SettingsWindow_Title" xml:space="preserve">
+    <value>Launchbox 設定</value>
+  </data>
+</root>
