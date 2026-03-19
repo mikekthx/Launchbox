@@ -175,10 +175,15 @@ public class IconService(IFileSystem fileSystem) : IIconService
         return iconBytes;
     }
 
+    // Maximum retry attempts for cache expiration loops to prevent infinite spinning
+    // when the Lazy factory consistently takes longer than CACHE_DURATION.
+    internal const int MAX_CACHE_RETRIES = 5;
+
     /// <summary>
     /// Gets a cached value for <paramref name="key"/>, retrying after removing the entry if it
     /// has expired or if its value factory threw. Optionally recovers from factory exceptions
     /// via <paramref name="errorHandler"/>; rethrows if no handler is provided.
+    /// Returns the last expired value if the retry limit is exceeded.
     /// </summary>
     private TValue GetWithExpirationRetry<TKey, TValue, TArg>(
         ConcurrentDictionary<TKey, Lazy<TValue>> cache,
@@ -188,7 +193,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
         Func<TValue, bool> isExpired,
         Func<Exception, TValue>? errorHandler = null) where TKey : notnull
     {
-        while (true)
+        for (int attempt = 0; attempt < MAX_CACHE_RETRIES; attempt++)
         {
             var lazyEntry = cache.GetOrAdd(key, valueFactory, factoryArgument);
 
@@ -198,6 +203,13 @@ public class IconService(IFileSystem fileSystem) : IIconService
 
                 if (!isExpired(entry))
                 {
+                    return entry;
+                }
+
+                if (attempt == MAX_CACHE_RETRIES - 1)
+                {
+                    // Return the stale value rather than spinning indefinitely
+                    Trace.WriteLine($"Cache retry limit ({MAX_CACHE_RETRIES}) exceeded for key; returning stale value");
                     return entry;
                 }
 
@@ -214,6 +226,9 @@ public class IconService(IFileSystem fileSystem) : IIconService
                 throw;
             }
         }
+
+        // Unreachable due to the return inside the final iteration, but satisfies the compiler
+        throw new InvalidOperationException("Cache retry loop exited unexpectedly");
     }
 
     /// <summary>
