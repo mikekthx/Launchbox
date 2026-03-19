@@ -11,6 +11,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Collection("Localization")]
 public class MainViewModelTests
 {
     private readonly MockFileSystem _fileSystem;
@@ -40,6 +41,21 @@ public class MainViewModelTests
         _settingsService.ShortcutsPath = _shortcutFolder;
 
         _fileSystem.CreateDirectory(_shortcutFolder);
+
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "TrayMenu_Hide", "Hide" },
+            { "TrayMenu_Show", "Show" },
+            { "TrayMenu_Settings", "Settings" },
+            { "TrayMenu_Exit", "Exit" },
+            { "Tray_TooltipFormat", "Launchbox ({0})" },
+            { "Tray_AutomationName", "Launchbox System Tray Icon" },
+            { "Error_NotificationTitle", "Launchbox Error" },
+            { "Modifier_Alt", "Alt" },
+            { "Modifier_Ctrl", "Ctrl" },
+            { "Modifier_Shift", "Shift" },
+            { "Modifier_Win", "Win" },
+        }));
     }
 
     private MainViewModel CreateViewModel()
@@ -326,6 +342,46 @@ public class MainViewModelTests
         await vm.LoadAppsAsync();
 
         Assert.Equal(2, vm.FilteredApps.Count());
+    }
+
+    [Fact]
+    public void ToggleWindowText_ReturnsLocalizedHide_WhenVisible()
+    {
+        var vm = CreateViewModel();
+        _windowService.RaiseVisibilityChanged(true);
+
+        Assert.Equal("Hide", vm.ToggleWindowText);
+    }
+
+    [Fact]
+    public void ToggleWindowText_ReturnsLocalizedShow_WhenHidden()
+    {
+        var vm = CreateViewModel();
+        _windowService.RaiseVisibilityChanged(false);
+
+        Assert.Equal("Show", vm.ToggleWindowText);
+    }
+
+    [Fact]
+    public void SettingsMenuText_ReturnsLocalizedString()
+    {
+        var vm = CreateViewModel();
+        Assert.Equal("Settings", vm.SettingsMenuText);
+    }
+
+    [Fact]
+    public void ExitMenuText_ReturnsLocalizedString()
+    {
+        var vm = CreateViewModel();
+        Assert.Equal("Exit", vm.ExitMenuText);
+    }
+
+    [Fact]
+    public void TrayToolTipText_UsesLocalizedFormat()
+    {
+        var vm = CreateViewModel();
+        // Default hotkey is Alt+S
+        Assert.Equal("Launchbox (Alt+S)", vm.TrayToolTipText);
     }
 
     private class ThrowingFileSystem : MockFileSystem

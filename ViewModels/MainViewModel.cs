@@ -82,7 +82,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _ => 56,
     };
 
-    public string ToggleWindowText => _windowService.IsVisible ? "Hide" : "Show";
+    public string ToggleWindowText => _windowService.IsVisible
+        ? Localization.GetString("TrayMenu_Hide")
+        : Localization.GetString("TrayMenu_Show");
+
+    public string SettingsMenuText => Localization.GetString("TrayMenu_Settings");
+
+    public string ExitMenuText => Localization.GetString("TrayMenu_Exit");
 
     public string TrayToolTipText
     {
@@ -92,10 +98,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             int key = _settingsService.HotkeyKey;
 
             var parts = new List<string>();
-            if ((mod & Constants.MOD_CONTROL) != 0) parts.Add("Ctrl");
-            if ((mod & Constants.MOD_ALT) != 0) parts.Add("Alt");
-            if ((mod & Constants.MOD_SHIFT) != 0) parts.Add("Shift");
-            if ((mod & Constants.MOD_WIN) != 0) parts.Add("Win");
+            if ((mod & Constants.MOD_CONTROL) != 0) parts.Add(Localization.GetString("Modifier_Ctrl"));
+            if ((mod & Constants.MOD_ALT) != 0) parts.Add(Localization.GetString("Modifier_Alt"));
+            if ((mod & Constants.MOD_SHIFT) != 0) parts.Add(Localization.GetString("Modifier_Shift"));
+            if ((mod & Constants.MOD_WIN) != 0) parts.Add(Localization.GetString("Modifier_Win"));
 
             var vk = (Windows.System.VirtualKey)key;
             string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
@@ -103,7 +109,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 : vk.ToString();
             parts.Add(keyName);
 
-            return $"Launchbox ({string.Join("+", parts)})";
+            return string.Format(Localization.GetString("Tray_TooltipFormat"), string.Join("+", parts));
         }
     }
 
