@@ -72,6 +72,7 @@
     <Compile Include="..\Services\WinUIImageFactory.cs" Link="Services\WinUIImageFactory.cs" />
     <Compile Include="..\Services\IStringProvider.cs" Link="Services\IStringProvider.cs" />
     <Compile Include="..\Helpers\Localization.cs" Link="Helpers\Localization.cs" />
+    <Compile Include="..\Helpers\LocalizedOption.cs" Link="Helpers\LocalizedOption.cs" />
   </ItemGroup>
 
 </Project>
