@@ -39,12 +39,15 @@ public class PathSecurityTests
         Assert.True(PathSecurity.IsUnsafePath(@"\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\"));
     }
 
-    [Fact]
-    public void IsUnsafePath_HandlesNullOrEmpty()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    [InlineData("\t")]
+    [Trait("Category", "Security")]
+    public void IsUnsafePath_ReturnsTrueForNullOrWhitespace(string? path)
     {
-        Assert.False(PathSecurity.IsUnsafePath(null));
-        Assert.False(PathSecurity.IsUnsafePath(""));
-        Assert.False(PathSecurity.IsUnsafePath("   "));
+        Assert.True(PathSecurity.IsUnsafePath(path));
     }
 
     [Fact]

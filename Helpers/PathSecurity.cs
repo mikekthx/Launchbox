@@ -7,7 +7,8 @@ public static class PathSecurity
 {
     public static bool IsUnsafePath(string? path)
     {
-        if (string.IsNullOrWhiteSpace(path)) return false;
+        // Security: Process.Start("") with UseShellExecute opens the working directory in Explorer
+        if (string.IsNullOrWhiteSpace(path)) return true;
 
         // Check for invalid path characters (Fail Closed)
         // Explicitly check for common Windows invalid characters that might pass Path.GetFullPath on some runtimes
