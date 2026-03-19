@@ -56,14 +56,12 @@ public partial class App : Application
 
     private static bool IsRecoverable(Exception ex)
     {
-        if (ex is OutOfMemoryException or StackOverflowException or SEHException or AccessViolationException)
-            return false;
-
-        // Transient COM disconnection during WinUI layout passes (RPC_E_DISCONNECTED)
-        if (ex is COMException comEx && comEx.HResult == unchecked((int)0x80010108))
-            return true;
-
-        return false;
+        // Only truly fatal exceptions should terminate the app; everything else is survivable
+        return ex is not (OutOfMemoryException
+            or StackOverflowException
+            or AccessViolationException
+            or SEHException
+            or TypeInitializationException);
     }
 
     private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
