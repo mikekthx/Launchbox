@@ -130,6 +130,16 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public void OpenSettingsCommand_DelegatesToWindowService()
+    {
+        var viewModel = CreateViewModel();
+
+        viewModel.OpenSettingsCommand.Execute(null);
+
+        Assert.True(_windowService.OpenSettingsCalled);
+    }
+
+    [Fact]
     public void ToggleWindowText_UpdatesWhenVisibilityChanges()
     {
         var viewModel = CreateViewModel();
