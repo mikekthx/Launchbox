@@ -23,8 +23,8 @@ public class BackdropService : IBackdropService
         IBackdropWindowWrapper windowWrapper,
         Func<DateTime>? timeProvider = null)
     {
-        _processService = processService;
-        _windowWrapper = windowWrapper;
+        _processService = processService ?? throw new ArgumentNullException(nameof(processService));
+        _windowWrapper = windowWrapper ?? throw new ArgumentNullException(nameof(windowWrapper));
         _timeProvider = timeProvider ?? (() => DateTime.Now);
     }
 

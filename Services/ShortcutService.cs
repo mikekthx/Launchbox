@@ -13,7 +13,7 @@ public class ShortcutService : IShortcutService
 
     public ShortcutService(IFileSystem fileSystem)
     {
-        _fileSystem = fileSystem;
+        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     }
 
     public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions)

@@ -29,6 +29,32 @@ public class ProcessStarterSecurityTests
         Assert.Contains("Execution of unsafe path", exception.Message);
     }
 
+    [Fact]
+    public void Start_ThrowsArgumentNullException_ForNullStartInfo()
+    {
+        Assert.Throws<ArgumentNullException>(() => _processStarter.Start(null!));
+    }
+
+    [Theory]
+    [InlineData("https://example.com")]
+    [InlineData("http://example.com/path?q=1")]
+    [InlineData("--url=https://example.com")]
+    public void Start_AllowsUrlArguments(string urlArgs)
+    {
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = OperatingSystem.IsWindows() ? "cmd.exe" : "echo",
+            Arguments = urlArgs,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        // Should not throw — URLs are legitimate arguments
+        var process = _processStarter.Start(startInfo);
+        process?.WaitForExit();
+        process?.Dispose();
+    }
+
     [Theory]
     [InlineData(@"\\server\share\payload")]
     [InlineData("//server/share/payload")]

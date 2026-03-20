@@ -15,9 +15,9 @@ public class WinUILauncher : IAppLauncher
 
     public WinUILauncher(IShortcutResolver shortcutResolver, IProcessStarter processStarter, IFileSystem fileSystem)
     {
-        _shortcutResolver = shortcutResolver;
-        _processStarter = processStarter;
-        _fileSystem = fileSystem;
+        _shortcutResolver = shortcutResolver ?? throw new ArgumentNullException(nameof(shortcutResolver));
+        _processStarter = processStarter ?? throw new ArgumentNullException(nameof(processStarter));
+        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     }
 
     public void Launch(string path)
@@ -73,7 +73,7 @@ public class WinUILauncher : IAppLauncher
             if (extension == ".lnk")
             {
                 string? args = metadata?.Arguments;
-                if (!string.IsNullOrEmpty(args) && (args.Contains(@"\\") || args.Contains("//") || args.Contains(@"\/") || args.Contains(@"/\")))
+                if (PathSecurity.ContainsUncPath(args))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
                     return;
