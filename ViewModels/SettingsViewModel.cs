@@ -69,7 +69,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             ?? ViewModeOptions[0];
         set
         {
-            if (value != null && Enum.TryParse<FolderViewMode>(value.Value, out var mode))
+            if (value is not null && Enum.TryParse<FolderViewMode>(value.Value, out var mode))
             {
                 _settingsService.FolderViewMode = mode;
             }
@@ -135,7 +135,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to add folder: {ex.Message}");
+            Trace.WriteLine($"Failed to add folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
