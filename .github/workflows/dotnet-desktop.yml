@@ -29,10 +29,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Enable Windows Long Paths
-        if: github.event_name != 'pull_request'
-        run: Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
-
       - name: Initialize CodeQL (extractorless — PR only)
         if: github.event_name == 'pull_request'
         uses: github/codeql-action/init@v4
@@ -62,11 +58,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-codeql-
 
+      - name: Pre-create Source Generator Folders
+        if: github.event_name != 'pull_request'
+        run: |
+          New-Item -ItemType Directory -Force -Path "obj\Gen\WinRT.SourceGenerator\Generator.WinRTAotSourceGenerator"
+          New-Item -ItemType Directory -Force -Path "obj\Gen\WinRT.SourceGenerator\Generator.WinRTSourceGenerator"
+
       - name: Build for CodeQL analysis
         if: github.event_name != 'pull_request'
         run: |
           dotnet restore $env:Solution_Name
-          dotnet build $env:Solution_Name --configuration Debug -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
+          dotnet build $env:Solution_Name --configuration Debug -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputPath=obj\Gen -p:AppxPackageSigningEnabled=false
 
       - name: Perform Analysis
         uses: github/codeql-action/analyze@v4
