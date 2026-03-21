@@ -6,6 +6,8 @@ public static class Constants
 {
     public const int WINDOW_WIDTH = 650;
     public const int WINDOW_HEIGHT = 700;
+    public const int MIN_WINDOW_WIDTH = 300;
+    public const int MIN_WINDOW_HEIGHT = 200;
 
     public const int MOD_ALT = 0x0001;
     public const int MOD_CONTROL = 0x0002;
