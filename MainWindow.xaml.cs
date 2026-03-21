@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using Microsoft.UI.Xaml;
@@ -8,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Launchbox;
@@ -168,6 +170,22 @@ public sealed partial class MainWindow : Window
             _ = _backdropService.UpdateBackdropAsync();
             ViewModel.FilterText = string.Empty;
             SearchBox.Focus(FocusState.Programmatic);
+        }
+    }
+
+    private void GroupHeader_Tapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AppItemGroup group }
+            && ViewModel.CollapsibleGroupsEnabled)
+        {
+            // Match by FolderPath (stable identity) — labels can be duplicated, paths cannot
+            var stableGroup = ViewModel.GroupedApps.FirstOrDefault(g => g.FolderPath == group.FolderPath);
+            if (stableGroup != null)
+            {
+                // IsCollapsed setter mutates the inner ObservableCollection in place —
+                // CollectionViewSource observes the change automatically
+                stableGroup.IsCollapsed = !stableGroup.IsCollapsed;
+            }
         }
     }
 
