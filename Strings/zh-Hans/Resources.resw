@@ -211,16 +211,16 @@
   <data name="Settings_AddFolder.Content" xml:space="preserve">
     <value>添加文件夹</value>
   </data>
-  <data name="Settings_RemoveFolder.ToolTip" xml:space="preserve">
+  <data name="Settings_RemoveFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>删除</value>
   </data>
-  <data name="Settings_MoveUp.ToolTip" xml:space="preserve">
+  <data name="Settings_MoveUp.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>上移</value>
   </data>
-  <data name="Settings_MoveDown.ToolTip" xml:space="preserve">
+  <data name="Settings_MoveDown.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>下移</value>
   </data>
-  <data name="Settings_RenameFolder.ToolTip" xml:space="preserve">
+  <data name="Settings_RenameFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>重命名</value>
   </data>
   <data name="Settings_ViewMode.Text" xml:space="preserve">
