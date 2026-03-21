@@ -1,9 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Launchbox.Helpers;
+using Launchbox.Models;
 using Launchbox.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -55,6 +57,39 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
     }
 
+    public IReadOnlyList<LocalizedOption> ViewModeOptions { get; } =
+    [
+        new("Merged", Localization.GetString("Settings_ViewMode_Merged")),
+        new("Grouped", Localization.GetString("Settings_ViewMode_Grouped"))
+    ];
+
+    public LocalizedOption SelectedViewModeOption
+    {
+        get => ViewModeOptions.FirstOrDefault(o => o.Value == _settingsService.FolderViewMode.ToString())
+            ?? ViewModeOptions[0];
+        set
+        {
+            if (value != null && Enum.TryParse<FolderViewMode>(value.Value, out var mode))
+            {
+                _settingsService.FolderViewMode = mode;
+            }
+        }
+    }
+
+    public FolderViewMode SelectedViewMode
+    {
+        get => _settingsService.FolderViewMode;
+        set => _settingsService.FolderViewMode = value;
+    }
+
+    public bool CollapsibleGroups
+    {
+        get => _settingsService.CollapsibleGroups;
+        set => _settingsService.CollapsibleGroups = value;
+    }
+
+    public ObservableCollection<ShortcutFolder> Folders { get; } = [];
+
     public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
@@ -63,6 +98,8 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
         _pendingStartupValue = _settingsService.IsRunAtStartup;
         _settingsService.PropertyChanged += OnServicePropertyChanged;
+
+        RefreshFolders();
     }
 
     [RelayCommand]
@@ -79,6 +116,73 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to browse for folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task AddFolderAsync()
+    {
+        try
+        {
+            var path = await _filePickerService.PickSingleFolderAsync();
+            if (!string.IsNullOrEmpty(path))
+            {
+                if (_settingsService.AddShortcutFolder(path))
+                {
+                    RefreshFolders();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to add folder: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private void RemoveFolder(int order)
+    {
+        if (_settingsService.RemoveShortcutFolder(order))
+        {
+            RefreshFolders();
+        }
+    }
+
+    [RelayCommand]
+    private void MoveFolderUp(int order)
+    {
+        if (order > 0 && _settingsService.ReorderShortcutFolder(order, order - 1))
+        {
+            RefreshFolders();
+        }
+    }
+
+    [RelayCommand]
+    private void MoveFolderDown(int order)
+    {
+        var folders = _settingsService.GetShortcutFolders();
+        if (order < folders.Count - 1 && _settingsService.ReorderShortcutFolder(order, order + 1))
+        {
+            RefreshFolders();
+        }
+    }
+
+    // ViewModel stays platform-agnostic — no WinUI types (ContentDialog, XamlRoot).
+    // The rename UI lives in SettingsWindow.xaml.cs code-behind.
+    public void ApplyRename(int order, string newLabel)
+    {
+        if (_settingsService.RenameShortcutFolder(order, newLabel))
+        {
+            RefreshFolders();
+        }
+    }
+
+    private void RefreshFolders()
+    {
+        Folders.Clear();
+        foreach (var f in _settingsService.GetShortcutFolders())
+        {
+            Folders.Add(f);
         }
     }
 
@@ -127,6 +231,14 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(HotkeyKeyString));
         else if (e.PropertyName == nameof(SettingsService.GridSize))
             OnPropertyChanged(nameof(SelectedGridSize));
+        else if (e.PropertyName == nameof(SettingsService.KeepCentered))
+            OnPropertyChanged(nameof(KeepCentered));
+        else if (e.PropertyName == "ShortcutFolders")
+            RefreshFolders();
+        else if (e.PropertyName == nameof(SettingsService.FolderViewMode))
+            OnPropertyChanged(nameof(SelectedViewModeOption));
+        else if (e.PropertyName == nameof(SettingsService.CollapsibleGroups))
+            OnPropertyChanged(nameof(CollapsibleGroups));
     }
 
     public string ShortcutsPath
@@ -207,6 +319,12 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             // Always notify to refresh UI (e.g., if user typed invalid char, revert to old value)
             OnPropertyChanged(nameof(HotkeyKeyString));
         }
+    }
+
+    public bool KeepCentered
+    {
+        get => _settingsService.KeepCentered;
+        set => _settingsService.KeepCentered = value;
     }
 
     [RelayCommand]
