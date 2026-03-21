@@ -8,7 +8,7 @@ public static class PathSecurity
 {
     // Security: regex to strip URI scheme prefixes (e.g. "https://", "ftp://") from argument strings
     // so that remaining "//" can be detected as UNC path indicators.
-    private static readonly Regex UriSchemePattern = new(@"[a-zA-Z][a-zA-Z0-9+\-.]*://", RegexOptions.Compiled);
+    private static readonly Regex URI_SCHEME_PATTERN = new(@"[a-zA-Z][a-zA-Z0-9+\-.]*://", RegexOptions.Compiled);
 
     /// <summary>
     /// Detects UNC path patterns in argument strings while allowing legitimate URLs.
@@ -32,7 +32,7 @@ public static class PathSecurity
         // For //, we need to distinguish UNC paths (//server/share) from URLs (https://example.com).
         // A legitimate URL has :// where the colon is part of the scheme. Strip those out and check
         // if any remaining // exists.
-        string withoutSchemes = UriSchemePattern.Replace(args, "SCHEME_REMOVED");
+        string withoutSchemes = URI_SCHEME_PATTERN.Replace(args, "SCHEME_REMOVED");
         return withoutSchemes.Contains("//");
     }
 
