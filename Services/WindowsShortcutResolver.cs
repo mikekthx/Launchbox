@@ -6,8 +6,14 @@ using System.Text;
 
 namespace Launchbox.Services;
 
+/// <summary>
+/// Resolves Windows shortcut files (.lnk and .url) to extract their target path, arguments, and working directory.
+/// </summary>
 public class WindowsShortcutResolver : IShortcutResolver
 {
+    private const int MAX_PATH = 260;
+    private const int MAX_ARGS_LENGTH = 1024;
+
     private readonly IFileSystem _fileSystem;
 
     public WindowsShortcutResolver(IFileSystem fileSystem)
@@ -15,6 +21,12 @@ public class WindowsShortcutResolver : IShortcutResolver
         _fileSystem = fileSystem;
     }
 
+    /// <summary>
+    /// Parses the provided shortcut file and extracts its underlying metadata.
+    /// Returns null if the path is invalid or if COM resolution fails.
+    /// </summary>
+    /// <param name="shortcutPath">The full path to the .lnk or .url file.</param>
+    /// <returns>A <see cref="ShortcutMetadata"/> object containing the resolved path, arguments, and working directory.</returns>
     public ShortcutMetadata? Resolve(string shortcutPath)
     {
         if (string.IsNullOrWhiteSpace(shortcutPath)) return null;
@@ -53,13 +65,13 @@ public class WindowsShortcutResolver : IShortcutResolver
             link = (IShellLinkW)new ShellLink();
             ((IPersistFile)link).Load(path, 0);
 
-            var pathSb = new StringBuilder(260); // MAX_PATH
+            var pathSb = new StringBuilder(MAX_PATH);
             link.GetPath(pathSb, pathSb.Capacity, IntPtr.Zero, 0);
 
-            var argsSb = new StringBuilder(1024);
+            var argsSb = new StringBuilder(MAX_ARGS_LENGTH);
             link.GetArguments(argsSb, argsSb.Capacity);
 
-            var dirSb = new StringBuilder(260); // MAX_PATH
+            var dirSb = new StringBuilder(MAX_PATH);
             link.GetWorkingDirectory(dirSb, dirSb.Capacity);
 
             return new ShortcutMetadata(pathSb.ToString(), argsSb.ToString(), dirSb.ToString());
