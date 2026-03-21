@@ -88,21 +88,6 @@
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
     <value>Run at Startup</value>
   </data>
-  <data name="Settings_ShortcutsHeader.Text" xml:space="preserve">
-    <value>Shortcuts Folder</value>
-  </data>
-  <data name="Settings_BrowseButton.Content" xml:space="preserve">
-    <value>Browse...</value>
-  </data>
-  <data name="Settings_BrowseButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Select a new folder for shortcuts</value>
-  </data>
-  <data name="Settings_BrowseButton.AutomationProperties.Name" xml:space="preserve">
-    <value>Browse for shortcuts folder</value>
-  </data>
-  <data name="Settings_ChangesNote.Text" xml:space="preserve">
-    <value>Changes will be applied immediately.</value>
-  </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Global Hotkey</value>
   </data>
@@ -147,9 +132,6 @@
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>Keep Window Centered</value>
-  </data>
-  <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
-    <value>Shortcuts folder path</value>
   </data>
 
   <!-- C# Code Strings -->

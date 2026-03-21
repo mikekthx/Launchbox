@@ -88,21 +88,6 @@
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
     <value>Beim Start ausführen</value>
   </data>
-  <data name="Settings_ShortcutsHeader.Text" xml:space="preserve">
-    <value>Verknüpfungsordner</value>
-  </data>
-  <data name="Settings_BrowseButton.Content" xml:space="preserve">
-    <value>Durchsuchen...</value>
-  </data>
-  <data name="Settings_BrowseButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Einen neuen Ordner für Verknüpfungen auswählen</value>
-  </data>
-  <data name="Settings_BrowseButton.AutomationProperties.Name" xml:space="preserve">
-    <value>Nach Verknüpfungsordner suchen</value>
-  </data>
-  <data name="Settings_ChangesNote.Text" xml:space="preserve">
-    <value>Änderungen werden sofort übernommen.</value>
-  </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Globaler Hotkey</value>
   </data>
@@ -147,9 +132,6 @@
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>Fenster zentriert halten</value>
-  </data>
-  <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
-    <value>Pfad zum Verknüpfungsordner</value>
   </data>
 
   <!-- C# Code Strings -->

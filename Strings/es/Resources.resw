@@ -88,21 +88,6 @@
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
     <value>Ejecutar al iniciar</value>
   </data>
-  <data name="Settings_ShortcutsHeader.Text" xml:space="preserve">
-    <value>Carpeta de accesos directos</value>
-  </data>
-  <data name="Settings_BrowseButton.Content" xml:space="preserve">
-    <value>Examinar...</value>
-  </data>
-  <data name="Settings_BrowseButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Seleccionar una nueva carpeta para los accesos directos</value>
-  </data>
-  <data name="Settings_BrowseButton.AutomationProperties.Name" xml:space="preserve">
-    <value>Buscar carpeta de accesos directos</value>
-  </data>
-  <data name="Settings_ChangesNote.Text" xml:space="preserve">
-    <value>Los cambios se aplicarán de inmediato.</value>
-  </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Atajo de teclado global</value>
   </data>
@@ -147,9 +132,6 @@
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>Mantener ventana centrada</value>
-  </data>
-  <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
-    <value>Ruta de la carpeta de accesos directos</value>
   </data>
 
   <!-- C# Code Strings -->

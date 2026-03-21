@@ -88,21 +88,6 @@
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
     <value>Executar ao Iniciar</value>
   </data>
-  <data name="Settings_ShortcutsHeader.Text" xml:space="preserve">
-    <value>Pasta de Atalhos</value>
-  </data>
-  <data name="Settings_BrowseButton.Content" xml:space="preserve">
-    <value>Procurar...</value>
-  </data>
-  <data name="Settings_BrowseButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Selecionar uma nova pasta para atalhos</value>
-  </data>
-  <data name="Settings_BrowseButton.AutomationProperties.Name" xml:space="preserve">
-    <value>Procurar pasta de atalhos</value>
-  </data>
-  <data name="Settings_ChangesNote.Text" xml:space="preserve">
-    <value>As alterações serão aplicadas imediatamente.</value>
-  </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Atalho Global</value>
   </data>
@@ -147,9 +132,6 @@
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>Manter janela centralizada</value>
-  </data>
-  <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
-    <value>Caminho da pasta de atalhos</value>
   </data>
 
   <!-- C# Code Strings -->

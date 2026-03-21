@@ -88,21 +88,6 @@
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
     <value>시작 시 실행</value>
   </data>
-  <data name="Settings_ShortcutsHeader.Text" xml:space="preserve">
-    <value>바로 가기 폴더</value>
-  </data>
-  <data name="Settings_BrowseButton.Content" xml:space="preserve">
-    <value>찾아보기...</value>
-  </data>
-  <data name="Settings_BrowseButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>바로 가기를 위한 새 폴더 선택</value>
-  </data>
-  <data name="Settings_BrowseButton.AutomationProperties.Name" xml:space="preserve">
-    <value>바로 가기 폴더 찾아보기</value>
-  </data>
-  <data name="Settings_ChangesNote.Text" xml:space="preserve">
-    <value>변경 사항이 즉시 적용됩니다.</value>
-  </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>전역 단축키</value>
   </data>
@@ -147,9 +132,6 @@
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>창을 중앙에 유지</value>
-  </data>
-  <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
-    <value>바로 가기 폴더 경로</value>
   </data>
 
   <!-- C# Code Strings -->
