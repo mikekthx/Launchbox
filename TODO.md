@@ -128,9 +128,9 @@
 
 ### Features
 - [ ] Keyboard navigation: arrow keys to move through the grid, Enter to launch -- essential for a keyboard-first launcher
-- [ ] Window height auto-sizing: detect work area and clamp/resize on activation
+- [x] Window height auto-sizing: detect work area and clamp/resize on activation
 - [ ] Custom icon support UI: the .icons/ directory feature exists but there's no UI to set custom icons (users must manually place files)
-- [ ] Multi-folder shortcut sources: support multiple folders instead of just one
+- [x] Multi-folder shortcut sources: support multiple folders instead of just one
 
 ## Low
 
