@@ -31,5 +31,13 @@ public class AppItem : ObservableObject
         set => SetProperty(ref _icon, value);
     }
 
+    public string FolderLabel { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Stable identity for grouping — the folder's original path.
+    /// Labels can be duplicated across folders; paths cannot.
+    /// </summary>
+    public string FolderPath { get; init; } = string.Empty;
+
     public override string ToString() => $"{Name} ({Path})";
 }
