@@ -1,0 +1,162 @@
+using Launchbox.Helpers;
+using Launchbox.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+
+namespace Launchbox.Services;
+
+public class ShortcutFolderManager
+{
+    private const string FOLDERS_KEY = "ShortcutFolders";
+    private const string LEGACY_KEY = "ShortcutsPath";
+    private const int MAX_FOLDERS = 20;
+    private const int MAX_JSON_BYTES = 7168; // 7KB safety margin under 8KB LocalSettings limit
+
+    private readonly ISettingsStore _store;
+    private readonly object _lock = new();
+    // volatile for read visibility from UI thread; lock protects read-modify-write in mutations
+    private volatile IReadOnlyList<ShortcutFolder> _cache;
+
+    public ShortcutFolderManager(ISettingsStore store)
+    {
+        ArgumentNullException.ThrowIfNull(store);
+        _store = store;
+        _cache = LoadFolders();
+    }
+
+    public IReadOnlyList<ShortcutFolder> GetFolders() => _cache;
+
+    private IReadOnlyList<ShortcutFolder> LoadFolders()
+    {
+        // Try reading stored JSON — if the new key exists, legacy is implicitly ignored
+        if (_store.TryGetValue(FOLDERS_KEY, out var val) && val is string json && !string.IsNullOrEmpty(json))
+        {
+            try
+            {
+                var folders = JsonSerializer.Deserialize<List<ShortcutFolder>>(json);
+                if (folders != null && folders.Count > 0)
+                {
+                    return ValidateAndNormalize(folders);
+                }
+            }
+            catch (JsonException ex)
+            {
+                System.Diagnostics.Trace.WriteLine($"Corrupt ShortcutFolders JSON, using default: {ex.Message}");
+                // Do NOT overwrite — allows manual recovery
+            }
+        }
+
+        // Migration: check legacy key (new key's existence supersedes legacy — no sentinel needed)
+        if (_store.TryGetValue(LEGACY_KEY, out var legacyVal) && legacyVal is string legacyPath
+            && !string.IsNullOrEmpty(legacyPath))
+        {
+            var label = Path.GetFileName(legacyPath) ?? "Shortcuts";
+            var migrated = new List<ShortcutFolder>
+            {
+                new() { Path = legacyPath, Label = label, Order = 0 }
+            };
+            _store.SetValue(FOLDERS_KEY, JsonSerializer.Serialize(migrated));
+            return ValidateAndNormalize(migrated);
+        }
+
+        // Default
+        var defaultPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
+        return [new ShortcutFolder { Path = defaultPath, Label = "Shortcuts", Order = 0 }];
+    }
+
+    public bool AddFolder(string path, string? label = null)
+    {
+        lock (_lock)
+        {
+            var folders = new List<ShortcutFolder>(_cache);
+            if (folders.Count >= MAX_FOLDERS) return false;
+
+            if (PathSecurity.IsUnsafePath(path)) return false;
+
+            label ??= Path.GetFileName(path) ?? path;
+            var newFolder = new ShortcutFolder { Path = path, Label = label, Order = folders.Count };
+            folders.Add(newFolder);
+
+            return TryPersistAndCache(folders);
+        }
+    }
+
+    public bool RemoveFolder(int order)
+    {
+        lock (_lock)
+        {
+            var folders = new List<ShortcutFolder>(_cache);
+            var index = folders.FindIndex(f => f.Order == order);
+            if (index < 0) return false;
+
+            folders.RemoveAt(index);
+            var normalized = Renumber(folders);
+            return TryPersistAndCache(normalized);
+        }
+    }
+
+    public bool ReorderFolder(int fromOrder, int toOrder)
+    {
+        lock (_lock)
+        {
+            var folders = new List<ShortcutFolder>(_cache);
+            var fromIndex = folders.FindIndex(f => f.Order == fromOrder);
+            var toIndex = folders.FindIndex(f => f.Order == toOrder);
+            if (fromIndex < 0 || toIndex < 0) return false;
+
+            var item = folders[fromIndex];
+            folders.RemoveAt(fromIndex);
+            folders.Insert(toIndex, item);
+
+            var normalized = Renumber(folders);
+            return TryPersistAndCache(normalized);
+        }
+    }
+
+    public bool RenameFolder(int order, string newLabel)
+    {
+        lock (_lock)
+        {
+            if (string.IsNullOrWhiteSpace(newLabel)) return false;
+
+            var folders = new List<ShortcutFolder>(_cache);
+            var index = folders.FindIndex(f => f.Order == order);
+            if (index < 0) return false;
+
+            folders[index] = folders[index] with { Label = newLabel };
+            return TryPersistAndCache(folders);
+        }
+    }
+
+    private bool TryPersistAndCache(List<ShortcutFolder> folders)
+    {
+        // Serialize once — reuse for both size check and persistence
+        var json = JsonSerializer.Serialize(folders);
+        if (System.Text.Encoding.UTF8.GetByteCount(json) > MAX_JSON_BYTES)
+        {
+            return false;
+        }
+        if (!_store.SetValue(FOLDERS_KEY, json)) return false;
+        _cache = ValidateAndNormalize(folders);
+        return true;
+    }
+
+    private static IReadOnlyList<ShortcutFolder> ValidateAndNormalize(List<ShortcutFolder> folders)
+    {
+        var valid = folders
+            .Where(f => !string.IsNullOrEmpty(f.Path) && !PathSecurity.IsUnsafePath(
+                Environment.ExpandEnvironmentVariables(f.Path)))
+            .ToList();
+
+        return Renumber(valid).AsReadOnly();
+    }
+
+    private static List<ShortcutFolder> Renumber(List<ShortcutFolder> folders)
+    {
+        return folders.Select((f, i) => f with { Order = i }).ToList();
+    }
+}

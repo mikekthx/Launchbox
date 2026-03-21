@@ -75,6 +75,7 @@
     <Compile Include="..\Services\IStringProvider.cs" Link="Services\IStringProvider.cs" />
     <Compile Include="..\Helpers\Localization.cs" Link="Helpers\Localization.cs" />
     <Compile Include="..\Helpers\LocalizedOption.cs" Link="Helpers\LocalizedOption.cs" />
+    <Compile Include="..\Services\ShortcutFolderManager.cs" Link="Services\ShortcutFolderManager.cs" />
   </ItemGroup>
 
 </Project>
