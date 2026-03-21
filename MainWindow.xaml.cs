@@ -61,9 +61,10 @@ public sealed partial class MainWindow : Window
         // DataContext required for {Binding} on out-of-tree elements (TrayIcon, ContextFlyout)
         // that cannot use {x:Bind} because they are not in the visual tree.
         RootGrid.DataContext = this;
-        // AppGrid.Tag relays ViewModel to the DataTemplate, which cannot reach ViewModel directly
-        // because x:DataType="models:AppItem" restricts the binding context to AppItem.
+        // AppGrid/GroupedAppGrid.Tag relays ViewModel to the DataTemplate, which cannot reach
+        // ViewModel directly because x:DataType="models:AppItem" restricts the binding context to AppItem.
         AppGrid.Tag = ViewModel;
+        GroupedAppGrid.Tag = ViewModel;
 
         _ = _backdropService.UpdateBackdropAsync();
 
