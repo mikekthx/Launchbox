@@ -48,6 +48,11 @@ public static class NativeMethods
     /// </summary>
     public const int WM_NCLBUTTONDBLCLK = 0x00A3;
 
+    /// <summary>
+    /// Sent to a window when the size or position of the window is about to change. An application can use this message to override the window's default maximized size and position, or its default minimum or maximum tracking size.
+    /// </summary>
+    public const int WM_GETMINMAXINFO = 0x0024;
+
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
@@ -100,6 +105,16 @@ public static class NativeMethods
     {
         public int X;
         public int Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MINMAXINFO
+    {
+        public POINT ptReserved;
+        public POINT ptMaxSize;
+        public POINT ptMaxPosition;
+        public POINT ptMinTrackSize;
+        public POINT ptMaxTrackSize;
     }
 
     public const uint MB_OK = 0x0;
