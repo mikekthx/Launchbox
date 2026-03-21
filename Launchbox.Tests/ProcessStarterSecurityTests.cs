@@ -44,15 +44,14 @@ public class ProcessStarterSecurityTests
         var startInfo = new ProcessStartInfo
         {
             FileName = OperatingSystem.IsWindows() ? "cmd.exe" : "echo",
-            Arguments = urlArgs,
+            Arguments = OperatingSystem.IsWindows() ? $"/c echo {urlArgs}" : urlArgs,
             UseShellExecute = false,
             CreateNoWindow = true
         };
 
         // Should not throw — URLs are legitimate arguments
-        var process = _processStarter.Start(startInfo);
-        process?.WaitForExit();
-        process?.Dispose();
+        using var process = _processStarter.Start(startInfo);
+        process?.Kill();
     }
 
     [Theory]
