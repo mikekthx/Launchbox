@@ -31,7 +31,8 @@ public sealed partial class MainWindow : Window
     {
         var settingsStore = new LocalSettingsStore();
         var startupService = new WinUIStartupService();
-        _settingsService = new SettingsService(settingsStore, startupService);
+        var folderManager = new ShortcutFolderManager(settingsStore);
+        _settingsService = new SettingsService(settingsStore, startupService, folderManager);
         _filePickerService = new WinUIFilePickerService();
 
         var dispatcher = new WinUIDispatcher(this.DispatcherQueue);

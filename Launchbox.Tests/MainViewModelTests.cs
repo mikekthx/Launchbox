@@ -37,7 +37,7 @@ public class MainViewModelTests
         // Create SettingsService with MockStore
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        _settingsService = new SettingsService(settingsStore, startupService);
+        _settingsService = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
         _settingsService.ShortcutsPath = _shortcutFolder;
 
         _fileSystem.CreateDirectory(_shortcutFolder);

@@ -20,7 +20,7 @@ public class SettingsServiceSecurityTests
         {
             var settingsStore = new MockSettingsStore();
             var startupService = new MockStartupService();
-            var service = new SettingsService(settingsStore, startupService);
+            var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
             string unsafePath = @"\\attacker\share\SecretProject";
 
@@ -45,7 +45,7 @@ public class SettingsServiceSecurityTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         string unsafePath = @"\\attacker\share\Shortcuts";
 
@@ -62,7 +62,7 @@ public class SettingsServiceSecurityTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         string unsafePath = @"\\attacker\share\Shortcuts";
 

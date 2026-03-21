@@ -31,7 +31,7 @@ public class MainViewModelPerformanceTests
         }
 
         var settingsStore = new MockSettingsStore();
-        var settingsService = new SettingsService(settingsStore, new MockStartupService());
+        var settingsService = new SettingsService(settingsStore, new MockStartupService(), new ShortcutFolderManager(settingsStore));
         settingsService.ShortcutsPath = shortcutFolder;
 
         var shortcutService = new ShortcutService(fileSystem);

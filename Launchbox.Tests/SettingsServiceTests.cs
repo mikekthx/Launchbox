@@ -11,7 +11,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         var path = service.ShortcutsPath;
 
@@ -23,7 +23,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService { Success = false };
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         await service.SetRunAtStartupAsync(true);
 
@@ -36,7 +36,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         service.ShortcutsPath = @"C:\Test\Shortcuts";
 
@@ -50,7 +50,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         Assert.Equal(Constants.MOD_ALT, service.HotkeyModifiers);
         Assert.Equal(Constants.VK_S, service.HotkeyKey);
@@ -61,7 +61,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         service.HotkeyModifiers = Constants.MOD_CONTROL;
         service.HotkeyKey = (int)'K';
@@ -75,7 +75,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         await service.SetRunAtStartupAsync(true);
 
@@ -93,7 +93,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService { IsEnabled = true };
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         await service.InitializeAsync();
 
@@ -105,7 +105,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService { ShouldFail = true };
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         // This should not throw if the issue is fixed
         var exception = await Record.ExceptionAsync(() => service.InitializeAsync());
@@ -121,7 +121,7 @@ public class SettingsServiceTests
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService);
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
         var initialPath = service.ShortcutsPath;
 
         service.ShortcutsPath = unsafePath;

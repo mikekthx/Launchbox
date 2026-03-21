@@ -35,7 +35,7 @@ public class MainViewModelRedactionTests : IDisposable
 
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        _settingsService = new SettingsService(settingsStore, startupService);
+        _settingsService = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         _traceOutput = new ThreadSafeStringWriter();
         _traceListener = new TextWriterTraceListener(_traceOutput);

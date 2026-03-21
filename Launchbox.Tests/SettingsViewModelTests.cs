@@ -26,7 +26,7 @@ public class SettingsViewModelTests
         }));
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var settingsService = new SettingsService(settingsStore, startupService);
+        var settingsService = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
         var pickerService = new MockFilePickerService();
         var windowService = new MockWindowService();
 
@@ -182,7 +182,7 @@ public class SettingsViewModelTests
             { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
         }));
         var store = new MockSettingsStore();
-        var settingsService = new SettingsService(store, new MockStartupService());
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
         Assert.Equal("Medium", vm.SelectedGridSize.Value);
     }
@@ -196,7 +196,7 @@ public class SettingsViewModelTests
             { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
         }));
         var store = new MockSettingsStore();
-        var settingsService = new SettingsService(store, new MockStartupService());
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
         vm.SelectedGridSize = vm.GridSizeOptions.First(o => o.Value == "Large");
         Assert.Equal(GridSize.Large, settingsService.GridSize);
@@ -211,7 +211,7 @@ public class SettingsViewModelTests
             { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
         }));
         var store = new MockSettingsStore();
-        var settingsService = new SettingsService(store, new MockStartupService());
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
 
         string? changed = null;
@@ -230,7 +230,7 @@ public class SettingsViewModelTests
             { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
         }));
         var store = new MockSettingsStore();
-        var settingsService = new SettingsService(store, new MockStartupService());
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
         Assert.Equal(3, vm.GridSizeOptions.Count);
         Assert.Equal("Small", vm.GridSizeOptions[0].Value);
@@ -242,7 +242,7 @@ public class SettingsViewModelTests
     public void GridSize_Default_IsMedium()
     {
         var store = new MockSettingsStore();
-        var service = new SettingsService(store, new MockStartupService());
+        var service = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         Assert.Equal(GridSize.Medium, service.GridSize);
     }
 
@@ -250,11 +250,11 @@ public class SettingsViewModelTests
     public void GridSize_WhenSet_Persists()
     {
         var store = new MockSettingsStore();
-        var service = new SettingsService(store, new MockStartupService());
+        var service = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         service.GridSize = GridSize.Large;
 
         // Re-read from same store
-        var service2 = new SettingsService(store, new MockStartupService());
+        var service2 = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         Assert.Equal(GridSize.Large, service2.GridSize);
     }
 
@@ -262,7 +262,7 @@ public class SettingsViewModelTests
     public void GridSize_WhenSet_RaisesPropertyChanged()
     {
         var store = new MockSettingsStore();
-        var service = new SettingsService(store, new MockStartupService());
+        var service = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
         string? changedProperty = null;
         service.PropertyChanged += (_, e) => changedProperty = e.PropertyName;
 

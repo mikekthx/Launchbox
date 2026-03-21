@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Launchbox.Helpers;
+using Launchbox.Models;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -11,11 +13,13 @@ public class SettingsService : ObservableObject
 {
     private readonly ISettingsStore _store;
     private readonly IStartupService _startupService;
+    private readonly ShortcutFolderManager _folderManager;
 
-    public SettingsService(ISettingsStore store, IStartupService startupService)
+    public SettingsService(ISettingsStore store, IStartupService startupService, ShortcutFolderManager folderManager)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
         _startupService = startupService ?? throw new ArgumentNullException(nameof(startupService));
+        _folderManager = folderManager ?? throw new ArgumentNullException(nameof(folderManager));
     }
 
     /// <summary>
@@ -48,6 +52,87 @@ public class SettingsService : ObservableObject
             }
 
             if (ShortcutsPath != value && _store.SetValue(nameof(ShortcutsPath), value))
+            {
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public IReadOnlyList<ShortcutFolder> GetShortcutFolders() => _folderManager.GetFolders();
+
+    public bool AddShortcutFolder(string path, string? label = null)
+    {
+        if (_folderManager.AddFolder(path, label))
+        {
+            OnPropertyChanged("ShortcutFolders");
+            return true;
+        }
+        return false;
+    }
+
+    public bool RemoveShortcutFolder(int order)
+    {
+        if (_folderManager.RemoveFolder(order))
+        {
+            OnPropertyChanged("ShortcutFolders");
+            return true;
+        }
+        return false;
+    }
+
+    public bool ReorderShortcutFolder(int fromOrder, int toOrder)
+    {
+        if (_folderManager.ReorderFolder(fromOrder, toOrder))
+        {
+            OnPropertyChanged("ShortcutFolders");
+            return true;
+        }
+        return false;
+    }
+
+    public bool RenameShortcutFolder(int order, string newLabel)
+    {
+        if (_folderManager.RenameFolder(order, newLabel))
+        {
+            OnPropertyChanged("ShortcutFolders");
+            return true;
+        }
+        return false;
+    }
+
+    public FolderViewMode FolderViewMode
+    {
+        get
+        {
+            if (_store.TryGetValue(nameof(FolderViewMode), out var val) && val is string s
+                && Enum.TryParse<FolderViewMode>(s, out var mode))
+            {
+                return mode;
+            }
+            return FolderViewMode.Merged;
+        }
+        set
+        {
+            if (FolderViewMode != value && _store.SetValue(nameof(FolderViewMode), value.ToString()))
+            {
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool CollapsibleGroups
+    {
+        get
+        {
+            if (_store.TryGetValue(nameof(CollapsibleGroups), out var val) && val is bool b)
+            {
+                return b;
+            }
+            return true;
+        }
+        set
+        {
+            if (CollapsibleGroups != value && _store.SetValue(nameof(CollapsibleGroups), value))
             {
                 OnPropertyChanged();
             }
@@ -112,6 +197,25 @@ public class SettingsService : ObservableObject
         set
         {
             if (GridSize != value && _store.SetValue(nameof(GridSize), value.ToString()))
+            {
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public bool KeepCentered
+    {
+        get
+        {
+            if (_store.TryGetValue(nameof(KeepCentered), out var val) && val is bool b)
+            {
+                return b;
+            }
+            return false;
+        }
+        set
+        {
+            if (KeepCentered != value && _store.SetValue(nameof(KeepCentered), value))
             {
                 OnPropertyChanged();
             }
