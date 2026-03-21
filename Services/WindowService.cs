@@ -5,6 +5,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Launchbox.Services;
 
@@ -153,6 +154,14 @@ public class WindowService : IWindowService, IDisposable
 
     private IntPtr NewWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)
     {
+        if (msg == NativeMethods.WM_GETMINMAXINFO)
+        {
+            var mmi = Marshal.PtrToStructure<NativeMethods.MINMAXINFO>(lParam);
+            mmi.ptMinTrackSize.X = Constants.MIN_WINDOW_WIDTH;
+            mmi.ptMinTrackSize.Y = Constants.MIN_WINDOW_HEIGHT;
+            Marshal.StructureToPtr(mmi, lParam, false);
+            return IntPtr.Zero;
+        }
         if (msg == NativeMethods.WM_HOTKEY && wParam.ToInt32() == Constants.HOTKEY_ID)
         {
             ToggleVisibility();
