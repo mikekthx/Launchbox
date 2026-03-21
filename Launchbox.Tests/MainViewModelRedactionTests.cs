@@ -71,8 +71,21 @@ public class MainViewModelRedactionTests : IDisposable
         var secretPart = Path.Combine("Users", "User");
         var fullPath = Path.Combine("C:", secretPart, folderName);
 
-        _settingsService.ShortcutsPath = fullPath;
-        var viewModel = CreateViewModel();
+        // Configure the folder via the store so ShortcutFolderManager picks it up
+        // at construction time (legacy migration reads ShortcutsPath key).
+        var store = new MockSettingsStore();
+        store.SetValue("ShortcutsPath", fullPath);
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
+
+        var viewModel = new MainViewModel(
+            _mockShortcutService,
+            _mockIconService,
+            _imageFactory,
+            _dispatcher,
+            _appLauncher,
+            _fileSystem,
+            settingsService,
+            _windowService);
 
         // Act
         await viewModel.LoadAppsAsync();

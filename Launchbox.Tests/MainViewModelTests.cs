@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,6 +23,7 @@ public class MainViewModelTests
     private readonly MockAppLauncher _appLauncher;
     private readonly SettingsService _settingsService;
     private readonly MockWindowService _windowService;
+    private readonly MockSettingsStore _settingsStore;
     private readonly string _shortcutFolder = Path.Combine("C:", "Shortcuts");
 
     public MainViewModelTests()
@@ -34,11 +36,12 @@ public class MainViewModelTests
         _appLauncher = new MockAppLauncher();
         _windowService = new MockWindowService();
 
-        // Create SettingsService with MockStore
-        var settingsStore = new MockSettingsStore();
+        // Pre-populate the store with the default folder JSON so ShortcutFolderManager
+        // picks it up at construction time (migration reads ShortcutsPath key).
+        _settingsStore = new MockSettingsStore();
+        _settingsStore.SetValue("ShortcutsPath", _shortcutFolder);
         var startupService = new MockStartupService();
-        _settingsService = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
-        _settingsService.ShortcutsPath = _shortcutFolder;
+        _settingsService = new SettingsService(_settingsStore, startupService, new ShortcutFolderManager(_settingsStore));
 
         _fileSystem.CreateDirectory(_shortcutFolder);
 
@@ -186,11 +189,22 @@ public class MainViewModelTests
     [Fact]
     public void OpenShortcutsFolderCommand_CreatesFolder_IfMissing()
     {
-        // Change settings to a path that doesn't exist
+        // Add a new folder that doesn't exist yet as the first folder (order 0 replaces existing)
         string newPath = Path.Combine("C:", "NewShortcuts");
-        _settingsService.ShortcutsPath = newPath;
+        // Reset the store to have only the new path so it becomes the first folder
+        var newStore = new MockSettingsStore();
+        newStore.SetValue("ShortcutsPath", newPath);
+        var newSettingsService = new SettingsService(newStore, new MockStartupService(), new ShortcutFolderManager(newStore));
 
-        var viewModel = CreateViewModel();
+        var viewModel = new MainViewModel(
+            _shortcutService,
+            _iconService,
+            _imageFactory,
+            _dispatcher,
+            _appLauncher,
+            _fileSystem,
+            newSettingsService,
+            _windowService);
 
         Assert.False(_fileSystem.DirectoryExists(newPath));
 
@@ -203,7 +217,13 @@ public class MainViewModelTests
     [Fact]
     public void OpenShortcutsFolderCommand_CatchesException_WhenDirectoryCreationFails()
     {
-        // Arrange
+        // Arrange: configure a path that doesn't exist in the throwing file system,
+        // so CreateDirectory is called and throws
+        string newPath = Path.Combine("C:", "NewShortcuts");
+        var newStore = new MockSettingsStore();
+        newStore.SetValue("ShortcutsPath", newPath);
+        var newSettingsService = new SettingsService(newStore, new MockStartupService(), new ShortcutFolderManager(newStore));
+
         var throwingFileSystem = new ThrowingFileSystem();
         var viewModel = new MainViewModel(
             _shortcutService,
@@ -212,11 +232,8 @@ public class MainViewModelTests
             _dispatcher,
             _appLauncher,
             throwingFileSystem,
-            _settingsService,
+            newSettingsService,
             _windowService);
-
-        string newPath = Path.Combine("C:", "NewShortcuts");
-        _settingsService.ShortcutsPath = newPath;
 
         // Act & Assert
         // This should not throw
@@ -438,5 +455,205 @@ public class MainViewModelTests
         // Dispatcher operations enqueue async tasks. We can await EnqueueAsync in our MockDispatcher.
         // But since MockDispatcher runs synchronously, the change would have happened immediately if subscribed.
         Assert.Empty(viewModel.Apps);
+    }
+
+    // --- MULTI-FOLDER TESTS ---
+
+    private SettingsService CreateSettingsServiceWithFolders(params (string path, string label, int order)[] folderDefs)
+    {
+        var store = new MockSettingsStore();
+        var folders = folderDefs.Select(f => new { Path = f.path, Label = f.label, Order = f.order }).ToList();
+        store.SetValue("ShortcutFolders", JsonSerializer.Serialize(folders));
+        return new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_LoadsFromMultipleFolders()
+    {
+        // Arrange: two folders, each with one file
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "App1.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "Game1.lnk"));
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (_shortcutFolder, "Shortcuts", 0),
+            (folder2, "Games", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        // Act
+        await vm.LoadAppsAsync();
+
+        // Assert: both apps appear, each with its folder label
+        Assert.Equal(2, vm.Apps.Count);
+        var app1 = vm.Apps.FirstOrDefault(a => a.Name == "App1");
+        var game1 = vm.Apps.FirstOrDefault(a => a.Name == "Game1");
+        Assert.NotNull(app1);
+        Assert.NotNull(game1);
+        Assert.Equal("Shortcuts", app1.FolderLabel);
+        Assert.Equal("Games", game1.FolderLabel);
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_MergedMode_SortsAlphabetically()
+    {
+        // Arrange: two files in same folder, added in reverse alphabetical order to verify sorting
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Zephyr.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+
+        var vm = CreateViewModel();
+
+        // Act
+        await vm.LoadAppsAsync();
+
+        // Assert: Apps are sorted alphabetically
+        Assert.Equal(2, vm.Apps.Count);
+        Assert.Equal("Alpha", vm.Apps[0].Name);
+        Assert.Equal("Zephyr", vm.Apps[1].Name);
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_GroupedMode_BuildsGroupedApps()
+    {
+        // Arrange: two folders
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "App1.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "Game1.lnk"));
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (_shortcutFolder, "Shortcuts", 0),
+            (folder2, "Games", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        // Act
+        await vm.LoadAppsAsync();
+
+        // Assert: GroupedApps has two groups with correct labels
+        Assert.Equal(2, vm.GroupedApps.Count);
+        Assert.Contains(vm.GroupedApps, g => g.Label == "Shortcuts");
+        Assert.Contains(vm.GroupedApps, g => g.Label == "Games");
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_GroupedMode_GroupsOrderedByFolderOrder()
+    {
+        // Arrange: two folders, Games has lower order (should appear first)
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "App1.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "Game1.lnk"));
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (folder2, "Games", 0),
+            (_shortcutFolder, "Shortcuts", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        // Act
+        await vm.LoadAppsAsync();
+
+        // Assert: first group is Games (order 0), second is Shortcuts (order 1)
+        Assert.Equal(2, vm.GroupedApps.Count);
+        Assert.Equal("Games", vm.GroupedApps[0].Label);
+        Assert.Equal("Shortcuts", vm.GroupedApps[1].Label);
+    }
+
+    [Fact]
+    public async Task ApplyFilter_HidesNonMatchingItemsInGroups()
+    {
+        // Arrange: two apps in same folder
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        // Act
+        vm.FilterText = "alp";
+
+        // Assert: the group only shows matching items
+        Assert.Single(vm.GroupedApps);
+        Assert.Single(vm.GroupedApps[0]);
+        Assert.Equal("Alpha", vm.GroupedApps[0][0].Name);
+    }
+
+    [Fact]
+    public async Task FilteredApps_FilterAcrossMultipleFolders()
+    {
+        // Arrange: two folders, one matching item in each
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "AlphaGame.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "Beta.lnk"));
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (_shortcutFolder, "Shortcuts", 0),
+            (folder2, "Games", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        await vm.LoadAppsAsync();
+
+        // Act
+        vm.FilterText = "alp";
+
+        // Assert: FilteredApps includes matches from both folders
+        Assert.Equal(2, vm.FilteredApps.Count);
+        Assert.Contains(vm.FilteredApps, a => a.Name == "Alpha");
+        Assert.Contains(vm.FilteredApps, a => a.Name == "AlphaGame");
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_DuplicateNames_BothAppear()
+    {
+        // Arrange: same name in two different folders
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "App.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "App.lnk"));
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (_shortcutFolder, "Shortcuts", 0),
+            (folder2, "Games", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        // Act
+        await vm.LoadAppsAsync();
+
+        // Assert: both "App" items appear, from different folders
+        Assert.Equal(2, vm.Apps.Count);
+        Assert.Equal(2, vm.Apps.Count(a => a.Name == "App"));
+        Assert.Contains(vm.Apps, a => a.FolderLabel == "Shortcuts");
+        Assert.Contains(vm.Apps, a => a.FolderLabel == "Games");
+    }
+
+    [Fact]
+    public void OpenShortcutsFolder_MultipleFolders_OpensFirst()
+    {
+        // Arrange: two folders, second has lower order to verify first-by-order wins
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (_shortcutFolder, "Shortcuts", 0),
+            (folder2, "Games", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        // Act
+        vm.OpenShortcutsFolderCommand.Execute(null);
+
+        // Assert: opens the first folder by order (Shortcuts, order 0)
+        Assert.Equal(_shortcutFolder, _appLauncher.LastOpenedFolder);
     }
 }

@@ -29,6 +29,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public BulkObservableCollection<AppItem> Apps { get; } = [];
 
+    public ObservableCollection<AppItemGroup> GroupedApps { get; } = [];
+
+    public bool CollapsibleGroupsEnabled => _settingsService.CollapsibleGroups;
+
+    public bool IsMergedMode => _settingsService.FolderViewMode == FolderViewMode.Merged;
+    public bool IsGroupedMode => _settingsService.FolderViewMode == FolderViewMode.Grouped;
+    public bool IsMergedModeVisible => IsMergedMode && !IsEmpty;
+    public bool IsGroupedModeVisible => IsGroupedMode && !IsEmpty;
+
     private bool _isEmpty;
     public bool IsEmpty
     {
@@ -49,7 +58,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _cachedFilteredApps = null;
                 OnPropertyChanged(nameof(FilteredApps));
                 OnPropertyChanged(nameof(HasNoMatches));
+                ApplyGroupedFilter();
             }
+        }
+    }
+
+    private void ApplyGroupedFilter()
+    {
+        foreach (var group in GroupedApps)
+        {
+            group.ApplyFilter(_filterText);
         }
     }
 
@@ -154,6 +172,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // Reload apps when folder path changes
             _ = LoadAppsAsync();
         }
+        else if (e.PropertyName == "ShortcutFolders")
+        {
+            _ = LoadAppsAsync();
+        }
         else if (e.PropertyName == nameof(SettingsService.GridSize))
         {
             OnPropertyChanged(nameof(ItemWidth));
@@ -163,6 +185,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
         else if (e.PropertyName is nameof(SettingsService.HotkeyModifiers) or nameof(SettingsService.HotkeyKey))
         {
             OnPropertyChanged(nameof(TrayToolTipText));
+        }
+        else if (e.PropertyName == nameof(SettingsService.CollapsibleGroups))
+        {
+            OnPropertyChanged(nameof(CollapsibleGroupsEnabled));
+        }
+        else if (e.PropertyName == nameof(SettingsService.FolderViewMode))
+        {
+            OnPropertyChanged(nameof(IsMergedMode));
+            OnPropertyChanged(nameof(IsGroupedMode));
+            OnPropertyChanged(nameof(IsMergedModeVisible));
+            OnPropertyChanged(nameof(IsGroupedModeVisible));
         }
     }
 
@@ -189,37 +222,64 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         try
         {
-            var shortcutFolder = _settingsService.ShortcutsPath;
+            var folders = _settingsService.GetShortcutFolders();
+            List<AppItem> localAppItems = [];
+            List<string> allFiles = [];
 
-            // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-            var files = await Task.Run(() => _shortcutService.GetShortcutFiles(shortcutFolder, Constants.ALLOWED_EXTENSIONS), ct);
+            foreach (var folder in folders.OrderBy(f => f.Order))
+            {
+                // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+                var files = await Task.Run(() =>
+                    _shortcutService.GetShortcutFiles(
+                        Environment.ExpandEnvironmentVariables(folder.Path),
+                        Constants.ALLOWED_EXTENSIONS), ct);
+
+                if (files != null)
+                {
+                    allFiles.AddRange(files);
+                    foreach (var file in files)
+                    {
+                        try
+                        {
+                            var name = Path.GetFileNameWithoutExtension(file);
+                            localAppItems.Add(new AppItem
+                            {
+                                Name = name,
+                                Path = file,
+                                FolderLabel = folder.Label,
+                                FolderPath = folder.Path
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                        }
+                    }
+                }
+                else
+                {
+                    Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
+                }
+            }
 
             ct.ThrowIfCancellationRequested();
 
-            await Task.Run(() => _iconService.PruneCache(files ?? []), ct);
+            await Task.Run(() => _iconService.PruneCache(allFiles), ct);
 
-            List<AppItem> localAppItems = [];
+            // Sort merged mode alphabetically
+            localAppItems.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (files != null)
-            {
-                foreach (var file in files)
+            // Build grouped data structure — group by FolderPath (unique), display Label
+            var groupedData = localAppItems
+                .GroupBy(a => a.FolderPath)
+                .OrderBy(g => folders.FirstOrDefault(f => f.Path == g.Key)?.Order ?? int.MaxValue)
+                .Select(g =>
                 {
-                    try
-                    {
-                        var name = Path.GetFileNameWithoutExtension(file);
-                        var appItem = new AppItem { Name = name, Path = file };
-                        localAppItems.Add(appItem);
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                    }
-                }
-            }
-            else
-            {
-                Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(shortcutFolder)}");
-            }
+                    var folder = folders.FirstOrDefault(f => f.Path == g.Key);
+                    var label = folder?.Label ?? System.IO.Path.GetFileName(g.Key) ?? g.Key;
+                    return new AppItemGroup(label, g.Key, g.OrderBy(a => a.Name));
+                })
+                .ToList();
 
             ct.ThrowIfCancellationRequested();
 
@@ -227,6 +287,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 Apps.ReplaceAll(localAppItems);
                 IsEmpty = Apps.Count == 0;
+
+                GroupedApps.Clear();
+                foreach (var group in groupedData)
+                {
+                    GroupedApps.Add(group);
+                }
+
+                OnPropertyChanged(nameof(IsMergedModeVisible));
+                OnPropertyChanged(nameof(IsGroupedModeVisible));
                 return Task.CompletedTask;
             });
 
@@ -292,7 +361,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         try
         {
-            var shortcutFolder = _settingsService.ShortcutsPath;
+            var folders = _settingsService.GetShortcutFolders();
+            var firstFolder = folders.OrderBy(f => f.Order).FirstOrDefault();
+            var shortcutFolder = firstFolder != null
+                ? Environment.ExpandEnvironmentVariables(firstFolder.Path)
+                : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
+
             if (!_fileSystem.DirectoryExists(shortcutFolder))
             {
                 _fileSystem.CreateDirectory(shortcutFolder);

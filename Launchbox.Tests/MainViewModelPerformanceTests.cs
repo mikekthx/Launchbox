@@ -30,9 +30,10 @@ public class MainViewModelPerformanceTests
             fileSystem.AddFile(Path.Combine(shortcutFolder, $"App{i}.lnk"));
         }
 
+        // Pre-populate store so ShortcutFolderManager picks up the folder via legacy migration
         var settingsStore = new MockSettingsStore();
+        settingsStore.SetValue("ShortcutsPath", shortcutFolder);
         var settingsService = new SettingsService(settingsStore, new MockStartupService(), new ShortcutFolderManager(settingsStore));
-        settingsService.ShortcutsPath = shortcutFolder;
 
         var shortcutService = new ShortcutService(fileSystem);
         var iconService = new MockIconService();
