@@ -29,6 +29,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Enable Windows Long Paths
+        if: github.event_name != 'pull_request'
+        run: Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" -Name "LongPathsEnabled" -Value 1
+
       - name: Initialize CodeQL (extractorless — PR only)
         if: github.event_name == 'pull_request'
         uses: github/codeql-action/init@v4
