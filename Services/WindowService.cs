@@ -357,7 +357,7 @@ public class WindowService : IWindowService, IDisposable
 
     /// <summary>
     /// Ensures the window fits within the current display's work area.
-    /// Shrinks height if needed and repositions if the window is off-screen horizontally
+    /// Shrinks height and width if needed and repositions if the window is off-screen horizontally
     /// (e.g., after a monitor disconnect). Clamped changes are display-time only and
     /// are not persisted, so the user's preferred size restores on a larger display.
     /// </summary>
@@ -376,10 +376,15 @@ public class WindowService : IWindowService, IDisposable
             bool needsResize = size.Height > maxHeight;
             int clampedHeight = needsResize ? maxHeight : size.Height;
 
+            int maxWidth = workArea.Width - 40;
+            bool needsWidthClamp = size.Width > maxWidth;
+            int clampedWidth = needsWidthClamp ? maxWidth : size.Width;
+            needsResize = needsResize || needsWidthClamp;
+
             // Check if the window's left edge is beyond the right edge of the work area,
             // or the right edge is before the left edge of the work area (entirely off-screen).
             bool offScreenHorizontally = pos.X >= workArea.X + workArea.Width
-                                         || pos.X + size.Width <= workArea.X;
+                                         || pos.X + clampedWidth <= workArea.X;
 
             if (!needsResize && !offScreenHorizontally) return;
 
@@ -389,13 +394,13 @@ public class WindowService : IWindowService, IDisposable
             {
                 if (needsResize)
                 {
-                    _appWindow.Resize(new Windows.Graphics.SizeInt32(size.Width, clampedHeight));
+                    _appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
                 }
 
                 if (offScreenHorizontally)
                 {
                     // Center horizontally on the primary display
-                    int newX = workArea.X + (workArea.Width - size.Width) / 2;
+                    int newX = workArea.X + (workArea.Width - clampedWidth) / 2;
                     int newY = pos.Y;
                     // Also clamp vertically if needed
                     if (newY < workArea.Y || newY + clampedHeight > workArea.Y + workArea.Height)
