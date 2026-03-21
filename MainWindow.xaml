@@ -23,8 +23,7 @@
         <tb:TaskbarIcon x:Name="TrayIcon"
                         ToolTipText="{Binding ViewModel.TrayToolTipText, Mode=OneWay}"
                         IconSource="/Assets/Square44x44Logo.targetsize-24_altform-unplated.png"
-                        LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}"
-                        DoubleClickCommand="{Binding ViewModel.ToggleWindowCommand}">
+                        LeftClickCommand="{Binding ViewModel.ToggleWindowCommand}">
             <tb:TaskbarIcon.ContextFlyout>
                 <MenuFlyout>
                     <MenuFlyoutItem Text="{Binding ViewModel.ToggleWindowText, Mode=OneWay}"
