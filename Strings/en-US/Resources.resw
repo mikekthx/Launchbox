@@ -145,6 +145,9 @@
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
     <value>Reset Window Position</value>
   </data>
+  <data name="Settings_KeepCentered.Header" xml:space="preserve">
+    <value>Keep Window Centered</value>
+  </data>
   <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
     <value>Shortcuts folder path</value>
   </data>
@@ -201,5 +204,44 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox Settings</value>
+  </data>
+  <data name="Settings_FolderList.Text" xml:space="preserve">
+    <value>Shortcut Folders</value>
+  </data>
+  <data name="Settings_AddFolder.Content" xml:space="preserve">
+    <value>Add Folder</value>
+  </data>
+  <data name="Settings_RemoveFolder.ToolTip" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="Settings_MoveUp.ToolTip" xml:space="preserve">
+    <value>Move Up</value>
+  </data>
+  <data name="Settings_MoveDown.ToolTip" xml:space="preserve">
+    <value>Move Down</value>
+  </data>
+  <data name="Settings_RenameFolder.ToolTip" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Settings_ViewMode.Text" xml:space="preserve">
+    <value>View Mode</value>
+  </data>
+  <data name="Settings_ViewMode_Merged" xml:space="preserve">
+    <value>Merged</value>
+  </data>
+  <data name="Settings_ViewMode_Grouped" xml:space="preserve">
+    <value>Grouped</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
+    <value>Collapsible Groups</value>
+  </data>
+  <data name="Settings_RenameFolder_Title" xml:space="preserve">
+    <value>Rename Folder</value>
+  </data>
+  <data name="Settings_RenameFolder_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
+    <value>Cancel</value>
   </data>
 </root>

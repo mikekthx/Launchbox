@@ -18,7 +18,7 @@ namespace Launchbox.Models;
 public class AppItemGroup : ObservableCollection<AppItem>
 {
     /// <summary>Sentinel item kept in collapsed groups so CVS doesn't hide the header.</summary>
-    private static readonly AppItem CollapsedPlaceholder = new() { Name = string.Empty, Path = string.Empty };
+    private static readonly AppItem COLLAPSED_PLACEHOLDER = new() { Name = string.Empty, Path = string.Empty };
 
     public string Label { get; }
 
@@ -85,7 +85,7 @@ public class AppItemGroup : ObservableCollection<AppItem>
         if (_isCollapsed)
         {
             // WinUI 3 CVS hides 0-item groups — keep one placeholder so header stays visible
-            Add(CollapsedPlaceholder);
+            Add(COLLAPSED_PLACEHOLDER);
         }
         else
         {

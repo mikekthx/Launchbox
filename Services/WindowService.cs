@@ -177,6 +177,7 @@ public class WindowService : IWindowService, IDisposable
     /// <summary>
     /// Toggles the main window's visibility, restoring its previous position or centering it if displayed for the first time.
     /// Also restores the window state if it was minimized (iconic) and brings it to the foreground.
+    /// When KeepCentered is enabled, re-centers on every show using the current window size.
     /// </summary>
     public void ToggleVisibility()
     {
@@ -192,9 +193,21 @@ public class WindowService : IWindowService, IDisposable
                 return;
             }
 
-            if (!_hasPositioned)
+            // Set unconditionally BEFORE any positioning path — required for hide toggle to work
+            bool firstShow = !_hasPositioned;
+            _hasPositioned = true;
+
+            if (_settingsService.KeepCentered)
             {
-                _hasPositioned = true;
+                if (firstShow)
+                {
+                    // First show: restore saved size (not position), then center at that size
+                    RestoreWindowPosition();
+                }
+                CenterOnCurrentDisplay();
+            }
+            else if (firstShow)
+            {
                 bool positionRestored = RestoreWindowPosition();
 
                 if (!positionRestored)
@@ -352,6 +365,25 @@ public class WindowService : IWindowService, IDisposable
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to center window: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+    }
+
+    private void CenterOnCurrentDisplay()
+    {
+        if (_appWindow == null) return;
+
+        try
+        {
+            var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
+            var currentSize = _appWindow.Size;
+            // Add display origin so centering works on secondary monitors (non-zero WorkArea.X/Y)
+            var x = displayArea.WorkArea.X + (displayArea.WorkArea.Width - currentSize.Width) / 2;
+            var y = displayArea.WorkArea.Y + (displayArea.WorkArea.Height - currentSize.Height) / 2;
+            _appWindow.Move(new Windows.Graphics.PointInt32(x, y));
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to center window on display: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 

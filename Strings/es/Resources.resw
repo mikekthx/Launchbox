@@ -145,6 +145,9 @@
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
     <value>Restablecer posición de ventana</value>
   </data>
+  <data name="Settings_KeepCentered.Header" xml:space="preserve">
+    <value>Mantener ventana centrada</value>
+  </data>
   <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
     <value>Ruta de la carpeta de accesos directos</value>
   </data>
@@ -201,5 +204,44 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Configuración de Launchbox</value>
+  </data>
+  <data name="Settings_FolderList.Text" xml:space="preserve">
+    <value>Carpetas de accesos directos</value>
+  </data>
+  <data name="Settings_AddFolder.Content" xml:space="preserve">
+    <value>Agregar carpeta</value>
+  </data>
+  <data name="Settings_RemoveFolder.ToolTip" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Settings_MoveUp.ToolTip" xml:space="preserve">
+    <value>Subir</value>
+  </data>
+  <data name="Settings_MoveDown.ToolTip" xml:space="preserve">
+    <value>Bajar</value>
+  </data>
+  <data name="Settings_RenameFolder.ToolTip" xml:space="preserve">
+    <value>Renombrar</value>
+  </data>
+  <data name="Settings_ViewMode.Text" xml:space="preserve">
+    <value>Modo de vista</value>
+  </data>
+  <data name="Settings_ViewMode_Merged" xml:space="preserve">
+    <value>Combinado</value>
+  </data>
+  <data name="Settings_ViewMode_Grouped" xml:space="preserve">
+    <value>Agrupado</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
+    <value>Grupos contraíbles</value>
+  </data>
+  <data name="Settings_RenameFolder_Title" xml:space="preserve">
+    <value>Renombrar carpeta</value>
+  </data>
+  <data name="Settings_RenameFolder_OK" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
+    <value>Cancelar</value>
   </data>
 </root>

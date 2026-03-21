@@ -2,6 +2,7 @@ using Launchbox.Helpers;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.System;
@@ -35,28 +36,6 @@ public class SettingsViewModelTests
         return (settingsService, startupService, pickerService, viewModel);
     }
 
-    [Fact]
-    public void ShortcutsPath_UpdatesService_WhenChanged()
-    {
-        var (service, _, _, vm) = CreateViewModel();
-
-        vm.ShortcutsPath = @"C:\NewPath";
-
-        Assert.Equal(@"C:\NewPath", service.ShortcutsPath);
-    }
-
-    [Fact]
-    public void ShortcutsPath_RaisesPropertyChanged_WhenServiceChanges()
-    {
-        var (service, _, _, vm) = CreateViewModel();
-        bool raised = false;
-        vm.PropertyChanged += (s, e) => { if (e.PropertyName == nameof(SettingsViewModel.ShortcutsPath)) raised = true; };
-
-        service.ShortcutsPath = @"C:\ExternalChange";
-
-        Assert.True(raised);
-        Assert.Equal(@"C:\ExternalChange", vm.ShortcutsPath);
-    }
 
     [Fact]
     public async Task RunAtStartup_UpdatesServiceAsync()
@@ -139,38 +118,34 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public async Task BrowseFolderCommand_UpdatesPath_WhenFolderSelected()
+    public async Task AddFolderCommand_AddsFolder_WhenFolderSelected()
     {
         var (_, _, picker, vm) = CreateViewModel();
         picker.SelectedFolder = @"C:\PickedFolder";
 
         var tcs = new TaskCompletionSource();
-        vm.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(SettingsViewModel.ShortcutsPath))
-                tcs.TrySetResult();
-        };
+        vm.Folders.CollectionChanged += (s, e) => tcs.TrySetResult();
 
-        vm.BrowseFolderCommand.Execute(new object());
+        vm.AddFolderCommand.Execute(new object());
 
         await tcs.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
 
-        Assert.Equal(@"C:\PickedFolder", vm.ShortcutsPath);
+        Assert.Contains(vm.Folders, f => f.Path == @"C:\PickedFolder");
     }
 
     [Fact]
-    public async Task BrowseFolderCommand_DoesNothing_WhenCancelled()
+    public async Task AddFolderCommand_DoesNothing_WhenCancelled()
     {
         var (_, _, picker, vm) = CreateViewModel();
         picker.SelectedFolder = null; // Cancelled
-        var oldPath = vm.ShortcutsPath;
+        var initialCount = vm.Folders.Count;
 
-        vm.BrowseFolderCommand.Execute(new object());
+        vm.AddFolderCommand.Execute(new object());
 
         // Wait briefly to ensure it didn't change
         await Task.Delay(50, TestContext.Current.CancellationToken);
 
-        Assert.Equal(oldPath, vm.ShortcutsPath);
+        Assert.Equal(initialCount, vm.Folders.Count);
     }
 
     [Fact]

@@ -103,23 +103,6 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private async Task BrowseFolderAsync()
-    {
-        try
-        {
-            var folder = await _filePickerService.PickSingleFolderAsync();
-            if (!string.IsNullOrEmpty(folder))
-            {
-                ShortcutsPath = folder;
-            }
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Failed to browse for folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
-    }
-
-    [RelayCommand]
     private async Task AddFolderAsync()
     {
         try
@@ -221,9 +204,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private void OnServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(SettingsService.ShortcutsPath))
-            OnPropertyChanged(nameof(ShortcutsPath));
-        else if (e.PropertyName == nameof(SettingsService.IsRunAtStartup))
+        if (e.PropertyName == nameof(SettingsService.IsRunAtStartup))
             OnPropertyChanged(nameof(RunAtStartup));
         else if (e.PropertyName == nameof(SettingsService.HotkeyModifiers))
             OnPropertyChanged(nameof(SelectedModifier));
@@ -239,12 +220,6 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(SelectedViewModeOption));
         else if (e.PropertyName == nameof(SettingsService.CollapsibleGroups))
             OnPropertyChanged(nameof(CollapsibleGroups));
-    }
-
-    public string ShortcutsPath
-    {
-        get => _settingsService.ShortcutsPath;
-        set => _settingsService.ShortcutsPath = value;
     }
 
     public bool RunAtStartup

@@ -450,7 +450,7 @@ public class MainViewModelTests
         // We can observe this by clearing the Apps collection, triggering the change,
         // and waiting to see if it populates.
         viewModel.Apps.Clear();
-        _settingsService.ShortcutsPath = "C:\\NewPath";
+        _settingsService.AddShortcutFolder("C:\\NewPath");
 
         // Dispatcher operations enqueue async tasks. We can await EnqueueAsync in our MockDispatcher.
         // But since MockDispatcher runs synchronously, the change would have happened immediately if subscribed.

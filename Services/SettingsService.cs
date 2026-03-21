@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Launchbox.Services;
@@ -23,17 +24,18 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Gets or sets the path to the folder containing application shortcuts.
-    /// When getting, environment variables in the path are automatically expanded.
-    /// The path is continuously verified for security boundaries; accessing or setting an unsafe path is blocked and logged.
+    /// Gets the path to the primary shortcut folder.
+    /// Delegates to the folder manager, returning the first folder's expanded path or the default Desktop\Shortcuts path.
     /// </summary>
     public string ShortcutsPath
     {
         get
         {
-            if (_store.TryGetValue(nameof(ShortcutsPath), out var val) && val is string path)
+            var folders = _folderManager.GetFolders();
+            var first = folders.OrderBy(f => f.Order).FirstOrDefault();
+            if (first != null)
             {
-                var expandedPath = Environment.ExpandEnvironmentVariables(path);
+                var expandedPath = Environment.ExpandEnvironmentVariables(first.Path);
                 if (!PathSecurity.IsUnsafePath(expandedPath))
                 {
                     return expandedPath;
@@ -41,20 +43,6 @@ public class SettingsService : ObservableObject
                 Trace.WriteLine($"Ignored unsafe ShortcutsPath from settings: {PathSecurity.RedactPath(expandedPath)}");
             }
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
-        }
-        set
-        {
-            if (PathSecurity.IsUnsafePath(value))
-            {
-                Trace.WriteLine($"Blocked setting unsafe ShortcutsPath: {PathSecurity.RedactPath(value)}");
-                OnPropertyChanged();
-                return;
-            }
-
-            if (ShortcutsPath != value && _store.SetValue(nameof(ShortcutsPath), value))
-            {
-                OnPropertyChanged();
-            }
         }
     }
 

@@ -145,6 +145,9 @@
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
     <value>重置窗口位置</value>
   </data>
+  <data name="Settings_KeepCentered.Header" xml:space="preserve">
+    <value>保持窗口居中</value>
+  </data>
   <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
     <value>快捷方式文件夹路径</value>
   </data>
@@ -201,5 +204,44 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 设置</value>
+  </data>
+  <data name="Settings_FolderList.Text" xml:space="preserve">
+    <value>快捷方式文件夹</value>
+  </data>
+  <data name="Settings_AddFolder.Content" xml:space="preserve">
+    <value>添加文件夹</value>
+  </data>
+  <data name="Settings_RemoveFolder.ToolTip" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="Settings_MoveUp.ToolTip" xml:space="preserve">
+    <value>上移</value>
+  </data>
+  <data name="Settings_MoveDown.ToolTip" xml:space="preserve">
+    <value>下移</value>
+  </data>
+  <data name="Settings_RenameFolder.ToolTip" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="Settings_ViewMode.Text" xml:space="preserve">
+    <value>视图模式</value>
+  </data>
+  <data name="Settings_ViewMode_Merged" xml:space="preserve">
+    <value>合并</value>
+  </data>
+  <data name="Settings_ViewMode_Grouped" xml:space="preserve">
+    <value>分组</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
+    <value>可折叠组</value>
+  </data>
+  <data name="Settings_RenameFolder_Title" xml:space="preserve">
+    <value>重命名文件夹</value>
+  </data>
+  <data name="Settings_RenameFolder_OK" xml:space="preserve">
+    <value>确定</value>
+  </data>
+  <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
+    <value>取消</value>
   </data>
 </root>

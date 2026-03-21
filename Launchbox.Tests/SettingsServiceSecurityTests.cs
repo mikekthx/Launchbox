@@ -10,7 +10,7 @@ namespace Launchbox.Tests;
 public class SettingsServiceSecurityTests
 {
     [Fact]
-    public void ShortcutsPath_Setter_RedactsUnsafePath_InTrace()
+    public void AddShortcutFolder_DoesNotAddUnsafePath()
     {
         using var sw = new StringWriter();
         using var listener = new TextWriterTraceListener(sw);
@@ -21,18 +21,19 @@ public class SettingsServiceSecurityTests
             var settingsStore = new MockSettingsStore();
             var startupService = new MockStartupService();
             var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
+            var initialCount = service.GetShortcutFolders().Count;
 
             string unsafePath = @"\\attacker\share\SecretProject";
 
-            // Act
-            service.ShortcutsPath = unsafePath;
+            // Act — AddShortcutFolder should reject unsafe paths
+            bool added = service.AddShortcutFolder(unsafePath);
 
             Trace.Flush();
-            string log = sw.ToString();
 
-            // Assert
-            string expectedMessage = $"Blocked setting unsafe ShortcutsPath: {PathSecurity.RedactPath(unsafePath)}";
-            Assert.Contains(expectedMessage, log);
+            // The unsafe folder must not have been added
+            Assert.False(added);
+            Assert.Equal(initialCount, service.GetShortcutFolders().Count);
+            Assert.DoesNotContain(service.GetShortcutFolders(), f => f.Path == unsafePath);
         }
         finally
         {
@@ -41,7 +42,7 @@ public class SettingsServiceSecurityTests
     }
 
     [Fact]
-    public void ShortcutsPath_Setter_RejectsUnsafePath()
+    public void AddShortcutFolder_RejectsUnsafePath()
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
@@ -50,30 +51,32 @@ public class SettingsServiceSecurityTests
         string unsafePath = @"\\attacker\share\Shortcuts";
 
         // Act
-        service.ShortcutsPath = unsafePath;
+        bool added = service.AddShortcutFolder(unsafePath);
 
-        // Assert
-        // Should remain default or previous value, NOT the unsafe path
+        // Assert — unsafe path must be rejected; ShortcutsPath returns the safe default
+        Assert.False(added);
+        Assert.DoesNotContain(service.GetShortcutFolders(), f => f.Path == unsafePath);
         Assert.NotEqual(unsafePath, service.ShortcutsPath);
     }
 
     [Fact]
-    public void ShortcutsPath_Getter_SanitizesUnsafePathInStore()
+    public void ShortcutsPath_Getter_SanitizesUnsafePathInFolderManager()
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
-        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         string unsafePath = @"\\attacker\share\Shortcuts";
 
-        // Manually inject unsafe path into store
-        settingsStore.SetValue("ShortcutsPath", unsafePath);
+        // Inject unsafe path into store before constructing manager (simulating tampered settings)
+        settingsStore.SetValue("ShortcutFolders", $"[{{\"Order\":0,\"Path\":\"{unsafePath.Replace("\\", "\\\\")}\",\"Label\":\"Test\"}}]");
+
+        // Construct after injection so the manager loads the tampered JSON
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
         // Act
         string currentPath = service.ShortcutsPath;
 
-        // Assert
-        // Should ignore the stored unsafe path and return default
+        // Assert: should ignore the stored unsafe path and return default
         Assert.NotEqual(unsafePath, currentPath);
     }
 }

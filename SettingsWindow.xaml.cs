@@ -24,6 +24,7 @@ public sealed partial class SettingsWindow : Window
         ViewModel = new SettingsViewModel(settingsService, windowService, filePickerService);
 
         this.InitializeComponent();
+        SettingsContent.DataContext = this;
 
         this.Title = Localization.GetString("SettingsWindow_Title");
         this.ExtendsContentIntoTitleBar = true;

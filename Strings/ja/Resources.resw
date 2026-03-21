@@ -145,6 +145,9 @@
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
     <value>ウィンドウ位置をリセット</value>
   </data>
+  <data name="Settings_KeepCentered.Header" xml:space="preserve">
+    <value>ウィンドウを中央に配置</value>
+  </data>
   <data name="Settings_ShortcutsPath.AutomationProperties.Name" xml:space="preserve">
     <value>ショートカットフォルダのパス</value>
   </data>
@@ -201,5 +204,44 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 設定</value>
+  </data>
+  <data name="Settings_FolderList.Text" xml:space="preserve">
+    <value>ショートカットフォルダー</value>
+  </data>
+  <data name="Settings_AddFolder.Content" xml:space="preserve">
+    <value>フォルダーを追加</value>
+  </data>
+  <data name="Settings_RemoveFolder.ToolTip" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="Settings_MoveUp.ToolTip" xml:space="preserve">
+    <value>上へ</value>
+  </data>
+  <data name="Settings_MoveDown.ToolTip" xml:space="preserve">
+    <value>下へ</value>
+  </data>
+  <data name="Settings_RenameFolder.ToolTip" xml:space="preserve">
+    <value>名前の変更</value>
+  </data>
+  <data name="Settings_ViewMode.Text" xml:space="preserve">
+    <value>表示モード</value>
+  </data>
+  <data name="Settings_ViewMode_Merged" xml:space="preserve">
+    <value>統合</value>
+  </data>
+  <data name="Settings_ViewMode_Grouped" xml:space="preserve">
+    <value>グループ化</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
+    <value>折りたたみ可能なグループ</value>
+  </data>
+  <data name="Settings_RenameFolder_Title" xml:space="preserve">
+    <value>フォルダーの名前を変更</value>
+  </data>
+  <data name="Settings_RenameFolder_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
+    <value>キャンセル</value>
   </data>
 </root>

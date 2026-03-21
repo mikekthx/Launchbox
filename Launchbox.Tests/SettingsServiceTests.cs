@@ -32,17 +32,21 @@ public class SettingsServiceTests
     }
 
     [Fact]
-    public void ShortcutsPath_SavesAndRetrievesValue()
+    public void ShortcutsPath_ReflectsFirstFolder_WhenFolderAdded()
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
+
+        // Pre-populate store with the desired folder so it becomes order 0 (the first folder)
+        var json = System.Text.Json.JsonSerializer.Serialize(new[]
+        {
+            new Launchbox.Models.ShortcutFolder { Path = @"C:\Test\Shortcuts", Label = "Shortcuts", Order = 0 }
+        });
+        settingsStore.SetValue("ShortcutFolders", json);
+
         var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
 
-        service.ShortcutsPath = @"C:\Test\Shortcuts";
-
         Assert.Equal(@"C:\Test\Shortcuts", service.ShortcutsPath);
-        Assert.True(settingsStore.TryGetValue("ShortcutsPath", out var val));
-        Assert.Equal(@"C:\Test\Shortcuts", val);
     }
 
     [Fact]
@@ -117,16 +121,19 @@ public class SettingsServiceTests
     [InlineData(@"\\attacker\share")]
     [InlineData(@"\\?\UNC\attacker\share")]
     [InlineData(@"//attacker/share")]
-    public void ShortcutsPath_RejectsUnsafePaths(string unsafePath)
+    public void ShortcutsPath_IgnoresUnsafeFolderInManager(string unsafePath)
     {
         var settingsStore = new MockSettingsStore();
         var startupService = new MockStartupService();
+
+        // Inject unsafe path before constructing manager so it's loaded from tampered store
+        settingsStore.SetValue("ShortcutFolders", $"[{{\"Order\":0,\"Path\":\"{unsafePath.Replace("\\", "\\\\")}\",\"Label\":\"Test\"}}]");
+
         var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
-        var initialPath = service.ShortcutsPath;
 
-        service.ShortcutsPath = unsafePath;
+        var path = service.ShortcutsPath;
 
-        Assert.Equal(initialPath, service.ShortcutsPath);
-        Assert.False(settingsStore.TryGetValue("ShortcutsPath", out _));
+        Assert.NotEqual(unsafePath, path);
+        Assert.Contains("Shortcuts", path);
     }
 }
