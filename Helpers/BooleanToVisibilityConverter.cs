@@ -6,7 +6,7 @@ namespace Launchbox.Helpers;
 
 public class BooleanToVisibilityConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language)
+    public object Convert(object value, Type targetType, object parameter, string _)
     {
         bool isVisible = value is bool b && b;
 
@@ -18,7 +18,7 @@ public class BooleanToVisibilityConverter : IValueConverter
         return isVisible ? Visibility.Visible : Visibility.Collapsed;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language)
+    public object ConvertBack(object value, Type targetType, object parameter, string _)
     {
         return value is Visibility v && v == Visibility.Visible;
     }
