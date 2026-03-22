@@ -170,12 +170,14 @@ public static class PathSecurity
     }
 
     // Matches single-quoted strings in exception messages (e.g., 'C:\Users\file.txt')
-    private static readonly Regex QUOTED_STRING_PATTERN = new(@"'([^']+)'", RegexOptions.Compiled);
+    private static readonly Regex QUOTED_PATH_PATTERN = new(@"'([^']+[\\/][^']+)'", RegexOptions.Compiled);
+
+    // Matches unquoted Windows drive paths (e.g., C:\Users\file.txt) and UNC paths (\\server\share)
+    private static readonly Regex UNQUOTED_PATH_PATTERN = new(@"(?:[A-Za-z]:\\|\\\\)[^\s""']+", RegexOptions.Compiled);
 
     /// <summary>
     /// Returns a safe exception message that preserves diagnostic context while redacting
-    /// sensitive file paths. Quoted strings containing path separators are redacted via
-    /// <see cref="RedactPath"/>; all other message content is preserved as-is.
+    /// sensitive file paths. Both quoted and unquoted paths are redacted via <see cref="RedactPath"/>.
     /// </summary>
     public static string GetSafeExceptionMessage(Exception ex)
     {
@@ -187,14 +189,13 @@ public static class PathSecurity
         if (string.IsNullOrEmpty(message))
             return $"[{typeName}]";
 
-        // Redact quoted strings that look like paths (contain \ or /)
-        string safeMessage = QUOTED_STRING_PATTERN.Replace(message, m =>
-        {
-            string value = m.Groups[1].Value;
-            return value.IndexOfAny(PATH_SEPARATORS) >= 0
-                ? $"'{RedactPath(value)}'"
-                : m.Value;
-        });
+        // Pass 1: redact quoted paths (e.g., 'C:\Secret\file.txt')
+        string safeMessage = QUOTED_PATH_PATTERN.Replace(message, m =>
+            $"'{RedactPath(m.Groups[1].Value)}'");
+
+        // Pass 2: redact remaining unquoted Windows/UNC paths
+        safeMessage = UNQUOTED_PATH_PATTERN.Replace(safeMessage, m =>
+            RedactPath(m.Value));
 
         return $"[{typeName}] {safeMessage}";
     }
