@@ -189,7 +189,7 @@
                   <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4" Tapped="GroupHeader_Tapped">
                     <FontIcon Glyph="{x:Bind IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
-                              Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled, Mode=OneWay,
+                              Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled,
                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <TextBlock Grid.Column="1" Text="{x:Bind Label}"
                                Style="{ThemeResource SubtitleTextBlockStyle}" />
