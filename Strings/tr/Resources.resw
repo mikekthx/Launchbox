@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- MainWindow.xaml — In-Tree Elements -->
+  <data name="MainWindow_NoShortcuts.Text" xml:space="preserve">
+    <value>Kısayol bulunamadı</value>
+  </data>
+  <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
+    <value>Masaüstü/Shortcuts klasörüne kısayollar ekleyin</value>
+  </data>
+  <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Yapılandırılmış kısayol klasörünü aç</value>
+  </data>
+  <data name="MainWindow_OpenFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>Kısayol klasörünü aç</value>
+  </data>
+  <data name="MainWindow_OpenFolderText.Text" xml:space="preserve">
+    <value>Kısayol klasörünü aç</value>
+  </data>
+  <data name="MainWindow_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Ara...</value>
+  </data>
+  <data name="MainWindow_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Kısayolları ara (temizlemek için Esc)</value>
+  </data>
+  <data name="MainWindow_SearchBox.AutomationProperties.Name" xml:space="preserve">
+    <value>Kısayolları ara</value>
+  </data>
+  <data name="MainWindow_NoMatches.Text" xml:space="preserve">
+    <value>Eşleşme bulunamadı</value>
+  </data>
+  <data name="MainWindow_ShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
+    <value>Kısayol ızgarası</value>
+  </data>
+
+  <!-- SettingsWindow.xaml — In-Tree Elements -->
+  <data name="Settings_TitleText.Text" xml:space="preserve">
+    <value>Launchbox Ayarları</value>
+  </data>
+  <data name="Settings_GeneralHeader.Text" xml:space="preserve">
+    <value>Genel</value>
+  </data>
+  <data name="Settings_StartupToggle.Header" xml:space="preserve">
+    <value>Başlangıçta çalıştır</value>
+  </data>
+  <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Windows'ta oturum açıldığında Launchbox'ı otomatik başlat</value>
+  </data>
+  <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Başlangıçta çalıştır</value>
+  </data>
+  <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
+    <value>Genel kısayol tuşu</value>
+  </data>
+  <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Bir değiştirici tuş seçin (ör. Alt)</value>
+  </data>
+  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
+    <value>Kısayol değiştirici tuşu</value>
+  </data>
+  <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
+    <value>Tuş</value>
+  </data>
+  <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Bir tuş girin (ör. S, F1, Home)</value>
+  </data>
+  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
+    <value>Kısayol tuşu</value>
+  </data>
+  <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
+    <value>Görünüm</value>
+  </data>
+  <data name="Settings_IconSizeLabel.Text" xml:space="preserve">
+    <value>Simge boyutu</value>
+  </data>
+  <data name="Settings_IconSizeCombo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Başlatıcı ızgarasındaki simge boyutunu ayarla</value>
+  </data>
+  <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
+    <value>Simge boyutu</value>
+  </data>
+  <data name="Settings_WindowHeader.Text" xml:space="preserve">
+    <value>Pencere yönetimi</value>
+  </data>
+  <data name="Settings_ResetPosition.Content" xml:space="preserve">
+    <value>Pencere konumunu sıfırla</value>
+  </data>
+  <data name="Settings_ResetPosition.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Ana pencereyi ekranın ortasına taşır</value>
+  </data>
+  <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
+    <value>Pencere konumunu sıfırla</value>
+  </data>
+  <data name="Settings_KeepCentered.Header" xml:space="preserve">
+    <value>Pencereyi ortada tut</value>
+  </data>
+
+  <!-- C# Code Strings -->
+  <data name="Tray_TooltipFormat" xml:space="preserve">
+    <value>Launchbox ({0})</value>
+    <comment>{0} = hotkey combination like "Alt+S"</comment>
+  </data>
+  <data name="TrayMenu_Hide" xml:space="preserve">
+    <value>Gizle</value>
+  </data>
+  <data name="TrayMenu_Show" xml:space="preserve">
+    <value>Göster</value>
+  </data>
+  <data name="TrayMenu_Settings" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
+  <data name="TrayMenu_Exit" xml:space="preserve">
+    <value>Çıkış</value>
+  </data>
+  <data name="Tray_AutomationName" xml:space="preserve">
+    <value>Launchbox bildirim alanı simgesi</value>
+  </data>
+  <data name="Modifier_Alt" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Modifier_Ctrl" xml:space="preserve">
+    <value>Ctrl</value>
+  </data>
+  <data name="Modifier_Shift" xml:space="preserve">
+    <value>Shift</value>
+  </data>
+  <data name="Modifier_Win" xml:space="preserve">
+    <value>Win</value>
+  </data>
+  <data name="GridSize_Small" xml:space="preserve">
+    <value>Küçük</value>
+  </data>
+  <data name="GridSize_Medium" xml:space="preserve">
+    <value>Orta</value>
+  </data>
+  <data name="GridSize_Large" xml:space="preserve">
+    <value>Büyük</value>
+  </data>
+  <data name="Error_CriticalMessage" xml:space="preserve">
+    <value>Launchbox kritik bir hatayla karşılaştı ve kapatılması gerekiyor.</value>
+  </data>
+  <data name="Error_CriticalTitle" xml:space="preserve">
+    <value>Launchbox</value>
+  </data>
+  <data name="Error_NotificationTitle" xml:space="preserve">
+    <value>Launchbox Hatası</value>
+  </data>
+  <data name="SettingsWindow_Title" xml:space="preserve">
+    <value>Launchbox Ayarları</value>
+  </data>
+  <data name="Settings_FolderList.Text" xml:space="preserve">
+    <value>Kısayol klasörleri</value>
+  </data>
+  <data name="Settings_AddFolder.Content" xml:space="preserve">
+    <value>Klasör ekle</value>
+  </data>
+  <data name="Settings_RemoveFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Kaldır</value>
+  </data>
+  <data name="Settings_MoveUp.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Yukarı taşı</value>
+  </data>
+  <data name="Settings_MoveDown.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Aşağı taşı</value>
+  </data>
+  <data name="Settings_RenameFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Yeniden adlandır</value>
+  </data>
+  <data name="Settings_ViewMode.Text" xml:space="preserve">
+    <value>Görünüm modu</value>
+  </data>
+  <data name="Settings_ViewMode_Merged" xml:space="preserve">
+    <value>Birleşik</value>
+  </data>
+  <data name="Settings_ViewMode_Grouped" xml:space="preserve">
+    <value>Gruplanmış</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
+    <value>Daraltılabilir gruplar</value>
+  </data>
+  <data name="Settings_RenameFolder_Title" xml:space="preserve">
+    <value>Klasörü yeniden adlandır</value>
+  </data>
+  <data name="Settings_RenameFolder_OK" xml:space="preserve">
+    <value>Tamam</value>
+  </data>
+  <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
+    <value>İptal</value>
+  </data>
+</root>

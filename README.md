@@ -13,7 +13,7 @@ Launchbox is a modern, lightweight Windows desktop application launcher built wi
 - **📂 Multi-Folder Sources**: Configure multiple shortcut folders with add, remove, reorder, and rename support in Settings.
 - **🗂️ Flexible View Modes**: Display shortcuts merged alphabetically or grouped by source folder, with collapsible groups for better organization.
 - **🎨 Modern UI**: Built with WinUI 3 with an acrylic backdrop for a native Windows 11 look and feel.
-- **🌍 Localization**: Automatically uses your Windows language, with support for 8 languages (English, Spanish, French, German, Japanese, Simplified Chinese, Korean, and Brazilian Portuguese).
+- **🌍 Localization**: Automatically uses your Windows language, with support for 13 languages (English, Spanish, French, German, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified Chinese, and Traditional Chinese).
 - **🔗 Support for Various Shortcuts**: Handles standard application shortcuts (`.lnk`) and Internet shortcuts (`.url`).
 - **🖼️ Custom Icons**: Override any shortcut's icon by placing a `.png` or `.ico` file in the `.icons` directory alongside your shortcuts.
 - **⚙️ Settings**: Dedicated settings window for hotkey, shortcut folders, view mode, startup behavior, and window management.

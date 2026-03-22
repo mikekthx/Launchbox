@@ -96,10 +96,15 @@ Launchbox/
 │   ├── es/Resources.resw       # Spanish
 │   ├── fr/Resources.resw       # French
 │   ├── de/Resources.resw       # German
+│   ├── it/Resources.resw       # Italian
 │   ├── ja/Resources.resw       # Japanese
-│   ├── zh-Hans/Resources.resw  # Simplified Chinese
 │   ├── ko/Resources.resw       # Korean
-│   └── pt-BR/Resources.resw    # Brazilian Portuguese
+│   ├── pl/Resources.resw       # Polish
+│   ├── pt-BR/Resources.resw    # Brazilian Portuguese
+│   ├── ru/Resources.resw       # Russian
+│   ├── tr/Resources.resw       # Turkish
+│   ├── zh-Hans/Resources.resw  # Simplified Chinese
+│   └── zh-Hant/Resources.resw  # Traditional Chinese
 ├── Launchbox.Tests/            # xUnit test project (file-linked)
 ├── Assets/                     # Application icons
 └── Properties/                 # Launch/publish profiles
@@ -329,14 +334,14 @@ Additional services:
 - Window position persistence must remain compatible with existing LocalSettings-based storage
 
 ### Localization
-The app uses WinUI 3 native `.resw` resource files with automatic Windows language detection across 8 locales (en-US, es, fr, de, ja, zh-Hans, ko, pt-BR).
+The app uses WinUI 3 native `.resw` resource files with automatic Windows language detection across 13 locales (en-US, es, fr, de, it, ja, ko, pl, pt-BR, ru, tr, zh-Hans, zh-Hant).
 
 - **XAML strings:** Use `x:Uid` attributes on in-tree elements. The `.resw` keys follow the pattern `ElementName.Property` (e.g., `MainWindow_SearchBox.PlaceholderText`).
 - **Out-of-tree strings** (tray menu, flyout): ViewModel properties backed by `Localization.GetString()`, bound via `{Binding}`.
 - **Code-behind strings:** Use `Localization.GetString("KeyName")` directly.
 - **Settings storage:** Uses `LocalizedOption` records that pair an English storage key (`Value`) with a localized display name (`DisplayName`). Settings always persist the English key; display uses the localized name.
 - **Test seam:** `Localization` defaults to a `DefaultStringProvider` that returns the key itself. Tests inject `MockStringProvider` via `Localization.SetProvider()`. The production app initializes `ResourceStringProvider` in `App.xaml.cs`. This avoids `COMException` from `ResourceLoader` in unpackaged test contexts.
-- **Adding a new localized string:** Add the key to all 8 `Strings/*/Resources.resw` files. For XAML, add `x:Uid` to the element. For C#, call `Localization.GetString("KeyName")`.
+- **Adding a new localized string:** Add the key to all 13 `Strings/*/Resources.resw` files. For XAML, add `x:Uid` to the element. For C#, call `Localization.GetString("KeyName")`.
 
 ### Dependency Composition
 All dependencies are composed **manually** in the `MainWindow` constructor (no DI container). `SettingsService`, `WindowService`, and `LocalSettingsStore` are shared singleton instances passed to both `MainViewModel` and `SettingsViewModel`. When adding a new service, wire it up in the `MainWindow` constructor.

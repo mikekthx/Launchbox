@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- MainWindow.xaml — In-Tree Elements -->
+  <data name="MainWindow_NoShortcuts.Text" xml:space="preserve">
+    <value>Nessun collegamento trovato</value>
+  </data>
+  <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
+    <value>Aggiungi collegamenti alla cartella Desktop/Shortcuts</value>
+  </data>
+  <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Apri la cartella dei collegamenti configurata</value>
+  </data>
+  <data name="MainWindow_OpenFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>Apri cartella collegamenti</value>
+  </data>
+  <data name="MainWindow_OpenFolderText.Text" xml:space="preserve">
+    <value>Apri cartella collegamenti</value>
+  </data>
+  <data name="MainWindow_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Cerca...</value>
+  </data>
+  <data name="MainWindow_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Cerca collegamenti (Esc per cancellare)</value>
+  </data>
+  <data name="MainWindow_SearchBox.AutomationProperties.Name" xml:space="preserve">
+    <value>Cerca collegamenti</value>
+  </data>
+  <data name="MainWindow_NoMatches.Text" xml:space="preserve">
+    <value>Nessuna corrispondenza</value>
+  </data>
+  <data name="MainWindow_ShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
+    <value>Griglia collegamenti</value>
+  </data>
+
+  <!-- SettingsWindow.xaml — In-Tree Elements -->
+  <data name="Settings_TitleText.Text" xml:space="preserve">
+    <value>Impostazioni Launchbox</value>
+  </data>
+  <data name="Settings_GeneralHeader.Text" xml:space="preserve">
+    <value>Generale</value>
+  </data>
+  <data name="Settings_StartupToggle.Header" xml:space="preserve">
+    <value>Esegui all'avvio</value>
+  </data>
+  <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Avvia automaticamente Launchbox all'accesso a Windows</value>
+  </data>
+  <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
+    <value>Esegui all'avvio</value>
+  </data>
+  <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
+    <value>Tasto di scelta rapida globale</value>
+  </data>
+  <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Seleziona un tasto modificatore (es. Alt)</value>
+  </data>
+  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
+    <value>Modificatore tasto rapido</value>
+  </data>
+  <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
+    <value>Tasto</value>
+  </data>
+  <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Inserisci un tasto (es. S, F1, Home)</value>
+  </data>
+  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
+    <value>Tasto rapido</value>
+  </data>
+  <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
+    <value>Aspetto</value>
+  </data>
+  <data name="Settings_IconSizeLabel.Text" xml:space="preserve">
+    <value>Dimensione icone</value>
+  </data>
+  <data name="Settings_IconSizeCombo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Imposta la dimensione delle icone nella griglia</value>
+  </data>
+  <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
+    <value>Dimensione icone</value>
+  </data>
+  <data name="Settings_WindowHeader.Text" xml:space="preserve">
+    <value>Gestione finestra</value>
+  </data>
+  <data name="Settings_ResetPosition.Content" xml:space="preserve">
+    <value>Reimposta posizione finestra</value>
+  </data>
+  <data name="Settings_ResetPosition.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sposta la finestra principale al centro dello schermo</value>
+  </data>
+  <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
+    <value>Reimposta posizione finestra</value>
+  </data>
+  <data name="Settings_KeepCentered.Header" xml:space="preserve">
+    <value>Mantieni finestra centrata</value>
+  </data>
+
+  <!-- C# Code Strings -->
+  <data name="Tray_TooltipFormat" xml:space="preserve">
+    <value>Launchbox ({0})</value>
+    <comment>{0} = hotkey combination like "Alt+S"</comment>
+  </data>
+  <data name="TrayMenu_Hide" xml:space="preserve">
+    <value>Nascondi</value>
+  </data>
+  <data name="TrayMenu_Show" xml:space="preserve">
+    <value>Mostra</value>
+  </data>
+  <data name="TrayMenu_Settings" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="TrayMenu_Exit" xml:space="preserve">
+    <value>Esci</value>
+  </data>
+  <data name="Tray_AutomationName" xml:space="preserve">
+    <value>Icona Launchbox nell'area di notifica</value>
+  </data>
+  <data name="Modifier_Alt" xml:space="preserve">
+    <value>Alt</value>
+  </data>
+  <data name="Modifier_Ctrl" xml:space="preserve">
+    <value>Ctrl</value>
+  </data>
+  <data name="Modifier_Shift" xml:space="preserve">
+    <value>Maiusc</value>
+  </data>
+  <data name="Modifier_Win" xml:space="preserve">
+    <value>Win</value>
+  </data>
+  <data name="GridSize_Small" xml:space="preserve">
+    <value>Piccolo</value>
+  </data>
+  <data name="GridSize_Medium" xml:space="preserve">
+    <value>Medio</value>
+  </data>
+  <data name="GridSize_Large" xml:space="preserve">
+    <value>Grande</value>
+  </data>
+  <data name="Error_CriticalMessage" xml:space="preserve">
+    <value>Launchbox ha riscontrato un errore critico e deve chiudersi.</value>
+  </data>
+  <data name="Error_CriticalTitle" xml:space="preserve">
+    <value>Launchbox</value>
+  </data>
+  <data name="Error_NotificationTitle" xml:space="preserve">
+    <value>Errore Launchbox</value>
+  </data>
+  <data name="SettingsWindow_Title" xml:space="preserve">
+    <value>Impostazioni Launchbox</value>
+  </data>
+  <data name="Settings_FolderList.Text" xml:space="preserve">
+    <value>Cartelle collegamenti</value>
+  </data>
+  <data name="Settings_AddFolder.Content" xml:space="preserve">
+    <value>Aggiungi cartella</value>
+  </data>
+  <data name="Settings_RemoveFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Rimuovi</value>
+  </data>
+  <data name="Settings_MoveUp.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sposta su</value>
+  </data>
+  <data name="Settings_MoveDown.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sposta giù</value>
+  </data>
+  <data name="Settings_RenameFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Rinomina</value>
+  </data>
+  <data name="Settings_ViewMode.Text" xml:space="preserve">
+    <value>Modalità visualizzazione</value>
+  </data>
+  <data name="Settings_ViewMode_Merged" xml:space="preserve">
+    <value>Unificata</value>
+  </data>
+  <data name="Settings_ViewMode_Grouped" xml:space="preserve">
+    <value>Raggruppata</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
+    <value>Gruppi comprimibili</value>
+  </data>
+  <data name="Settings_RenameFolder_Title" xml:space="preserve">
+    <value>Rinomina cartella</value>
+  </data>
+  <data name="Settings_RenameFolder_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+</root>
