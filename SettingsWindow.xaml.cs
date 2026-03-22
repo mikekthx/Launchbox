@@ -47,22 +47,29 @@ public sealed partial class SettingsWindow : Window
 
     private async void RenameFolder_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: ShortcutFolder folder }) return;
-
-        var textBox = new TextBox { Text = folder.Label, PlaceholderText = folder.Label };
-        var dialog = new ContentDialog
+        try
         {
-            Title = Localization.GetString("Settings_RenameFolder_Title"),
-            PrimaryButtonText = Localization.GetString("Settings_RenameFolder_OK"),
-            CloseButtonText = Localization.GetString("Settings_RenameFolder_Cancel"),
-            Content = textBox,
-            XamlRoot = Content.XamlRoot
-        };
+            if (sender is not Button { DataContext: ShortcutFolder folder }) return;
 
-        var result = await dialog.ShowAsync();
-        if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(textBox.Text))
+            var textBox = new TextBox { Text = folder.Label, PlaceholderText = folder.Label };
+            var dialog = new ContentDialog
+            {
+                Title = Localization.GetString("Settings_RenameFolder_Title"),
+                PrimaryButtonText = Localization.GetString("Settings_RenameFolder_OK"),
+                CloseButtonText = Localization.GetString("Settings_RenameFolder_Cancel"),
+                Content = textBox,
+                XamlRoot = Content.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                ViewModel.ApplyRename(folder.Order, textBox.Text);
+            }
+        }
+        catch (System.Exception ex)
         {
-            ViewModel.ApplyRename(folder.Order, textBox.Text);
+            System.Diagnostics.Trace.WriteLine($"Failed to rename folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 }
