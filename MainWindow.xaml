@@ -114,8 +114,8 @@
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:AppItem">
-                    <StackPanel Width="{x:Bind AppGrid.Tag.ItemWidth, Mode=OneWay}"
-                                Height="{x:Bind AppGrid.Tag.ItemHeight, Mode=OneWay}"
+                    <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
+                                Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
                                 Spacing="4"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
@@ -123,8 +123,8 @@
                                 AutomationProperties.Name="{x:Bind Name}">
 
                         <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
-                               Width="{x:Bind AppGrid.Tag.IconSize, Mode=OneWay}"
-                               Height="{x:Bind AppGrid.Tag.IconSize, Mode=OneWay}"
+                               Width="{Binding Tag.IconSize, ElementName=AppGrid}"
+                               Height="{Binding Tag.IconSize, ElementName=AppGrid}"
                                Margin="0,10,0,0"
                                AutomationProperties.AccessibilityView="Raw"
                                x:Phase="1"/>
@@ -157,8 +157,8 @@
 
           <GridView.ItemTemplate>
             <DataTemplate x:DataType="models:AppItem">
-              <StackPanel Width="{x:Bind GroupedAppGrid.Tag.ItemWidth, Mode=OneWay}"
-                          Height="{x:Bind GroupedAppGrid.Tag.ItemHeight, Mode=OneWay}"
+              <StackPanel Width="{Binding Tag.ItemWidth, ElementName=GroupedAppGrid}"
+                          Height="{Binding Tag.ItemHeight, ElementName=GroupedAppGrid}"
                           Spacing="4"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
@@ -166,8 +166,8 @@
                           AutomationProperties.Name="{x:Bind Name}"
                           Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource EmptyStringToCollapsedConverter}}">
                 <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
-                       Width="{x:Bind GroupedAppGrid.Tag.IconSize, Mode=OneWay}"
-                       Height="{x:Bind GroupedAppGrid.Tag.IconSize, Mode=OneWay}"
+                       Width="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
+                       Height="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
                        Margin="0,10,0,0"
                        AutomationProperties.AccessibilityView="Raw"
                        x:Phase="1"/>
