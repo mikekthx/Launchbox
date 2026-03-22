@@ -70,9 +70,7 @@
                     VerticalAlignment="Center"
                     Spacing="12"
                     <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->
-                    <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->
-                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
-                    <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->>
+                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
@@ -191,7 +189,7 @@
                   <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4" Tapped="GroupHeader_Tapped">
                     <FontIcon Glyph="{x:Bind IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
-                              Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled, Mode=OneWay, Mode=OneWay,
+                              Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled, Mode=OneWay,
                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <TextBlock Grid.Column="1" Text="{x:Bind Label}"
                                Style="{ThemeResource SubtitleTextBlockStyle}" />
