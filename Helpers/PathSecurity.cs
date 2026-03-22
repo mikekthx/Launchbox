@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Launchbox.Helpers;
@@ -84,11 +85,9 @@ public static class PathSecurity
             return true; // Block anything else starting with \\?\ (e.g. GLOBALROOT, Volume, etc.)
         }
 
-        // Check for standard UNC paths
-        if (path.StartsWith(@"\\") || path.StartsWith("//")) return true;
-
-        // Check for mixed slash UNC paths (e.g. /\server/share or \/server/share)
-        if (path.StartsWith(@"/\") || path.StartsWith(@"\/")) return true;
+        // Check for standard and mixed slash UNC paths
+        string[] unsafePrefixes = { @"\\", "//", @"/\", @"\/" };
+        if (unsafePrefixes.Any(prefix => path.StartsWith(prefix))) return true;
 
         // Check normalized path for hidden UNC (Defense in depth)
         try
