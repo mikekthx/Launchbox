@@ -69,8 +69,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
-                    <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->
-                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
@@ -104,7 +103,7 @@
                   Background="Transparent"
                   SelectionMode="None"
                   IsItemClickEnabled="True"
-                  Visibility="{x:Bind ViewModel.IsMergedModeVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Visibility="{Binding ViewModel.IsMergedModeVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ItemsSource="{x:Bind ViewModel.FilteredApps, Mode=OneWay}"
                   ItemContainerStyle="{StaticResource AppItemContainerStyle}"
@@ -148,7 +147,7 @@
                   SelectionMode="None"
                   IsItemClickEnabled="True"
                   ItemsSource="{Binding Source={StaticResource GroupedAppsSource}}"
-                  Visibility="{x:Bind ViewModel.IsGroupedModeVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Visibility="{Binding ViewModel.IsGroupedModeVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ItemContainerStyle="{StaticResource AppItemContainerStyle}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
@@ -164,7 +163,7 @@
                           VerticalAlignment="Center"
                           ToolTipService.ToolTip="{x:Bind Name}"
                           AutomationProperties.Name="{x:Bind Name}"
-                          Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource EmptyStringToCollapsedConverter}}">
+                          Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
                 <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
                        Width="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
                        Height="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
@@ -187,7 +186,7 @@
               <GroupStyle.HeaderTemplate>
                 <DataTemplate x:DataType="models:AppItemGroup">
                   <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4" Tapped="GroupHeader_Tapped">
-                    <FontIcon Glyph="{x:Bind IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
+                    <FontIcon Glyph="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
                               Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled,
                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
@@ -221,6 +220,6 @@
                    VerticalAlignment="Center"
                    FontSize="16"
                    FontWeight="SemiBold"
-                   Visibility="{x:Bind ViewModel.HasNoMatches, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                   Visibility="{Binding ViewModel.HasNoMatches, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </Window>
