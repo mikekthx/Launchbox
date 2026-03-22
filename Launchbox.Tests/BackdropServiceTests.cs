@@ -79,4 +79,48 @@ public class BackdropServiceTests
         await service.UpdateBackdropAsync();
         Assert.Equal(2, processService.CallCount);
     }
+
+    [Fact]
+    public async Task UpdateBackdropAsync_WhenExceptionOccurs_AttemptsFallback()
+    {
+        // Arrange
+        var processService = new MockProcessService { ShouldReturnTrue = true };
+        var windowWrapper = new MockBackdropWindowWrapper
+        {
+            IsBackdropSet = true,
+            IsDesktopAcrylicBackdropSet = false,
+            ShouldThrowOnClearBackdrop = true
+        };
+        var service = new BackdropService(processService, windowWrapper);
+
+        // Act
+        await service.UpdateBackdropAsync();
+
+        // Assert
+        Assert.True(windowWrapper.ClearBackdropCalled);
+        Assert.True(windowWrapper.SetDesktopAcrylicBackdropCalled);
+    }
+
+    [Fact]
+    public async Task UpdateBackdropAsync_WhenExceptionAndFallbackExceptionOccurs_DoesNotPropagate()
+    {
+        // Arrange
+        var processService = new MockProcessService { ShouldReturnTrue = true };
+        var windowWrapper = new MockBackdropWindowWrapper
+        {
+            IsBackdropSet = true,
+            IsDesktopAcrylicBackdropSet = false,
+            ShouldThrowOnClearBackdrop = true,
+            ShouldThrowOnSetDesktopAcrylicBackdrop = true
+        };
+        var service = new BackdropService(processService, windowWrapper);
+
+        // Act
+        var exception = await Record.ExceptionAsync(() => service.UpdateBackdropAsync());
+
+        // Assert
+        Assert.Null(exception);
+        Assert.True(windowWrapper.ClearBackdropCalled);
+        Assert.True(windowWrapper.SetDesktopAcrylicBackdropCalled);
+    }
 }
