@@ -75,4 +75,31 @@ public class WindowsShortcutResolverTests
             System.Environment.SetEnvironmentVariable(envVar, null);
         }
     }
+
+    [Fact]
+    public void ResolveTarget_Returns_Null_On_COMException_For_Invalid_Lnk()
+    {
+        if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+        {
+            string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.Guid.NewGuid().ToString() + ".lnk");
+            try
+            {
+                // Write garbage data to simulate a corrupted or invalid .lnk file
+                System.IO.File.WriteAllText(tempFile, "This is not a valid shortcut file");
+
+                // Act
+                var result = _resolver.Resolve(tempFile);
+
+                // Assert
+                Assert.Null(result);
+            }
+            finally
+            {
+                if (System.IO.File.Exists(tempFile))
+                {
+                    System.IO.File.Delete(tempFile);
+                }
+            }
+        }
+    }
 }
