@@ -69,7 +69,10 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
-                    Visibility="{Binding ViewModel.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->
+                    <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->
+                    Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    <!-- Bolt Optimization: Using {x:Bind} instead of {Binding} to avoid reflection overhead during UI updates -->>
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
@@ -103,7 +106,7 @@
                   Background="Transparent"
                   SelectionMode="None"
                   IsItemClickEnabled="True"
-                  Visibility="{Binding ViewModel.IsMergedModeVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Visibility="{x:Bind ViewModel.IsMergedModeVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ItemsSource="{x:Bind ViewModel.FilteredApps, Mode=OneWay}"
                   ItemContainerStyle="{StaticResource AppItemContainerStyle}"
@@ -113,8 +116,8 @@
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:AppItem">
-                    <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
-                                Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
+                    <StackPanel Width="{x:Bind AppGrid.Tag.ItemWidth, Mode=OneWay}"
+                                Height="{x:Bind AppGrid.Tag.ItemHeight, Mode=OneWay}"
                                 Spacing="4"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
@@ -122,8 +125,8 @@
                                 AutomationProperties.Name="{x:Bind Name}">
 
                         <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
-                               Width="{Binding Tag.IconSize, ElementName=AppGrid}"
-                               Height="{Binding Tag.IconSize, ElementName=AppGrid}"
+                               Width="{x:Bind AppGrid.Tag.IconSize, Mode=OneWay}"
+                               Height="{x:Bind AppGrid.Tag.IconSize, Mode=OneWay}"
                                Margin="0,10,0,0"
                                AutomationProperties.AccessibilityView="Raw"
                                x:Phase="1"/>
@@ -147,7 +150,7 @@
                   SelectionMode="None"
                   IsItemClickEnabled="True"
                   ItemsSource="{Binding Source={StaticResource GroupedAppsSource}}"
-                  Visibility="{Binding ViewModel.IsGroupedModeVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                  Visibility="{x:Bind ViewModel.IsGroupedModeVisible, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
                   ItemContainerStyle="{StaticResource AppItemContainerStyle}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
@@ -156,17 +159,17 @@
 
           <GridView.ItemTemplate>
             <DataTemplate x:DataType="models:AppItem">
-              <StackPanel Width="{Binding Tag.ItemWidth, ElementName=GroupedAppGrid}"
-                          Height="{Binding Tag.ItemHeight, ElementName=GroupedAppGrid}"
+              <StackPanel Width="{x:Bind GroupedAppGrid.Tag.ItemWidth, Mode=OneWay}"
+                          Height="{x:Bind GroupedAppGrid.Tag.ItemHeight, Mode=OneWay}"
                           Spacing="4"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
                           ToolTipService.ToolTip="{x:Bind Name}"
                           AutomationProperties.Name="{x:Bind Name}"
-                          Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
+                          Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource EmptyStringToCollapsedConverter}}">
                 <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
-                       Width="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
-                       Height="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
+                       Width="{x:Bind GroupedAppGrid.Tag.IconSize, Mode=OneWay}"
+                       Height="{x:Bind GroupedAppGrid.Tag.IconSize, Mode=OneWay}"
                        Margin="0,10,0,0"
                        AutomationProperties.AccessibilityView="Raw"
                        x:Phase="1"/>
@@ -186,9 +189,9 @@
               <GroupStyle.HeaderTemplate>
                 <DataTemplate x:DataType="models:AppItemGroup">
                   <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4" Tapped="GroupHeader_Tapped">
-                    <FontIcon Glyph="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
+                    <FontIcon Glyph="{x:Bind IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
-                              Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled,
+                              Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled, Mode=OneWay, Mode=OneWay,
                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <TextBlock Grid.Column="1" Text="{x:Bind Label}"
                                Style="{ThemeResource SubtitleTextBlockStyle}" />
@@ -220,6 +223,6 @@
                    VerticalAlignment="Center"
                    FontSize="16"
                    FontWeight="SemiBold"
-                   Visibility="{Binding ViewModel.HasNoMatches, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                   Visibility="{x:Bind ViewModel.HasNoMatches, Mode=OneWay, Converter={StaticResource BooleanToVisibilityConverter}}" />
     </Grid>
 </Window>
