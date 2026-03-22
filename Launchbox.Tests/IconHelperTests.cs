@@ -94,4 +94,17 @@ public class IconHelperTests
         Assert.True(streamReadable);
         Assert.Equal(2, streamLength);
     }
+
+    [Fact]
+    public async Task CreateBitmapImageAsync_ReturnsNull_WhenBytesAreInvalid()
+    {
+        // Arrange
+        byte[] invalidBytes = [0x01, 0x02, 0x03];
+
+        // Act
+        var result = await IconHelper.CreateBitmapImageAsync(invalidBytes);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
