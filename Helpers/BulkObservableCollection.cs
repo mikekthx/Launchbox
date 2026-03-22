@@ -15,6 +15,10 @@ public class BulkObservableCollection<T> : ObservableCollection<T>
 {
     private bool _isSuppressingNotifications;
 
+    public BulkObservableCollection() { }
+
+    public BulkObservableCollection(IEnumerable<T> items) : base(items) { }
+
     public void AddRange(IEnumerable<T> items)
     {
         _isSuppressingNotifications = true;

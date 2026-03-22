@@ -1,6 +1,6 @@
+using Launchbox.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -8,14 +8,16 @@ namespace Launchbox.Models;
 
 /// <summary>
 /// A group of AppItems for a single folder. Supports collapse/expand by mutating the
-/// inner ObservableCollection (clear/restore) rather than returning new group instances.
+/// inner collection (clear/restore) rather than returning new group instances.
+/// Uses BulkObservableCollection to batch UI notifications during filter/collapse operations.
 /// WinUI 3's CollectionViewSource hides groups with 0 items, so collapsed groups retain
-/// a single invisible placeholder to keep the header visible.
+/// a single invisible placeholder to keep the header visible — unless the active filter
+/// produces zero matches, in which case the group is emptied so CVS hides it.
 ///
 /// THREADING: All public methods that mutate the collection (ApplyFilter, IsCollapsed setter)
 /// must be called from the UI thread only — ObservableCollection is not thread-safe.
 /// </summary>
-public class AppItemGroup : ObservableCollection<AppItem>
+public class AppItemGroup : BulkObservableCollection<AppItem>
 {
     /// <summary>Sentinel item kept in collapsed groups so CVS doesn't hide the header.</summary>
     private static readonly AppItem COLLAPSED_PLACEHOLDER = new() { Name = string.Empty, Path = string.Empty };
@@ -58,15 +60,31 @@ public class AppItemGroup : ObservableCollection<AppItem>
 
     /// <summary>
     /// Replaces the visible items with a filtered subset. Preserves the backup for expand.
-    /// For collapsed groups: stores the filter but does not change visible items (placeholder stays).
-    /// If the filter produces 0 matches and the group is not collapsed, the group is emptied
-    /// (CVS will hide the header, which is correct — no matching items means no group to show).
+    /// For collapsed groups: evaluates the filter against _allItems. If zero items match,
+    /// the group is emptied (CVS hides the header). If items match, the placeholder stays.
     /// </summary>
     public void ApplyFilter(string? filterText)
     {
         _activeFilter = filterText;
 
-        if (_isCollapsed) return; // collapsed groups keep placeholder; filter applied on expand
+        if (_isCollapsed)
+        {
+            // Evaluate the filter to decide whether the collapsed header should be visible
+            bool hasMatches = string.IsNullOrEmpty(filterText)
+                || _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+
+            if (hasMatches && Count == 0)
+            {
+                // Restore placeholder so header reappears
+                ReplaceAll([COLLAPSED_PLACEHOLDER]);
+            }
+            else if (!hasMatches && Count > 0)
+            {
+                // No matches — hide the group entirely
+                ReplaceAll([]);
+            }
+            return;
+        }
 
         var source = string.IsNullOrEmpty(filterText)
             ? _allItems
@@ -75,17 +93,18 @@ public class AppItemGroup : ObservableCollection<AppItem>
         // Minimize churn: only replace if the set actually changed
         if (source.SequenceEqual(this)) return;
 
-        Clear();
-        foreach (var item in source) Add(item);
+        ReplaceAll(source);
     }
 
     private void ApplyCollapseState()
     {
-        Clear();
         if (_isCollapsed)
         {
-            // WinUI 3 CVS hides 0-item groups — keep one placeholder so header stays visible
-            Add(COLLAPSED_PLACEHOLDER);
+            // Evaluate filter to decide if collapsed header should be visible
+            bool hasMatches = string.IsNullOrEmpty(_activeFilter)
+                || _allItems.Any(a => a.Name.Contains(_activeFilter, StringComparison.OrdinalIgnoreCase));
+
+            ReplaceAll(hasMatches ? [COLLAPSED_PLACEHOLDER] : []);
         }
         else
         {
@@ -94,7 +113,7 @@ public class AppItemGroup : ObservableCollection<AppItem>
                 ? _allItems
                 : _allItems.Where(a => a.Name.Contains(_activeFilter, StringComparison.OrdinalIgnoreCase)).ToList();
 
-            foreach (var item in source) Add(item);
+            ReplaceAll(source);
         }
     }
 }
