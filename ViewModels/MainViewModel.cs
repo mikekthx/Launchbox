@@ -29,7 +29,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public BulkObservableCollection<AppItem> Apps { get; } = [];
 
-    public ObservableCollection<AppItemGroup> GroupedApps { get; } = [];
+    public BulkObservableCollection<AppItemGroup> GroupedApps { get; } = [];
 
     public bool CollapsibleGroupsEnabled => _settingsService.CollapsibleGroups;
 
@@ -288,11 +288,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 Apps.ReplaceAll(localAppItems);
                 IsEmpty = Apps.Count == 0;
 
-                GroupedApps.Clear();
-                foreach (var group in groupedData)
-                {
-                    GroupedApps.Add(group);
-                }
+                GroupedApps.ReplaceAll(groupedData);
 
                 OnPropertyChanged(nameof(IsMergedModeVisible));
                 OnPropertyChanged(nameof(IsGroupedModeVisible));
