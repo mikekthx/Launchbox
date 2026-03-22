@@ -270,14 +270,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
             localAppItems.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
 
             // Build grouped data structure — group by FolderPath (unique), display Label
+            var folderDict = folders
+                .Where(f => f.Path != null)
+                .DistinctBy(f => f.Path)
+                .ToDictionary(f => f.Path);
+
             var groupedData = localAppItems
                 .GroupBy(a => a.FolderPath)
-                .OrderBy(g => folders.FirstOrDefault(f => f.Path == g.Key)?.Order ?? int.MaxValue)
+                .OrderBy(g => g.Key != null && folderDict.TryGetValue(g.Key, out var f) ? f.Order : int.MaxValue)
                 .Select(g =>
                 {
-                    var folder = folders.FirstOrDefault(f => f.Path == g.Key);
-                    var label = folder?.Label ?? System.IO.Path.GetFileName(g.Key) ?? g.Key;
-                    return new AppItemGroup(label, g.Key, g.OrderBy(a => a.Name));
+                    ShortcutFolder? folder = null;
+                    if (g.Key != null)
+                    {
+                        folderDict.TryGetValue(g.Key, out folder);
+                    }
+                    var label = folder?.Label ?? (g.Key != null ? System.IO.Path.GetFileName(g.Key) : null) ?? g.Key ?? string.Empty;
+                    return new AppItemGroup(label, g.Key ?? string.Empty, g.OrderBy(a => a.Name));
                 })
                 .ToList();
 
