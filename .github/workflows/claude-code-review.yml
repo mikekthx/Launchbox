@@ -27,7 +27,16 @@ jobs:
         with:
           github_token: ${{ secrets.CLAUDE_PAT }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          prompt: "Review this pull request. Focus on code quality, potential bugs, and adherence to the project's coding standards."
+          prompt: |
+            Review PR #${{ github.event.pull_request.number }} in this repository.
+
+            Fetch the diff with: gh pr diff ${{ github.event.pull_request.number }}
+
+            Focus on code quality, potential bugs, and adherence to the project's coding
+            standards documented in CLAUDE.md.
+
+            When done, post your complete review as a comment on the PR:
+            gh pr comment ${{ github.event.pull_request.number }} --body "your review text"
           allowed_bots: "*"
           claude_args: "--allowed-tools Bash(gh pr:*)"
           show_full_output: true
