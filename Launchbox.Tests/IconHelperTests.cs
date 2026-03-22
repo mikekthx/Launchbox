@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -93,5 +94,19 @@ public class IconHelperTests
         // Assert
         Assert.True(streamReadable);
         Assert.Equal(2, streamLength);
+    }
+
+    [Fact]
+    public async Task CreateBitmapImageAsync_ReturnsNull_WhenBytesAreInvalid()
+    {
+        // Arrange
+        byte[] bytes = { 0x01, 0x02, 0x03 };
+
+        // Act - Testing the public 1-arg overload specifically.
+        // Underlying generic error handling is tested via CreateImageAsync tests.
+        var result = await IconHelper.CreateBitmapImageAsync(bytes);
+
+        // Assert
+        Assert.Null(result);
     }
 }
