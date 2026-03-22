@@ -9,9 +9,9 @@ namespace Launchbox.Helpers;
 /// </summary>
 public class EmptyStringToCollapsedConverter : IValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, string language) =>
+    public object Convert(object value, Type targetType, object parameter, string _) =>
         value is string s && !string.IsNullOrEmpty(s) ? Visibility.Visible : Visibility.Collapsed;
 
-    public object ConvertBack(object value, Type targetType, object parameter, string language) =>
+    public object ConvertBack(object value, Type targetType, object parameter, string _) =>
         throw new NotSupportedException();
 }
