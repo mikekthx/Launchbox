@@ -55,6 +55,20 @@ public class FileSystemSecurityTests
         Assert.Equal(string.Empty, result);
     }
 
+    [Fact]
+    public void FileSystem_GetIniValue_ReturnsEmptyString_OnException()
+    {
+        // On .NET Core 2.1+, File.Exists handles long paths gracefully rather than throwing PathTooLongException,
+        // so to test the exception handling block inside GetIniValue (which catches File.GetAttributes errors),
+        // we use a path with invalid trailing characters (null byte) that bypasses IsUnsafePath but causes
+        // File.Exists / File.GetAttributes to throw ArgumentException.
+        string pathWithNullByte = "C:\\valid_path_but_hidden_null\0.ini";
+
+        string result = _fileSystem.GetIniValue(pathWithNullByte, "Section", "Key");
+
+        Assert.Equal(string.Empty, result);
+    }
+
     [Theory]
     [InlineData(@"\\attacker\share\file.txt")]
     [InlineData(@"//attacker/share/file.txt")]
