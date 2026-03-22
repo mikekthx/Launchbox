@@ -2,14 +2,14 @@ name: Claude Code Review
 
 on:
   pull_request:
-    types: [labeled]
+    types: [opened, synchronize, ready_for_review, reopened]
 
 jobs:
   claude-review:
-    if: github.event.label.name == 'claude-review'
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       issues: write
       id-token: write
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Run Claude Code Review
         id: claude-review
@@ -27,16 +27,55 @@ jobs:
         with:
           github_token: ${{ secrets.CLAUDE_PAT }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
           prompt: |
-            Review PR #${{ github.event.pull_request.number }} in this repository.
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Fetch the diff with: gh pr diff ${{ github.event.pull_request.number }}
+            Perform a thorough code review of this pull request. Start by fetching the
+            diff, then review all changed files.
 
-            Focus on code quality, potential bugs, and adherence to the project's coding
-            standards documented in CLAUDE.md.
+            ## Review Areas
 
-            When done, post your complete review as a comment on the PR:
-            gh pr comment ${{ github.event.pull_request.number }} --body "your review text"
-          allowed_bots: "*"
-          claude_args: "--allowed-tools Bash(gh pr:*)"
-          show_full_output: true
+            1. **Code Quality & Standards**
+               - Adherence to conventions in CLAUDE.md (naming, formatting, async/await,
+                 error handling, nullable reference types, modern C# 12+ idioms)
+               - No unnecessary complexity, premature abstractions, or over-engineering
+               - Comments explain *why*, not *what* — no redundant prose comments
+
+            2. **Correctness & Bugs**
+               - Logic errors, off-by-one issues, null dereferences
+               - Async/threading issues (e.g. fire-and-forget without `_ =`, missing
+                 ConfigureAwait, UI thread violations in WinUI 3)
+               - Win32/P/Invoke correctness (SetLastError, handle lifetimes)
+
+            3. **Security**
+               - Path traversal, injection risks, unsafe file operations
+               - Validate that new P/Invoke declarations are in NativeMethods.cs
+               - No secrets or credentials hardcoded
+
+            4. **WinUI 3 / XAML**
+               - x:Bind vs {Binding} used correctly (out-of-tree elements must use {Binding})
+               - No SetConverterLookupRoot issues from converters in Window context
+               - New services wired up in MainWindow constructor
+
+            5. **Testing**
+               - New testable classes linked in Launchbox.Tests/Launchbox.Tests.csproj
+               - Tests use MockStringProvider / other existing mocks where applicable
+               - No mocking of real file system or settings unless via the service interfaces
+
+            6. **Localization**
+               - New UI strings added to all 8 .resw files (en-US, es, fr, de, ja, zh-Hans,
+                 ko, pt-BR)
+               - XAML uses x:Uid for in-tree elements; code-behind uses Localization.GetString()
+
+            ## Output Format
+
+            - Post **inline comments** on specific lines for concrete issues or suggestions
+            - Post a **top-level summary comment** covering: what the PR does, overall
+              assessment, and any blocking issues
+            - Skip inline comments for nitpicks that don't affect correctness or standards
+
+          claude_args: >-
+            --allowedTools
+            "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
