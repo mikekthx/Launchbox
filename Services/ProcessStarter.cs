@@ -1,7 +1,7 @@
 using Launchbox.Helpers;
 using System;
-using System.Diagnostics;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 
 namespace Launchbox.Services;
