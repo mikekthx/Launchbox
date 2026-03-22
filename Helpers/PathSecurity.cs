@@ -169,16 +169,33 @@ public static class PathSecurity
         }
     }
 
+    // Matches single-quoted strings in exception messages (e.g., 'C:\Users\file.txt')
+    private static readonly Regex QUOTED_STRING_PATTERN = new(@"'([^']+)'", RegexOptions.Compiled);
+
     /// <summary>
-    /// Returns a safe exception message that avoids leaking sensitive paths or system information.
-    /// Use this instead of ex.Message when logging exceptions related to file system operations.
+    /// Returns a safe exception message that preserves diagnostic context while redacting
+    /// sensitive file paths. Quoted strings containing path separators are redacted via
+    /// <see cref="RedactPath"/>; all other message content is preserved as-is.
     /// </summary>
     public static string GetSafeExceptionMessage(Exception ex)
     {
         if (ex == null) return "[Unknown Error]";
 
-        // Return only the exception type name
-        // ex.Message often contains the full path which we want to avoid leaking
-        return $"[{ex.GetType().Name}]";
+        string typeName = ex.GetType().Name;
+        string message = ex.Message;
+
+        if (string.IsNullOrEmpty(message))
+            return $"[{typeName}]";
+
+        // Redact quoted strings that look like paths (contain \ or /)
+        string safeMessage = QUOTED_STRING_PATTERN.Replace(message, m =>
+        {
+            string value = m.Groups[1].Value;
+            return value.IndexOfAny(PATH_SEPARATORS) >= 0
+                ? $"'{RedactPath(value)}'"
+                : m.Value;
+        });
+
+        return $"[{typeName}] {safeMessage}";
     }
 }
