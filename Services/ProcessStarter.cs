@@ -1,6 +1,8 @@
 using Launchbox.Helpers;
 using System;
 using System.Diagnostics;
+using System.ComponentModel;
+using System.IO;
 
 namespace Launchbox.Services;
 
@@ -27,6 +29,19 @@ public class ProcessStarter : IProcessStarter
             throw new UnauthorizedAccessException("Execution with unsafe arguments is denied.");
         }
 
-        return Process.Start(startInfo);
+        try
+        {
+            return Process.Start(startInfo);
+        }
+        catch (Win32Exception ex)
+        {
+            Trace.WriteLine($"Win32Exception in ProcessStarter: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            throw new Win32Exception(ex.NativeErrorCode, "A system error occurred while starting the process.");
+        }
+        catch (FileNotFoundException ex)
+        {
+            Trace.WriteLine($"FileNotFoundException in ProcessStarter: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            throw new FileNotFoundException("The specified executable could not be found.");
+        }
     }
 }

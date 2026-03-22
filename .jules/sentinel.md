@@ -57,3 +57,8 @@
 **Vulnerability:** `WindowsShortcutResolver.ResolveUrl` returned the raw URL string from `.url` files after expanding environment variables, without validating the scheme. This allowed `.url` files to be used to execute local files (via `file://`) or other unsafe protocols, bypassing extension-based restrictions.
 **Learning:** Validating file extensions is not enough when the file content can specify a protocol that redirects execution to unintended targets. For `.url` files, the resulting URI must be explicitly whitelisted to safe schemes.
 **Prevention:** For any shortcut format that resolves to a URI, always validate the resulting absolute URI scheme against a strict whitelist (e.g., `http` and `https`) before returning it for execution.
+
+## 2026-03-22 - Unhandled Process Start Exceptions Leaking System Internals
+**Vulnerability:** `ProcessStarter.Start` directly wrapped `Process.Start` without catching exceptions like `Win32Exception` and `FileNotFoundException`. When these unhandled exceptions bubbled up to callers, they contained exact local file paths and internal execution arguments, which were potentially logged or exposed to the UI if not carefully handled by upstream callers.
+**Learning:** `Process.Start` can throw exceptions that reveal sensitive internal path and argument state from the OS.
+**Prevention:** Always wrap `Process.Start` with a `try-catch` block that securely logs the original error and throws a sanitized exception (e.g., stripping the original sensitive string message while maintaining the type and native error codes) to prevent information exposure.
