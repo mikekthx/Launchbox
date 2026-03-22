@@ -231,6 +231,29 @@ public class ImageHeaderParserTests
     }
 
     [Fact]
+    public void GetMaxIcoDimensions_HandlesEndOfStreamException_WhenReadingEntry()
+    {
+        // Header says 50 entries, but only includes 1 full entry.
+        // Reading the second entry should throw EndOfStreamException since
+        // there are 0 bytes remaining.
+        byte[] data =
+        [
+            0, 0,   // Reserved
+            1, 0,   // Type = Icon
+            50, 0,  // Count = 50
+            // Entry 1 (complete 16 bytes)
+            48, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ];
+        using var stream = new MemoryStream(data);
+
+        var result = ImageHeaderParser.GetMaxIcoDimensions(stream);
+
+        Assert.NotNull(result);
+        Assert.Equal(48, result.Value.Width);
+        Assert.Equal(48, result.Value.Height);
+    }
+
+    [Fact]
     public void GetMaxIcoDimensions_ReturnsNull_WhenStreamThrows()
     {
         using var stream = new ThrowingStream();
