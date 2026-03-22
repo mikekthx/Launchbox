@@ -68,4 +68,19 @@ public class ProcessStarterSecurityTests
         var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
         Assert.Contains("Execution with unsafe arguments", exception.Message);
     }
+
+    [Theory]
+    [InlineData(@"\\server\share\payload")]
+    [InlineData("//server/share/payload")]
+    public void Start_ThrowsUnauthorizedAccessException_ForUnsafeWorkingDirectory(string unsafeDir)
+    {
+        var startInfo = new ProcessStartInfo("cmd.exe")
+        {
+            WorkingDirectory = unsafeDir,
+            UseShellExecute = false
+        };
+
+        var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
+        Assert.Contains("Execution with unsafe working directory", exception.Message);
+    }
 }
