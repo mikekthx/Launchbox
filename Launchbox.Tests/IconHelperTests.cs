@@ -1,6 +1,7 @@
 using Launchbox.Helpers;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
@@ -99,6 +100,11 @@ public class IconHelperTests
     [Fact]
     public async Task CreateBitmapImageAsync_ReturnsNull_WhenBytesAreInvalid()
     {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
         // Arrange
         byte[] bytes = { 0x01, 0x02, 0x03 };
 
@@ -108,5 +114,37 @@ public class IconHelperTests
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task CreateBitmapImageAsync_LogsError_WhenBytesAreInvalid()
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            return;
+        }
+
+        // Arrange
+        byte[] corruptedBytes = { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46 }; // invalid JPEG header
+        using var stringWriter = new StringWriter();
+        var listener = new TextWriterTraceListener(stringWriter);
+        Trace.Listeners.Add(listener);
+
+        try
+        {
+            // Act
+            var result = await IconHelper.CreateBitmapImageAsync(corruptedBytes);
+
+            // Assert
+            Assert.Null(result);
+
+            Trace.Flush();
+            string traceOutput = stringWriter.ToString();
+            Assert.Contains("Failed to create BitmapImage:", traceOutput);
+        }
+        finally
+        {
+            Trace.Listeners.Remove(listener);
+        }
     }
 }
