@@ -6,9 +6,11 @@ namespace Launchbox.Helpers;
 
 public static class PathSecurity
 {
-    // Security: regex to strip URI scheme prefixes (e.g. "https://", "ftp://") from argument strings
+    // Security: regex to strip only known-safe web URI schemes from argument strings
     // so that remaining "//" can be detected as UNC path indicators.
-    private static readonly Regex URI_SCHEME_PATTERN = new(@"[a-zA-Z][a-zA-Z0-9+\-.]*://", RegexOptions.Compiled);
+    // IMPORTANT: Only safe schemes are stripped. Network-file schemes (file://, smb://, nfs://, dav://)
+    // are intentionally NOT stripped so their "//" is caught as a UNC indicator.
+    private static readonly Regex SAFE_URI_SCHEME_PATTERN = new(@"https?://|ftp://", RegexOptions.Compiled);
 
     // Cached arrays to avoid per-call allocations in hot validation paths
     private static readonly char[] INVALID_PATH_CHARS = Path.GetInvalidPathChars();
@@ -37,7 +39,7 @@ public static class PathSecurity
         // For //, we need to distinguish UNC paths (//server/share) from URLs (https://example.com).
         // A legitimate URL has :// where the colon is part of the scheme. Strip those out and check
         // if any remaining // exists.
-        string withoutSchemes = URI_SCHEME_PATTERN.Replace(args, "SCHEME_REMOVED");
+        string withoutSchemes = SAFE_URI_SCHEME_PATTERN.Replace(args, "SCHEME_REMOVED");
         return withoutSchemes.Contains("//");
     }
 

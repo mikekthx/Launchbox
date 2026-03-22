@@ -87,6 +87,46 @@ public class PathSecurityTests
     }
 
     [Theory]
+    [InlineData("file://server/share")]
+    [InlineData("--path=file://server/share/payload.exe")]
+    [InlineData("smb://attacker/share")]
+    [InlineData("dav://attacker/share")]
+    [Trait("Category", "Security")]
+    public void ContainsUncPath_BlocksNetworkFileSchemes(string args)
+    {
+        Assert.True(PathSecurity.ContainsUncPath(args), $"Should detect UNC in: {args}");
+    }
+
+    [Theory]
+    [InlineData("https://example.com")]
+    [InlineData("--url=https://example.com")]
+    [InlineData("http://example.com/path")]
+    [InlineData("ftp://mirror.example.com/file.zip")]
+    public void ContainsUncPath_AllowsSafeWebSchemes(string args)
+    {
+        Assert.False(PathSecurity.ContainsUncPath(args), $"Should allow safe scheme: {args}");
+    }
+
+    [Theory]
+    [InlineData(@"\\server\share")]
+    [InlineData(@"//server/share")]
+    [InlineData(@"\/server")]
+    [InlineData(@"/\server")]
+    public void ContainsUncPath_BlocksStandardUncPatterns(string args)
+    {
+        Assert.True(PathSecurity.ContainsUncPath(args), $"Should detect UNC: {args}");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("simple argument")]
+    public void ContainsUncPath_AllowsSafeArguments(string? args)
+    {
+        Assert.False(PathSecurity.ContainsUncPath(args));
+    }
+
+    [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
