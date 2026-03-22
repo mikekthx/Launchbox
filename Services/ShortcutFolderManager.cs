@@ -70,44 +70,36 @@ public class ShortcutFolderManager
 
     public bool AddFolder(string path, string? label = null)
     {
-        lock (_lock)
+        if (PathSecurity.IsUnsafePath(path)) return false;
+
+        // Also validate the expanded path to catch env vars that resolve to UNC paths
+        var expandedPath = Environment.ExpandEnvironmentVariables(path);
+        if (PathSecurity.IsUnsafePath(expandedPath)) return false;
+
+        return MutateAndPersist(folders =>
         {
-            var folders = new List<ShortcutFolder>(_cache);
             if (folders.Count >= MAX_FOLDERS) return false;
-
-            if (PathSecurity.IsUnsafePath(path)) return false;
-
-            // Also validate the expanded path to catch env vars that resolve to UNC paths
-            var expandedPath = Environment.ExpandEnvironmentVariables(path);
-            if (PathSecurity.IsUnsafePath(expandedPath)) return false;
-
             label ??= Path.GetFileName(path) ?? path;
-            var newFolder = new ShortcutFolder { Path = path, Label = label, Order = folders.Count };
-            folders.Add(newFolder);
-
-            return TryPersistAndCache(folders);
-        }
+            folders.Add(new ShortcutFolder { Path = path, Label = label, Order = folders.Count });
+            return true;
+        });
     }
 
     public bool RemoveFolder(int order)
     {
-        lock (_lock)
+        return MutateAndPersist(folders =>
         {
-            var folders = new List<ShortcutFolder>(_cache);
             var index = folders.FindIndex(f => f.Order == order);
             if (index < 0) return false;
-
             folders.RemoveAt(index);
-            var normalized = Renumber(folders);
-            return TryPersistAndCache(normalized);
-        }
+            return true;
+        }, renumber: true);
     }
 
     public bool ReorderFolder(int fromOrder, int toOrder)
     {
-        lock (_lock)
+        return MutateAndPersist(folders =>
         {
-            var folders = new List<ShortcutFolder>(_cache);
             var fromIndex = folders.FindIndex(f => f.Order == fromOrder);
             var toIndex = folders.FindIndex(f => f.Order == toOrder);
             if (fromIndex < 0 || toIndex < 0) return false;
@@ -115,24 +107,35 @@ public class ShortcutFolderManager
             var item = folders[fromIndex];
             folders.RemoveAt(fromIndex);
             folders.Insert(toIndex, item);
-
-            var normalized = Renumber(folders);
-            return TryPersistAndCache(normalized);
-        }
+            return true;
+        }, renumber: true);
     }
 
     public bool RenameFolder(int order, string newLabel)
     {
-        lock (_lock)
-        {
-            if (string.IsNullOrWhiteSpace(newLabel)) return false;
+        if (string.IsNullOrWhiteSpace(newLabel)) return false;
 
-            var folders = new List<ShortcutFolder>(_cache);
+        return MutateAndPersist(folders =>
+        {
             var index = folders.FindIndex(f => f.Order == order);
             if (index < 0) return false;
-
             folders[index] = folders[index] with { Label = newLabel };
-            return TryPersistAndCache(folders);
+            return true;
+        });
+    }
+
+    /// <summary>
+    /// Centralizes the lock → copy → mutate → persist → cache pattern shared by all mutation methods.
+    /// The <paramref name="mutate"/> delegate receives a mutable copy of the current folder list
+    /// and returns true if the mutation succeeded (false aborts without persisting).
+    /// </summary>
+    private bool MutateAndPersist(Func<List<ShortcutFolder>, bool> mutate, bool renumber = false)
+    {
+        lock (_lock)
+        {
+            var folders = new List<ShortcutFolder>(_cache);
+            if (!mutate(folders)) return false;
+            return TryPersistAndCache(renumber ? Renumber(folders) : folders);
         }
     }
 
