@@ -185,10 +185,11 @@ try
 }
 catch (Exception ex)
 {
-    System.Diagnostics.Trace.WriteLine($"Failed to {action}: {ex.Message}");
+    Trace.WriteLine($"Failed to {action}: {PathSecurity.GetSafeExceptionMessage(ex)}");
 }
 ```
 - Always log errors with context (use `Trace.WriteLine` for production visibility)
+- For file-system operations, use `PathSecurity.GetSafeExceptionMessage(ex)` instead of `ex.Message` — it redacts quoted and unquoted file paths from the message while preserving diagnostic context
 - Never swallow exceptions silently
 - Use `finally` for cleanup
 
@@ -316,6 +317,7 @@ Additional services:
 - `ProcessService` (`IProcessService`): Higher-level process operations.
 - `WinUILauncher` (`IAppLauncher`): Sole owner of shortcut security validation. Resolves `.lnk`/`.url` metadata via `IShortcutResolver`, validates target/args/workingDir, then delegates to `IProcessStarter`.
 - `WindowsShortcutResolver` (`IShortcutResolver`): Resolves `.lnk` shortcut targets via ShellLink COM interop and `.url` files via INI parsing.
+- `ShortcutFolderManager`: Manages multi-folder shortcut sources (add/remove/reorder/rename). Mutations go through a centralized `MutateAndPersist` helper that handles locking, cache copy, persistence, and validation.
 - `WindowPositionManager`: Manages window position persistence via `ISettingsStore`.
 - `NativeMethods`: Centralized P/Invoke declarations (user32, kernel32). All declarations must have `SetLastError = true`.
 
@@ -391,6 +393,7 @@ Prefer the smallest verification set that meaningfully exercises the affected be
 - `NativeMethods.cs` is the central location for P/Invoke declarations; avoid scattering Win32 imports into feature files
 - Hotkey, tray, and auto-hide behavior span both window code and services; regressions often come from changing one side without tracing the full event flow
 - `WinUILauncher` is the sole owner of shortcut security validation (target, args, workingDir via COM). `ProcessStarter` only validates `ProcessStartInfo` fields as defense-in-depth — do not add shortcut resolution back to `ProcessStarter`
+- `PathSecurity.ContainsUncPath` intentionally only strips safe web schemes (`http://`, `https://`, `ftp://`) before checking for `//`. Network-file schemes (`file://`, `smb://`, `dav://`) are left in place so their `//` triggers UNC detection — do not "fix" the regex to strip all schemes
 - Localized strings used in tests require `Localization.SetProvider(new MockStringProvider(...))` setup; without it, `Localization.GetString()` returns the key itself (via `DefaultStringProvider`). Test classes that mutate the static provider must use `[Collection("Localization")]` to prevent parallel execution conflicts
 - `.gitattributes` normalizes line endings to LF in the repo; without it, `core.autocrlf=true` on Windows causes phantom "modified" files in `git status`
 
