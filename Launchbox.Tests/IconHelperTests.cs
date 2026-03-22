@@ -109,4 +109,18 @@ public class IconHelperTests
         // Assert
         Assert.Null(result);
     }
+
+    [Fact]
+    public async Task CreateBitmapImageAsync_CatchesException_WhenBytesAreCorrupted()
+    {
+        // Arrange
+        // Using an incomplete JPEG header to reliably trigger exception during SetSourceAsync or Init()
+        byte[] corruptedBytes = { 0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00 };
+
+        // Act
+        var result = await IconHelper.CreateBitmapImageAsync(corruptedBytes);
+
+        // Assert
+        Assert.Null(result);
+    }
 }
