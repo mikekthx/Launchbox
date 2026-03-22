@@ -8,3 +8,7 @@
 ## 2026-03-08 - Prevent ThreadPool Starvation in MainViewModel
 **Learning:** In bounded concurrent loops (`Parallel.ForEachAsync` with a low `MaxDegreeOfParallelism`), executing synchronous blocking I/O calls directly within the loop body can severely starve the thread pool. This happens because the worker threads are blocked entirely waiting for I/O instead of yielding back to the async state machine to schedule continuations or other application tasks.
 **Action:** When forced to use synchronous I/O within async loops, wrap the blocking call (e.g., `_iconService.ExtractIconBytes`) inside an `await Task.Run(...)`. This offloads the blocking work to background threads, yielding the worker thread and ensuring responsiveness in the UI dispatcher.
+
+## 2026-03-22 - Remove Task.Run from Fast Synchronous Operations
+**Learning:** Offloading very short synchronous tasks (e.g., dictionary clearing, memory-only operations) to the thread pool via `Task.Run` is an anti-pattern. The overhead of task scheduling, thread pool queuing, and context switching often outweighs the execution time of the task itself, leading to a net performance regression.
+**Action:** When an operation is purely CPU-bound, synchronous, and known to be fast (e.g., `IconService.PruneCache`), execute it directly on the current thread rather than wrapping it in `Task.Run`.

@@ -264,7 +264,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             ct.ThrowIfCancellationRequested();
 
-            await Task.Run(() => _iconService.PruneCache(allFiles), ct);
+            _iconService.PruneCache(allFiles);
 
             // Sort merged mode alphabetically
             localAppItems.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
