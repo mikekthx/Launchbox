@@ -21,3 +21,7 @@
 ## 2026-03-08 - [Reliability] Prevent memory leaks in MainWindow due to unsubscribed events
 **Learning:** In WinUI 3/UWP, failing to explicitly unsubscribe from UI event handlers (like `PointerPressed`) or Window events (like `Activated`, `Closed`) when a window is closed can lead to memory leaks due to circular references between managed C# wrappers and native C++ objects.
 **Action:** Always explicitly unsubscribe (`-=`) from all dynamically attached event handlers during window disposal or closure (`Closed` event).
+
+## 2026-03-22 - [Reliability] Prevent unhandled exceptions in async void methods
+**Learning:** In WinUI/WPF applications, unhandled exceptions within `async void` event handlers (e.g., calling `await dialog.ShowAsync()`) bypass standard exception handling and crash the application because they cannot be observed by an awaiter.
+**Action:** Always wrap the bodies of `async void` methods in a `try/catch` block and log the exception rather than letting it crash the entire process.
