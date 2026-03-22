@@ -11,14 +11,14 @@ namespace Launchbox.Services;
 /// </summary>
 public class WindowsShortcutResolver : IShortcutResolver
 {
-    private const int MAX_PATH = 260;
-    private const int MAX_ARGS_LENGTH = 1024;
+    private const int MAX_PATH = 4096;
+    private const int MAX_ARGS_LENGTH = 8192;
 
     private readonly IFileSystem _fileSystem;
 
     public WindowsShortcutResolver(IFileSystem fileSystem)
     {
-        _fileSystem = fileSystem;
+        _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     }
 
     /// <summary>
@@ -74,6 +74,17 @@ public class WindowsShortcutResolver : IShortcutResolver
             var dirSb = new StringBuilder(MAX_PATH);
             link.GetWorkingDirectory(dirSb, dirSb.Capacity);
 
+            // Security: detect buffer truncation. If any field fills the entire buffer,
+            // the value was likely truncated — return null to fail closed rather than
+            // validating incomplete data.
+            if (pathSb.Length >= MAX_PATH - 1 ||
+                argsSb.Length >= MAX_ARGS_LENGTH - 1 ||
+                dirSb.Length >= MAX_PATH - 1)
+            {
+                System.Diagnostics.Trace.WriteLine($"Blocked shortcut with truncated metadata: {PathSecurity.RedactPath(path)}");
+                return null;
+            }
+
             return new ShortcutMetadata(pathSb.ToString(), argsSb.ToString(), dirSb.ToString());
         }
         // COM resolution can fail for shortcuts pointing to nonexistent or inaccessible targets.
@@ -97,7 +108,7 @@ public class WindowsShortcutResolver : IShortcutResolver
         string url = _fileSystem.GetIniValue(path, Constants.INTERNET_SHORTCUT_SECTION, "URL");
         if (string.IsNullOrWhiteSpace(url)) return null;
 
-        if (url.Contains('%') || url.Contains('$'))
+        if (url.Contains('%'))
         {
             url = Environment.ExpandEnvironmentVariables(url);
         }

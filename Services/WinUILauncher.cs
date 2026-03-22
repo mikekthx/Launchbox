@@ -1,5 +1,6 @@
 using Launchbox.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace Launchbox.Services;
 
 public class WinUILauncher : IAppLauncher
 {
-    private static readonly System.Collections.Generic.IReadOnlyList<string> ALLOWED_EXTENSIONS = Constants.ALLOWED_EXTENSIONS;
+    private static readonly IReadOnlyList<string> ALLOWED_EXTENSIONS = Constants.ALLOWED_EXTENSIONS;
     private readonly IShortcutResolver _shortcutResolver;
     private readonly IProcessStarter _processStarter;
     private readonly IFileSystem _fileSystem;
@@ -59,6 +60,10 @@ public class WinUILauncher : IAppLauncher
                     Trace.WriteLine($"Blocked execution of .url with unresolvable or unsafe scheme: {PathSecurity.RedactPath(path)}");
                     return;
                 }
+
+                // .lnk files may return null from COM resolution for valid shortcuts the shell
+                // can still handle. Log for diagnostics but allow launch to proceed.
+                Trace.WriteLine($"Launching .lnk with unresolved target (COM resolution failed): {PathSecurity.RedactPath(path)}");
             }
             else
             {

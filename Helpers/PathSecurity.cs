@@ -10,6 +10,11 @@ public static class PathSecurity
     // so that remaining "//" can be detected as UNC path indicators.
     private static readonly Regex URI_SCHEME_PATTERN = new(@"[a-zA-Z][a-zA-Z0-9+\-.]*://", RegexOptions.Compiled);
 
+    // Cached arrays to avoid per-call allocations in hot validation paths
+    private static readonly char[] INVALID_PATH_CHARS = Path.GetInvalidPathChars();
+    private static readonly char[] SPECIAL_INVALID_CHARS = ['|', '<', '>', '"', '*'];
+    private static readonly char[] PATH_SEPARATORS = ['\\', '/'];
+
     /// <summary>
     /// Detects UNC path patterns in argument strings while allowing legitimate URLs.
     /// Blocks: \\server\share, //server/share, \/server, /\server
@@ -43,9 +48,8 @@ public static class PathSecurity
 
         // Check for invalid path characters (Fail Closed)
         // Explicitly check for common Windows invalid characters that might pass Path.GetFullPath on some runtimes
-        char[] invalidChars = Path.GetInvalidPathChars();
-        if (path.IndexOfAny(invalidChars) >= 0) return true;
-        if (path.IndexOfAny(new[] { '|', '<', '>', '"', '*' }) >= 0) return true;
+        if (path.IndexOfAny(INVALID_PATH_CHARS) >= 0) return true;
+        if (path.IndexOfAny(SPECIAL_INVALID_CHARS) >= 0) return true;
 
         // Check for '?' separately to allow the valid extended path prefix \\?\
         int qIndex = path.IndexOf('?');
@@ -132,7 +136,7 @@ public static class PathSecurity
 
             // String manipulation is used directly rather than normalizing separators first
             // to avoid introducing new path traversal vectors via the normalization step itself.
-            int lastSlash = path.LastIndexOfAny(new[] { '\\', '/' });
+            int lastSlash = path.LastIndexOfAny(PATH_SEPARATORS);
             string fileName;
 
             if (lastSlash >= 0 && lastSlash < path.Length - 1)
