@@ -1,5 +1,6 @@
 using Launchbox.Services;
 using Launchbox.Tests;
+using System;
 using Xunit;
 
 namespace Launchbox.Tests;
@@ -216,5 +217,20 @@ public class WinUILauncherSecurityTests
         launcher.Launch(@"C:\safe\shortcut.lnk");
 
         Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void OpenFolder_Catches_ProcessStart_Exception()
+    {
+        var shortcutResolver = new MockShortcutResolver();
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        string folderPath = @"C:\safe\folder";
+        _fileSystem.AddDirectory(folderPath);
+
+        _processStarter.ExceptionToThrow = new Exception("Test exception for OpenFolder");
+
+        // Should not throw
+        launcher.OpenFolder(folderPath);
     }
 }
