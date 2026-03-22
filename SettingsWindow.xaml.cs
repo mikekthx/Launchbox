@@ -5,8 +5,6 @@ using Launchbox.ViewModels;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using System;
-using System.Diagnostics;
 using Windows.Graphics;
 
 namespace Launchbox;
@@ -69,9 +67,9 @@ public sealed partial class SettingsWindow : Window
                 ViewModel.ApplyRename(folder.Order, textBox.Text);
             }
         }
-        catch (Exception ex)
+        catch (System.Exception ex)
         {
-            Trace.WriteLine($"Failed to rename folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            System.Diagnostics.Trace.WriteLine($"Failed to rename folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 }
