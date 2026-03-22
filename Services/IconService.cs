@@ -370,14 +370,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
             hIcon = phicon[0];
             if (hIcon == IntPtr.Zero) return null;
 
-            lock (GDI_LOCK)
-            {
-                using var icon = WinIcon.FromHandle(hIcon);
-                using var bmp = icon.ToBitmap();
-                using var ms = new MemoryStream();
-                bmp.Save(ms, ImageFormat.Png);
-                return ms.ToArray();
-            }
+            return ConvertHandleToPng(hIcon);
         }
         catch (Exception ex)
         {
@@ -388,6 +381,18 @@ public class IconService(IFileSystem fileSystem) : IIconService
         {
             if (hIcon != IntPtr.Zero)
                 NativeMethods.DestroyIcon(hIcon);
+        }
+    }
+
+    private byte[]? ConvertHandleToPng(IntPtr hIcon)
+    {
+        lock (GDI_LOCK)
+        {
+            using var icon = WinIcon.FromHandle(hIcon);
+            using var bmp = icon.ToBitmap();
+            using var ms = new MemoryStream();
+            bmp.Save(ms, ImageFormat.Png);
+            return ms.ToArray();
         }
     }
 }
