@@ -67,7 +67,7 @@ public class WindowPositionManager
     public bool SaveWindowPosition(int x, int y, int width, int height)
     {
         // Capture previous values before writing so we can roll back on partial failure
-        TryGetWindowPosition(out int oldX, out int oldY, out int oldW, out int oldH);
+        bool hadPrevious = TryGetWindowPosition(out int oldX, out int oldY, out int oldW, out int oldH);
 
         (string Key, object Value)[] entries =
         [
@@ -83,20 +83,23 @@ public class WindowPositionManager
             {
                 Trace.WriteLine($"Failed to save window position: SetValue returned false for {entries[i].Key}");
 
-                // Roll back previously written entries to prevent a mixed old/new tuple
-                (string Key, object Value)[] rollback =
-                [
-                    (SETTING_KEY_X, oldX),
-                    (SETTING_KEY_Y, oldY),
-                    (SETTING_KEY_WIDTH, oldW),
-                    (SETTING_KEY_HEIGHT, oldH),
-                ];
-
-                for (int j = 0; j < i; j++)
+                // Only roll back if we had valid previous values — avoid writing zeros
+                if (hadPrevious)
                 {
-                    if (!_settings.SetValue(rollback[j].Key, rollback[j].Value))
+                    (string Key, object Value)[] rollback =
+                    [
+                        (SETTING_KEY_X, oldX),
+                        (SETTING_KEY_Y, oldY),
+                        (SETTING_KEY_WIDTH, oldW),
+                        (SETTING_KEY_HEIGHT, oldH),
+                    ];
+
+                    for (int j = 0; j < i; j++)
                     {
-                        Trace.WriteLine($"Failed to roll back window position for {rollback[j].Key}");
+                        if (!_settings.SetValue(rollback[j].Key, rollback[j].Value))
+                        {
+                            Trace.WriteLine($"Failed to roll back window position for {rollback[j].Key}");
+                        }
                     }
                 }
 

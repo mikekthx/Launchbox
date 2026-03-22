@@ -227,7 +227,7 @@ public sealed partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Error disposing {service?.GetType().Name}: {ex.Message}");
+            Trace.WriteLine($"Error disposing {service?.GetType().Name}: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 }

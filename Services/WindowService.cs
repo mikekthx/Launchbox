@@ -358,9 +358,7 @@ public class WindowService : IWindowService, IDisposable
             var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
             int height = Math.Min(Constants.WINDOW_HEIGHT, displayArea.WorkArea.Height - 40);
             _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
-            var x = (displayArea.WorkArea.Width - Constants.WINDOW_WIDTH) / 2;
-            var y = (displayArea.WorkArea.Height - height) / 2;
-            _appWindow.Move(new Windows.Graphics.PointInt32(x, y));
+            CenterOnCurrentDisplay();
         }
         catch (Exception ex)
         {
@@ -413,12 +411,13 @@ public class WindowService : IWindowService, IDisposable
             int clampedWidth = needsWidthClamp ? maxWidth : size.Width;
             needsResize = needsResize || needsWidthClamp;
 
-            // Check if the window's left edge is beyond the right edge of the work area,
-            // or the right edge is before the left edge of the work area (entirely off-screen).
+            // Check if the window is entirely off-screen on either axis
             bool offScreenHorizontally = pos.X >= workArea.X + workArea.Width
                                          || pos.X + clampedWidth <= workArea.X;
+            bool offScreenVertically = pos.Y >= workArea.Y + workArea.Height
+                                       || pos.Y + clampedHeight <= workArea.Y;
 
-            if (!needsResize && !offScreenHorizontally) return;
+            if (!needsResize && !offScreenHorizontally && !offScreenVertically) return;
 
             // Suppress save so clamped dimensions are not persisted
             _suppressSave = true;
@@ -429,16 +428,24 @@ public class WindowService : IWindowService, IDisposable
                     _appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
                 }
 
+                int newX = pos.X;
+                int newY = pos.Y;
+                bool needsMove = false;
+
                 if (offScreenHorizontally)
                 {
-                    // Center horizontally on the primary display
-                    int newX = workArea.X + (workArea.Width - clampedWidth) / 2;
-                    int newY = pos.Y;
-                    // Also clamp vertically if needed
-                    if (newY < workArea.Y || newY + clampedHeight > workArea.Y + workArea.Height)
-                    {
-                        newY = workArea.Y + (workArea.Height - clampedHeight) / 2;
-                    }
+                    newX = workArea.X + (workArea.Width - clampedWidth) / 2;
+                    needsMove = true;
+                }
+
+                if (offScreenVertically)
+                {
+                    newY = workArea.Y + (workArea.Height - clampedHeight) / 2;
+                    needsMove = true;
+                }
+
+                if (needsMove)
+                {
                     _appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
                 }
             }

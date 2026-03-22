@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Launchbox.Services;
 
@@ -21,9 +20,6 @@ public static class NativeMethods
 
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern bool DestroyIcon(IntPtr hIcon);
-
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    public static extern int GetPrivateProfileString(string s, string k, string d, StringBuilder r, int z, string f);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
     public static extern int GetPrivateProfileString(string s, string k, string d, [Out] char[] r, int z, string f);
