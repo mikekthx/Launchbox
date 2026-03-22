@@ -76,12 +76,6 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
     }
 
-    public FolderViewMode SelectedViewMode
-    {
-        get => _settingsService.FolderViewMode;
-        set => _settingsService.FolderViewMode = value;
-    }
-
     public bool CollapsibleGroups
     {
         get => _settingsService.CollapsibleGroups;
@@ -205,7 +199,10 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     private void OnServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SettingsService.IsRunAtStartup))
+        {
+            _pendingStartupValue = _settingsService.IsRunAtStartup;
             OnPropertyChanged(nameof(RunAtStartup));
+        }
         else if (e.PropertyName == nameof(SettingsService.HotkeyModifiers))
             OnPropertyChanged(nameof(SelectedModifier));
         else if (e.PropertyName == nameof(SettingsService.HotkeyKey))
@@ -297,7 +294,8 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             }
         }
         // Try to parse full key name (e.g. "F1", "Home", "Enter")
-        else if (Enum.TryParse<VirtualKey>(value, true, out var key))
+        // Reject purely numeric strings — Enum.TryParse("112") silently maps to VirtualKey.F1
+        else if (!value.All(char.IsDigit) && Enum.TryParse<VirtualKey>(value, true, out var key))
         {
             // Ensure it's a valid key
             if (Enum.IsDefined(typeof(VirtualKey), key))

@@ -46,7 +46,7 @@ public class IconService(IFileSystem fileSystem) : IIconService
 
     private string GetExpandedPath(string path)
     {
-        if (path.Contains('%') || path.Contains('$'))
+        if (path.Contains('%'))
         {
             return _expandedPathCache.GetOrAdd(path, static p => Environment.ExpandEnvironmentVariables(p));
         }

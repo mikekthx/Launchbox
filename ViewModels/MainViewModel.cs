@@ -270,13 +270,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
             localAppItems.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
 
             // Build grouped data structure — group by FolderPath (unique), display Label
+            var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
             var groupedData = localAppItems
                 .GroupBy(a => a.FolderPath)
-                .OrderBy(g => folders.FirstOrDefault(f => f.Path == g.Key)?.Order ?? int.MaxValue)
+                .OrderBy(g => folderLookup.TryGetValue(g.Key, out var f) ? f.Order : int.MaxValue)
                 .Select(g =>
                 {
-                    var folder = folders.FirstOrDefault(f => f.Path == g.Key);
-                    var label = folder?.Label ?? System.IO.Path.GetFileName(g.Key) ?? g.Key;
+                    var label = folderLookup.TryGetValue(g.Key, out var f) ? f.Label : Path.GetFileName(g.Key) ?? g.Key;
                     return new AppItemGroup(label, g.Key, g.OrderBy(a => a.Name));
                 })
                 .ToList();
@@ -292,6 +292,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
                 OnPropertyChanged(nameof(IsMergedModeVisible));
                 OnPropertyChanged(nameof(IsGroupedModeVisible));
+
+                // Reapply active filter to new group instances
+                if (!string.IsNullOrEmpty(_filterText))
+                {
+                    ApplyGroupedFilter();
+                }
+
                 return Task.CompletedTask;
             });
 
@@ -305,7 +312,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
             {
                 try
                 {
-                    var iconBytes = await Task.Run(() => _iconService.ExtractIconBytes(item.Path), token);
+                    // Parallel.ForEachAsync already runs on thread pool threads — no need for Task.Run
+                    var iconBytes = _iconService.ExtractIconBytes(item.Path);
                     if (iconBytes != null && !token.IsCancellationRequested)
                     {
                         await _dispatcher.EnqueueAsync(async () =>

@@ -44,7 +44,7 @@ public class ShortcutFolderManager
             }
             catch (JsonException ex)
             {
-                System.Diagnostics.Trace.WriteLine($"Corrupt ShortcutFolders JSON, using default: {ex.Message}");
+                System.Diagnostics.Trace.WriteLine($"Corrupt ShortcutFolders JSON, using default: {PathSecurity.GetSafeExceptionMessage(ex)}");
                 // Do NOT overwrite — allows manual recovery
             }
         }
@@ -76,6 +76,10 @@ public class ShortcutFolderManager
             if (folders.Count >= MAX_FOLDERS) return false;
 
             if (PathSecurity.IsUnsafePath(path)) return false;
+
+            // Also validate the expanded path to catch env vars that resolve to UNC paths
+            var expandedPath = Environment.ExpandEnvironmentVariables(path);
+            if (PathSecurity.IsUnsafePath(expandedPath)) return false;
 
             label ??= Path.GetFileName(path) ?? path;
             var newFolder = new ShortcutFolder { Path = path, Label = label, Order = folders.Count };

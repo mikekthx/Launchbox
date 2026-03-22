@@ -107,14 +107,16 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public void HotkeyKeyString_AcceptsNumericEnumValues()
+    public void HotkeyKeyString_RejectsNumericEnumValues()
     {
         var (service, _, _, vm) = CreateViewModel();
 
-        // "36" is the integer value for VirtualKey.Home
-        // Enum.TryParse accepts string representations of underlying integer values
+        int originalKey = service.HotkeyKey;
+
+        // "36" is the integer value for VirtualKey.Home — reject to prevent
+        // Enum.TryParse from silently mapping numeric strings to unexpected keys
         vm.HotkeyKeyString = "36";
-        Assert.Equal((int)VirtualKey.Home, service.HotkeyKey);
+        Assert.Equal(originalKey, service.HotkeyKey);
     }
 
     [Fact]
