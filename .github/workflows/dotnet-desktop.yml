@@ -163,7 +163,7 @@ jobs:
       run: dotnet build $env:Project_Path --configuration $env:Configuration -p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode -p:AppxBundle=$env:Appx_Bundle -p:GenerateAppxPackageOnBuild=true -p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT -p:NoWarn=APPX0107 -p:AppxPackageVersion=1.0.0.${{ github.run_number }} -p:AppxSymbolPackageEnabled=false
       env:
         Appx_Bundle: Always
-        Appx_Bundle_Platforms: x86|x64|arm64
+        Appx_Bundle_Platforms: x64|arm64
         Appx_Package_Build_Mode: StoreUpload
         Configuration: ${{ matrix.configuration }}
 
