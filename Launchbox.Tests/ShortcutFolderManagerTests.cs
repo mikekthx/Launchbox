@@ -121,6 +121,26 @@ public class ShortcutFolderManagerTests
     }
 
     [Fact]
+    public void GetFolders_InvalidJson_ReturnsDefault_DoesNotOverwrite()
+    {
+        const string corrupt = "{invalid}";
+        var store = new MockSettingsStore();
+        store.SetValue("ShortcutFolders", corrupt);
+
+        var manager = new ShortcutFolderManager(store);
+        var folders = manager.GetFolders();
+
+        // Falls back to default
+        Assert.Single(folders);
+        Assert.Contains("Shortcuts", folders[0].Path);
+
+        // Original corrupt value should NOT have been overwritten (allow manual recovery)
+        Assert.True(store.TryGetValue("ShortcutFolders", out var val));
+        Assert.Equal(corrupt, val);
+    }
+
+
+    [Fact]
     public void GetFolders_DropsUnsafePaths()
     {
         // UNC path should be filtered out by ValidateAndNormalize
