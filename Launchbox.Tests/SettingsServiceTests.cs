@@ -117,6 +117,32 @@ public class SettingsServiceTests
         Assert.False(service.IsRunAtStartup);
     }
 
+    [Fact]
+    public async Task InitializeAsync_LogsError_WhenStartupServiceFails()
+    {
+        using var sw = new System.IO.StringWriter();
+        using var listener = new System.Diagnostics.TextWriterTraceListener(sw);
+        System.Diagnostics.Trace.Listeners.Add(listener);
+
+        try
+        {
+            var settingsStore = new MockSettingsStore();
+            var startupService = new MockStartupService { ShouldFail = true };
+            var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
+
+            await service.InitializeAsync();
+
+            System.Diagnostics.Trace.Flush();
+            string output = sw.ToString();
+
+            Assert.Contains("Failed to initialize settings (StartupService):", output);
+        }
+        finally
+        {
+            System.Diagnostics.Trace.Listeners.Remove(listener);
+        }
+    }
+
     [Theory]
     [InlineData(@"\\attacker\share")]
     [InlineData(@"\\?\UNC\attacker\share")]
