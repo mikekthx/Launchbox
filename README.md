@@ -2,10 +2,10 @@
 
 Launchbox is a modern, lightweight Windows desktop application launcher built with **WinUI 3** and **.NET 10**. It integrates seamlessly with your system tray, providing instant access to your favorite shortcuts from one or more folders with a global hotkey.
 
-[![Build](https://img.shields.io/github/actions/workflow/status/mikekthx/Launchbox/dotnet-desktop.yml?style=flat&logo=github&label=Build)](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml)
-[![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen?style=flat&logo=github)](https://github.com/mikekthx/Launchbox/security/code-scanning)
-[![.NET](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
-[![WinUI](https://img.shields.io/badge/WinUI-3-0078d4?style=flat&logo=windows)](https://learn.microsoft.com/en-us/windows/apps/winui/)
+[![Build](https://img.shields.io/github/actions/workflow/status/mikekthx/Launchbox/dotnet-desktop.yml?style=flat&label=build)](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml)
+[![CodeQL](https://img.shields.io/badge/codeql-passing-brightgreen?style=flat)](https://github.com/mikekthx/Launchbox/security/code-scanning)
+[![.NET](https://img.shields.io/badge/.net-10.0-512bd4?style=flat)](https://dotnet.microsoft.com/)
+[![WinUI](https://img.shields.io/badge/winui-3-0078d4?style=flat)](https://learn.microsoft.com/en-us/windows/apps/winui/)
 [![License](https://img.shields.io/github/license/mikekthx/Launchbox?style=flat)](https://github.com/mikekthx/Launchbox/blob/main/LICENSE)
 
 ## Features
