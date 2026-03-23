@@ -1,3 +1,7 @@
+// Suppress IDE1006 (Naming rule violation) because WinUI XAML requires DependencyProperty
+// identifier fields to end exactly with "Property" rather than following standard uppercase static conventions.
+#pragma warning disable IDE1006
+
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using System.Windows.Input;
