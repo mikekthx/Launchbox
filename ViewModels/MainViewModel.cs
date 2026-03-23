@@ -399,8 +399,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             // Match by FolderPath (stable identity) — labels can be duplicated, paths cannot
             var stableGroup = GroupedApps.FirstOrDefault(g => g.FolderPath == group.FolderPath);
-            if (stableGroup != null)
+            if (stableGroup is not null)
             {
+                // IsCollapsed setter mutates the inner ObservableCollection in place —
+                // CollectionViewSource observes the change automatically
                 stableGroup.IsCollapsed = !stableGroup.IsCollapsed;
             }
         }
