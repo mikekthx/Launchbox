@@ -392,6 +392,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void OpenSettings() => _windowService.OpenSettings();
 
+    [RelayCommand]
+    private void ToggleGroup(AppItemGroup group)
+    {
+        if (CollapsibleGroupsEnabled && group != null)
+        {
+            var stableGroup = GroupedApps.FirstOrDefault(g => g.FolderPath == group.FolderPath);
+            if (stableGroup != null)
+            {
+                stableGroup.IsCollapsed = !stableGroup.IsCollapsed;
+            }
+        }
+    }
+
     public void ClearFilter() => FilterText = string.Empty;
 
     public void Dispose()

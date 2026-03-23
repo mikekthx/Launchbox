@@ -185,7 +185,9 @@
             <GroupStyle>
               <GroupStyle.HeaderTemplate>
                 <DataTemplate x:DataType="models:AppItemGroup">
-                  <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4" Tapped="GroupHeader_Tapped">
+                  <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4"
+                        helpers:UIElementExtensions.TappedCommand="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.ToggleGroupCommand}"
+                        helpers:UIElementExtensions.TappedCommandParameter="{Binding}">
                     <FontIcon Glyph="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
                               Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled,
