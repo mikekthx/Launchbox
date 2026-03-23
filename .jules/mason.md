@@ -4,3 +4,9 @@
 ## 2024-03-16 - Replacing KeyDown events with KeyboardAccelerators for strict MVVM
 **Learning:** Simple key events like `KeyDown="SearchBox_KeyDown"` in WinUI 3 code-behind can be cleanly eliminated by leveraging the `UIElement.KeyboardAccelerators` collection. This allows routing keys directly to `[RelayCommand]` methods in the ViewModel.
 **Action:** When asked to migrate simple input event handlers out of XAML code-behind, prefer declarative `KeyboardAccelerators` to invoke commands instead of adding event triggers or keeping logic in `.xaml.cs`.
+## 2024-05-25 - Converting Tapped events to ICommand on non-Button UIElements
+**Learning:** WinUI 3 does not natively support binding standard `UIElement` events (like `Grid.Tapped`) directly to an `ICommand` without external behavioral libraries like `Microsoft.Xaml.Interactivity`, and converting the `Grid` to a `Button` often ruins layout due to default Button styles and hover states.
+**Action:** Implement a custom attached property (e.g., `UIElementExtensions.TappedCommand`) to safely route `Tapped` events to `ICommand` in the ViewModel. This preserves the original visual layout while strictly adhering to MVVM without new NuGet packages.
+## 2024-05-25 - DependencyProperty Field Naming Rules in WinUI XAML
+**Learning:** WinUI 3 XAML compilation strictly requires DependencyProperty static readonly fields to end with the exact suffix `Property` matching the registered string name (e.g., `"TappedCommand"` must correspond to `TappedCommandProperty`). Renaming them to uppercase formats like `TAPPED_COMMAND_PROPERTY` breaks the XamlCompiler MSB3073 step during GitHub Actions CI builds or local builds.
+**Action:** Always name attached property fields exactly as `[Name]Property` with PascalCase in WinUI 3, ignoring any generic static-readonly uppercase IDE warnings, to ensure XAML compilation succeeds.
