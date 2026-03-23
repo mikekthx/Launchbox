@@ -393,10 +393,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private void OpenSettings() => _windowService.OpenSettings();
 
     [RelayCommand]
-    private void ToggleGroup(AppItemGroup group)
+    private void ToggleGroup(AppItemGroup? group)
     {
-        if (CollapsibleGroupsEnabled && group != null)
+        if (CollapsibleGroupsEnabled && group is not null)
         {
+            // Match by FolderPath (stable identity) — labels can be duplicated, paths cannot
             var stableGroup = GroupedApps.FirstOrDefault(g => g.FolderPath == group.FolderPath);
             if (stableGroup != null)
             {

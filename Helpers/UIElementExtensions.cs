@@ -1,5 +1,5 @@
-// Suppress IDE1006 (Naming rule violation) because WinUI XAML requires DependencyProperty
-// identifier fields to end exactly with "Property" rather than following standard uppercase static conventions.
+// WinUI XAML attached-property resolution requires the field name to match "[Name]Property"
+// (PascalCase), which conflicts with the project's static readonly UPPER_SNAKE_CASE rule.
 #pragma warning disable IDE1006
 
 using Microsoft.UI.Xaml;
@@ -17,14 +17,14 @@ public static class UIElementExtensions
             typeof(UIElementExtensions),
             new PropertyMetadata(null, OnTappedCommandPropertyChanged));
 
-    public static void SetTappedCommand(DependencyObject d, ICommand value)
+    public static void SetTappedCommand(DependencyObject d, ICommand? value)
     {
         d.SetValue(TappedCommandProperty, value);
     }
 
-    public static ICommand GetTappedCommand(DependencyObject d)
+    public static ICommand? GetTappedCommand(DependencyObject d)
     {
-        return (ICommand)d.GetValue(TappedCommandProperty);
+        return (ICommand?)d.GetValue(TappedCommandProperty);
     }
 
     public static readonly DependencyProperty TappedCommandParameterProperty =
@@ -34,12 +34,12 @@ public static class UIElementExtensions
             typeof(UIElementExtensions),
             new PropertyMetadata(null));
 
-    public static void SetTappedCommandParameter(DependencyObject d, object value)
+    public static void SetTappedCommandParameter(DependencyObject d, object? value)
     {
         d.SetValue(TappedCommandParameterProperty, value);
     }
 
-    public static object GetTappedCommandParameter(DependencyObject d)
+    public static object? GetTappedCommandParameter(DependencyObject d)
     {
         return d.GetValue(TappedCommandParameterProperty);
     }
