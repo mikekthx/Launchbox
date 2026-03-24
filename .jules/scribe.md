@@ -6,6 +6,6 @@
 **Learning:** `IconService` uses a complex `while(true)` loop with `ConcurrentDictionary<TKey, Lazy<TValue>>` to implement cache expiration. This pattern handles race conditions where multiple threads might access an expired entry simultaneously, but it adds significant cognitive load.
 **Action:** When encountering this pattern, encapsulate it in a dedicated helper method or class to hide the complexity from the business logic.
 
-## 2025-03-24 - GetWithExpirationRetry Clarity
+## 2026-03-24 - GetWithExpirationRetry Clarity
 **Learning:** `IconService` uses a complex `GetWithExpirationRetry` method to handle cache expiration in a concurrent environment. This replaces a previous `while(true)` loop. The method signature and logic are generic but conceptually dense. The inline lambdas for cache expiration logic in `GetCachedDirectoryInfo` and `GetCachedLastWriteTime` are particularly verbose.
 **Action:** No direct action needed as the pattern is already encapsulated into a helper method, but this remains a complex area.

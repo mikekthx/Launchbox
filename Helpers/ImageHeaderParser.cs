@@ -13,6 +13,7 @@ public static class ImageHeaderParser
     private const int ICO_MIN_HEADER_SIZE = 6;
     private const int ICO_ENTRY_SIZE = 16;
     private const int ICO_MAX_IMAGE_COUNT = 256;
+    private const int ICO_ZERO_DIMENSION_MEANS = 256;
 
     public static (int Width, int Height)? GetPngDimensions(Stream stream)
     {
