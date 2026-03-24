@@ -78,7 +78,6 @@ public static class ImageHeaderParser
             int maxWidth = 0;
             int maxHeight = 0;
 
-            // Each directory entry is 16 bytes
             var entry = new byte[ICO_ENTRY_SIZE];
             for (int i = 0; i < count; i++)
             {
