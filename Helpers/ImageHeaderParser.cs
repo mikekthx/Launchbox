@@ -9,15 +9,20 @@ public static class ImageHeaderParser
     // Minimal parser to extract dimensions from PNG and ICO headers
     // without loading the entire file or using System.Drawing.
 
+    private const int PNG_MIN_HEADER_SIZE = 24;
+    private const int ICO_MIN_HEADER_SIZE = 6;
+    private const int ICO_ENTRY_SIZE = 16;
+    private const int ICO_MAX_IMAGE_COUNT = 256;
+
     public static (int Width, int Height)? GetPngDimensions(Stream stream)
     {
         try
         {
-            if (stream.Length < 24) return null;
+            if (stream.Length < PNG_MIN_HEADER_SIZE) return null;
 
             stream.Position = 0;
-            var header = new byte[24];
-            stream.ReadExactly(header, 0, 24);
+            var header = new byte[PNG_MIN_HEADER_SIZE];
+            stream.ReadExactly(header, 0, PNG_MIN_HEADER_SIZE);
 
             // PNG Signature: 89 50 4E 47 0D 0A 1A 0A
             if (header[0] != 0x89 || header[1] != 0x50 || header[2] != 0x4E || header[3] != 0x47 ||
@@ -52,11 +57,11 @@ public static class ImageHeaderParser
     {
         try
         {
-            if (stream.Length < 6) return null;
+            if (stream.Length < ICO_MIN_HEADER_SIZE) return null;
 
             stream.Position = 0;
-            var header = new byte[6];
-            stream.ReadExactly(header, 0, 6);
+            var header = new byte[ICO_MIN_HEADER_SIZE];
+            stream.ReadExactly(header, 0, ICO_MIN_HEADER_SIZE);
 
             // Reserved (2 bytes) must be 0
             if (header[0] != 0 || header[1] != 0) return null;
@@ -67,18 +72,18 @@ public static class ImageHeaderParser
             // Count (2 bytes) — cap at 256 to prevent reading unbounded data from a malformed file
             int count = header[4] | (header[5] << 8);
             if (count == 0) return null;
-            if (count > 256) count = 256;
+            if (count > ICO_MAX_IMAGE_COUNT) count = ICO_MAX_IMAGE_COUNT;
 
             int maxWidth = 0;
             int maxHeight = 0;
 
             // Each directory entry is 16 bytes
-            var entry = new byte[16];
+            var entry = new byte[ICO_ENTRY_SIZE];
             for (int i = 0; i < count; i++)
             {
                 try
                 {
-                    stream.ReadExactly(entry, 0, 16);
+                    stream.ReadExactly(entry, 0, ICO_ENTRY_SIZE);
                 }
                 catch (EndOfStreamException)
                 {
