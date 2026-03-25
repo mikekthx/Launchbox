@@ -92,11 +92,11 @@ public static class ImageHeaderParser
 
                 // Width (1 byte): 0 means 256
                 int w = entry[0];
-                if (w == 0) w = 256;
+                if (w == 0) w = ICO_ZERO_DIMENSION_MEANS;
 
                 // Height (1 byte): 0 means 256
                 int h = entry[1];
-                if (h == 0) h = 256;
+                if (h == 0) h = ICO_ZERO_DIMENSION_MEANS;
 
                 if (w * h > maxWidth * maxHeight)
                 {
