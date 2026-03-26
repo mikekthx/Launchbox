@@ -156,7 +156,7 @@ public class SettingsService : ObservableObject
         {
             // Virtual key codes range from 0x01 to 0xFE
             if (_store.TryGetValue(nameof(HotkeyKey), out var val) && val is int key
-                && key >= 0x01 && key <= 0xFE)
+                && key >= Constants.MIN_VIRTUAL_KEY && key <= Constants.MAX_VIRTUAL_KEY)
             {
                 return key;
             }
