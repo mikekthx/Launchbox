@@ -490,6 +490,9 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
+# Line-ending normalization backup files
+*.orig
+
 # AI and Config
 .claude/
 .config/

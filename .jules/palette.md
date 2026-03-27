@@ -8,3 +8,7 @@
 ## 2026-03-13 - Preserve Tooltip Shortcuts
 **Learning:** Keyboard shortcut hints in tooltips (e.g., `(Alt+S)`) are standard Windows accessibility patterns that aid discoverability and should not be removed during routine UX enhancements.
 **Action:** Preserve existing keyboard shortcut hints in XAML tooltips, even if they refer to dynamically configurable hotkeys, unless specifically tasked with implementing a dynamic tooltip binding.
+
+## 2026-03-27 - Grid Toggle Button Accessibility
+**Learning:** In custom WinUI layouts, using a `Grid` with a tapped command (e.g., for a collapsible group header) makes it function as a button but entirely lacks accessibility semantics by default. Furthermore, without a `Background` explicitly set (e.g., `Background="Transparent"`), empty space in the Grid does not receive hit test events, making the interaction area unpredictably small.
+**Action:** Always ensure interactive layout panels (like Grids or StackPanels) have `Background="Transparent"` for proper hit-testing, and explicitly define `AutomationProperties.Name` and an appropriate `ToolTipService.ToolTip` so screen readers and mouse users understand the control's purpose. Note that `AutomationProperties.Role` is an HTML/ARIA concept and does not exist in WinUI 3; avoid using it to prevent XAML compilation errors.
