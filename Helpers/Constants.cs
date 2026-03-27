@@ -14,6 +14,9 @@ public static class Constants
     public const int MOD_SHIFT = 0x0004;
     public const int MOD_WIN = 0x0008;
 
+    public const int MIN_VIRTUAL_KEY = 0x01;
+    public const int MAX_VIRTUAL_KEY = 0xFE;
+
     public const int VK_S = 0x53;
     public const int HOTKEY_ID = 9000;
 
