@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using Microsoft.UI.Xaml;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.System;
 
 namespace Launchbox;
 
@@ -212,5 +214,32 @@ public sealed partial class MainWindow : Window
         {
             Trace.WriteLine($"Error disposing {service?.GetType().Name}: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
+    }
+
+    // --- KEYBOARD NAVIGATION ---
+    // Enter key launches the focused shortcut.
+    // WinUI GridView with IsItemClickEnabled does not automatically fire ItemClick on Enter,
+    // so we query the focused element manually.
+    private void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter) return;
+        var gridView = sender as GridView;
+        var focused = FocusManager.GetFocusedElement(gridView?.XamlRoot) as GridViewItem;
+        if (focused?.DataContext is AppItem item && !string.IsNullOrEmpty(item.Name))
+        {
+            ViewModel.LaunchAppCommand.Execute(item);
+            e.Handled = true;
+        }
+    }
+
+    // Typing while the grid has focus redirects characters to the search box,
+    // so the user can start typing to filter without clicking the search box first.
+    private void Grid_CharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
+    {
+        if (char.IsControl(args.Character)) return;
+        SearchBox.Text += args.Character.ToString();
+        SearchBox.Focus(FocusState.Programmatic);
+        SearchBox.SelectionStart = SearchBox.Text.Length;
+        args.Handled = true;
     }
 }

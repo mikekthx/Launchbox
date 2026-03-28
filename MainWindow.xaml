@@ -109,7 +109,9 @@
                   ItemContainerStyle="{StaticResource AppItemContainerStyle}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
-                  ScrollViewer.IsVerticalRailEnabled="True">
+                  ScrollViewer.IsVerticalRailEnabled="True"
+                  KeyDown="Grid_KeyDown"
+                  CharacterReceived="Grid_CharacterReceived">
 
             <GridView.ItemTemplate>
                 <DataTemplate x:DataType="models:AppItem">
@@ -152,7 +154,9 @@
                   ItemContainerStyle="{StaticResource AppItemContainerStyle}"
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
-                  ScrollViewer.IsVerticalRailEnabled="True">
+                  ScrollViewer.IsVerticalRailEnabled="True"
+                  KeyDown="Grid_KeyDown"
+                  CharacterReceived="Grid_CharacterReceived">
 
           <GridView.ItemTemplate>
             <DataTemplate x:DataType="models:AppItem">
