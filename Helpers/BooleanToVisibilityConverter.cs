@@ -7,11 +7,9 @@ namespace Launchbox.Helpers;
 public class BooleanToVisibilityConverter : IValueConverter
 {
     // x:Bind function binding requires a static method; IValueConverter.Convert cannot be called by name in compiled bindings.
-    public static Visibility ConvertBool(bool value, bool invert = false)
-    {
-        bool isVisible = invert ? !value : value;
-        return isVisible ? Visibility.Visible : Visibility.Collapsed;
-    }
+    // x:Bind also does not support optional/default parameters — overloads with explicit signatures are required.
+    public static Visibility ConvertBool(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
+    public static Visibility ConvertBool(bool value, bool invert) => invert ? ConvertBool(!value) : ConvertBool(value);
 
     public object Convert(object value, Type targetType, object parameter, string _)
     {
