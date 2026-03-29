@@ -241,4 +241,11 @@ public sealed partial class MainWindow : Window
         SearchBox.SelectionStart = SearchBox.Text.Length;
         args.Handled = true;
     }
+
+    private void AppGrid_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        // FilteredApps is already in the new order — WinUI modified it in-place during drag.
+        // Persist the new order so it survives app restarts.
+        ViewModel.PersistItemOrder();
+    }
 }

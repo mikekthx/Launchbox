@@ -438,6 +438,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public void ClearFilter() => FilterText = string.Empty;
 
+    /// <summary>
+    /// Persists the current order of <see cref="FilteredApps"/> after a drag-and-drop reorder.
+    /// Groups items by folder and writes the ordered file names to settings.
+    /// Also syncs <see cref="Apps"/> to match the new order so filter rebuilds stay consistent.
+    /// </summary>
+    public void PersistItemOrder()
+    {
+        foreach (var group in FilteredApps.GroupBy(a => a.FolderPath))
+        {
+            var names = group.Select(a => Path.GetFileName(a.Path)).ToList();
+            _settingsService.SetItemOrder(group.Key, names);
+        }
+        // Sync Apps to the new FilteredApps order — FilteredApps == Apps when no filter is active,
+        // which is the only time drag-and-drop is enabled (CanReorderItems bound to IsFilterEmpty).
+        Apps.ReplaceAll(FilteredApps);
+    }
+
     public void Dispose()
     {
         _loadCts?.Cancel();
