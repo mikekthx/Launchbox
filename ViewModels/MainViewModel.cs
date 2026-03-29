@@ -46,7 +46,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     private string _filterText = string.Empty;
-    private IReadOnlyList<AppItem>? _cachedFilteredApps;
 
     public string FilterText
     {
@@ -55,8 +54,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             if (SetProperty(ref _filterText, value))
             {
-                _cachedFilteredApps = null;
-                OnPropertyChanged(nameof(FilteredApps));
+                OnPropertyChanged(nameof(IsFilterEmpty));
+                RebuildFilteredApps();
                 OnPropertyChanged(nameof(HasNoMatches));
                 ApplyGroupedFilter();
             }
@@ -71,10 +70,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    public IReadOnlyList<AppItem> FilteredApps =>
-        _cachedFilteredApps ??= string.IsNullOrEmpty(_filterText)
-            ? Apps
-            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+    public BulkObservableCollection<AppItem> FilteredApps { get; } = [];
+
+    private void RebuildFilteredApps()
+    {
+        var source = string.IsNullOrEmpty(_filterText)
+            ? (IEnumerable<AppItem>)Apps
+            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase));
+        FilteredApps.ReplaceAll(source);
+    }
+
+    public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
 
     public bool HasNoMatches =>
         Apps.Count > 0 && !string.IsNullOrEmpty(_filterText) && FilteredApps.Count == 0;
@@ -160,8 +166,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void Apps_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        _cachedFilteredApps = null;
-        OnPropertyChanged(nameof(FilteredApps));
+        RebuildFilteredApps();
         OnPropertyChanged(nameof(HasNoMatches));
     }
 
@@ -266,18 +271,41 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             _iconService.PruneCache(allFiles);
 
-            // Sort merged mode alphabetically
-            localAppItems.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
+            // Apply custom item order per folder, falling back to alphabetical for unordered items.
+            var orderedItems = localAppItems
+                .GroupBy(a => a.FolderPath)
+                .SelectMany(g =>
+                {
+                    var customOrder = _settingsService.GetItemOrder(g.Key);
+                    if (customOrder.Count == 0)
+                        return (IEnumerable<AppItem>)g.OrderBy(a => a.Name);
+
+                    var byName = g.ToDictionary(
+                        a => Path.GetFileName(a.Path),
+                        StringComparer.OrdinalIgnoreCase);
+
+                    // Items with a custom position first, then new/unlisted items alphabetically.
+                    var ordered = customOrder
+                        .Where(name => byName.ContainsKey(name))
+                        .Select(name => byName[name])
+                        .ToList();
+                    var listed = new HashSet<string>(customOrder, StringComparer.OrdinalIgnoreCase);
+                    ordered.AddRange(g
+                        .Where(a => !listed.Contains(Path.GetFileName(a.Path)))
+                        .OrderBy(a => a.Name));
+                    return ordered;
+                })
+                .ToList();
 
             // Build grouped data structure — group by FolderPath (unique), display Label
             var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
-            var groupedData = localAppItems
+            var groupedData = orderedItems
                 .GroupBy(a => a.FolderPath)
                 .OrderBy(g => folderLookup.TryGetValue(g.Key, out var f) ? f.Order : int.MaxValue)
                 .Select(g =>
                 {
                     var label = folderLookup.TryGetValue(g.Key, out var f) ? f.Label : Path.GetFileName(g.Key) ?? g.Key;
-                    return new AppItemGroup(label, g.Key, g.OrderBy(a => a.Name));
+                    return new AppItemGroup(label, g.Key, g);
                 })
                 .ToList();
 
@@ -285,7 +313,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
             await _dispatcher.EnqueueAsync(() =>
             {
-                Apps.ReplaceAll(localAppItems);
+                Apps.ReplaceAll(orderedItems);
                 IsEmpty = Apps.Count == 0;
 
                 GroupedApps.ReplaceAll(groupedData);

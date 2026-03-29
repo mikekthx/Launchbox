@@ -656,4 +656,64 @@ public class MainViewModelTests
         // Assert: opens the first folder by order (Shortcuts, order 0)
         Assert.Equal(_shortcutFolder, _appLauncher.LastOpenedFolder);
     }
+
+    [Fact]
+    public async Task LoadAppsAsync_MultipleFolders_ItemsClusteredByFolderOrder()
+    {
+        // Arrange: two folders — custom order groups items by folder rather than sorting globally.
+        // "Zephyr" from folder 1 comes before "Alpha" from folder 2 because folder 1 has lower order.
+        string folder2 = Path.Combine("C:", "Games");
+        _fileSystem.CreateDirectory(folder2);
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Zephyr.lnk"));
+        _fileSystem.AddFile(Path.Combine(folder2, "Alpha.lnk"));
+
+        var settingsService = CreateSettingsServiceWithFolders(
+            (_shortcutFolder, "Shortcuts", 0),
+            (folder2, "Games", 1));
+
+        var vm = new MainViewModel(_shortcutService, _iconService, _imageFactory, _dispatcher,
+            _appLauncher, _fileSystem, settingsService, _windowService);
+
+        await vm.LoadAppsAsync();
+
+        // Folder 1 (order 0) items come before folder 2 (order 1) items.
+        // Within each single-item folder, alphabetical order trivially holds.
+        Assert.Equal(2, vm.Apps.Count);
+        Assert.Equal("Zephyr", vm.Apps[0].Name); // from Shortcuts (order 0)
+        Assert.Equal("Alpha", vm.Apps[1].Name);  // from Games (order 1)
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_AppliesCustomItemOrder()
+    {
+        // Arrange: two files in alphabetical order on disk; custom order reverses them
+        string folderPath = _shortcutFolder;
+        _fileSystem.AddFile(Path.Combine(folderPath, "B App.lnk"));
+        _fileSystem.AddFile(Path.Combine(folderPath, "A App.lnk"));
+
+        // Custom order: B before A (alphabetical would put A first)
+        _settingsService.SetItemOrder(folderPath, ["B App.lnk", "A App.lnk"]);
+
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        Assert.Equal(2, vm.Apps.Count);
+        Assert.Equal("B App", vm.Apps[0].Name);
+        Assert.Equal("A App", vm.Apps[1].Name);
+    }
+
+    [Fact]
+    public void IsFilterEmpty_TrueWhenNoFilter()
+    {
+        var vm = CreateViewModel();
+        Assert.True(vm.IsFilterEmpty);
+    }
+
+    [Fact]
+    public void IsFilterEmpty_FalseWhenFilterSet()
+    {
+        var vm = CreateViewModel();
+        vm.FilterText = "calc";
+        Assert.False(vm.IsFilterEmpty);
+    }
 }
