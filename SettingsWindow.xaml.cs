@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using Windows.Graphics;
 
 namespace Launchbox;
@@ -73,5 +74,11 @@ public sealed partial class SettingsWindow : Window
         {
             Trace.WriteLine($"Failed to rename folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
+    }
+
+    private void FolderList_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        var orderedPaths = sender.Items.OfType<ShortcutFolder>().Select(f => f.Path).ToList();
+        ViewModel.SetFolderSequence(orderedPaths);
     }
 }
