@@ -217,19 +217,17 @@ public sealed partial class MainWindow : Window
     }
 
     // --- KEYBOARD NAVIGATION ---
-    // Enter key launches the focused shortcut.
-    // WinUI GridView with IsItemClickEnabled does not automatically fire ItemClick on Enter,
+    // WinUI GridView with IsItemClickEnabled does not fire ItemClick on Enter,
     // so we query the focused element manually.
     private void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key != VirtualKey.Enter) return;
-        var gridView = sender as GridView;
-        var focused = FocusManager.GetFocusedElement(gridView?.XamlRoot) as GridViewItem;
+        // Always consume Enter at the grid level — prevent bubbling to parent scroll containers.
+        e.Handled = true;
+        if (sender is not GridView gridView) return;
+        var focused = FocusManager.GetFocusedElement(gridView.XamlRoot) as GridViewItem;
         if (focused?.DataContext is AppItem item && !string.IsNullOrEmpty(item.Name))
-        {
             ViewModel.LaunchAppCommand.Execute(item);
-            e.Handled = true;
-        }
     }
 
     // Typing while the grid has focus redirects characters to the search box,
@@ -237,7 +235,8 @@ public sealed partial class MainWindow : Window
     private void Grid_CharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
     {
         if (char.IsControl(args.Character)) return;
-        SearchBox.Text += args.Character.ToString();
+        // Route input through the ViewModel so the binding isn't bypassed.
+        ViewModel.FilterText += args.Character;
         SearchBox.Focus(FocusState.Programmatic);
         SearchBox.SelectionStart = SearchBox.Text.Length;
         args.Handled = true;
