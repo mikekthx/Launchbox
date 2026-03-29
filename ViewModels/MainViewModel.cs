@@ -440,19 +440,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     /// <summary>
     /// Persists the current order of <see cref="FilteredApps"/> after a drag-and-drop reorder.
-    /// Groups items by folder and writes the ordered file names to settings.
+    /// Groups items by folder and writes all ordered file names in a single store write.
     /// Also syncs <see cref="Apps"/> to match the new order so filter rebuilds stay consistent.
     /// </summary>
     public void PersistItemOrder()
     {
-        foreach (var group in FilteredApps.GroupBy(a => a.FolderPath))
-        {
-            var names = group.Select(a => Path.GetFileName(a.Path)).ToList();
-            _settingsService.SetItemOrder(group.Key, names);
-        }
-        // Sync Apps to the new FilteredApps order — FilteredApps == Apps when no filter is active,
-        // which is the only time drag-and-drop is enabled (CanReorderItems bound to IsFilterEmpty).
+        var orders = FilteredApps
+            .GroupBy(a => a.FolderPath)
+            .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
+        _settingsService.SetItemOrders(orders);
+
+        // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
+        // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
+        Apps.CollectionChanged -= Apps_CollectionChanged;
         Apps.ReplaceAll(FilteredApps);
+        Apps.CollectionChanged += Apps_CollectionChanged;
     }
 
     public void Dispose()

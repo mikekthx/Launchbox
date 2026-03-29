@@ -53,7 +53,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.AddFolder(path, label))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -63,7 +63,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.RemoveFolder(order))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -73,7 +73,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.ReorderFolder(fromOrder, toOrder))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -83,7 +83,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.RenameFolder(order, newLabel))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -93,13 +93,14 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.SetFolderSequence(orderedPaths))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
     }
 
     private const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
+    private const string SHORTCUT_FOLDERS_KEY = "ShortcutFolders";
 
     /// <summary>
     /// Returns the custom display order for shortcuts in <paramref name="folderPath"/>
@@ -108,25 +109,10 @@ public class SettingsService : ObservableObject
     /// </summary>
     public IReadOnlyList<string> GetItemOrder(string folderPath)
     {
-        if (!_store.TryGetValue(ITEM_ORDERS_KEY, out var val) || val is not string json)
-            return [];
-
-        try
-        {
-            var dict = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
-            if (dict != null)
-            {
-                var key = dict.Keys.FirstOrDefault(
-                    k => k.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
-                if (key != null)
-                    return dict[key];
-            }
-        }
-        catch (JsonException ex)
-        {
-            Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
-        return [];
+        var dict = DeserializeItemOrders();
+        var key = dict.Keys.FirstOrDefault(
+            k => k.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
+        return key != null ? dict[key] : [];
     }
 
     /// <summary>
@@ -135,23 +121,39 @@ public class SettingsService : ObservableObject
     /// </summary>
     public bool SetItemOrder(string folderPath, IReadOnlyList<string> orderedNames)
     {
-        var existing = _store.TryGetValue(ITEM_ORDERS_KEY, out var val) && val is string json
-            ? json : "{}";
+        var dict = DeserializeItemOrders();
+        dict[folderPath] = [.. orderedNames];
+        return PersistItemOrders(dict);
+    }
 
-        Dictionary<string, List<string>> dict;
+    /// <summary>
+    /// Persists custom display orders for all folders in one store write.
+    /// Orders for folders not present in <paramref name="orders"/> are discarded.
+    /// </summary>
+    public bool SetItemOrders(Dictionary<string, List<string>> orders)
+    {
+        return PersistItemOrders(orders);
+    }
+
+    private Dictionary<string, List<string>> DeserializeItemOrders()
+    {
+        if (!_store.TryGetValue(ITEM_ORDERS_KEY, out var val) || val is not string json)
+            return [];
+
         try
         {
-            dict = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(existing) ?? [];
+            return JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json) ?? [];
         }
         catch (JsonException ex)
         {
-            Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON, resetting: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            dict = [];
+            Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return [];
         }
+    }
 
-        dict[folderPath] = [.. orderedNames];
-
-        if (!_store.SetValue(ITEM_ORDERS_KEY, JsonSerializer.Serialize(dict)))
+    private bool PersistItemOrders(Dictionary<string, List<string>> orders)
+    {
+        if (!_store.SetValue(ITEM_ORDERS_KEY, JsonSerializer.Serialize(orders)))
             return false;
 
         OnPropertyChanged(ITEM_ORDERS_KEY);

@@ -716,4 +716,51 @@ public class MainViewModelTests
         vm.FilterText = "calc";
         Assert.False(vm.IsFilterEmpty);
     }
+
+    [Fact]
+    public async Task PersistItemOrder_PersistsOrderAndSyncsApps()
+    {
+        // Arrange: two items loaded in alphabetical order
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "A App.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "B App.lnk"));
+
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        // Simulate DnD reorder: move B before A directly in FilteredApps
+        var bItem = vm.FilteredApps.First(a => a.Name == "B App");
+        var aItem = vm.FilteredApps.First(a => a.Name == "A App");
+        vm.FilteredApps.Move(vm.FilteredApps.IndexOf(bItem), vm.FilteredApps.IndexOf(aItem));
+
+        // Act
+        vm.PersistItemOrder();
+
+        // Persisted order reflects new arrangement
+        var persisted = _settingsService.GetItemOrder(_shortcutFolder);
+        Assert.Equal(["B App.lnk", "A App.lnk"], persisted);
+
+        // Apps is synced to FilteredApps
+        Assert.Equal(2, vm.Apps.Count);
+        Assert.Equal("B App", vm.Apps[0].Name);
+        Assert.Equal("A App", vm.Apps[1].Name);
+    }
+
+    [Fact]
+    public async Task PersistItemOrder_DoesNotTriggerDoubleRebuild()
+    {
+        // Arrange
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "A App.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "B App.lnk"));
+
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        int filterRebuildCount = 0;
+        vm.FilteredApps.CollectionChanged += (_, _) => filterRebuildCount++;
+
+        // Act: Apps.ReplaceAll in PersistItemOrder must not cascade into a second FilteredApps.ReplaceAll
+        vm.PersistItemOrder();
+
+        Assert.Equal(0, filterRebuildCount);
+    }
 }

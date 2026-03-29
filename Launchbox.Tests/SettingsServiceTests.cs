@@ -223,4 +223,26 @@ public class SettingsServiceTests
         var order = svc.GetItemOrder(@"c:\desktop\shortcuts");
         Assert.Equal(["Notepad.lnk"], order);
     }
+
+    [Fact]
+    public void SetItemOrders_WritesAllFoldersInOneCall()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        var orders = new Dictionary<string, List<string>>
+        {
+            [@"C:\FolderA"] = ["A2.lnk", "A1.lnk"],
+            [@"C:\FolderB"] = ["B1.lnk"],
+        };
+
+        var result = svc.SetItemOrders(orders);
+
+        Assert.True(result);
+        Assert.Equal(["A2.lnk", "A1.lnk"], svc.GetItemOrder(@"C:\FolderA"));
+        Assert.Equal(["B1.lnk"], svc.GetItemOrder(@"C:\FolderB"));
+    }
 }
