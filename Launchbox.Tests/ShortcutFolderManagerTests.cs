@@ -362,6 +362,69 @@ public class ShortcutFolderManagerTests
         }
     }
 
+    // --- SET FOLDER SEQUENCE ---
+
+    [Fact]
+    public void SetFolderSequence_ReordersAndPersists()
+    {
+        var store = StoreWithFolders([
+            new ShortcutFolder { Path = SafePath("A"), Label = "A", Order = 0 },
+            new ShortcutFolder { Path = SafePath("B"), Label = "B", Order = 1 },
+            new ShortcutFolder { Path = SafePath("C"), Label = "C", Order = 2 },
+        ]);
+        var manager = new ShortcutFolderManager(store);
+
+        var result = manager.SetFolderSequence([SafePath("C"), SafePath("A"), SafePath("B")]);
+
+        Assert.True(result);
+        var folders = manager.GetFolders();
+        Assert.Equal(3, folders.Count);
+        Assert.Equal("C", folders[0].Label);
+        Assert.Equal("A", folders[1].Label);
+        Assert.Equal("B", folders[2].Label);
+        Assert.Equal(0, folders[0].Order);
+        Assert.Equal(1, folders[1].Order);
+        Assert.Equal(2, folders[2].Order);
+    }
+
+    [Fact]
+    public void SetFolderSequence_IgnoresUnknownPaths()
+    {
+        var store = StoreWithFolders([
+            new ShortcutFolder { Path = SafePath("A"), Label = "A", Order = 0 },
+            new ShortcutFolder { Path = SafePath("B"), Label = "B", Order = 1 },
+        ]);
+        var manager = new ShortcutFolderManager(store);
+
+        var result = manager.SetFolderSequence([SafePath("B"), SafePath("Z"), SafePath("A")]);
+
+        Assert.True(result);
+        var folders = manager.GetFolders();
+        Assert.Equal(2, folders.Count);
+        Assert.Equal("B", folders[0].Label);
+        Assert.Equal("A", folders[1].Label);
+    }
+
+    [Fact]
+    public void SetFolderSequence_AppendsUnrepresentedFolders()
+    {
+        var store = StoreWithFolders([
+            new ShortcutFolder { Path = SafePath("A"), Label = "A", Order = 0 },
+            new ShortcutFolder { Path = SafePath("B"), Label = "B", Order = 1 },
+            new ShortcutFolder { Path = SafePath("C"), Label = "C", Order = 2 },
+        ]);
+        var manager = new ShortcutFolderManager(store);
+
+        var result = manager.SetFolderSequence([SafePath("B"), SafePath("A")]);
+
+        Assert.True(result);
+        var folders = manager.GetFolders();
+        Assert.Equal(3, folders.Count);
+        Assert.Equal("B", folders[0].Label);
+        Assert.Equal("A", folders[1].Label);
+        Assert.Equal("C", folders[2].Label);
+    }
+
     // --- THREAD SAFETY ---
 
     [Fact]
