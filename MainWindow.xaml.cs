@@ -246,6 +246,13 @@ public sealed partial class MainWindow : Window
     {
         // FilteredApps is already in the new order — WinUI modified it in-place during drag.
         // Persist the new order so it survives app restarts.
-        ViewModel.PersistItemOrder();
+        try
+        {
+            ViewModel.PersistItemOrder();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to persist item order: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
     }
 }

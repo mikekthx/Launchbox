@@ -101,6 +101,8 @@ public class SettingsService : ObservableObject
 
     private const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
     internal const string SHORTCUT_FOLDERS_KEY = "ShortcutFolders";
+    // 7KB safety margin under the 8KB LocalSettings per-value limit
+    private const int MAX_ITEM_ORDERS_BYTES = 7168;
 
     /// <summary>
     /// Returns the custom display order for shortcuts in <paramref name="folderPath"/>
@@ -135,6 +137,20 @@ public class SettingsService : ObservableObject
         return PersistItemOrders(orders);
     }
 
+    /// <summary>
+    /// Merges <paramref name="updates"/> into the existing order store in one write.
+    /// Folders not present in <paramref name="updates"/> retain their saved order.
+    /// Use this instead of <see cref="SetItemOrders"/> when only a subset of folders
+    /// are currently loaded (e.g. some folders are unavailable).
+    /// </summary>
+    public bool MergeItemOrders(Dictionary<string, List<string>> updates)
+    {
+        var existing = DeserializeItemOrders();
+        foreach (var (key, value) in updates)
+            existing[key] = value;
+        return PersistItemOrders(existing);
+    }
+
     private Dictionary<string, List<string>> DeserializeItemOrders()
     {
         if (!_store.TryGetValue(ITEM_ORDERS_KEY, out var val) || val is not string json)
@@ -153,7 +169,11 @@ public class SettingsService : ObservableObject
 
     private bool PersistItemOrders(Dictionary<string, List<string>> orders)
     {
-        if (!_store.SetValue(ITEM_ORDERS_KEY, JsonSerializer.Serialize(orders)))
+        var json = JsonSerializer.Serialize(orders);
+        if (System.Text.Encoding.UTF8.GetByteCount(json) > MAX_ITEM_ORDERS_BYTES)
+            return false;
+
+        if (!_store.SetValue(ITEM_ORDERS_KEY, json))
             return false;
 
         OnPropertyChanged(ITEM_ORDERS_KEY);

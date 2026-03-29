@@ -448,9 +448,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var orders = FilteredApps
             .GroupBy(a => a.FolderPath)
             .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
-        // Safe to use the batch overload (discards other folders' orders): when IsFilterEmpty
-        // is true, FilteredApps contains items from every registered folder.
-        _settingsService.SetItemOrders(orders);
+        // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
+        // that failed to load) produces no items in FilteredApps and must not lose its saved order.
+        _settingsService.MergeItemOrders(orders);
 
         // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
         // when no filter is active (CanReorderItems is bound to IsFilterEmpty).

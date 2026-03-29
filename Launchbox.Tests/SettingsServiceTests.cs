@@ -245,4 +245,55 @@ public class SettingsServiceTests
         Assert.Equal(["A2.lnk", "A1.lnk"], svc.GetItemOrder(@"C:\FolderA"));
         Assert.Equal(["B1.lnk"], svc.GetItemOrder(@"C:\FolderB"));
     }
+
+    [Fact]
+    public void MergeItemOrders_PreservesAbsentFolderOrders()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        // Pre-save orders for two folders
+        svc.SetItemOrders(new Dictionary<string, List<string>>
+        {
+            [@"C:\FolderA"] = ["A1.lnk", "A2.lnk"],
+            [@"C:\FolderB"] = ["B1.lnk", "B2.lnk"],
+        });
+
+        // Merge update only touches FolderA (FolderB is unavailable/empty)
+        var result = svc.MergeItemOrders(new Dictionary<string, List<string>>
+        {
+            [@"C:\FolderA"] = ["A2.lnk", "A1.lnk"],
+        });
+
+        Assert.True(result);
+        Assert.Equal(["A2.lnk", "A1.lnk"], svc.GetItemOrder(@"C:\FolderA"));
+        // FolderB's saved order is preserved, not erased
+        Assert.Equal(["B1.lnk", "B2.lnk"], svc.GetItemOrder(@"C:\FolderB"));
+    }
+
+    [Fact]
+    public void PersistItemOrders_ReturnsFalse_WhenSizeExceedsLimit()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        // Build a dict large enough to exceed the 7168-byte limit
+        var hugeNames = Enumerable.Range(0, 500).Select(i => $"VeryLongShortcutName_{i:D4}.lnk").ToList();
+        var orders = new Dictionary<string, List<string>>
+        {
+            [@"C:\Shortcuts"] = hugeNames,
+        };
+
+        var result = svc.SetItemOrders(orders);
+
+        Assert.False(result);
+        // Store was not written — existing orders are unchanged
+        Assert.Empty(svc.GetItemOrder(@"C:\Shortcuts"));
+    }
 }
