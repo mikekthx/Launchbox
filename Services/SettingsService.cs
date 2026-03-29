@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Launchbox.Services;
@@ -96,6 +97,65 @@ public class SettingsService : ObservableObject
             return true;
         }
         return false;
+    }
+
+    private const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
+
+    /// <summary>
+    /// Returns the custom display order for shortcuts in <paramref name="folderPath"/>
+    /// as an ordered list of file names (e.g. "Notepad.lnk").
+    /// Returns an empty list if no custom order has been saved.
+    /// </summary>
+    public IReadOnlyList<string> GetItemOrder(string folderPath)
+    {
+        if (!_store.TryGetValue(ITEM_ORDERS_KEY, out var val) || val is not string json)
+            return [];
+
+        try
+        {
+            var dict = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+            if (dict != null)
+            {
+                var key = dict.Keys.FirstOrDefault(
+                    k => k.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
+                if (key != null)
+                    return dict[key];
+            }
+        }
+        catch (JsonException ex)
+        {
+            Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+        return [];
+    }
+
+    /// <summary>
+    /// Persists a custom display order for shortcuts in <paramref name="folderPath"/>.
+    /// Orders for other folders are preserved.
+    /// </summary>
+    public bool SetItemOrder(string folderPath, IReadOnlyList<string> orderedNames)
+    {
+        var existing = _store.TryGetValue(ITEM_ORDERS_KEY, out var val) && val is string json
+            ? json : "{}";
+
+        Dictionary<string, List<string>> dict;
+        try
+        {
+            dict = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(existing) ?? [];
+        }
+        catch (JsonException ex)
+        {
+            Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON, resetting: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            dict = [];
+        }
+
+        dict[folderPath] = [.. orderedNames];
+
+        if (!_store.SetValue(ITEM_ORDERS_KEY, JsonSerializer.Serialize(dict)))
+            return false;
+
+        OnPropertyChanged(ITEM_ORDERS_KEY);
+        return true;
     }
 
     public FolderViewMode FolderViewMode

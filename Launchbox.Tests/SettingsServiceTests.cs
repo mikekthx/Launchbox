@@ -162,4 +162,65 @@ public class SettingsServiceTests
         Assert.NotEqual(unsafePath, path);
         Assert.Contains("Shortcuts", path);
     }
+
+    [Fact]
+    public void GetItemOrder_ReturnsEmpty_WhenNotSet()
+    {
+        var svc = new SettingsService(
+            new MockSettingsStore(),
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        var order = svc.GetItemOrder(@"C:\Desktop\Shortcuts");
+
+        Assert.Empty(order);
+    }
+
+    [Fact]
+    public void SetItemOrder_PersistsAndRetrievesOrder()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        var names = new List<string> { "Notepad.lnk", "Calculator.lnk", "Paint.lnk" };
+        var result = svc.SetItemOrder(@"C:\Desktop\Shortcuts", names);
+
+        Assert.True(result);
+        var retrieved = svc.GetItemOrder(@"C:\Desktop\Shortcuts");
+        Assert.Equal(names, retrieved);
+    }
+
+    [Fact]
+    public void SetItemOrder_PreservesOtherFolderOrders()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        svc.SetItemOrder(@"C:\FolderA", ["A1.lnk", "A2.lnk"]);
+        svc.SetItemOrder(@"C:\FolderB", ["B1.lnk", "B2.lnk"]);
+
+        Assert.Equal(["A1.lnk", "A2.lnk"], svc.GetItemOrder(@"C:\FolderA"));
+        Assert.Equal(["B1.lnk", "B2.lnk"], svc.GetItemOrder(@"C:\FolderB"));
+    }
+
+    [Fact]
+    public void GetItemOrder_ReturnsCaseInsensitiveMatch()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        svc.SetItemOrder(@"C:\Desktop\Shortcuts", ["Notepad.lnk"]);
+
+        var order = svc.GetItemOrder(@"c:\desktop\shortcuts");
+        Assert.Equal(["Notepad.lnk"], order);
+    }
 }
