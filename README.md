@@ -13,6 +13,7 @@ Launchbox is a modern, lightweight Windows desktop application launcher built wi
 - **⚡ Fast Access**: Instantly toggle the launcher with a configurable global hotkey (default `Alt+S`).
 - **🖥️ System Tray Integration**: Runs quietly in the background, accessible via a tray icon.
 - **📂 Multi-Folder Sources**: Configure multiple shortcut folders with add, remove, reorder, and rename support in Settings.
+- **⌨️ Keyboard Navigation**: Type anywhere to search, Enter to launch the focused shortcut. Drag-and-drop to reorder shortcuts; reordering is disabled while a search filter is active.
 - **🗂️ Flexible View Modes**: Display shortcuts merged alphabetically or grouped by source folder, with collapsible groups for better organization.
 - **🎨 Modern UI**: Built with WinUI 3 with an acrylic backdrop for a native Windows 11 look and feel.
 - **🌍 Localization**: Automatically uses your Windows language, with support for 13 languages (English, Spanish, French, German, Italian, Japanese, Korean, Polish, Brazilian Portuguese, Russian, Turkish, Simplified Chinese, and Traditional Chinese).
