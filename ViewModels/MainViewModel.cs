@@ -177,7 +177,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             // Reload apps when folder path changes
             _ = LoadAppsAsync();
         }
-        else if (e.PropertyName == "ShortcutFolders")
+        else if (e.PropertyName == SettingsService.SHORTCUT_FOLDERS_KEY)
         {
             _ = LoadAppsAsync();
         }
@@ -448,6 +448,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         var orders = FilteredApps
             .GroupBy(a => a.FolderPath)
             .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
+        // Safe to use the batch overload (discards other folders' orders): when IsFilterEmpty
+        // is true, FilteredApps contains items from every registered folder.
         _settingsService.SetItemOrders(orders);
 
         // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps

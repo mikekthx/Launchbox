@@ -100,7 +100,7 @@ public class SettingsService : ObservableObject
     }
 
     private const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
-    private const string SHORTCUT_FOLDERS_KEY = "ShortcutFolders";
+    internal const string SHORTCUT_FOLDERS_KEY = "ShortcutFolders";
 
     /// <summary>
     /// Returns the custom display order for shortcuts in <paramref name="folderPath"/>

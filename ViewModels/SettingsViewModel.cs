@@ -217,7 +217,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(SelectedGridSize));
         else if (e.PropertyName == nameof(SettingsService.KeepCentered))
             OnPropertyChanged(nameof(KeepCentered));
-        else if (e.PropertyName == "ShortcutFolders")
+        else if (e.PropertyName == SettingsService.SHORTCUT_FOLDERS_KEY)
             RefreshFolders();
         else if (e.PropertyName == nameof(SettingsService.FolderViewMode))
             OnPropertyChanged(nameof(SelectedViewModeOption));
