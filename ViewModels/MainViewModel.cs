@@ -231,7 +231,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
                 var files = await Task.Run(() =>
                     _shortcutService.GetShortcutFiles(
-                        Environment.ExpandEnvironmentVariables(folder.Path),
+                        folder.ExpandedPath,
                         Constants.ALLOWED_EXTENSIONS), ct);
 
                 if (files != null)
@@ -368,7 +368,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var folders = _settingsService.GetShortcutFolders();
             var firstFolder = folders.OrderBy(f => f.Order).FirstOrDefault();
             var shortcutFolder = firstFolder != null
-                ? Environment.ExpandEnvironmentVariables(firstFolder.Path)
+                ? firstFolder.ExpandedPath
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
 
             if (!_fileSystem.DirectoryExists(shortcutFolder))
