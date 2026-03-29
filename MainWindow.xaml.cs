@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using Microsoft.UI.Xaml;
@@ -10,6 +11,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.System;
 
 namespace Launchbox;
 
@@ -211,6 +213,46 @@ public sealed partial class MainWindow : Window
         catch (Exception ex)
         {
             Trace.WriteLine($"Error disposing {service?.GetType().Name}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+    }
+
+    // --- KEYBOARD NAVIGATION ---
+    // WinUI GridView with IsItemClickEnabled does not fire ItemClick on Enter,
+    // so we query the focused element manually.
+    private void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter) return;
+        // Always consume Enter at the grid level — prevent bubbling to parent scroll containers.
+        e.Handled = true;
+        if (sender is not GridView gridView) return;
+        var focused = FocusManager.GetFocusedElement(gridView.XamlRoot) as GridViewItem;
+        if (focused?.DataContext is AppItem item && !string.IsNullOrEmpty(item.Name))
+            ViewModel.LaunchAppCommand.Execute(item);
+    }
+
+    // Typing while the grid has focus redirects characters to the search box,
+    // so the user can start typing to filter without clicking the search box first.
+    private void Grid_CharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
+    {
+        if (char.IsControl(args.Character)) return;
+        // Route input through the ViewModel so the binding isn't bypassed.
+        ViewModel.FilterText += args.Character;
+        SearchBox.Focus(FocusState.Programmatic);
+        SearchBox.SelectionStart = SearchBox.Text.Length;
+        args.Handled = true;
+    }
+
+    private void AppGrid_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+    {
+        // FilteredApps is already in the new order — WinUI modified it in-place during drag.
+        // Persist the new order so it survives app restarts.
+        try
+        {
+            ViewModel.PersistItemOrder();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to persist item order: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 }

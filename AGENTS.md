@@ -396,6 +396,8 @@ Prefer the smallest verification set that meaningfully exercises the affected be
 - `PathSecurity.ContainsUncPath` intentionally only strips safe web schemes (`http://`, `https://`, `ftp://`) before checking for `//`. Network-file schemes (`file://`, `smb://`, `dav://`) are left in place so their `//` triggers UNC detection — do not "fix" the regex to strip all schemes
 - Localized strings used in tests require `Localization.SetProvider(new MockStringProvider(...))` setup; without it, `Localization.GetString()` returns the key itself (via `DefaultStringProvider`). Test classes that mutate the static provider must use `[Collection("Localization")]` to prevent parallel execution conflicts
 - `.gitattributes` normalizes line endings to LF in the repo; without it, `core.autocrlf=true` on Windows causes phantom "modified" files in `git status`
+- `FilteredApps` in `MainViewModel` is a mutable `BulkObservableCollection<AppItem>`, not a read-only computed property — WinUI `CanReorderItems` requires `IList`. Do not revert it to a computed property. `CanReorderItems` is bound to `IsFilterEmpty` so drag-and-drop is disabled while a search filter is active, preventing reordering of a filtered subset.
+- `SettingsService.SetItemOrders(Dictionary)` is the preferred batch overwrite for persisting shortcut order after a drag — one store write covers all folders. `SetItemOrder(folderPath, names)` is available for single-folder updates but triggers a store read-modify-write cycle.
 
 ## Date Awareness
 When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.

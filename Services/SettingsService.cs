@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Launchbox.Services;
@@ -52,7 +53,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.AddFolder(path, label))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -62,7 +63,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.RemoveFolder(order))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -72,7 +73,7 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.ReorderFolder(fromOrder, toOrder))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
@@ -82,10 +83,101 @@ public class SettingsService : ObservableObject
     {
         if (_folderManager.RenameFolder(order, newLabel))
         {
-            OnPropertyChanged("ShortcutFolders");
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
             return true;
         }
         return false;
+    }
+
+    public bool SetShortcutFolderSequence(IReadOnlyList<string> orderedPaths)
+    {
+        if (_folderManager.SetFolderSequence(orderedPaths))
+        {
+            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
+            return true;
+        }
+        return false;
+    }
+
+    private const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
+    internal const string SHORTCUT_FOLDERS_KEY = "ShortcutFolders";
+    // 7KB safety margin under the 8KB LocalSettings per-value limit
+    private const int MAX_ITEM_ORDERS_BYTES = 7168;
+
+    /// <summary>
+    /// Returns the custom display order for shortcuts in <paramref name="folderPath"/>
+    /// as an ordered list of file names (e.g. "Notepad.lnk").
+    /// Returns an empty list if no custom order has been saved.
+    /// </summary>
+    public IReadOnlyList<string> GetItemOrder(string folderPath)
+    {
+        var dict = DeserializeItemOrders();
+        var key = dict.Keys.FirstOrDefault(
+            k => k.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
+        return key != null ? dict[key] : [];
+    }
+
+    /// <summary>
+    /// Persists a custom display order for shortcuts in <paramref name="folderPath"/>.
+    /// Orders for other folders are preserved.
+    /// </summary>
+    public bool SetItemOrder(string folderPath, IReadOnlyList<string> orderedNames)
+    {
+        var dict = DeserializeItemOrders();
+        dict[folderPath] = [.. orderedNames];
+        return PersistItemOrders(dict);
+    }
+
+    /// <summary>
+    /// Persists custom display orders for all folders in one store write.
+    /// Orders for folders not present in <paramref name="orders"/> are discarded.
+    /// </summary>
+    public bool SetItemOrders(Dictionary<string, List<string>> orders)
+    {
+        return PersistItemOrders(orders);
+    }
+
+    /// <summary>
+    /// Merges <paramref name="updates"/> into the existing order store in one write.
+    /// Folders not present in <paramref name="updates"/> retain their saved order.
+    /// Use this instead of <see cref="SetItemOrders"/> when only a subset of folders
+    /// are currently loaded (e.g. some folders are unavailable).
+    /// </summary>
+    public bool MergeItemOrders(Dictionary<string, List<string>> updates)
+    {
+        var existing = DeserializeItemOrders();
+        foreach (var (key, value) in updates)
+            existing[key] = value;
+        return PersistItemOrders(existing);
+    }
+
+    private Dictionary<string, List<string>> DeserializeItemOrders()
+    {
+        if (!_store.TryGetValue(ITEM_ORDERS_KEY, out var val) || val is not string json)
+            return [];
+
+        try
+        {
+            return JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json) ?? [];
+        }
+        catch (JsonException ex)
+        {
+            Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return [];
+        }
+    }
+
+    private bool PersistItemOrders(Dictionary<string, List<string>> orders)
+    {
+        var json = JsonSerializer.Serialize(orders);
+        if (System.Text.Encoding.UTF8.GetByteCount(json) > MAX_ITEM_ORDERS_BYTES)
+            return false;
+
+        if (!_store.SetValue(ITEM_ORDERS_KEY, json))
+            return false;
+
+        OnPropertyChanged(ITEM_ORDERS_KEY);
+        return true;
     }
 
     public FolderViewMode FolderViewMode

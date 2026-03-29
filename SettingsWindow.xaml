@@ -34,7 +34,14 @@
                 <!-- Shortcut Folders -->
                 <TextBlock x:Uid="Settings_FolderList" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,8" />
 
-                <ListView ItemsSource="{x:Bind ViewModel.Folders}" SelectionMode="None" MaxHeight="200">
+                <ListView x:Name="FolderList"
+                          ItemsSource="{x:Bind ViewModel.Folders}"
+                          SelectionMode="None"
+                          MaxHeight="200"
+                          CanReorderItems="True"
+                          AllowDrop="True"
+                          CanDragItems="True"
+                          DragItemsCompleted="FolderList_DragItemsCompleted">
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4">
