@@ -88,6 +88,16 @@ public class SettingsService : ObservableObject
         return false;
     }
 
+    public bool SetShortcutFolderSequence(IReadOnlyList<string> orderedPaths)
+    {
+        if (_folderManager.SetFolderSequence(orderedPaths))
+        {
+            OnPropertyChanged("ShortcutFolders");
+            return true;
+        }
+        return false;
+    }
+
     public FolderViewMode FolderViewMode
     {
         get

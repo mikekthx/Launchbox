@@ -154,6 +154,12 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
     }
 
+    public void SetFolderSequence(IReadOnlyList<string> orderedPaths)
+    {
+        if (_settingsService.SetShortcutFolderSequence(orderedPaths))
+            RefreshFolders();
+    }
+
     private void RefreshFolders()
     {
         Folders.Clear();
