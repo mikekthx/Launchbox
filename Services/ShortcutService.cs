@@ -26,7 +26,7 @@ public class ShortcutService : IShortcutService
         try
         {
             return _fileSystem.EnumerateFiles(folderPath)
-                .Where(f => allowedExtensions.Contains(Path.GetExtension(f) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
+                .Where(f => allowedExtensions.Any(ext => f.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
                 .OrderBy(f => Path.GetFileName(f))
                 .ToArray();
         }

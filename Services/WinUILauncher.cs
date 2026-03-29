@@ -35,15 +35,18 @@ public class WinUILauncher : IAppLauncher
             return;
         }
 
-        string extension = Path.GetExtension(path).ToLowerInvariant();
-        if (!ALLOWED_EXTENSIONS.Contains(extension))
+        bool isLnk = path.EndsWith(".lnk", StringComparison.OrdinalIgnoreCase);
+        bool isUrl = path.EndsWith(".url", StringComparison.OrdinalIgnoreCase);
+
+        // Check against allowed extensions without allocating new strings
+        if (!ALLOWED_EXTENSIONS.Any(ext => path.EndsWith(ext, StringComparison.OrdinalIgnoreCase)))
         {
             Trace.WriteLine($"Blocked execution of unauthorized file: {PathSecurity.RedactPath(path)}");
             return;
         }
 
         // Validate shortcut target (Defense-in-depth)
-        if (extension == ".lnk" || extension == ".url")
+        if (isLnk || isUrl)
         {
             var metadata = _shortcutResolver.Resolve(path);
             string? targetPath = metadata?.Target;
@@ -55,7 +58,7 @@ public class WinUILauncher : IAppLauncher
             // can still handle, so only .url null-resolution is treated as a security block.
             if (string.IsNullOrEmpty(targetPath))
             {
-                if (extension == ".url")
+                if (isUrl)
                 {
                     Trace.WriteLine($"Blocked execution of .url with unresolvable or unsafe scheme: {PathSecurity.RedactPath(path)}");
                     return;
@@ -75,7 +78,7 @@ public class WinUILauncher : IAppLauncher
                 Trace.WriteLine($"Shortcut target validated: {PathSecurity.RedactPath(targetPath)}");
             }
 
-            if (extension == ".lnk")
+            if (isLnk)
             {
                 string? args = metadata?.Arguments;
                 if (PathSecurity.ContainsUncPath(args))
