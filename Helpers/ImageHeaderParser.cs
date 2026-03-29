@@ -32,8 +32,6 @@ public static class ImageHeaderParser
                 return null;
             }
 
-            // Width is at byte 16 (4 bytes, Big Endian)
-            // Height is at byte 20 (4 bytes, Big Endian)
             int width = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(16, 4));
             int height = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(20, 4));
 
@@ -79,7 +77,7 @@ public static class ImageHeaderParser
                     break;
                 }
 
-                // Width (1 byte) and Height (1 byte): 0 means 256
+                // ICO convention: a dimension of 0 actually represents 256 pixels.
                 int w = entry[0] == 0 ? ICO_ZERO_DIMENSION_MEANS : entry[0];
                 int h = entry[1] == 0 ? ICO_ZERO_DIMENSION_MEANS : entry[1];
 
