@@ -25,8 +25,7 @@ public static class ImageHeaderParser
             var header = new byte[PNG_MIN_HEADER_SIZE];
             stream.ReadExactly(header, 0, PNG_MIN_HEADER_SIZE);
 
-            // Validate PNG Signature (89 50 4E 47 0D 0A 1A 0A) and IHDR Chunk Header
-            // Length must be exactly 13 (0x0000000D), Type must be "IHDR" (0x49484452)
+            // Validate PNG Signature and IHDR Chunk Header
             if (header is not [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, ..])
             {
                 return null;
@@ -54,7 +53,7 @@ public static class ImageHeaderParser
             var header = new byte[ICO_MIN_HEADER_SIZE];
             stream.ReadExactly(header, 0, ICO_MIN_HEADER_SIZE);
 
-            // Validate ICO Header: Reserved (2 bytes) must be 0, Type (2 bytes) must be 1
+            // Validate ICO Header (Reserved and Type)
             if (header is not [0, 0, 1, 0, ..]) return null;
 
             // Count (2 bytes) — cap at 256 to prevent reading unbounded data from a malformed file
