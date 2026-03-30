@@ -12,4 +12,10 @@ public class MockFilePickerService : IFilePickerService
     {
         return Task.FromResult(SelectedFolder);
     }
+
+    public string? RenameResult { get; set; }
+    public Task<string?> ShowRenameFolderDialogAsync(string currentLabel)
+    {
+        return Task.FromResult(RenameResult);
+    }
 }

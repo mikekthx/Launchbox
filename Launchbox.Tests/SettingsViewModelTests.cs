@@ -358,4 +358,49 @@ public class SettingsViewModelTests
         Assert.Equal("B", vm.Folders[0].Label);
         Assert.Equal("A", vm.Folders[1].Label);
     }
+
+    [Fact]
+    public async Task RenameFolderAsync_WhenValidLabelProvided_RenamesFolder()
+    {
+        var store = new MockSettingsStore();
+        var folders = new System.Collections.Generic.List<ShortcutFolder>
+        {
+            new() { Path = @"C:\Desktop\A", Label = "OldLabel", Order = 0 }
+        };
+        store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
+
+        var settingsService = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(store));
+        var picker = new MockFilePickerService { RenameResult = "NewLabel" };
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), picker);
+
+        await vm.RenameFolderCommand.ExecuteAsync(vm.Folders[0]);
+
+        Assert.Equal("NewLabel", vm.Folders[0].Label);
+    }
+
+    [Fact]
+    public async Task RenameFolderAsync_WhenNullLabelProvided_DoesNotRenameFolder()
+    {
+        var store = new MockSettingsStore();
+        var folders = new System.Collections.Generic.List<ShortcutFolder>
+        {
+            new() { Path = @"C:\Desktop\A", Label = "OldLabel", Order = 0 }
+        };
+        store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
+
+        var settingsService = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(store));
+        var picker = new MockFilePickerService { RenameResult = null };
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), picker);
+
+        await vm.RenameFolderCommand.ExecuteAsync(vm.Folders[0]);
+
+        Assert.Equal("OldLabel", vm.Folders[0].Label);
+    }
+
 }

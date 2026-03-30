@@ -129,8 +129,17 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             _settingsService.ReorderShortcutFolder(order, order + 1);
     }
 
-    // ViewModel stays platform-agnostic — no WinUI types (ContentDialog, XamlRoot).
-    // The rename UI lives in SettingsWindow.xaml.cs code-behind.
+    [RelayCommand]
+    private async Task RenameFolderAsync(ShortcutFolder folder)
+    {
+        if (folder == null) return;
+        var newLabel = await _filePickerService.ShowRenameFolderDialogAsync(folder.Label);
+        if (!string.IsNullOrWhiteSpace(newLabel))
+        {
+            ApplyRename(folder.Order, newLabel);
+        }
+    }
+
     public void ApplyRename(int order, string newLabel) => _settingsService.RenameShortcutFolder(order, newLabel);
 
     public void SetFolderSequence(IReadOnlyList<string> orderedPaths) => _settingsService.SetShortcutFolderSequence(orderedPaths);
