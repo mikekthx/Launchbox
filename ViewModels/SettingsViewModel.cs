@@ -103,12 +103,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         {
             var path = await _filePickerService.PickSingleFolderAsync();
             if (!string.IsNullOrEmpty(path))
-            {
-                if (_settingsService.AddShortcutFolder(path))
-                {
-                    RefreshFolders();
-                }
-            }
+                _settingsService.AddShortcutFolder(path);
         }
         catch (Exception ex)
         {
@@ -117,48 +112,28 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void RemoveFolder(int order)
-    {
-        if (_settingsService.RemoveShortcutFolder(order))
-        {
-            RefreshFolders();
-        }
-    }
+    private void RemoveFolder(int order) => _settingsService.RemoveShortcutFolder(order);
 
     [RelayCommand]
     private void MoveFolderUp(int order)
     {
-        if (order > 0 && _settingsService.ReorderShortcutFolder(order, order - 1))
-        {
-            RefreshFolders();
-        }
+        if (order > 0)
+            _settingsService.ReorderShortcutFolder(order, order - 1);
     }
 
     [RelayCommand]
     private void MoveFolderDown(int order)
     {
         var folders = _settingsService.GetShortcutFolders();
-        if (order < folders.Count - 1 && _settingsService.ReorderShortcutFolder(order, order + 1))
-        {
-            RefreshFolders();
-        }
+        if (order < folders.Count - 1)
+            _settingsService.ReorderShortcutFolder(order, order + 1);
     }
 
     // ViewModel stays platform-agnostic — no WinUI types (ContentDialog, XamlRoot).
     // The rename UI lives in SettingsWindow.xaml.cs code-behind.
-    public void ApplyRename(int order, string newLabel)
-    {
-        if (_settingsService.RenameShortcutFolder(order, newLabel))
-        {
-            RefreshFolders();
-        }
-    }
+    public void ApplyRename(int order, string newLabel) => _settingsService.RenameShortcutFolder(order, newLabel);
 
-    public void SetFolderSequence(IReadOnlyList<string> orderedPaths)
-    {
-        if (_settingsService.SetShortcutFolderSequence(orderedPaths))
-            RefreshFolders();
-    }
+    public void SetFolderSequence(IReadOnlyList<string> orderedPaths) => _settingsService.SetShortcutFolderSequence(orderedPaths);
 
     private void RefreshFolders()
     {
