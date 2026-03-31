@@ -1,4 +1,5 @@
 using System;
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.IO;
 
@@ -26,24 +27,22 @@ public static class ImageHeaderParser
             stream.ReadExactly(header, 0, PNG_MIN_HEADER_SIZE);
 
             // PNG Signature: 89 50 4E 47 0D 0A 1A 0A
-            if (header[0] != 0x89 || header[1] != 0x50 || header[2] != 0x4E || header[3] != 0x47 ||
-                header[4] != 0x0D || header[5] != 0x0A || header[6] != 0x1A || header[7] != 0x0A)
+            if (header is not [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, ..])
             {
                 return null;
             }
 
             // IHDR Chunk starts at byte 8: Length (4 bytes) + Type (4 bytes) + Data
             // Length must be exactly 13 (0x0000000D), Type must be "IHDR" (0x49484452)
-            if (header[8] != 0x00 || header[9] != 0x00 || header[10] != 0x00 || header[11] != 0x0D)
+            if (header.AsSpan(8, 8) is not [0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52])
+            {
                 return null;
-            if (header[12] != 0x49 || header[13] != 0x48 || header[14] != 0x44 || header[15] != 0x52)
-                return null;
+            }
 
             // Width is at byte 16 (4 bytes, Big Endian)
             // Height is at byte 20 (4 bytes, Big Endian)
-
-            int width = (header[16] << 24) | (header[17] << 16) | (header[18] << 8) | header[19];
-            int height = (header[20] << 24) | (header[21] << 16) | (header[22] << 8) | header[23];
+            int width = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(16, 4));
+            int height = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(20, 4));
 
             return (width, height);
         }
