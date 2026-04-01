@@ -127,10 +127,26 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 int key = _settingsService.HotkeyKey;
 
                 var sb = new StringBuilder();
-                if ((mod & Constants.MOD_CONTROL) != 0) { sb.Append(Localization.GetString("Modifier_Ctrl")); sb.Append('+'); }
-                if ((mod & Constants.MOD_ALT) != 0) { sb.Append(Localization.GetString("Modifier_Alt")); sb.Append('+'); }
-                if ((mod & Constants.MOD_SHIFT) != 0) { sb.Append(Localization.GetString("Modifier_Shift")); sb.Append('+'); }
-                if ((mod & Constants.MOD_WIN) != 0) { sb.Append(Localization.GetString("Modifier_Win")); sb.Append('+'); }
+                if ((mod & Constants.MOD_CONTROL) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Ctrl"));
+                    sb.Append('+');
+                }
+                if ((mod & Constants.MOD_ALT) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Alt"));
+                    sb.Append('+');
+                }
+                if ((mod & Constants.MOD_SHIFT) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Shift"));
+                    sb.Append('+');
+                }
+                if ((mod & Constants.MOD_WIN) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Win"));
+                    sb.Append('+');
+                }
 
                 var vk = (Windows.System.VirtualKey)key;
                 string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
@@ -141,7 +157,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 _trayToolTipText = string.Format(Localization.GetString("Tray_TooltipFormat"), sb.ToString());
             }
 
-            return _trayToolTipText;
+            return _trayToolTipText!;
         }
     }
 
