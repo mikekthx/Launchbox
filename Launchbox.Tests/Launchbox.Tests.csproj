@@ -64,6 +64,7 @@
     <Compile Include="..\Services\IWindowService.cs" Link="Services\IWindowService.cs" />
     <Compile Include="..\ViewModels\SettingsViewModel.cs" Link="ViewModels\SettingsViewModel.cs" />
     <Compile Include="..\Helpers\BooleanToVisibilityConverter.cs" Link="Helpers\BooleanToVisibilityConverter.cs" />
+    <Compile Include="..\Helpers\EmptyStringToCollapsedConverter.cs" Link="Helpers\EmptyStringToCollapsedConverter.cs" />
     <Compile Include="..\Helpers\BulkObservableCollection.cs" Link="Helpers\BulkObservableCollection.cs" />
 
     <Compile Include="..\Services\BackdropService.cs" Link="Services\BackdropService.cs" />

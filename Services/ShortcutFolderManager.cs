@@ -125,6 +125,32 @@ public class ShortcutFolderManager
     }
 
     /// <summary>
+    /// Sets the canonical folder order to match <paramref name="orderedPaths"/>.
+    /// Unknown paths are skipped; folders not present in <paramref name="orderedPaths"/>
+    /// are appended at the end so they are never silently dropped.
+    /// </summary>
+    public bool SetFolderSequence(IReadOnlyList<string> orderedPaths)
+    {
+        return MutateAndPersist(folders =>
+        {
+            var lookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
+            var represented = new HashSet<string>(orderedPaths, StringComparer.OrdinalIgnoreCase);
+
+            var ordered = orderedPaths
+                .Where(p => lookup.ContainsKey(p))
+                .Select(p => lookup[p])
+                .ToList();
+
+            // Append any folders not covered by orderedPaths so they are never silently lost.
+            ordered.AddRange(folders.Where(f => !represented.Contains(f.Path)));
+
+            folders.Clear();
+            folders.AddRange(ordered);
+            return true;
+        }, renumber: true);
+    }
+
+    /// <summary>
     /// Centralizes the lock → copy → mutate → persist → cache pattern shared by all mutation methods.
     /// The <paramref name="mutate"/> delegate receives a mutable copy of the current folder list
     /// and returns true if the mutation succeeded (false aborts without persisting).

@@ -72,4 +72,28 @@ public class BooleanToVisibilityConverterTests
         var result = converter.ConvertBack(value!, typeof(bool), null!, "en-US");
         Assert.Equal(false, result);
     }
+
+    [Fact]
+    public void ConvertBool_True_ReturnsVisible()
+    {
+        Assert.Equal(Visibility.Visible, BooleanToVisibilityConverter.ConvertBool(true));
+    }
+
+    [Fact]
+    public void ConvertBool_False_ReturnsCollapsed()
+    {
+        Assert.Equal(Visibility.Collapsed, BooleanToVisibilityConverter.ConvertBool(false));
+    }
+
+    [Fact]
+    public void ConvertBool_True_Invert_ReturnsCollapsed()
+    {
+        Assert.Equal(Visibility.Collapsed, BooleanToVisibilityConverter.ConvertBool(true, invert: true));
+    }
+
+    [Fact]
+    public void ConvertBool_False_Invert_ReturnsVisible()
+    {
+        Assert.Equal(Visibility.Visible, BooleanToVisibilityConverter.ConvertBool(false, invert: true));
+    }
 }

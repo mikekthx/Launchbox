@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
@@ -332,5 +333,29 @@ public class SettingsViewModelTests
         await Task.Delay(100, TestContext.Current.CancellationToken);
 
         // If we get here without an unobserved exception, the test passes
+    }
+
+    [Fact]
+    public void SetFolderSequence_ReordersAndRefreshesFolders()
+    {
+        var store = new MockSettingsStore();
+        var folders = new System.Collections.Generic.List<ShortcutFolder>
+        {
+            new() { Path = @"C:\Desktop\A", Label = "A", Order = 0 },
+            new() { Path = @"C:\Desktop\B", Label = "B", Order = 1 },
+        };
+        store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
+
+        var settingsService = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(store));
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+
+        vm.SetFolderSequence([@"C:\Desktop\B", @"C:\Desktop\A"]);
+
+        Assert.Equal(2, vm.Folders.Count);
+        Assert.Equal("B", vm.Folders[0].Label);
+        Assert.Equal("A", vm.Folders[1].Label);
     }
 }
