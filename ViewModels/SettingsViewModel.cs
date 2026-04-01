@@ -132,15 +132,21 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private async Task RenameFolderAsync(ShortcutFolder folder)
     {
-        if (folder == null) return;
-        var newLabel = await _filePickerService.ShowRenameFolderDialogAsync(folder.Label);
-        if (!string.IsNullOrWhiteSpace(newLabel))
+        try
         {
-            ApplyRename(folder.Order, newLabel);
+            var newLabel = await _filePickerService.ShowRenameFolderDialogAsync(folder.Label);
+            if (!string.IsNullOrWhiteSpace(newLabel))
+            {
+                ApplyRename(folder.Order, newLabel);
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to rename folder: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 
-    public void ApplyRename(int order, string newLabel) => _settingsService.RenameShortcutFolder(order, newLabel);
+    private void ApplyRename(int order, string newLabel) => _settingsService.RenameShortcutFolder(order, newLabel);
 
     public void SetFolderSequence(IReadOnlyList<string> orderedPaths) => _settingsService.SetShortcutFolderSequence(orderedPaths);
 

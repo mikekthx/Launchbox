@@ -44,22 +44,30 @@ public class WinUIFilePickerService : IFilePickerService
             return null;
         }
 
-        var textBox = new Microsoft.UI.Xaml.Controls.TextBox { Text = currentLabel, PlaceholderText = currentLabel };
-        var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+        try
         {
-            Title = Launchbox.Helpers.Localization.GetString("Settings_RenameFolder_Title"),
-            PrimaryButtonText = Launchbox.Helpers.Localization.GetString("Settings_RenameFolder_OK"),
-            CloseButtonText = Launchbox.Helpers.Localization.GetString("Settings_RenameFolder_Cancel"),
-            Content = textBox,
-            XamlRoot = window.Content.XamlRoot
-        };
+            var textBox = new Microsoft.UI.Xaml.Controls.TextBox { Text = currentLabel, PlaceholderText = currentLabel };
+            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            {
+                Title = Launchbox.Helpers.Localization.GetString("Settings_RenameFolder_Title"),
+                PrimaryButtonText = Launchbox.Helpers.Localization.GetString("Settings_RenameFolder_OK"),
+                CloseButtonText = Launchbox.Helpers.Localization.GetString("Settings_RenameFolder_Cancel"),
+                Content = textBox,
+                XamlRoot = window.Content.XamlRoot
+            };
 
-        var result = await dialog.ShowAsync();
-        if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(textBox.Text))
-        {
-            return textBox.Text;
+            var result = await dialog.ShowAsync();
+            if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary && !string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                return textBox.Text;
+            }
+
+            return null;
         }
-
-        return null;
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to show rename dialog: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+            return null;
+        }
     }
 }
