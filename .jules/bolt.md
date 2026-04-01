@@ -12,3 +12,7 @@
 ## 2026-03-22 - Remove Task.Run from Fast Synchronous Operations
 **Learning:** Offloading very short synchronous tasks (e.g., dictionary clearing, memory-only operations) to the thread pool via `Task.Run` is an anti-pattern. The overhead of task scheduling, thread pool queuing, and context switching often outweighs the execution time of the task itself, leading to a net performance regression.
 **Action:** When an operation is purely CPU-bound, synchronous, and known to be fast (e.g., `IconService.PruneCache`), execute it directly on the current thread rather than wrapping it in `Task.Run`.
+
+## 2026-03-29 - Cache Environment Variable Expansion
+**Learning:** Expanding environment variables via `Environment.ExpandEnvironmentVariables` is a PInvoke that is slow on Windows. Repeatedly calling this in loops or hot paths (e.g., during app loading) introduces measurable overhead.
+**Action:** Expand environment variables once when retrieving paths from external sources (e.g., settings) and cache the result in a property (e.g., `ExpandedPath`) to avoid redundant expansions. Use `[JsonIgnore]` to prevent the machine-specific expanded path from being serialized.

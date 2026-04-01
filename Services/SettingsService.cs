@@ -36,7 +36,7 @@ public class SettingsService : ObservableObject
             var first = folders.OrderBy(f => f.Order).FirstOrDefault();
             if (first != null)
             {
-                var expandedPath = Environment.ExpandEnvironmentVariables(first.Path);
+                var expandedPath = first.ExpandedPath;
                 if (!PathSecurity.IsUnsafePath(expandedPath))
                 {
                     return expandedPath;

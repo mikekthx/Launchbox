@@ -181,8 +181,14 @@ public class ShortcutFolderManager
     private static IReadOnlyList<ShortcutFolder> ValidateAndNormalize(List<ShortcutFolder> folders)
     {
         var valid = folders
-            .Where(f => !string.IsNullOrEmpty(f.Path) && !PathSecurity.IsUnsafePath(
-                Environment.ExpandEnvironmentVariables(f.Path)))
+            .Where(f => !string.IsNullOrEmpty(f.Path))
+            .Select(f =>
+            {
+                var expanded = Environment.ExpandEnvironmentVariables(f.Path);
+                return (Folder: f, Expanded: expanded);
+            })
+            .Where(x => !PathSecurity.IsUnsafePath(x.Expanded))
+            .Select(x => x.Folder with { ExpandedPath = x.Expanded })
             .ToList();
 
         return Renumber(valid).AsReadOnly();
