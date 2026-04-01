@@ -25,7 +25,7 @@ public class MainViewModelPerformanceTests
         var fileSystem = new MockFileSystem();
         fileSystem.CreateDirectory(shortcutFolder);
 
-        foreach (var i in Enumerable.Range(0, 500))
+        foreach (var i in Enumerable.Range(0, 5000))
         {
             fileSystem.AddFile(Path.Combine(shortcutFolder, $"App{i}.lnk"));
         }
@@ -57,7 +57,7 @@ public class MainViewModelPerformanceTests
 
         Assert.True(sw.Elapsed.TotalSeconds < 2.0,
             $"LoadAppsAsync took {sw.Elapsed.TotalSeconds:F2}s — expected < 2.0s");
-        Assert.Equal(500, vm.Apps.Count);
-        _output.WriteLine($"LoadAppsAsync with 500 files: {sw.Elapsed.TotalMilliseconds:F0}ms");
+        Assert.Equal(5000, vm.Apps.Count);
+        _output.WriteLine($"LoadAppsAsync with 5000 files: {sw.Elapsed.TotalMilliseconds:F2}ms");
     }
 }
