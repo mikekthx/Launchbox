@@ -74,7 +74,10 @@ Launchbox/
 │   # CommunityToolkit.Mvvm provides ObservableObject base class,
 │   # [RelayCommand] and [ObservableProperty] source generators
 ├── Models/                     # Data models
-│   └── AppItem.cs              # Application shortcut model
+│   ├── AppItem.cs              # Application shortcut model
+│   ├── AppItemGroup.cs         # Ordered group of AppItems for folder/grouped view
+│   ├── FolderViewMode.cs       # Enum: Merged (flat) or Grouped (per-folder) display
+│   └── ShortcutFolder.cs       # Multi-folder shortcut source (path, label, order)
 ├── Services/                   # Platform-agnostic interfaces and implementations
 │   ├── IAppLauncher.cs         # Process launching abstraction
 │   ├── IBackdropService.cs     # Window backdrop management
@@ -397,7 +400,7 @@ Prefer the smallest verification set that meaningfully exercises the affected be
 - Localized strings used in tests require `Localization.SetProvider(new MockStringProvider(...))` setup; without it, `Localization.GetString()` returns the key itself (via `DefaultStringProvider`). Test classes that mutate the static provider must use `[Collection("Localization")]` to prevent parallel execution conflicts
 - `.gitattributes` normalizes line endings to LF in the repo; without it, `core.autocrlf=true` on Windows causes phantom "modified" files in `git status`
 - `FilteredApps` in `MainViewModel` is a mutable `BulkObservableCollection<AppItem>`, not a read-only computed property — WinUI `CanReorderItems` requires `IList`. Do not revert it to a computed property. `CanReorderItems` is bound to `IsFilterEmpty` so drag-and-drop is disabled while a search filter is active, preventing reordering of a filtered subset.
-- `SettingsService.SetItemOrders(Dictionary)` is the preferred batch overwrite for persisting shortcut order after a drag — one store write covers all folders. `SetItemOrder(folderPath, names)` is available for single-folder updates but triggers a store read-modify-write cycle.
+- `SettingsService.MergeItemOrders(Dictionary)` is the correct method for persisting shortcut order after a drag — it updates only the folders present in the dict, preserving saved order for folders that failed to load (e.g., slow/offline drive). `SetItemOrders` is a full overwrite and must NOT be used after a drag in a multi-folder setup. `SetItemOrder(folderPath, names)` is available for single-folder updates.
 
 ## Date Awareness
 When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.
