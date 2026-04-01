@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -114,26 +115,49 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public string ExitMenuText => Localization.GetString("TrayMenu_Exit");
 
+    private string? _trayToolTipText;
+
     public string TrayToolTipText
     {
         get
         {
-            int mod = _settingsService.HotkeyModifiers;
-            int key = _settingsService.HotkeyKey;
+            if (_trayToolTipText is null)
+            {
+                int mod = _settingsService.HotkeyModifiers;
+                int key = _settingsService.HotkeyKey;
 
-            var parts = new List<string>();
-            if ((mod & Constants.MOD_CONTROL) != 0) parts.Add(Localization.GetString("Modifier_Ctrl"));
-            if ((mod & Constants.MOD_ALT) != 0) parts.Add(Localization.GetString("Modifier_Alt"));
-            if ((mod & Constants.MOD_SHIFT) != 0) parts.Add(Localization.GetString("Modifier_Shift"));
-            if ((mod & Constants.MOD_WIN) != 0) parts.Add(Localization.GetString("Modifier_Win"));
+                var sb = new StringBuilder();
+                if ((mod & Constants.MOD_CONTROL) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Ctrl"));
+                    sb.Append('+');
+                }
+                if ((mod & Constants.MOD_ALT) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Alt"));
+                    sb.Append('+');
+                }
+                if ((mod & Constants.MOD_SHIFT) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Shift"));
+                    sb.Append('+');
+                }
+                if ((mod & Constants.MOD_WIN) != 0)
+                {
+                    sb.Append(Localization.GetString("Modifier_Win"));
+                    sb.Append('+');
+                }
 
-            var vk = (Windows.System.VirtualKey)key;
-            string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
-                ? ((char)key).ToString()
-                : vk.ToString();
-            parts.Add(keyName);
+                var vk = (Windows.System.VirtualKey)key;
+                string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
+                    ? ((char)key).ToString()
+                    : vk.ToString();
+                sb.Append(keyName);
 
-            return string.Format(Localization.GetString("Tray_TooltipFormat"), string.Join("+", parts));
+                _trayToolTipText = string.Format(Localization.GetString("Tray_TooltipFormat"), sb.ToString());
+            }
+
+            return _trayToolTipText!;
         }
     }
 
@@ -189,6 +213,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else if (e.PropertyName is nameof(SettingsService.HotkeyModifiers) or nameof(SettingsService.HotkeyKey))
         {
+            _trayToolTipText = null;
             OnPropertyChanged(nameof(TrayToolTipText));
         }
         else if (e.PropertyName == nameof(SettingsService.CollapsibleGroups))
