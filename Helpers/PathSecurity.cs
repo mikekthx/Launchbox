@@ -79,15 +79,14 @@ public static class PathSecurity
         // Allow local long paths ONLY if they are standard drive paths (e.g. \\?\C:\...)
         if (path.StartsWith(@"\\?\", StringComparison.OrdinalIgnoreCase))
         {
+            // Block anything else starting with \\?\ (e.g. GLOBALROOT, Volume, etc.)
             // Must be at least 7 chars: \\?\C:\
-            if (path.Length >= 7 &&
-                char.IsLetter(path[4]) &&
-                path[5] == ':' &&
-                path[6] == '\\')
+            if (path.Length < 7 || !char.IsLetter(path[4]) || path[5] != ':' || path[6] != '\\')
             {
-                return false;
+                return true;
             }
-            return true; // Block anything else starting with \\?\ (e.g. GLOBALROOT, Volume, etc.)
+
+            return false;
         }
 
         // Check for standard UNC paths
