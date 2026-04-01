@@ -10,3 +10,6 @@
 ## 2024-05-25 - DependencyProperty Field Naming Rules in WinUI XAML
 **Learning:** WinUI 3 XAML compilation strictly requires DependencyProperty static readonly fields to end with the exact suffix `Property` matching the registered string name (e.g., `"TappedCommand"` must correspond to `TappedCommandProperty`). Renaming them to uppercase formats like `TAPPED_COMMAND_PROPERTY` breaks the XamlCompiler MSB3073 step during GitHub Actions CI builds or local builds.
 **Action:** Always name attached property fields exactly as `[Name]Property` with PascalCase in WinUI 3, ignoring any generic static-readonly uppercase IDE warnings, to ensure XAML compilation succeeds.
+## 2024-05-26 - Moving ContentDialog into Services for MVVM
+**Learning:** In WinUI 3, displaying a `ContentDialog` requires a `XamlRoot` which is tightly coupled to the View layer, often tempting developers to handle complex business logic (like renaming items and persisting them) inside the `.xaml.cs` code-behind.
+**Action:** When a UI interaction like a dialog is required before proceeding with ViewModel logic, abstract the dialog presentation into a service (e.g. extending `IFilePickerService` or creating an `IDialogService`) that returns the resulting data. The ViewModel can then await this data and orchestrate the actual business logic updates cleanly.
