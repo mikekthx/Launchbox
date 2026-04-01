@@ -80,4 +80,7 @@
     <Compile Include="..\Models\AppItemGroup.cs" Link="Models\AppItemGroup.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Helpers\CollapseChevronConverter.cs" Link="Helpers\CollapseChevronConverter.cs" />
+  </ItemGroup>
 </Project>
