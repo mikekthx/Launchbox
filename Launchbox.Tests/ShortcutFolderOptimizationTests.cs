@@ -40,6 +40,36 @@ public class ShortcutFolderOptimizationTests
     }
 
     [Fact]
+    public void ShortcutFolder_Equals_IgnoresCachedExpandedPath()
+    {
+        var a = new ShortcutFolder { Path = "X", Label = "Y", Order = 0 };
+        var b = a with { ExpandedPath = "expanded_X" };
+
+        Assert.Equal(a, b);
+        Assert.Equal(a.GetHashCode(), b.GetHashCode());
+    }
+
+    [Fact]
+    public void ShortcutFolderManager_LoadFromStore_PopulatesExpandedPath()
+    {
+        // Simulate persisted state: JSON has no ExpandedPath (it's [JsonIgnore]).
+        // A new manager loading from the store must still populate ExpandedPath via ValidateAndNormalize.
+        var path = "%TEMP%\\LaunchboxLoadTest";
+        var store = new MockSettingsStore();
+        var seed = new System.Collections.Generic.List<ShortcutFolder>
+        {
+            new() { Path = path, Label = "Loaded Folder", Order = 0 }
+        };
+        store.SetValue("ShortcutFolders", JsonSerializer.Serialize(seed));
+
+        var manager = new ShortcutFolderManager(store);
+        var folder = manager.GetFolders().FirstOrDefault();
+
+        Assert.NotNull(folder);
+        Assert.Equal(Environment.ExpandEnvironmentVariables(path), folder.ExpandedPath);
+    }
+
+    [Fact]
     public void ShortcutFolderManager_PopulatesExpandedPath()
     {
         var store = new MockSettingsStore();

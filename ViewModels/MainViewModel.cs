@@ -367,8 +367,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             var folders = _settingsService.GetShortcutFolders();
             var firstFolder = folders.OrderBy(f => f.Order).FirstOrDefault();
-            var shortcutFolder = firstFolder != null
-                ? firstFolder.ExpandedPath
+            var shortcutFolder = !string.IsNullOrEmpty(firstFolder?.ExpandedPath)
+                ? firstFolder!.ExpandedPath
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
 
             if (!_fileSystem.DirectoryExists(shortcutFolder))
