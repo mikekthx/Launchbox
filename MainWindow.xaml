@@ -146,7 +146,8 @@
             </GridView.ItemTemplate>
         </GridView>
 
-        <GridView x:Name="GroupedAppGrid"
+        <GridView x:Uid="MainWindow_GroupedShortcutsGrid"
+                  x:Name="GroupedAppGrid"
                   Grid.Row="0"
                   Padding="20"
                   Background="Transparent"
