@@ -70,8 +70,7 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         if (_isCollapsed)
         {
             // Evaluate the filter to decide whether the collapsed header should be visible
-            bool hasMatches = string.IsNullOrEmpty(filterText)
-                || _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+            bool hasMatches = HasMatches(filterText);
 
             if (hasMatches && Count == 0)
             {
@@ -86,9 +85,7 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
             return;
         }
 
-        var source = string.IsNullOrEmpty(filterText)
-            ? _allItems
-            : _allItems.Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+        var source = GetFilteredItems(filterText);
 
         // Minimize churn: only replace if the set actually changed
         if (source.SequenceEqual(this)) return;
@@ -101,19 +98,25 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         if (_isCollapsed)
         {
             // Evaluate filter to decide if collapsed header should be visible
-            bool hasMatches = string.IsNullOrEmpty(_activeFilter)
-                || _allItems.Any(a => a.Name.Contains(_activeFilter, StringComparison.OrdinalIgnoreCase));
+            bool hasMatches = HasMatches(_activeFilter);
 
             ReplaceAll(hasMatches ? [COLLAPSED_PLACEHOLDER] : []);
         }
         else
         {
             // Expand: re-apply the active filter (don't restore unfiltered _allItems)
-            var source = string.IsNullOrEmpty(_activeFilter)
-                ? _allItems
-                : _allItems.Where(a => a.Name.Contains(_activeFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+            var source = GetFilteredItems(_activeFilter);
 
             ReplaceAll(source);
         }
     }
+
+    private bool HasMatches(string? filterText) =>
+        string.IsNullOrEmpty(filterText) ||
+        _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
+
+    private List<AppItem> GetFilteredItems(string? filterText) =>
+        string.IsNullOrEmpty(filterText)
+            ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
+            : _allItems.Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
 }
