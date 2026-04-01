@@ -111,16 +111,12 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         }
     }
 
-    private bool HasMatches(string? filterText)
-    {
-        return string.IsNullOrEmpty(filterText) ||
-               _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
-    }
+    private bool HasMatches(string? filterText) =>
+        string.IsNullOrEmpty(filterText) ||
+        _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
-    private List<AppItem> GetFilteredItems(string? filterText)
-    {
-        return string.IsNullOrEmpty(filterText)
-            ? _allItems
+    private List<AppItem> GetFilteredItems(string? filterText) =>
+        string.IsNullOrEmpty(filterText)
+            ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
             : _allItems.Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
-    }
 }
