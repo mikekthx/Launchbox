@@ -29,6 +29,17 @@ public class ShortcutFolderOptimizationTests
     }
 
     [Fact]
+    public void ShortcutFolder_ExpandedPath_FallsBackToExpansion_WhenNotPrePopulated()
+    {
+        // Simulate a folder constructed without going through ValidateAndNormalize
+        // (e.g., deserialized directly from the settings store).
+        var path = "%TEMP%\\LaunchboxFallbackTest";
+        var folder = new ShortcutFolder { Path = path, Label = "Test", Order = 0 };
+
+        Assert.Equal(Environment.ExpandEnvironmentVariables(path), folder.ExpandedPath);
+    }
+
+    [Fact]
     public void ShortcutFolderManager_PopulatesExpandedPath()
     {
         var store = new MockSettingsStore();
