@@ -78,9 +78,7 @@
     <Compile Include="..\Helpers\LocalizedOption.cs" Link="Helpers\LocalizedOption.cs" />
     <Compile Include="..\Services\ShortcutFolderManager.cs" Link="Services\ShortcutFolderManager.cs" />
     <Compile Include="..\Models\AppItemGroup.cs" Link="Models\AppItemGroup.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Include="..\Helpers\CollapseChevronConverter.cs" Link="Helpers\CollapseChevronConverter.cs" />
   </ItemGroup>
+
 </Project>
