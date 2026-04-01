@@ -40,6 +40,7 @@ public class ShortcutFolderManagerTests
         Assert.Single(folders);
         Assert.Contains("Shortcuts", folders[0].Path);
         Assert.Equal(0, folders[0].Order);
+        Assert.False(string.IsNullOrEmpty(folders[0].ExpandedPath));
     }
 
     [Fact]
