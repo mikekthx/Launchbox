@@ -326,12 +326,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
             var groupedData = orderedItems
                 .GroupBy(a => a.FolderPath)
-                .OrderBy(g => folderLookup.TryGetValue(g.Key, out var f) ? f.Order : int.MaxValue)
                 .Select(g =>
                 {
-                    var label = folderLookup.TryGetValue(g.Key, out var f) ? f.Label : Path.GetFileName(g.Key) ?? g.Key;
-                    return new AppItemGroup(label, g.Key, g);
+                    var isFolderFound = folderLookup.TryGetValue(g.Key, out var folder);
+                    var sortOrder = isFolderFound && folder != null ? folder.Order : int.MaxValue;
+                    var label = isFolderFound && folder != null ? folder.Label : Path.GetFileName(g.Key) ?? g.Key;
+
+                    return new { Group = g, SortOrder = sortOrder, Label = label };
                 })
+                .OrderBy(info => info.SortOrder)
+                .Select(info => new AppItemGroup(info.Label, info.Group.Key, info.Group))
                 .ToList();
 
             ct.ThrowIfCancellationRequested();
