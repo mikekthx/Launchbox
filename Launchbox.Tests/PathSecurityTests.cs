@@ -108,6 +108,17 @@ public class PathSecurityTests
     }
 
     [Theory]
+    [InlineData("HTTPS://example.com")]
+    [InlineData("--url=HTTP://example.com")]
+    [InlineData("FTP://mirror.example.com/file.zip")]
+    [InlineData("Https://example.com/path")]
+    public void ContainsUncPath_AllowsMixedCaseSafeWebSchemes(string args)
+    {
+        // Mixed-case schemes are still valid URLs and must not be flagged as UNC paths
+        Assert.False(PathSecurity.ContainsUncPath(args), $"Should allow mixed-case scheme: {args}");
+    }
+
+    [Theory]
     [InlineData(@"\\server\share")]
     [InlineData(@"//server/share")]
     [InlineData(@"\/server")]

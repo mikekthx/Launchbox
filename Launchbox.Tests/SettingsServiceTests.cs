@@ -225,6 +225,23 @@ public class SettingsServiceTests
     }
 
     [Fact]
+    public void GetItemOrder_ReturnsCaseInsensitiveMatch_AfterRoundTrip()
+    {
+        // Bug: DeserializeItemOrders used a case-sensitive dictionary, so a casing mismatch
+        // after loading from the store (simulating a restart) lost the persisted order.
+        var store = new MockSettingsStore();
+        var svc1 = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
+        svc1.SetItemOrder(@"C:\Desktop\Shortcuts", ["Notepad.lnk", "Calc.lnk"]);
+
+        // New service instance loads from the same store (simulates app restart)
+        var svc2 = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
+
+        // Look up with different casing — must still return the persisted order
+        var order = svc2.GetItemOrder(@"c:\desktop\shortcuts");
+        Assert.Equal(["Notepad.lnk", "Calc.lnk"], order);
+    }
+
+    [Fact]
     public void SetItemOrders_WritesAllFoldersInOneCall()
     {
         var store = new MockSettingsStore();

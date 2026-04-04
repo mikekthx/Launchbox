@@ -10,7 +10,7 @@ public static class PathSecurity
     // so that remaining "//" can be detected as UNC path indicators.
     // IMPORTANT: Only safe schemes are stripped. Network-file schemes (file://, smb://, nfs://, dav://)
     // are intentionally NOT stripped so their "//" is caught as a UNC indicator.
-    private static readonly Regex SAFE_URI_SCHEME_PATTERN = new(@"https?://|ftp://", RegexOptions.Compiled);
+    private static readonly Regex SAFE_URI_SCHEME_PATTERN = new(@"https?://|ftp://", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     // Cached arrays to avoid per-call allocations in hot validation paths
     private static readonly char[] INVALID_PATH_CHARS = Path.GetInvalidPathChars();

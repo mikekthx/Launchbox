@@ -158,7 +158,11 @@ public class SettingsService : ObservableObject
 
         try
         {
-            return JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json) ?? [];
+            var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+            if (deserialized == null) return [];
+            // Windows paths are case-insensitive; rebuild with OrdinalIgnoreCase so a casing
+            // mismatch between stored keys and lookup keys never silently loses order data.
+            return new Dictionary<string, List<string>>(deserialized, StringComparer.OrdinalIgnoreCase);
         }
         catch (JsonException ex)
         {
