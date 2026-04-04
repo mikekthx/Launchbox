@@ -1,20 +1,25 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
-  # Monitor your C# NuGet packages weekly
+  # Monitor C# NuGet packages weekly
   - package-ecosystem: "nuget"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
 
-  # Monitor your GitHub Actions weekly
+  # Monitor GitHub Actions weekly.
+  # Actions are pinned to commit SHAs with # vN comments (see dotnet-desktop.yml).
+  # Dependabot reads the comment to resolve the latest release SHA and opens a PR
+  # updating both the SHA and the comment — keeping pins immutable while still
+  # receiving release notifications. All semver update types are included so that
+  # patch-level security fixes are not missed.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    groups:
+      # Bundle all action updates into one PR per week to reduce noise
+      actions-dependencies:
+        patterns:
+          - "*"
