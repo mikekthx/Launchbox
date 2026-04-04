@@ -34,7 +34,7 @@ public class IconServiceExceptionTests
         _mockFileSystem.AddFile(pngPath, size: 1024, content: null, lastWriteTime: DateTime.Now);
         _mockFileSystem.AddFile(icoPath, size: 1024, content: null, lastWriteTime: DateTime.Now);
 
-        var result = _iconService.ExtractIconBytes(shortcutPath);
+        var result = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         // We expect empty array (MockFileSystem behavior) but NO CRASH.
         Assert.Empty(result!);
@@ -62,7 +62,7 @@ public class IconServiceExceptionTests
         // Configure to fail
         faultyFileSystem.FailPath = pngPath;
 
-        var result = iconService.ExtractIconBytes(shortcutPath);
+        var result = iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         // Should return null (graceful failure)
         Assert.Null(result);

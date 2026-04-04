@@ -96,7 +96,7 @@ public class IconServiceSecurityTests
         // But crucially, ExtractIconBytes returns null immediately due to IsUnsafePath check.
 
         // Act
-        var result = _iconService.ExtractIconBytes(unsafePath);
+        var result = _iconService.ExtractIconBytes(unsafePath, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Null(result);

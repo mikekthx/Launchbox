@@ -291,7 +291,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var files = await Task.Run(() =>
                 _shortcutService.GetShortcutFiles(
                     folder.ExpandedPath,
-                    Constants.ALLOWED_EXTENSIONS), ct);
+                    Constants.ALLOWED_EXTENSIONS, ct), ct);
 
             if (files != null)
             {
@@ -407,7 +407,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             try
             {
                 // Parallel.ForEachAsync already runs on thread pool threads — no need for Task.Run
-                var iconBytes = _iconService.ExtractIconBytes(item.Path);
+                var iconBytes = _iconService.ExtractIconBytes(item.Path, token);
                 if (iconBytes != null && !token.IsCancellationRequested)
                 {
                     await _dispatcher.EnqueueAsync(async () =>

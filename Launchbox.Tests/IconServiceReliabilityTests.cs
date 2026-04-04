@@ -57,7 +57,7 @@ public class IconServiceReliabilityTests
         // We catch it to proceed to the second part of the test.
         try
         {
-            iconService.ExtractIconBytes(shortcutPath);
+            iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
         }
         catch (UnauthorizedAccessException)
         {
@@ -69,7 +69,7 @@ public class IconServiceReliabilityTests
         // If our fix works, it will re-evaluate GetLastWriteTime, which succeeds (FailNextGetLastWriteTime is false).
         // It returns null because there's no real icon, but it shouldn't throw.
 
-        var result = iconService.ExtractIconBytes(shortcutPath);
+        var result = iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         Assert.Null(result); // Should be null (no icon), not throw exception
     }
@@ -95,7 +95,7 @@ public class IconServiceReliabilityTests
         // Act: call ExtractIconBytes repeatedly; the internal cache loop must terminate
         // even if entries appear expired on every check (due to MAX_CACHE_RETRIES).
         // This call should complete in bounded time rather than spinning forever.
-        var result = iconService.ExtractIconBytes(shortcutPath);
+        var result = iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         // Assert: the method completed (didn't hang) and the file system was called
         // a bounded number of times. Each retry re-creates the Lazy, so we expect

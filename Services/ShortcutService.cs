@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace Launchbox.Services;
 
@@ -16,12 +17,16 @@ public class ShortcutService : IShortcutService
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
     }
 
-    public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions)
+    public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+
         if (allowedExtensions == null || !_fileSystem.DirectoryExists(folderPath))
         {
             return null; // Folder does not exist (distinct from empty: no shortcuts in folder)
         }
+
+        ct.ThrowIfCancellationRequested();
 
         try
         {

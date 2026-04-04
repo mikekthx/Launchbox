@@ -1,6 +1,7 @@
 using Launchbox.Services;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Launchbox.Tests;
 
@@ -19,7 +20,7 @@ public class MockIconService : IIconService
         _throwingPaths.Add(path);
     }
 
-    public byte[]? ExtractIconBytes(string path)
+    public byte[]? ExtractIconBytes(string path, CancellationToken ct = default)
     {
         if (_throwingPaths.Contains(path))
         {

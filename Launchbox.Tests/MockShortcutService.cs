@@ -1,5 +1,6 @@
 using Launchbox.Services;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Launchbox.Tests;
 
@@ -12,7 +13,7 @@ public class MockShortcutService : IShortcutService
         _files = files;
     }
 
-    public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions)
+    public string[]? GetShortcutFiles(string folderPath, IReadOnlyList<string> allowedExtensions, CancellationToken ct = default)
     {
         return _files;
     }

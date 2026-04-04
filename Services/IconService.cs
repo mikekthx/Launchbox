@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using WinIcon = System.Drawing.Icon;
 
 namespace Launchbox.Services;
@@ -102,8 +103,10 @@ public class IconService(IFileSystem fileSystem) : IIconService
     /// If no custom icon is found, it falls back to the system's default icon extraction.
     /// Results are cached based on file modification timestamps to minimize I/O operations.
     /// </remarks>
-    public byte[]? ExtractIconBytes(string path)
+    public byte[]? ExtractIconBytes(string path, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+
         if (PathSecurity.IsUnsafePath(path))
         {
             Trace.WriteLine($"Blocked icon extraction for unsafe path: {PathSecurity.RedactPath(path)}");

@@ -63,7 +63,7 @@ public class IconServiceOptimizationTests
         int iterations = 100;
         for (int i = 0; i < iterations; i++)
         {
-            iconService.ExtractIconBytes(appPath);
+            iconService.ExtractIconBytes(appPath, TestContext.Current.CancellationToken);
         }
 
         // 3. Measure

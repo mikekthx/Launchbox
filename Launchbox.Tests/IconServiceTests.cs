@@ -74,7 +74,7 @@ public class IconServiceTests
         _mockFileSystem.AddDirectory(iconsDir);
         _mockFileSystem.AddFile(pngPath, content: expectedBytes);
 
-        var result = _iconService.ExtractIconBytes(shortcutPath);
+        var result = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedBytes, result);
     }
@@ -91,7 +91,7 @@ public class IconServiceTests
         _mockFileSystem.AddDirectory(iconsDir);
         _mockFileSystem.AddFile(icoPath, content: expectedBytes);
 
-        var result = _iconService.ExtractIconBytes(shortcutPath);
+        var result = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         Assert.Equal(expectedBytes, result);
     }
@@ -115,7 +115,7 @@ public class IconServiceTests
         _mockFileSystem.AddFile(pngPath, content: pngBytes);
         _mockFileSystem.AddFile(icoPath, content: icoBytes);
 
-        var result = _iconService.ExtractIconBytes(shortcutPath);
+        var result = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         Assert.Equal(icoBytes, result);
     }
@@ -137,7 +137,7 @@ public class IconServiceTests
         _mockFileSystem.AddFile(pngPath, content: pngBytes);
         _mockFileSystem.AddFile(icoPath, content: icoBytes);
 
-        var result = _iconService.ExtractIconBytes(shortcutPath);
+        var result = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         Assert.Equal(pngBytes, result);
     }
@@ -158,7 +158,7 @@ public class IconServiceTests
         _mockFileSystem.AddFile(pngPath, content: pngBytes, lastWriteTime: DateTime.Now.AddHours(-1));
 
         // First call: Load initial
-        var result1 = _iconService.ExtractIconBytes(shortcutPath);
+        var result1 = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
         Assert.Equal(pngBytes, result1);
 
         // Update file with newer timestamp
@@ -169,7 +169,7 @@ public class IconServiceTests
         _iconService.PruneCache([]);
 
         // Second call: Should detect timestamp change and reload
-        var result2 = _iconService.ExtractIconBytes(shortcutPath);
+        var result2 = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
         Assert.Equal(newBytes, result2);
     }
 
@@ -191,11 +191,11 @@ public class IconServiceTests
         _mockFileSystem.AddFile(pngPath, content: pngBytes, lastWriteTime: time);
 
         // First call
-        var result1 = _iconService.ExtractIconBytes(shortcutPath);
+        var result1 = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
         Assert.Equal(pngBytes, result1);
 
         // Second call (timestamps same)
-        var result2 = _iconService.ExtractIconBytes(shortcutPath);
+        var result2 = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
         Assert.Equal(pngBytes, result2);
     }
 
@@ -214,7 +214,7 @@ public class IconServiceTests
         // We set size explicitly. Content is null but size check should trigger before read.
         _mockFileSystem.AddFile(pngPath, size: largeSize, content: null);
 
-        var result = _iconService.ExtractIconBytes(shortcutPath);
+        var result = _iconService.ExtractIconBytes(shortcutPath, TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
@@ -236,8 +236,8 @@ public class IconServiceTests
         _mockFileSystem.AddFile(pngPath2, content: [2]);
 
         // Populate cache
-        _iconService.ExtractIconBytes(shortcutPath1);
-        _iconService.ExtractIconBytes(shortcutPath2);
+        _iconService.ExtractIconBytes(shortcutPath1, TestContext.Current.CancellationToken);
+        _iconService.ExtractIconBytes(shortcutPath2, TestContext.Current.CancellationToken);
 
         // Prune shortcutPath2 (keep shortcutPath1)
         var activePaths = new[] { shortcutPath1 };
@@ -261,7 +261,7 @@ public class IconServiceTests
         _mockFileSystem.AddDirectory(System.IO.Path.GetDirectoryName(expandedPath)!);
         _mockFileSystem.AddFile(expandedPath);
 
-        _iconService.ExtractIconBytes(expandedPath);
+        _iconService.ExtractIconBytes(expandedPath, TestContext.Current.CancellationToken);
 
         // Pass the unexpanded path as "active" — icon should NOT be evicted
         int removedCount = _iconService.PruneCache([envPath]);

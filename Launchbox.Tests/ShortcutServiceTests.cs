@@ -18,7 +18,7 @@ public class ShortcutServiceTests
         var mockFileSystem = new MockFileSystem();
         var service = new ShortcutService(mockFileSystem);
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS, TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
@@ -34,7 +34,7 @@ public class ShortcutServiceTests
 
         var service = new ShortcutService(mockFileSystem);
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(2, result.Length);
@@ -54,7 +54,7 @@ public class ShortcutServiceTests
 
         var service = new ShortcutService(mockFileSystem);
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Equal(3, result.Length);
@@ -73,7 +73,7 @@ public class ShortcutServiceTests
         var service = new ShortcutService(mockFileSystem);
         var uppercaseExtensions = new[] { ".LNK" };
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, uppercaseExtensions);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, uppercaseExtensions, TestContext.Current.CancellationToken);
 
         Assert.NotNull(result);
         Assert.Single(result);
@@ -87,7 +87,7 @@ public class ShortcutServiceTests
         mockFileSystem.AddDirectory(SHORTCUT_FOLDER);
         var service = new ShortcutService(mockFileSystem);
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, null!);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, null!, TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
@@ -100,7 +100,7 @@ public class ShortcutServiceTests
         mockFileSystem.AddDirectory(SHORTCUT_FOLDER);
         var service = new ShortcutService(mockFileSystem);
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS, TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
@@ -113,7 +113,7 @@ public class ShortcutServiceTests
         mockFileSystem.AddDirectory(SHORTCUT_FOLDER);
         var service = new ShortcutService(mockFileSystem);
 
-        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS);
+        var result = service.GetShortcutFiles(SHORTCUT_FOLDER, ALLOWED_EXTENSIONS, TestContext.Current.CancellationToken);
 
         Assert.Null(result);
     }
