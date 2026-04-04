@@ -216,6 +216,8 @@ Use section comments in large files:
 - Multi-line attributes for complex elements
 - Use `x:Bind` (compiled bindings) for simple properties. For dynamic types (e.g. `AppItem.Icon`), use `x:Bind` with a cast: `{x:Bind (media:ImageSource)Icon}`.
 - When adding commands or variables to out-of-tree UI elements (such as TaskbarIcon, ContextFlyout, or MenuFlyout), always use standard {Binding} instead of {x:Bind} to avoid CS1503 casting errors during compilation. Ensure `RootGrid.DataContext = this;` is set in the code-behind.
+- `AutomationProperties.LabeledBy` must always use `{Binding ElementName=SomeName}`, never `{x:Bind SomeName}`. Using `{x:Bind}` for `LabeledBy` causes a silent XamlCompiler crash (exit code 1, no diagnostics) regardless of whether the element is in-tree or out-of-tree.
+- `TextBox` in WinUI 3 does not have a `ClearButtonVisible` property. The native clear button appears automatically when text is entered (built into the default control template). Do not add any property to enable it.
 - Semantic names: `RootGrid`, `AppGrid`, `TrayIcon`
 
 ### Comment Style
