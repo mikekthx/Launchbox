@@ -262,8 +262,9 @@ public class IconService(IFileSystem fileSystem) : IIconService
             var files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
             return (true, files, DateTime.UtcNow);
         }
-        catch
+        catch (Exception ex)
         {
+            Trace.WriteLine($"Failed to enumerate .icons directory: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return (true, null, DateTime.UtcNow);
         }
     }
