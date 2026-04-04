@@ -6,6 +6,13 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    groups:
+      # Bundle all NuGet updates into one PR per week to reduce noise
+      nuget-dependencies:
+        patterns:
+          - "*"
 
   # Monitor GitHub Actions weekly.
   # Actions are pinned to commit SHAs with # vN comments (see dotnet-desktop.yml).
@@ -18,6 +25,8 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
     groups:
       # Bundle all action updates into one PR per week to reduce noise
       actions-dependencies:

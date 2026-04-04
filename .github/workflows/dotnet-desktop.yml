@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ "main" ]
   schedule:
-    # Full CodeQL scan weekly (Monday 6 AM UTC)
+    # CodeQL scan weekly (Monday 6 AM UTC)
     - cron: '0 6 * * 1'
 
 permissions:
@@ -16,59 +16,25 @@ permissions:
   artifact-metadata: write
   security-events: write
   checks: write
+  actions: read
 
 jobs:
 
-  # Fast extractorless scan on PRs; full build-traced scan on push to main
   analyze:
     name: Security Scan (CodeQL)
     runs-on: windows-latest
-    env:
-      Solution_Name: Launchbox.sln
+    concurrency:
+      group: ${{ github.workflow }}-analyze-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Initialize CodeQL (extractorless — PR only)
-        if: github.event_name == 'pull_request'
+      - name: Initialize CodeQL
         uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         with:
           languages: csharp
           build-mode: none
-
-      - name: Initialize CodeQL (build-traced — push/schedule)
-        if: github.event_name != 'pull_request'
-        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4
-        with:
-          languages: csharp
-          build-mode: manual
-
-      - name: Install .NET Core
-        if: github.event_name != 'pull_request'
-        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
-        with:
-          global-json-file: global.json
-
-      - name: Cache NuGet packages
-        if: github.event_name != 'pull_request'
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-codeql-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-codeql-
-
-      - name: Pre-create Source Generator Folders
-        if: github.event_name != 'pull_request'
-        run: |
-          New-Item -ItemType Directory -Force -Path "obj\Gen\WinRT.SourceGenerator\Generator.WinRTAotSourceGenerator"
-          New-Item -ItemType Directory -Force -Path "obj\Gen\WinRT.SourceGenerator\Generator.WinRTSourceGenerator"
-
-      - name: Build for CodeQL analysis
-        if: github.event_name != 'pull_request'
-        run: |
-          dotnet restore $env:Solution_Name
-          dotnet build $env:Solution_Name --configuration Debug -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputPath=obj\Gen -p:AppxPackageSigningEnabled=false
 
       - name: Perform Analysis
         uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4
@@ -77,9 +43,9 @@ jobs:
     # Skip build/test/package on scheduled runs (schedule is for CodeQL only)
     if: github.event_name != 'schedule'
 
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
+    concurrency:
+      group: ${{ github.workflow }}-build-${{ github.ref }}
+      cancel-in-progress: true
 
     runs-on: windows-latest
 
@@ -114,20 +80,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nuget-
 
-    # Cache MSBuild intermediate files for incremental builds
-    - name: Cache MSBuild obj folders
-      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
-      with:
-        path: '**/obj'
-        key: ${{ runner.os }}-obj-${{ matrix.configuration }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-obj-${{ matrix.configuration }}-
-
     # Execute all unit tests in the specific test project
     # coverlet.runsettings forces IncludeTestAssembly=true and filters to production namespaces
     # so that file-linked production code in Launchbox.Tests.dll is measured correctly.
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
+      run: dotnet test $env:Test_Project_Path --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
 
     # Fail the build if line coverage of production code drops below 80%
     - name: Check coverage threshold
@@ -149,7 +106,7 @@ jobs:
       uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3
       if: always()
       with:
-        name: Unit Test Results (${{ matrix.configuration }})
+        name: Unit Test Results
         path: "**/test-results.trx"
         reporter: dotnet-trx
 
@@ -158,46 +115,53 @@ jobs:
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       if: always()
       with:
-        name: Coverage Report - ${{ matrix.configuration }}
+        name: Coverage Report
         path: TestResults/**/coverage.cobertura.xml
         if-no-files-found: warn
 
     # Build the full WinUI app to catch XAML/binding compile errors (tests only link a subset of files)
     - name: Build the application
-      run: dotnet build $env:Project_Path --configuration ${{ matrix.configuration }} -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
+      run: dotnet build $env:Project_Path --configuration Release -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
 
     # Decode and install the base 64 encoded pfx
     - name: Decode and install the pfx
       if: github.event_name != 'pull_request'
       run: |
-        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
+        $pfx_cert_byte = [System.Convert]::FromBase64String($env:BASE64_PFX)
         $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-        $pwd = ConvertTo-SecureString -String "${{ secrets.Pfx_Key }}" -Force -AsPlainText
+        $pwd = ConvertTo-SecureString -String $env:PFX_KEY -Force -AsPlainText
         $cert = Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $pwd
         echo "CERT_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
+      env:
+        BASE64_PFX: ${{ secrets.Base64_Encoded_Pfx }}
+        PFX_KEY: ${{ secrets.Pfx_Key }}
 
     # Create the app package by building and packaging the single-project MSIX
     - name: Create the app package
       if: github.event_name != 'pull_request'
-      run: dotnet build $env:Project_Path --configuration $env:Configuration -p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode -p:AppxBundle=$env:Appx_Bundle -p:GenerateAppxPackageOnBuild=true -p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT -p:NoWarn=APPX0107 -p:AppxPackageVersion=1.0.0.${{ github.run_number }} -p:AppxSymbolPackageEnabled=false
+      run: dotnet build $env:Project_Path --configuration Release -p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode -p:AppxBundle=$env:Appx_Bundle -p:AppxBundlePlatforms=$env:Appx_Bundle_Platforms -p:GenerateAppxPackageOnBuild=true -p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT -p:NoWarn=APPX0107 -p:AppxPackageVersion=1.0.0.${{ github.run_number }} -p:AppxSymbolPackageEnabled=false
       env:
         Appx_Bundle: Always
         Appx_Bundle_Platforms: x64|arm64
         Appx_Package_Build_Mode: StoreUpload
-        Configuration: ${{ matrix.configuration }}
 
-    # Remove the pfx
-    - name: Remove the pfx
-      if: github.event_name != 'pull_request'
-      run: Remove-Item -path $env:Project_Directory\GitHubActionsWorkflow.pfx
+    # Remove the pfx file and the imported cert from the machine store — always(), so
+    # signing material is cleaned up even if the packaging step fails mid-run.
+    - name: Remove the pfx and cert
+      if: always() && github.event_name != 'pull_request'
+      run: |
+        Remove-Item -Path $env:Project_Directory\GitHubActionsWorkflow.pfx -ErrorAction SilentlyContinue
+        if ($env:CERT_THUMBPRINT) {
+          Get-ChildItem Cert:\CurrentUser\My\$env:CERT_THUMBPRINT -ErrorAction SilentlyContinue | Remove-Item
+        }
 
     # Upload the MSIX package
     - name: Upload build artifacts
       if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       with:
-        name: MSIX Package - ${{ matrix.configuration }}
+        name: MSIX Package
         path: ${{ env.Project_Directory }}\AppPackages
 
     # Generate the unforgeable birth certificate for the installer
@@ -205,4 +169,4 @@ jobs:
       if: github.event_name != 'pull_request'
       uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
       with:
-        subject-path: AppPackages/**/*.msi*
+        subject-path: AppPackages/**/*.msixbundle
