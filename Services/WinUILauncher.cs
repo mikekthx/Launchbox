@@ -46,27 +46,36 @@ public class WinUILauncher : IAppLauncher
         if (extension == ".lnk" || extension == ".url")
         {
             var metadata = _shortcutResolver.Resolve(path);
-            string? targetPath = metadata?.Target;
 
-            // .url files MUST resolve to a safe scheme (http/https). A null result means
-            // the resolver rejected the scheme, so block execution to prevent shell-executing
-            // arbitrary URI schemes (file://, ms-settings://, custom handlers, etc.).
-            // .lnk files may return null from COM resolution for valid shortcuts the shell
-            // can still handle, so only .url null-resolution is treated as a security block.
+            // Security: fail closed if the resolver could not produce metadata at all
+            // (COM failure, buffer truncation, non-Windows platform, or exception).
+            // Proceeding without metadata would silently skip arg/workingDir validation.
+            if (metadata == null)
+            {
+                Trace.WriteLine($"Blocked execution of shortcut with unresolvable metadata: {PathSecurity.RedactPath(path)}");
+                return;
+            }
+
+            string? targetPath = metadata.Target;
+
             if (string.IsNullOrEmpty(targetPath))
             {
                 if (extension == ".url")
                 {
+                    // .url MUST have a resolved http/https target; null means unsafe scheme was rejected.
                     Trace.WriteLine($"Blocked execution of .url with unresolvable or unsafe scheme: {PathSecurity.RedactPath(path)}");
                     return;
                 }
 
-                // .lnk files may return null from COM resolution for valid shortcuts the shell
-                // can still handle. Log for diagnostics but allow launch to proceed.
-                Trace.WriteLine($"Launching .lnk with unresolved target (COM resolution failed): {PathSecurity.RedactPath(path)}");
+                // .lnk with an empty target string: COM resolved successfully but returned no path.
+                // The shell may still be able to handle it, so proceed with arg/workingDir checks.
+                Trace.WriteLine($"Launching .lnk with empty target (COM returned no path): {PathSecurity.RedactPath(path)}");
             }
-            else
+            else if (extension == ".lnk")
             {
+                // Security: validate .lnk target as a filesystem path.
+                // .url targets are http/https URLs already validated by the resolver — IsUnsafePath
+                // is a filesystem check and would reject query-string characters.
                 if (PathSecurity.IsUnsafePath(targetPath))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut pointing to unsafe target: {PathSecurity.RedactPath(targetPath)}");
@@ -77,14 +86,14 @@ public class WinUILauncher : IAppLauncher
 
             if (extension == ".lnk")
             {
-                string? args = metadata?.Arguments;
+                string? args = metadata.Arguments;
                 if (PathSecurity.ContainsUncPath(args))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
                     return;
                 }
 
-                string? workingDir = metadata?.WorkingDirectory;
+                string? workingDir = metadata.WorkingDirectory;
                 if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe working directory: {PathSecurity.RedactPath(path)}");

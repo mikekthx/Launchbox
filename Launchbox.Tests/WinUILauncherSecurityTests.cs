@@ -122,16 +122,59 @@ public class WinUILauncherSecurityTests
     }
 
     [Fact]
-    public void Launch_Allows_LnkFile_When_ResolveTarget_Returns_Null()
+    public void Launch_Allows_LnkFile_When_MetadataTarget_Is_Empty()
     {
-        // .lnk files with null resolution are allowed — COM may fail for valid shortcuts
-        // that the shell can still handle
-        var shortcutResolver = new MockShortcutResolver(target: null);
+        // metadata is resolved but target string is empty — shell may still handle it
+        var shortcutResolver = new MockShortcutResolver(target: string.Empty);
         var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
 
         _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
 
         launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.True(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Blocks_LnkFile_When_Resolve_Returns_Null()
+    {
+        // Resolve() returns null (COM failure, truncation) — must fail closed
+        var shortcutResolver = new MockShortcutResolver(returnNull: true);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+        launcher.Launch(@"C:\safe\shortcut.lnk");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void Launch_Blocks_UrlFile_When_Resolve_Returns_Null()
+    {
+        // Resolve() returns null — must fail closed for .url too
+        var shortcutResolver = new MockShortcutResolver(returnNull: true);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\website.url");
+
+        launcher.Launch(@"C:\safe\website.url");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Theory]
+    [InlineData("https://example.com?q=search")]
+    [InlineData("https://example.com?foo=bar&baz=qux")]
+    [InlineData("http://example.com/path?id=1")]
+    public void Launch_Allows_UrlFile_With_QueryParameters(string urlWithQuery)
+    {
+        var shortcutResolver = new MockShortcutResolver(urlWithQuery);
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\website.url");
+
+        launcher.Launch(@"C:\safe\website.url");
 
         Assert.True(_processStarter.WasStarted);
     }
