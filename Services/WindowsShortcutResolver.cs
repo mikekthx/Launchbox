@@ -14,6 +14,64 @@ public class WindowsShortcutResolver : IShortcutResolver
     private const int MAX_PATH = 4096;
     private const int MAX_ARGS_LENGTH = 8192;
 
+    // Security: explicit allowlist of safe URI schemes for .url files.
+    // An allowlist is mandatory here — Windows has hundreds of undocumented built-in URI schemes
+    // (several with historical CVEs, e.g. ms-msdt/Follina, ms-appinstaller/Emotet, search-ms)
+    // and third-party apps can register arbitrary schemes with unpredictable argument handling.
+    // Only schemes whose handlers are well-known, widely deployed, and incapable of direct
+    // filesystem access or arbitrary code execution are included.
+    private static readonly HashSet<string> ALLOWED_URL_SCHEMES = new(StringComparer.OrdinalIgnoreCase)
+    {
+        // Web
+        "http", "https",
+
+        // Email / telephony
+        "mailto", "tel", "callto", "sip",
+
+        // Gaming clients
+        "steam",                   // Steam
+        "com.epicgames.launcher",  // Epic Games Launcher
+        "xbox",                    // Xbox app
+        "goggalaxy",               // GOG Galaxy
+        "origin", "origin2",       // EA / Origin
+        "battlenet",               // Blizzard Battle.net
+        "uplay", "ubisoft-connect",// Ubisoft Connect
+        "roblox", "roblox-player", // Roblox
+
+        // Communication
+        "discord",
+        "msteams", "teamscmd",     // Microsoft Teams
+        "slack",
+        "zoommtg", "zoomus",       // Zoom
+        "skype",
+        "tg", "telegram",          // Telegram
+        "whatsapp",
+
+        // Media
+        "spotify",
+        "itunes",
+
+        // Development tools
+        "vscode", "vscode-insiders",
+        "obsidian",
+        "jetbrains",               // JetBrains Toolbox
+        "github-windows",          // GitHub Desktop
+        "postman",
+        "figma",
+
+        // Safe Windows built-in utilities
+        // Excluded: ms-msdt (Follina/CVE-2022-30190), search-ms/search (SMB relay),
+        //           ms-appinstaller (Emotet vector), ms-officecmd (parameter injection),
+        //           shell: (arbitrary shell commands), mhtml: (IE rendering bypass)
+        "ms-settings",
+        "ms-windows-store",
+        "ms-calculator", "calculator",
+        "ms-clock",
+        "ms-photos",
+        "ms-paint",
+        "ms-screenclip",
+    };
+
     private readonly IFileSystem _fileSystem;
 
     public WindowsShortcutResolver(IFileSystem fileSystem)
@@ -113,14 +171,11 @@ public class WindowsShortcutResolver : IShortcutResolver
             url = Environment.ExpandEnvironmentVariables(url);
         }
 
-        // Security: Ensure URL scheme is safe (restricted to http/https).
-        // This prevents .url files from being used to execute local files (file://) or other unsafe schemes.
-        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri))
+        // Security: only pass through URLs whose scheme is in the explicit allowlist.
+        // See ALLOWED_URL_SCHEMES above for the rationale — blocklist is not viable here.
+        if (Uri.TryCreate(url, UriKind.Absolute, out Uri? uri) && ALLOWED_URL_SCHEMES.Contains(uri.Scheme))
         {
-            if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
-            {
-                return url;
-            }
+            return url;
         }
 
         return null;

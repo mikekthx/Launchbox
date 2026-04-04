@@ -27,11 +27,22 @@ public class WindowsShortcutResolverSecurityTests : IDisposable
     }
 
     [Theory]
+    // Filesystem / network access schemes
     [InlineData("file://C:/Windows/System32/calc.exe")]
     [InlineData("ftp://attacker.com/malware.exe")]
+    [InlineData("smb://attacker.com/share/malware.exe")]
+    // Script execution
     [InlineData("javascript:alert(1)")]
+    [InlineData("vbscript:MsgBox(1)")]
+    // Data URI
+    [InlineData("data:text/html,<script>alert(1)</script>")]
+    // Known Windows exploit vectors (Follina, Emotet, search-ms relay)
+    [InlineData("ms-msdt:/id PCWDiagnostic /skip force /param \"IT_RebrowseForFile=? IT_LaunchMethod=ContextMenu\"")]
+    [InlineData("search-ms:query=malware&crumb=location:\\\\attacker.com\\share")]
+    [InlineData("ms-appinstaller:?source=https://attacker.com/malware.appinstaller")]
+    [InlineData("shell:startup")]
+    // Bare filesystem path masquerading as URL
     [InlineData(@"C:\Windows\System32\cmd.exe")]
-    [InlineData("mailto:victim@example.com")]
     public void ResolveTarget_BlocksUnsafeUrlSchemes(string unsafeUrl)
     {
         // Arrange
@@ -45,6 +56,46 @@ public class WindowsShortcutResolverSecurityTests : IDisposable
 
         // Assert
         Assert.Null(result);
+    }
+
+    [Theory]
+    // Web
+    [InlineData("https://github.com")]
+    [InlineData("http://localhost:8080/")]
+    // Email / telephony
+    [InlineData("mailto:someone@example.com")]
+    [InlineData("tel:+15555555555")]
+    // Gaming clients
+    [InlineData("steam://rungameid/3326230")]
+    [InlineData("com.epicgames.launcher://apps/fortnite?action=launch")]
+    [InlineData("xbox://")]
+    [InlineData("goggalaxy://open/game/123")]
+    [InlineData("battlenet://Heroes/")]
+    [InlineData("uplay://launch/1234/0")]
+    // Communication
+    [InlineData("discord://channels/@me")]
+    [InlineData("slack://open")]
+    [InlineData("zoommtg://zoom.us/join?confno=12345")]
+    [InlineData("msteams://l/meetup-join/123")]
+    [InlineData("tg://resolve?domain=username")]
+    // Media / productivity
+    [InlineData("spotify:track:4uLU6hMCjMI75M1A2tKUQC")]
+    [InlineData("obsidian://open?vault=Notes")]
+    [InlineData("vscode://file/C:/project/README.md")]
+    // Safe Windows utilities
+    [InlineData("ms-settings:display")]
+    [InlineData("ms-windows-store://home")]
+    [InlineData("ms-calculator:")]
+    public void ResolveTarget_AllowsSafeNonHttpSchemes(string safeUrl)
+    {
+        var fileSystem = new MockFileSystem();
+        var resolver = new WindowsShortcutResolver(fileSystem);
+        string shortcutPath = @"C:\shortcuts\app.url";
+        fileSystem.SetIniValue(shortcutPath, "InternetShortcut", "URL", safeUrl);
+
+        var result = resolver.Resolve(shortcutPath)?.Target;
+
+        Assert.Equal(safeUrl, result);
     }
 
     [Fact]
