@@ -246,8 +246,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Interlocked.Exchange is safe even if called from multiple threads.
         var cts = new CancellationTokenSource();
         var old = Interlocked.Exchange(ref _loadCts, cts);
+        // Cancel but do not Dispose: background tasks hold a captured CancellationToken derived
+        // from this source and may still be checking it as they unwind. Disposing the source
+        // while token callbacks are still registered can throw ObjectDisposedException.
+        // CancellationTokenSource is GC-managed and does not hold unmanaged resources.
         old?.Cancel();
-        old?.Dispose();
         var ct = cts.Token;
 
         try
@@ -518,8 +521,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        // Cancel only — see LoadAppsAsync for why Dispose is intentionally omitted.
         _loadCts?.Cancel();
-        _loadCts?.Dispose();
         _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
         Apps.CollectionChanged -= Apps_CollectionChanged;

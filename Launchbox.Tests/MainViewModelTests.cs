@@ -420,30 +420,23 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public async Task Dispose_DisposesCancellationTokenSource()
+    public async Task Dispose_CancelsCancellationTokenSource()
     {
         // Arrange
         var viewModel = CreateViewModel();
 
-        // Act
-        // Call LoadAppsAsync to ensure the _loadCts is initialized
+        // Act: initialize _loadCts, then dispose.
         await viewModel.LoadAppsAsync();
-
-        // At this point, _loadCts is initialized but not disposed, let's grab the actual Token to inspect
-        // The token is not publicly exposed, so we invoke Dispose() to test its effect
         viewModel.Dispose();
 
         // Assert
-        // 1. Verify CancellationTokenSource is disposed.
+        // 1. Verify the CTS is cancelled (but intentionally not disposed — see MainViewModel.Dispose
+        //    for why: disposing while background tasks hold the token can throw ObjectDisposedException).
         var loadCtsField = typeof(MainViewModel).GetField("_loadCts", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
         var cts = (System.Threading.CancellationTokenSource?)loadCtsField?.GetValue(viewModel);
 
         Assert.NotNull(cts);
-        Assert.Throws<ObjectDisposedException>(() =>
-        {
-            // Accessing WaitHandle on a disposed CancellationTokenSource throws ObjectDisposedException
-            var handle = cts.Token.WaitHandle;
-        });
+        Assert.True(cts.IsCancellationRequested);
 
         // 2. Verify SettingsService event is unsubscribed.
         // After disposal, modifying the ShortcutsPath should not trigger LoadAppsAsync().
