@@ -79,6 +79,7 @@ public class ShortcutFolderManager
         return MutateAndPersist(folders =>
         {
             if (folders.Count >= MAX_FOLDERS) return false;
+            if (folders.Any(f => string.Equals(f.Path, path, StringComparison.OrdinalIgnoreCase))) return false;
             label ??= Path.GetFileName(path) ?? path;
             folders.Add(new ShortcutFolder { Path = path, Label = label, Order = folders.Count });
             return true;
@@ -133,10 +134,18 @@ public class ShortcutFolderManager
     {
         return MutateAndPersist(folders =>
         {
-            var lookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
-            var represented = new HashSet<string>(orderedPaths, StringComparer.OrdinalIgnoreCase);
+            // GroupBy guards against duplicate paths (e.g. from corrupted persisted state);
+            // take the first occurrence so the lookup is always safe.
+            var lookup = folders
+                .GroupBy(f => f.Path, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
 
-            var ordered = orderedPaths
+            // Deduplicate orderedPaths so a caller passing the same path twice
+            // cannot produce duplicate folder entries in the result.
+            var distinctOrderedPaths = orderedPaths.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            var represented = new HashSet<string>(distinctOrderedPaths, StringComparer.OrdinalIgnoreCase);
+
+            var ordered = distinctOrderedPaths
                 .Where(p => lookup.ContainsKey(p))
                 .Select(p => lookup[p])
                 .ToList();
@@ -189,6 +198,9 @@ public class ShortcutFolderManager
             })
             .Where(x => !PathSecurity.IsUnsafePath(x.Expanded))
             .Select(x => x.Folder with { ExpandedPath = x.Expanded })
+            // Deduplicate by path so corrupted persisted state never leaks into _cache.
+            .GroupBy(f => f.Path, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.First())
             .ToList();
 
         return Renumber(valid).AsReadOnly();

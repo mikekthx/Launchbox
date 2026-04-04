@@ -237,6 +237,96 @@ public class ShortcutFolderManagerTests
         Assert.Single(manager.GetFolders());
     }
 
+    [Fact]
+    public void AddFolder_RejectsDuplicatePath()
+    {
+        var store = new MockSettingsStore();
+        var manager = new ShortcutFolderManager(store);
+
+        manager.AddFolder(SafePath("Apps"), "Apps");
+        var result = manager.AddFolder(SafePath("Apps"), "Apps Again");
+
+        Assert.False(result);
+        // Only the default + one added folder
+        Assert.Equal(2, manager.GetFolders().Count);
+    }
+
+    [Fact]
+    public void AddFolder_RejectsDuplicatePath_CaseInsensitive()
+    {
+        var store = new MockSettingsStore();
+        var manager = new ShortcutFolderManager(store);
+
+        manager.AddFolder(@"C:\apps\MyFolder", "MyFolder");
+        var result = manager.AddFolder(@"C:\APPS\MYFOLDER", "MyFolder Upper");
+
+        Assert.False(result);
+        Assert.Equal(2, manager.GetFolders().Count);
+    }
+
+    [Fact]
+    public void SetFolderSequence_DoesNotCrashWithDuplicatePaths()
+    {
+        // If duplicates somehow exist in the list (e.g. loaded from corrupted store),
+        // SetFolderSequence must not throw ArgumentException and must deduplicate the result.
+        var store = new MockSettingsStore();
+        var initialFolders = new List<ShortcutFolder>
+        {
+            new() { Path = SafePath("A"), Label = "A", Order = 0 },
+            new() { Path = SafePath("B"), Label = "B", Order = 1 },
+            new() { Path = SafePath("A"), Label = "A Dup", Order = 2 },
+        };
+        store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(initialFolders));
+        var manager = new ShortcutFolderManager(store);
+
+        var ex = Record.Exception(() => manager.SetFolderSequence([SafePath("B"), SafePath("A")]));
+
+        Assert.Null(ex);
+        var folders = manager.GetFolders();
+        // Duplicates must be collapsed; B first, A second
+        Assert.Equal(2, folders.Count);
+        Assert.Equal(SafePath("B"), folders[0].Path, StringComparer.OrdinalIgnoreCase);
+        Assert.Equal(SafePath("A"), folders[1].Path, StringComparer.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void SetFolderSequence_DeduplicatesDuplicateOrderedPaths()
+    {
+        // orderedPaths itself containing duplicates must not create duplicate folder entries
+        var store = new MockSettingsStore();
+        var manager = new ShortcutFolderManager(store);
+        manager.AddFolder(SafePath("A"), "A");
+        manager.AddFolder(SafePath("B"), "B");
+
+        manager.SetFolderSequence([SafePath("A"), SafePath("A"), SafePath("B")]);
+
+        var folders = manager.GetFolders();
+        Assert.Equal(3, folders.Count); // default + A + B
+        var paths = folders.Select(f => f.Path).ToList();
+        Assert.Equal(paths.Distinct(StringComparer.OrdinalIgnoreCase).Count(), paths.Count);
+    }
+
+    [Fact]
+    public void LoadFolders_DeduplicatesCorruptedStoredDuplicates()
+    {
+        // Duplicates in persisted JSON must be collapsed on load so _cache never holds duplicates
+        var store = new MockSettingsStore();
+        var initialFolders = new List<ShortcutFolder>
+        {
+            new() { Path = SafePath("A"), Label = "A", Order = 0 },
+            new() { Path = SafePath("A"), Label = "A Dup", Order = 1 },
+            new() { Path = SafePath("B"), Label = "B", Order = 2 },
+        };
+        store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(initialFolders));
+
+        var manager = new ShortcutFolderManager(store);
+
+        var folders = manager.GetFolders();
+        Assert.Equal(2, folders.Count);
+        var paths = folders.Select(f => f.Path).ToList();
+        Assert.Equal(paths.Distinct(StringComparer.OrdinalIgnoreCase).Count(), paths.Count);
+    }
+
     // --- REMOVE ---
 
     [Fact]
