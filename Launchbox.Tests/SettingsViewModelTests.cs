@@ -292,12 +292,19 @@ public class SettingsViewModelTests
     {
         var (service, startup, _, vm) = CreateViewModel();
 
-        // Rapidly toggle true then false — both should fire, not be dropped
+        // Each toggle fires one PropertyChanged on IsRunAtStartup; wait for both.
+        int count = 0;
+        var tcs = new TaskCompletionSource();
+        service.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsService.IsRunAtStartup) && ++count == 2)
+                tcs.TrySetResult();
+        };
+
         vm.RunAtStartup = true;
         vm.RunAtStartup = false;
 
-        // Wait for both in-flight operations to complete
-        await Task.Delay(200, TestContext.Current.CancellationToken);
+        await tcs.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
         Assert.False(service.IsRunAtStartup);
         Assert.False(startup.IsEnabled);
@@ -308,11 +315,20 @@ public class SettingsViewModelTests
     {
         var (service, startup, _, vm) = CreateViewModel();
 
+        // Three toggles — wait for all three PropertyChanged events.
+        int count = 0;
+        var tcs = new TaskCompletionSource();
+        service.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsService.IsRunAtStartup) && ++count == 3)
+                tcs.TrySetResult();
+        };
+
         vm.RunAtStartup = true;
         vm.RunAtStartup = false;
         vm.RunAtStartup = true;
 
-        await Task.Delay(200, TestContext.Current.CancellationToken);
+        await tcs.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
         Assert.True(service.IsRunAtStartup);
         Assert.True(startup.IsEnabled);
