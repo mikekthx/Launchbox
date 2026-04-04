@@ -19,7 +19,6 @@ public class ShortcutFolderOptimizationTests
             Path = "%USERPROFILE%\\Shortcuts",
             Label = "My Shortcuts",
             Order = 1,
-            ExpandedPath = "C:\\Users\\Jules\\Shortcuts"
         };
 
         var json = JsonSerializer.Serialize(folder);
@@ -43,10 +42,23 @@ public class ShortcutFolderOptimizationTests
     public void ShortcutFolder_Equals_IgnoresCachedExpandedPath()
     {
         var a = new ShortcutFolder { Path = "X", Label = "Y", Order = 0 };
-        var b = a with { ExpandedPath = "expanded_X" };
+        var b = new ShortcutFolder { Path = "X", Label = "Y", Order = 0 };
 
         Assert.Equal(a, b);
         Assert.Equal(a.GetHashCode(), b.GetHashCode());
+    }
+
+    [Fact]
+    public void ShortcutFolder_WithExpression_ChangingPath_ReflectsNewExpandedPath()
+    {
+        // ExpandedPath is a pure computed property — a with-expression replacing Path
+        // must immediately reflect the new path's expansion, not the original's.
+        var original = new ShortcutFolder { Path = "%TEMP%", Label = "T", Order = 0 };
+
+        var modified = original with { Path = "%WINDIR%" };
+
+        Assert.Equal(Environment.ExpandEnvironmentVariables("%WINDIR%"), modified.ExpandedPath);
+        Assert.NotEqual(original.ExpandedPath, modified.ExpandedPath);
     }
 
     [Fact]
