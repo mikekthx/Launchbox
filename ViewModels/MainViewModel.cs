@@ -253,138 +253,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
         try
         {
             var folders = _settingsService.GetShortcutFolders();
-            List<AppItem> localAppItems = [];
-            List<string> allFiles = [];
-
-            foreach (var folder in folders.OrderBy(f => f.Order))
-            {
-                // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-                var files = await Task.Run(() =>
-                    _shortcutService.GetShortcutFiles(
-                        folder.ExpandedPath,
-                        Constants.ALLOWED_EXTENSIONS), ct);
-
-                if (files != null)
-                {
-                    allFiles.AddRange(files);
-                    foreach (var file in files)
-                    {
-                        try
-                        {
-                            var name = Path.GetFileNameWithoutExtension(file);
-                            localAppItems.Add(new AppItem
-                            {
-                                Name = name,
-                                Path = file,
-                                FolderLabel = folder.Label,
-                                FolderPath = folder.Path
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                        }
-                    }
-                }
-                else
-                {
-                    Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
-                }
-            }
+            var (localAppItems, allFiles) = await LoadAppItemsAsync(folders, ct);
 
             ct.ThrowIfCancellationRequested();
 
             _iconService.PruneCache(allFiles);
 
-            // Apply custom item order per folder, falling back to alphabetical for unordered items.
-            var orderedItems = localAppItems
-                .GroupBy(a => a.FolderPath)
-                .SelectMany(g =>
-                {
-                    var customOrder = _settingsService.GetItemOrder(g.Key);
-                    if (customOrder.Count == 0)
-                        return (IEnumerable<AppItem>)g.OrderBy(a => a.Name);
-
-                    var byName = g.ToDictionary(
-                        a => Path.GetFileName(a.Path),
-                        StringComparer.OrdinalIgnoreCase);
-
-                    // Items with a custom position first, then new/unlisted items alphabetically.
-                    var ordered = customOrder
-                        .Where(name => byName.ContainsKey(name))
-                        .Select(name => byName[name])
-                        .ToList();
-                    var listed = new HashSet<string>(customOrder, StringComparer.OrdinalIgnoreCase);
-                    ordered.AddRange(g
-                        .Where(a => !listed.Contains(Path.GetFileName(a.Path)))
-                        .OrderBy(a => a.Name));
-                    return ordered;
-                })
-                .ToList();
-
-            // Build grouped data structure — group by FolderPath (unique), display Label
-            var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
-            var groupedData = orderedItems
-                .GroupBy(a => a.FolderPath)
-                .OrderBy(g => folderLookup.TryGetValue(g.Key, out var f) ? f.Order : int.MaxValue)
-                .Select(g =>
-                {
-                    var label = folderLookup.TryGetValue(g.Key, out var f) ? f.Label : Path.GetFileName(g.Key) ?? g.Key;
-                    return new AppItemGroup(label, g.Key, g);
-                })
-                .ToList();
+            var orderedItems = OrderAppItems(localAppItems);
+            var groupedData = BuildGroupedData(orderedItems, folders);
 
             ct.ThrowIfCancellationRequested();
 
-            await _dispatcher.EnqueueAsync(() =>
-            {
-                Apps.ReplaceAll(orderedItems);
-                IsEmpty = Apps.Count == 0;
+            await UpdateUIAsync(orderedItems, groupedData);
 
-                GroupedApps.ReplaceAll(groupedData);
-
-                OnPropertyChanged(nameof(IsMergedModeVisible));
-                OnPropertyChanged(nameof(IsGroupedModeVisible));
-
-                // Reapply active filter to new group instances
-                if (!string.IsNullOrEmpty(_filterText))
-                {
-                    ApplyGroupedFilter();
-                }
-
-                return Task.CompletedTask;
-            });
-
-            var parallelOptions = new ParallelOptions
-            {
-                CancellationToken = ct,
-                MaxDegreeOfParallelism = 2 // Bound parallelism to prevent ThreadPool starvation with GDI+ locks
-            };
-
-            await Parallel.ForEachAsync(localAppItems, parallelOptions, async (item, token) =>
-            {
-                try
-                {
-                    // Parallel.ForEachAsync already runs on thread pool threads — no need for Task.Run
-                    var iconBytes = _iconService.ExtractIconBytes(item.Path);
-                    if (iconBytes != null && !token.IsCancellationRequested)
-                    {
-                        await _dispatcher.EnqueueAsync(async () =>
-                        {
-                            var image = await _imageFactory.CreateImageAsync(iconBytes);
-                            item.Icon = image;
-                        });
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
-                catch (Exception ex)
-                {
-                    Trace.WriteLine($"Failed to load icon for {PathSecurity.RedactPath(item.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                }
-            });
+            await ExtractIconsAsync(localAppItems, ct);
         }
         catch (OperationCanceledException)
         {
@@ -394,6 +276,156 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             Trace.WriteLine($"Unexpected error in LoadAppsAsync: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
+    }
+
+    private async Task<(List<AppItem> Items, List<string> AllFiles)> LoadAppItemsAsync(
+        IReadOnlyList<ShortcutFolder> folders,
+        CancellationToken ct)
+    {
+        List<AppItem> localAppItems = [];
+        List<string> allFiles = [];
+
+        foreach (var folder in folders.OrderBy(f => f.Order))
+        {
+            // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+            var files = await Task.Run(() =>
+                _shortcutService.GetShortcutFiles(
+                    folder.ExpandedPath,
+                    Constants.ALLOWED_EXTENSIONS), ct);
+
+            if (files != null)
+            {
+                allFiles.AddRange(files);
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var name = Path.GetFileNameWithoutExtension(file);
+                        localAppItems.Add(new AppItem
+                        {
+                            Name = name,
+                            Path = file,
+                            FolderLabel = folder.Label,
+                            FolderPath = folder.Path
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                    }
+                }
+            }
+            else
+            {
+                Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
+            }
+        }
+
+        return (localAppItems, allFiles);
+    }
+
+    private List<AppItem> OrderAppItems(List<AppItem> items)
+    {
+        // Apply custom item order per folder, falling back to alphabetical for unordered items.
+        return items
+            .GroupBy(a => a.FolderPath)
+            .SelectMany(g =>
+            {
+                var customOrder = _settingsService.GetItemOrder(g.Key);
+                if (customOrder.Count == 0)
+                    return (IEnumerable<AppItem>)g.OrderBy(a => a.Name);
+
+                var byName = g.ToDictionary(
+                    a => Path.GetFileName(a.Path),
+                    StringComparer.OrdinalIgnoreCase);
+
+                // Items with a custom position first, then new/unlisted items alphabetically.
+                var ordered = customOrder
+                    .Where(name => byName.ContainsKey(name))
+                    .Select(name => byName[name])
+                    .ToList();
+                var listed = new HashSet<string>(customOrder, StringComparer.OrdinalIgnoreCase);
+                ordered.AddRange(g
+                    .Where(a => !listed.Contains(Path.GetFileName(a.Path)))
+                    .OrderBy(a => a.Name));
+                return ordered;
+            })
+            .ToList();
+    }
+
+    private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
+    {
+        // Build grouped data structure — group by FolderPath (unique), display Label
+        var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
+        return orderedItems
+            .GroupBy(a => a.FolderPath)
+            .Select(g =>
+            {
+                var found = folderLookup.TryGetValue(g.Key, out var f);
+                return (
+                    Group: new AppItemGroup(found ? f!.Label : Path.GetFileName(g.Key) ?? g.Key, g.Key, g),
+                    Order: found ? f!.Order : int.MaxValue
+                );
+            })
+            .OrderBy(x => x.Order)
+            .Select(x => x.Group)
+            .ToList();
+    }
+
+    private Task UpdateUIAsync(List<AppItem> orderedItems, List<AppItemGroup> groupedData)
+    {
+        return _dispatcher.EnqueueAsync(() =>
+        {
+            Apps.ReplaceAll(orderedItems);
+            IsEmpty = Apps.Count == 0;
+
+            GroupedApps.ReplaceAll(groupedData);
+
+            OnPropertyChanged(nameof(IsMergedModeVisible));
+            OnPropertyChanged(nameof(IsGroupedModeVisible));
+
+            // Reapply active filter to new group instances
+            if (!string.IsNullOrEmpty(_filterText))
+            {
+                ApplyGroupedFilter();
+            }
+
+            return Task.CompletedTask;
+        });
+    }
+
+    private async Task ExtractIconsAsync(List<AppItem> items, CancellationToken ct)
+    {
+        var parallelOptions = new ParallelOptions
+        {
+            CancellationToken = ct,
+            MaxDegreeOfParallelism = 2 // Bound parallelism to prevent ThreadPool starvation with GDI+ locks
+        };
+
+        await Parallel.ForEachAsync(items, parallelOptions, async (item, token) =>
+        {
+            try
+            {
+                // Parallel.ForEachAsync already runs on thread pool threads — no need for Task.Run
+                var iconBytes = _iconService.ExtractIconBytes(item.Path);
+                if (iconBytes != null && !token.IsCancellationRequested)
+                {
+                    await _dispatcher.EnqueueAsync(async () =>
+                    {
+                        var image = await _imageFactory.CreateImageAsync(iconBytes);
+                        item.Icon = image;
+                    });
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Failed to load icon for {PathSecurity.RedactPath(item.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            }
+        });
     }
 
     [RelayCommand]
