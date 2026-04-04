@@ -82,7 +82,7 @@ jobs:
             - Post a **top-level summary comment** covering: what the PR does, overall
               assessment, and any blocking issues
             - Skip inline comments for nitpicks that don't affect correctness or standards
-            - If the PR AUTHOR is "google-labs-jules[bot]" and there are blocking issues
+            - If the PR AUTHOR is "app/google-labs-jules" and there are blocking issues
               or required changes, end the top-level summary with:
               "@jules please address the issues noted above"
 
