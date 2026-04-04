@@ -69,7 +69,10 @@
     <value>Nenhum resultado</value>
   </data>
   <data name="MainWindow_ShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
-    <value>Grade de Atalhos</value>
+    <value>Shortcuts Grid</value>
+  </data>
+  <data name="MainWindow_GroupedShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
+    <value>Grouped Shortcuts Grid</value>
   </data>
 
   <!-- SettingsWindow.xaml — In-Tree Elements -->
@@ -190,7 +193,7 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Pastas de atalhos</value>
   </data>
-  <data name="Settings_AddFolder.Content" xml:space="preserve">
+  <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Adicionar pasta</value>
   </data>
   <data name="Settings_RemoveFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">

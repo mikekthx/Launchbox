@@ -69,7 +69,10 @@
     <value>Keine Treffer</value>
   </data>
   <data name="MainWindow_ShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
-    <value>Verknüpfungsraster</value>
+    <value>Shortcuts Grid</value>
+  </data>
+  <data name="MainWindow_GroupedShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
+    <value>Grouped Shortcuts Grid</value>
   </data>
 
   <!-- SettingsWindow.xaml — In-Tree Elements -->
@@ -190,7 +193,7 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Verknüpfungsordner</value>
   </data>
-  <data name="Settings_AddFolder.Content" xml:space="preserve">
+  <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Ordner hinzufügen</value>
   </data>
   <data name="Settings_RemoveFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
