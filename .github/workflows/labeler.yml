@@ -5,6 +5,9 @@ on:
 
 jobs:
   triage:
+    # Dependabot already applies correct labels (dependencies, github_actions, etc.).
+    # Running labeler on top would strip those labels via sync-labels, so skip it.
+    if: github.actor != 'dependabot[bot]'
     permissions:
       contents: read
       pull-requests: write
