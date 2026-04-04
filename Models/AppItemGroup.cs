@@ -36,6 +36,58 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
     // Tracks the active filter text so expand can re-apply it
     private string? _activeFilter;
 
+    // True while internal ReplaceAll operations are running; suppresses the mutation guard
+    // so the base class methods can be called without triggering NotSupportedException.
+    // Also true during base-class construction (field initializer runs before base ctor).
+    private bool _suppressGuard = true;
+
+    // Wraps ReplaceAll with the mutation guard suppressed, so ApplyFilter and ApplyCollapseState
+    // can batch-replace the visible collection without the guard interfering.
+    private void ReplaceAllGuarded(IEnumerable<AppItem> items)
+    {
+        _suppressGuard = true;
+        try
+        {
+            ReplaceAll(items);
+        }
+        finally
+        {
+            _suppressGuard = false;
+        }
+    }
+
+    protected override void InsertItem(int index, AppItem item)
+    {
+        if (!_suppressGuard)
+            throw new NotSupportedException(
+                $"Direct Add/Insert bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
+        base.InsertItem(index, item);
+    }
+
+    protected override void RemoveItem(int index)
+    {
+        if (!_suppressGuard)
+            throw new NotSupportedException(
+                $"Direct Remove bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
+        base.RemoveItem(index);
+    }
+
+    protected override void ClearItems()
+    {
+        if (!_suppressGuard)
+            throw new NotSupportedException(
+                $"Direct Clear bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
+        base.ClearItems();
+    }
+
+    protected override void SetItem(int index, AppItem item)
+    {
+        if (!_suppressGuard)
+            throw new NotSupportedException(
+                $"Indexer set bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
+        base.SetItem(index, item);
+    }
+
     private bool _isCollapsed;
     public bool IsCollapsed
     {
@@ -56,6 +108,7 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         Label = label;
         FolderPath = folderPath;
         _allItems = [.. this]; // snapshot at construction
+        _suppressGuard = false; // guard now active; public mutation APIs will throw
     }
 
     /// <summary>
@@ -75,12 +128,12 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
             if (hasMatches && Count == 0)
             {
                 // Restore placeholder so header reappears
-                ReplaceAll([COLLAPSED_PLACEHOLDER]);
+                ReplaceAllGuarded([COLLAPSED_PLACEHOLDER]);
             }
             else if (!hasMatches && Count > 0)
             {
                 // No matches — hide the group entirely
-                ReplaceAll([]);
+                ReplaceAllGuarded([]);
             }
             return;
         }
@@ -90,7 +143,7 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         // Minimize churn: only replace if the set actually changed
         if (source.SequenceEqual(this)) return;
 
-        ReplaceAll(source);
+        ReplaceAllGuarded(source);
     }
 
     private void ApplyCollapseState()
@@ -100,14 +153,14 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
             // Evaluate filter to decide if collapsed header should be visible
             bool hasMatches = HasMatches(_activeFilter);
 
-            ReplaceAll(hasMatches ? [COLLAPSED_PLACEHOLDER] : []);
+            ReplaceAllGuarded(hasMatches ? [COLLAPSED_PLACEHOLDER] : []);
         }
         else
         {
             // Expand: re-apply the active filter (don't restore unfiltered _allItems)
             var source = GetFilteredItems(_activeFilter);
 
-            ReplaceAll(source);
+            ReplaceAllGuarded(source);
         }
     }
 

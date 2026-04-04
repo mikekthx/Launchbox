@@ -128,6 +128,46 @@ public class AppItemGroupTests
     }
 
     [Fact]
+    public void Add_Throws_NotSupportedException()
+    {
+        // Bug: inherited Add bypasses _allItems, silently corrupting filter/expand state.
+        var group = MakeGroup("Alpha");
+        Assert.Throws<NotSupportedException>(() => group.Add(MakeItem("Beta")));
+    }
+
+    [Fact]
+    public void Remove_Throws_NotSupportedException()
+    {
+        var group = MakeGroup("Alpha", "Beta");
+        Assert.Throws<NotSupportedException>(() => group.Remove(group[0]));
+    }
+
+    [Fact]
+    public void Clear_Throws_NotSupportedException()
+    {
+        var group = MakeGroup("Alpha");
+        Assert.Throws<NotSupportedException>(() => group.Clear());
+    }
+
+    [Fact]
+    public void IndexerSet_Throws_NotSupportedException()
+    {
+        var group = MakeGroup("Alpha");
+        Assert.Throws<NotSupportedException>(() => group[0] = MakeItem("Replacement"));
+    }
+
+    [Fact]
+    public void ApplyFilter_StillWorks_AfterGuardActivation()
+    {
+        // Internal ReplaceAll must still work via the guarded helper.
+        var group = MakeGroup("Alpha", "Beta");
+        group.ApplyFilter("alp");
+        Assert.Single(group);
+        group.ApplyFilter(null);
+        Assert.Equal(2, group.Count);
+    }
+
+    [Fact]
     public void ReplaceAll_BatchesNotifications()
     {
         var group = MakeGroup("Alpha", "Beta", "Gamma", "Delta");
