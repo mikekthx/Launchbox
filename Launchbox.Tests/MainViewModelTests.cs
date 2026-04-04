@@ -763,4 +763,91 @@ public class MainViewModelTests
 
         Assert.Equal(0, filterRebuildCount);
     }
+
+    // --- TOGGLE GROUP / CLEAR FILTER TESTS ---
+
+    [Fact]
+    public async Task ToggleGroupCommand_CollapsesGroup()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _settingsService.CollapsibleGroups = true;
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        var group = vm.GroupedApps.First();
+
+        vm.ToggleGroupCommand.Execute(group);
+
+        Assert.True(group.IsCollapsed);
+    }
+
+    [Fact]
+    public async Task ToggleGroupCommand_ExpandsCollapsedGroup()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _settingsService.CollapsibleGroups = true;
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        var group = vm.GroupedApps.First();
+        group.IsCollapsed = true;
+
+        vm.ToggleGroupCommand.Execute(group);
+
+        Assert.False(group.IsCollapsed);
+        Assert.Single(group); // item restored
+        Assert.Equal("Alpha", group[0].Name);
+    }
+
+    [Fact]
+    public async Task ToggleGroupCommand_NoOp_WhenCollapsibleGroupsDisabled()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _settingsService.CollapsibleGroups = false;
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        var group = vm.GroupedApps.First();
+
+        vm.ToggleGroupCommand.Execute(group);
+
+        Assert.False(group.IsCollapsed);
+        Assert.Single(group); // item unchanged
+    }
+
+    [Fact]
+    public async Task ClearFilter_RestoresFullItemSet()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        vm.FilterText = "alp";
+        Assert.Single(vm.FilteredApps);
+
+        vm.ClearFilter();
+
+        Assert.Equal(2, vm.FilteredApps.Count);
+        Assert.Equal(string.Empty, vm.FilterText);
+    }
+
+    [Fact]
+    public async Task ClearFilter_PreservesGroupCollapseState()
+    {
+        // Collapsed group stays collapsed after filter is cleared — only the filter changes
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
+        _settingsService.CollapsibleGroups = true;
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        var group = vm.GroupedApps.First();
+        group.IsCollapsed = true;
+        vm.FilterText = "alp"; // hide group entirely? no — "alp" matches Alpha so placeholder stays
+        Assert.Single(group);  // placeholder
+
+        vm.ClearFilter();
+
+        // Group stays collapsed; placeholder remains; filter text is empty
+        Assert.True(group.IsCollapsed);
+        Assert.Single(group);
+        Assert.Equal(string.Empty, group[0].Name); // placeholder sentinel
+        Assert.Equal(string.Empty, vm.FilterText);
+    }
 }
