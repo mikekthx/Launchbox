@@ -249,4 +249,23 @@ public class IconServiceTests
         removedCount = _iconService.PruneCache([]);
         Assert.Equal(1, removedCount);
     }
+
+    [Fact]
+    public void PruneCache_RetainsIcons_WhenActivePathsContainUnexpandedEnvVars()
+    {
+        // Bug: if caller passes %USERPROFILE%-style paths, the cache key (expanded path)
+        // won't match and the icon gets wrongly evicted.
+        string envPath = Path.Combine("%TEMP%", "TestIcons", "App.lnk");
+        string expandedPath = System.Environment.ExpandEnvironmentVariables(envPath);
+
+        _mockFileSystem.AddDirectory(System.IO.Path.GetDirectoryName(expandedPath)!);
+        _mockFileSystem.AddFile(expandedPath);
+
+        _iconService.ExtractIconBytes(expandedPath);
+
+        // Pass the unexpanded path as "active" — icon should NOT be evicted
+        int removedCount = _iconService.PruneCache([envPath]);
+
+        Assert.Equal(0, removedCount);
+    }
 }

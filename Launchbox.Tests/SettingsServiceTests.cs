@@ -314,6 +314,41 @@ public class SettingsServiceTests
         Assert.Empty(svc.GetItemOrder(@"C:\Shortcuts"));
     }
 
+    [Theory]
+    [InlineData(nameof(SettingsService.KeepCentered))]
+    [InlineData(nameof(SettingsService.CollapsibleGroups))]
+    [InlineData(nameof(SettingsService.FolderViewMode))]
+    [InlineData(nameof(SettingsService.GridSize))]
+    [InlineData(nameof(SettingsService.HotkeyModifiers))]
+    [InlineData(nameof(SettingsService.HotkeyKey))]
+    public void PropertySetter_FiresPropertyChanged_EvenOnWriteFailure(string propertyName)
+    {
+        // Bug: setters used `if (X != value && store.SetValue(...)) { OnPropertyChanged(); }`
+        // so a failed write silently left the UI out of sync with the persisted value.
+        var store = new MockSettingsStore();
+        store.FailSetValueKeys.Add(propertyName);
+        var svc = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
+
+        bool notified = false;
+        svc.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == propertyName) notified = true;
+        };
+
+        // Set a non-default value for each property type so the equality guard is bypassed
+        switch (propertyName)
+        {
+            case nameof(SettingsService.KeepCentered): svc.KeepCentered = true; break;
+            case nameof(SettingsService.CollapsibleGroups): svc.CollapsibleGroups = false; break;
+            case nameof(SettingsService.FolderViewMode): svc.FolderViewMode = Launchbox.Models.FolderViewMode.Grouped; break;
+            case nameof(SettingsService.GridSize): svc.GridSize = Launchbox.Helpers.GridSize.Large; break;
+            case nameof(SettingsService.HotkeyModifiers): svc.HotkeyModifiers = Constants.MOD_CONTROL; break;
+            case nameof(SettingsService.HotkeyKey): svc.HotkeyKey = (int)'A'; break;
+        }
+
+        Assert.True(notified); // binding must be notified so it can revert
+    }
+
     [Fact]
     public async Task SetRunAtStartupAsync_Disable_RevertsAndDoesNotThrow_WhenDisableFails()
     {

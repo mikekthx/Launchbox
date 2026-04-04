@@ -28,7 +28,11 @@ public class IconService(IFileSystem fileSystem) : IIconService
         _fileTimestampCache.Clear();
         _expandedPathCache.Clear();
 
-        var activeSet = new HashSet<string>(activePaths, StringComparer.OrdinalIgnoreCase);
+        // Expand environment variables so that callers passing %VAR%-style paths match
+        // cache keys, which are always stored in expanded form.
+        var activeSet = new HashSet<string>(
+            activePaths.Select(p => p.Contains('%') ? Environment.ExpandEnvironmentVariables(p) : p),
+            StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
 
         foreach (var kvp in _iconCache)

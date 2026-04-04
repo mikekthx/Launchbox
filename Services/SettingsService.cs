@@ -197,10 +197,10 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (FolderViewMode != value && _store.SetValue(nameof(FolderViewMode), value.ToString()))
-            {
-                OnPropertyChanged();
-            }
+            if (FolderViewMode == value) return;
+            if (!_store.SetValue(nameof(FolderViewMode), value.ToString()))
+                Trace.WriteLine($"Failed to persist {nameof(FolderViewMode)}: store write returned false");
+            OnPropertyChanged();
         }
     }
 
@@ -216,10 +216,10 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (CollapsibleGroups != value && _store.SetValue(nameof(CollapsibleGroups), value))
-            {
-                OnPropertyChanged();
-            }
+            if (CollapsibleGroups == value) return;
+            if (!_store.SetValue(nameof(CollapsibleGroups), value))
+                Trace.WriteLine($"Failed to persist {nameof(CollapsibleGroups)}: store write returned false");
+            OnPropertyChanged();
         }
     }
 
@@ -239,10 +239,10 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (HotkeyModifiers != value && _store.SetValue(nameof(HotkeyModifiers), value))
-            {
-                OnPropertyChanged();
-            }
+            if (HotkeyModifiers == value) return;
+            if (!_store.SetValue(nameof(HotkeyModifiers), value))
+                Trace.WriteLine($"Failed to persist {nameof(HotkeyModifiers)}: store write returned false");
+            OnPropertyChanged();
         }
     }
 
@@ -259,10 +259,10 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (HotkeyKey != value && _store.SetValue(nameof(HotkeyKey), value))
-            {
-                OnPropertyChanged();
-            }
+            if (HotkeyKey == value) return;
+            if (!_store.SetValue(nameof(HotkeyKey), value))
+                Trace.WriteLine($"Failed to persist {nameof(HotkeyKey)}: store write returned false");
+            OnPropertyChanged();
         }
     }
 
@@ -279,10 +279,10 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (GridSize != value && _store.SetValue(nameof(GridSize), value.ToString()))
-            {
-                OnPropertyChanged();
-            }
+            if (GridSize == value) return;
+            if (!_store.SetValue(nameof(GridSize), value.ToString()))
+                Trace.WriteLine($"Failed to persist {nameof(GridSize)}: store write returned false");
+            OnPropertyChanged();
         }
     }
 
@@ -298,10 +298,10 @@ public class SettingsService : ObservableObject
         }
         set
         {
-            if (KeepCentered != value && _store.SetValue(nameof(KeepCentered), value))
-            {
-                OnPropertyChanged();
-            }
+            if (KeepCentered == value) return;
+            if (!_store.SetValue(nameof(KeepCentered), value))
+                Trace.WriteLine($"Failed to persist {nameof(KeepCentered)}: store write returned false");
+            OnPropertyChanged();
         }
     }
 
