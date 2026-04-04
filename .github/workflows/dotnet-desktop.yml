@@ -27,31 +27,31 @@ jobs:
       Solution_Name: Launchbox.sln
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Initialize CodeQL (extractorless — PR only)
         if: github.event_name == 'pull_request'
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         with:
           languages: csharp
           build-mode: none
 
       - name: Initialize CodeQL (build-traced — push/schedule)
         if: github.event_name != 'pull_request'
-        uses: github/codeql-action/init@v4
+        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v4
         with:
           languages: csharp
           build-mode: manual
 
       - name: Install .NET Core
         if: github.event_name != 'pull_request'
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
         with:
           global-json-file: global.json
 
       - name: Cache NuGet packages
         if: github.event_name != 'pull_request'
-        uses: actions/cache@v5
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-codeql-${{ hashFiles('**/*.csproj') }}
@@ -71,7 +71,7 @@ jobs:
           dotnet build $env:Solution_Name --configuration Debug -p:EmitCompilerGeneratedFiles=true -p:CompilerGeneratedFilesOutputPath=obj\Gen -p:AppxPackageSigningEnabled=false
 
       - name: Perform Analysis
-        uses: github/codeql-action/analyze@v4
+        uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4
 
   build:
     # Skip build/test/package on scheduled runs (schedule is for CodeQL only)
@@ -91,13 +91,13 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       with:
         fetch-depth: 0
 
     # Install the .NET Core workload
     - name: Install .NET Core
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
       with:
         global-json-file: global.json
 
@@ -107,7 +107,7 @@ jobs:
 
     # Cache NuGet packages to speed up future builds
     - name: Cache NuGet packages
-      uses: actions/cache@v5
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
       with:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
@@ -116,7 +116,7 @@ jobs:
 
     # Cache MSBuild intermediate files for incremental builds
     - name: Cache MSBuild obj folders
-      uses: actions/cache@v5
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
       with:
         path: '**/obj'
         key: ${{ runner.os }}-obj-${{ matrix.configuration }}-${{ github.sha }}
@@ -129,7 +129,7 @@ jobs:
 
     # Turn that TRX file into a beautiful UI report in GitHub
     - name: Publish Test Report
-      uses: dorny/test-reporter@v3
+      uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3
       if: always()
       with:
         name: Unit Test Results (${{ matrix.configuration }})
@@ -175,7 +175,7 @@ jobs:
     # Upload the MSIX package
     - name: Upload build artifacts
       if: github.event_name != 'pull_request'
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       with:
         name: MSIX Package - ${{ matrix.configuration }}
         path: ${{ env.Project_Directory }}\AppPackages
@@ -183,6 +183,6 @@ jobs:
     # Generate the unforgeable birth certificate for the installer
     - name: Generate artifact attestation
       if: github.event_name != 'pull_request'
-      uses: actions/attest@v4
+      uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
       with:
         subject-path: AppPackages/**/*.msi*
