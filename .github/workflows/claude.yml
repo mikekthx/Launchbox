@@ -11,7 +11,7 @@ on:
     types: [submitted]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.issue.number || github.event.pull_request.number }}-${{ github.actor }}
+  group: ${{ github.workflow }}-${{ github.event.comment.id || github.event.issue.number || github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
