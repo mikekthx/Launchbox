@@ -10,7 +10,9 @@ concurrency:
 
 jobs:
   claude-review:
-    if: github.event.pull_request.draft == false
+    # Dependabot PRs cannot access repository secrets (GitHub security restriction),
+    # so the OAuth token would be empty. Skip review — SHA bumps don't need it.
+    if: github.event.pull_request.draft == false && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
