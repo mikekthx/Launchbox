@@ -86,21 +86,7 @@ public class WindowPositionManager
                 // Only roll back if we had valid previous values — avoid writing zeros
                 if (hadPrevious)
                 {
-                    (string Key, object Value)[] rollback =
-                    [
-                        (SETTING_KEY_X, oldX),
-                        (SETTING_KEY_Y, oldY),
-                        (SETTING_KEY_WIDTH, oldW),
-                        (SETTING_KEY_HEIGHT, oldH),
-                    ];
-
-                    for (int j = 0; j < i; j++)
-                    {
-                        if (!_settings.SetValue(rollback[j].Key, rollback[j].Value))
-                        {
-                            Trace.WriteLine($"Failed to roll back window position for {rollback[j].Key}");
-                        }
-                    }
+                    RollbackPartialSave(i, oldX, oldY, oldW, oldH);
                 }
 
                 return false;
@@ -108,5 +94,24 @@ public class WindowPositionManager
         }
 
         return true;
+    }
+
+    private void RollbackPartialSave(int successfulWrites, int oldX, int oldY, int oldW, int oldH)
+    {
+        (string Key, object Value)[] rollback =
+        [
+            (SETTING_KEY_X, oldX),
+            (SETTING_KEY_Y, oldY),
+            (SETTING_KEY_WIDTH, oldW),
+            (SETTING_KEY_HEIGHT, oldH),
+        ];
+
+        for (int j = 0; j < successfulWrites; j++)
+        {
+            if (!_settings.SetValue(rollback[j].Key, rollback[j].Value))
+            {
+                Trace.WriteLine($"Failed to roll back window position for {rollback[j].Key}");
+            }
+        }
     }
 }
