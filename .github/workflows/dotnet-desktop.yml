@@ -125,7 +125,7 @@ jobs:
 
     # Execute all unit tests in the specific test project
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
     # Turn that TRX file into a beautiful UI report in GitHub
     - name: Publish Test Report
@@ -136,15 +136,18 @@ jobs:
         path: "**/test-results.trx"
         reporter: dotnet-trx
 
+    # Upload coverage report as an artifact for tracking over time
+    - name: Upload coverage report
+      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
+      if: always()
+      with:
+        name: Coverage Report - ${{ matrix.configuration }}
+        path: TestResults/**/coverage.cobertura.xml
+        if-no-files-found: warn
+
     # Build the full WinUI app to catch XAML/binding compile errors (tests only link a subset of files)
     - name: Build the application
       run: dotnet build $env:Project_Path --configuration ${{ matrix.configuration }} -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
-
-    # Restore the application to populate the obj folder with RuntimeIdentifiers
-    - name: Restore the application
-      run: dotnet restore $env:Solution_Name
-      env:
-        Configuration: ${{ matrix.configuration }}
 
     # Decode and install the base 64 encoded pfx
     - name: Decode and install the pfx
