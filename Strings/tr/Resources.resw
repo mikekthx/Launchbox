@@ -193,6 +193,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Kısayol klasörleri</value>
   </data>
+  <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>Klasör ekle</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Klasör ekle</value>
   </data>

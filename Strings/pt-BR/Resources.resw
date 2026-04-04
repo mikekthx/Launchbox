@@ -193,6 +193,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Pastas de atalhos</value>
   </data>
+  <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>Adicionar pasta</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Adicionar pasta</value>
   </data>

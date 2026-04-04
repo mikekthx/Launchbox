@@ -193,6 +193,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Carpetas de accesos directos</value>
   </data>
+  <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>Agregar carpeta</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Agregar carpeta</value>
   </data>

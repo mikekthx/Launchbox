@@ -193,6 +193,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Foldery skrótów</value>
   </data>
+  <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>Dodaj folder</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Dodaj folder</value>
   </data>

@@ -193,6 +193,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>快捷方式文件夹</value>
   </data>
+  <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>添加文件夹</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>添加文件夹</value>
   </data>

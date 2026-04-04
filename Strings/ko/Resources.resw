@@ -193,6 +193,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>바로 가기 폴더</value>
   </data>
+  <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
+    <value>폴더 추가</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>폴더 추가</value>
   </data>
