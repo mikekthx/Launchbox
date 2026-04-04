@@ -46,7 +46,7 @@ The test project uses **file-linking** (`<Compile Include="..\ClassName.cs" Link
 CI runs on push/PR to `main` (`.github/workflows/dotnet-desktop.yml`):
 1. **Code format** — `dotnet format --verify-no-changes` (run `dotnet format Launchbox.sln` locally before committing)
 2. **App build** — `dotnet build` of the full WinUI app to catch XAML/binding compile errors
-3. **Unit tests** — `dotnet test` on both Debug and Release configurations, using `coverlet.runsettings` for coverage collection
+3. **Unit tests** — `dotnet test` in Release configuration, using `coverlet.runsettings` for coverage collection
 4. **Coverage threshold** — 80% minimum line coverage on production namespaces; build fails if below
 5. **CodeQL** — Security scanning for C# vulnerabilities
 6. **MSIX packaging** — Signed package build (push to `main` only)
