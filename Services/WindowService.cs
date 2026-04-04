@@ -85,7 +85,8 @@ public class WindowService : IWindowService, IDisposable
         // Hotkey
         UpdateHotkey();
 
-        // WndProc
+        // WndProc — delegate stored in _wndProcDelegate field to satisfy GC-root requirement;
+        // see NativeMethods.SetWindowLongPtr(WndProcDelegate) remarks.
         _wndProcDelegate = NewWndProc;
         _oldWndProc = NativeMethods.SetWindowLongPtr(_hWnd, NativeMethods.GWLP_WNDPROC, _wndProcDelegate);
         if (_oldWndProc == IntPtr.Zero)

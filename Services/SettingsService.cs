@@ -342,8 +342,17 @@ public class SettingsService : ObservableObject
         }
         else
         {
-            await _startupService.DisableStartupAsync();
-            IsRunAtStartup = false;
+            try
+            {
+                await _startupService.DisableStartupAsync();
+                IsRunAtStartup = false;
+            }
+            catch (Exception ex)
+            {
+                // Revert: OS denied the disable request; keep the toggle as enabled.
+                IsRunAtStartup = true;
+                Trace.WriteLine($"Failed to disable startup: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            }
         }
     }
 

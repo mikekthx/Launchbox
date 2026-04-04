@@ -296,4 +296,26 @@ public class SettingsServiceTests
         // Store was not written — existing orders are unchanged
         Assert.Empty(svc.GetItemOrder(@"C:\Shortcuts"));
     }
+
+    [Fact]
+    public async Task SetRunAtStartupAsync_Disable_RevertsAndDoesNotThrow_WhenDisableFails()
+    {
+        var settingsStore = new MockSettingsStore();
+        var startupService = new MockStartupService { IsEnabled = false };
+        var service = new SettingsService(settingsStore, startupService, new ShortcutFolderManager(settingsStore));
+
+        // Seed: enable startup so IsRunAtStartup = true
+        await service.SetRunAtStartupAsync(true);
+        Assert.True(service.IsRunAtStartup);
+
+        // Now make the OS throw on the next call
+        startupService.ShouldFail = true;
+
+        // Setting to false triggers DisableStartupAsync which will throw
+        var ex = await Record.ExceptionAsync(() => service.SetRunAtStartupAsync(false));
+
+        Assert.Null(ex);
+        // UI toggle must revert — the disable failed, so startup is still enabled
+        Assert.True(service.IsRunAtStartup);
+    }
 }

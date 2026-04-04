@@ -75,6 +75,14 @@ public static class NativeMethods
     [DllImport("user32.dll", SetLastError = true, EntryPoint = "SetWindowLong", CharSet = CharSet.Unicode)]
     private static extern IntPtr SetWindowLong32(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong);
 
+    /// <summary>
+    /// Replaces the window procedure for <paramref name="hWnd"/>.
+    /// </summary>
+    /// <remarks>
+    /// The caller MUST store a strong reference to <paramref name="dwNewLong"/> in a field for
+    /// the lifetime of the window. An inline or local delegate will be collected by the GC while
+    /// unmanaged code still holds the function pointer, producing a fatal AccessViolationException.
+    /// </remarks>
     public static IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, WndProcDelegate dwNewLong)
     {
         if (IntPtr.Size == 8) return SetWindowLongPtr64(hWnd, nIndex, dwNewLong);
