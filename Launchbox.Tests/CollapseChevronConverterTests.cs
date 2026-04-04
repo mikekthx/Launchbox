@@ -14,27 +14,14 @@ public class CollapseChevronConverterTests
         Assert.Equal("\uE76C", result);
     }
 
-    [Fact]
-    public void Convert_False_ReturnsCollapsedChevron()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(null)]
+    [InlineData("not a bool")]
+    public void Convert_NonTrue_ReturnsCollapsedChevron(object? value)
     {
         var converter = new CollapseChevronConverter();
-        var result = converter.Convert(false, typeof(string), null!, "en-US");
-        Assert.Equal("\uE76E", result);
-    }
-
-    [Fact]
-    public void Convert_Null_ReturnsCollapsedChevron()
-    {
-        var converter = new CollapseChevronConverter();
-        var result = converter.Convert(null!, typeof(string), null!, "en-US");
-        Assert.Equal("\uE76E", result);
-    }
-
-    [Fact]
-    public void Convert_NonBoolean_ReturnsCollapsedChevron()
-    {
-        var converter = new CollapseChevronConverter();
-        var result = converter.Convert("not a bool", typeof(string), null!, "en-US");
+        var result = converter.Convert(value!, typeof(string), null!, "en-US");
         Assert.Equal("\uE76E", result);
     }
 
