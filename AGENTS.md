@@ -46,10 +46,11 @@ The test project uses **file-linking** (`<Compile Include="..\ClassName.cs" Link
 CI runs on push/PR to `main` (`.github/workflows/dotnet-desktop.yml`):
 1. **Code format** — `dotnet format --verify-no-changes` (run `dotnet format Launchbox.sln` locally before committing)
 2. **App build** — `dotnet build` of the full WinUI app to catch XAML/binding compile errors
-3. **Unit tests** — `dotnet test` on both Debug and Release configurations
-4. **CodeQL** — Security scanning for C# vulnerabilities
-5. **MSIX packaging** — Signed package build (push to `main` only)
-6. **Artifact attestation** — Build provenance for published packages
+3. **Unit tests** — `dotnet test` on both Debug and Release configurations, using `coverlet.runsettings` for coverage collection
+4. **Coverage threshold** — 80% minimum line coverage on production namespaces; build fails if below
+5. **CodeQL** — Security scanning for C# vulnerabilities
+6. **MSIX packaging** — Signed package build (push to `main` only)
+7. **Artifact attestation** — Build provenance for published packages
 
 ## Project Structure
 
@@ -83,7 +84,7 @@ Launchbox/
 │   ├── IBackdropService.cs     # Window backdrop management
 │   ├── IDispatcher.cs          # UI thread dispatch abstraction
 │   ├── IFilePickerService.cs   # File/folder picker abstraction
-│   ├── IFileSystem.cs          # File system operations abstraction
+│   ├── IFileSystem.cs          # File system operations abstraction (includes WatchDirectory)
 │   ├── IImageFactory.cs        # Image creation from bytes
 │   ├── ISettingsStore.cs       # Settings persistence abstraction
 │   ├── IStartupService.cs      # Startup registration abstraction
@@ -403,6 +404,10 @@ Prefer the smallest verification set that meaningfully exercises the affected be
 - `.gitattributes` normalizes line endings to LF in the repo; without it, `core.autocrlf=true` on Windows causes phantom "modified" files in `git status`
 - `FilteredApps` in `MainViewModel` is a mutable `BulkObservableCollection<AppItem>`, not a read-only computed property — WinUI `CanReorderItems` requires `IList`. Do not revert it to a computed property. `CanReorderItems` is bound to `IsFilterEmpty` so drag-and-drop is disabled while a search filter is active, preventing reordering of a filtered subset.
 - `SettingsService.MergeItemOrders(Dictionary)` is the correct method for persisting shortcut order after a drag — it updates only the folders present in the dict, preserving saved order for folders that failed to load (e.g., slow/offline drive). `SetItemOrders` is a full overwrite and must NOT be used after a drag in a multi-folder setup. `SetItemOrder(folderPath, names)` is available for single-folder updates.
+- `MainViewModel._loadCts` uses `Cancel()` only — never `Dispose()`. Background continuations hold a captured `CancellationToken` derived from the source and may still be checking it as they unwind; disposing the source while token callbacks are registered throws `ObjectDisposedException`. `CancellationTokenSource` is GC-managed and holds no unmanaged resources.
+- `coverlet.runsettings` at the repo root is required for meaningful coverage. All production code compiles into `Launchbox.Tests.dll` via file-linking, so Coverlet's default assembly exclusion produces 0 covered lines. The runsettings sets `IncludeTestAssembly=true` with `Include=[Launchbox.Tests]Launchbox.*` and `Exclude=[Launchbox.Tests]Launchbox.Tests.*` to measure only production namespaces. Do not remove this file.
+- `MainViewModel.RebuildFolderWatchers` checks `_isDisposed` inside `_watcherLock` before installing new watchers. This guards against a race where an in-flight `LoadAppsAsync` builds watchers after `Dispose()` clears the list — without the guard, those watchers are never disposed and continue firing callbacks against a dead ViewModel. Do not remove this check.
+- `RebuildFolderWatchers` skips the swap when the folder list is unchanged (compares `_watchedPaths` by sequence). This prevents an unnecessary teardown/rebuild gap on every watcher-triggered reload. The skip is done inside the lock to keep it atomic with the `_isDisposed` check.
 
 ## Date Awareness
 When creating or updating files that require the current date (e.g., `.jules/scribe.md`, log files), **ALWAYS** verify the actual system date first by running `date +%Y-%m-%d` in the terminal. Do not guess or rely on pre-trained defaults.
