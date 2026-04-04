@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Collection("Localization")]
 public class MainViewModelRedactionTests : IDisposable
 {
     private readonly MockShortcutService _mockShortcutService;

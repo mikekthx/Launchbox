@@ -7,6 +7,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Collection("Localization")]
 public class MainViewModelErrorTests
 {
     private readonly MockShortcutService _mockShortcutService;

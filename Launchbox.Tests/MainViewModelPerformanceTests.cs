@@ -8,6 +8,7 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+[Collection("Localization")]
 [Trait("Category", "Performance")]
 public class MainViewModelPerformanceTests
 {
