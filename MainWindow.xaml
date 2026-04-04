@@ -26,6 +26,34 @@
             <CollectionViewSource x:Name="GroupedAppsSource" x:Key="GroupedAppsSource"
                                   Source="{x:Bind ViewModel.GroupedApps, Mode=OneWay}"
                                   IsSourceGrouped="True" />
+            <!-- Shared item template for both flat and grouped GridViews.
+                 ElementName=AppGrid resolves correctly from both GridViews (same namescope,
+                 same Tag value). Visibility hides empty-name placeholders in grouped mode;
+                 harmless for flat mode where names are always non-empty. -->
+            <DataTemplate x:Key="AppItemTemplate" x:DataType="models:AppItem">
+                <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
+                            Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
+                            Spacing="4"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            ToolTipService.ToolTip="{x:Bind Name}"
+                            AutomationProperties.Name="{x:Bind Name}"
+                            Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
+                    <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
+                           Width="{Binding Tag.IconSize, ElementName=AppGrid}"
+                           Height="{Binding Tag.IconSize, ElementName=AppGrid}"
+                           Margin="0,10,0,0"
+                           AutomationProperties.AccessibilityView="Raw"
+                           x:Phase="1"/>
+                    <TextBlock Text="{x:Bind Name}"
+                               TextAlignment="Center"
+                               TextWrapping="Wrap"
+                               MaxLines="3"
+                               TextTrimming="CharacterEllipsis"
+                               FontSize="12"
+                               FontWeight="SemiBold"/>
+                </StackPanel>
+            </DataTemplate>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -115,35 +143,8 @@
                   CanReorderItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   AllowDrop="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   CanDragItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
-                  DragItemsCompleted="AppGrid_DragItemsCompleted">
-
-            <GridView.ItemTemplate>
-                <DataTemplate x:DataType="models:AppItem">
-                    <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
-                                Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
-                                Spacing="4"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                ToolTipService.ToolTip="{x:Bind Name}"
-                                AutomationProperties.Name="{x:Bind Name}">
-
-                        <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
-                               Width="{Binding Tag.IconSize, ElementName=AppGrid}"
-                               Height="{Binding Tag.IconSize, ElementName=AppGrid}"
-                               Margin="0,10,0,0"
-                               AutomationProperties.AccessibilityView="Raw"
-                               x:Phase="1"/>
-
-                        <TextBlock Text="{x:Bind Name}"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   MaxLines="3"
-                                   TextTrimming="CharacterEllipsis"
-                                   FontSize="12"
-                                   FontWeight="SemiBold"/>
-                    </StackPanel>
-                </DataTemplate>
-            </GridView.ItemTemplate>
+                  DragItemsCompleted="AppGrid_DragItemsCompleted"
+                  ItemTemplate="{StaticResource AppItemTemplate}">
         </GridView>
 
         <GridView x:Uid="MainWindow_GroupedShortcutsGrid"
@@ -161,34 +162,8 @@
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
                   KeyDown="Grid_KeyDown"
-                  CharacterReceived="Grid_CharacterReceived">
-
-          <GridView.ItemTemplate>
-            <DataTemplate x:DataType="models:AppItem">
-              <StackPanel Width="{Binding Tag.ItemWidth, ElementName=GroupedAppGrid}"
-                          Height="{Binding Tag.ItemHeight, ElementName=GroupedAppGrid}"
-                          Spacing="4"
-                          HorizontalAlignment="Center"
-                          VerticalAlignment="Center"
-                          ToolTipService.ToolTip="{x:Bind Name}"
-                          AutomationProperties.Name="{x:Bind Name}"
-                          Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
-                <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
-                       Width="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
-                       Height="{Binding Tag.IconSize, ElementName=GroupedAppGrid}"
-                       Margin="0,10,0,0"
-                       AutomationProperties.AccessibilityView="Raw"
-                       x:Phase="1"/>
-                <TextBlock Text="{x:Bind Name}"
-                           TextAlignment="Center"
-                           TextWrapping="Wrap"
-                           MaxLines="3"
-                           TextTrimming="CharacterEllipsis"
-                           FontSize="12"
-                           FontWeight="SemiBold"/>
-              </StackPanel>
-            </DataTemplate>
-          </GridView.ItemTemplate>
+                  CharacterReceived="Grid_CharacterReceived"
+                  ItemTemplate="{StaticResource AppItemTemplate}">
 
           <GridView.GroupStyle>
             <GroupStyle>
