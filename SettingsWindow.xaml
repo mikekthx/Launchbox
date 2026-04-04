@@ -91,7 +91,7 @@
                     <TextBlock x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ComboBox x:Uid="Settings_HotkeyModifier" ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
-                        <TextBlock Text="+" VerticalAlignment="Center"/>
+                        <TextBlock Text="+" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
                         <TextBox x:Uid="Settings_HotkeyKey" Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
@@ -100,9 +100,8 @@
                 <StackPanel Spacing="8">
                     <TextBlock x:Uid="Settings_AppearanceHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <TextBlock x:Uid="Settings_IconSizeLabel" x:Name="IconSizeLabel" VerticalAlignment="Center"/>
+                        <TextBlock x:Uid="Settings_IconSizeLabel" VerticalAlignment="Center"/>
                         <ComboBox x:Uid="Settings_IconSizeCombo"
-                                  AutomationProperties.LabeledBy="{Binding ElementName=IconSizeLabel}"
                                   ItemsSource="{x:Bind ViewModel.GridSizeOptions}"
                                   SelectedItem="{x:Bind ViewModel.SelectedGridSize, Mode=TwoWay}"
                                   Width="120" />
