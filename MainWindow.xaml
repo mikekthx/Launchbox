@@ -214,6 +214,7 @@
         <TextBox x:Uid="MainWindow_SearchBox"
                  x:Name="SearchBox"
                  Grid.Row="1"
+                 ClearButtonVisible="True"
                  Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                  BorderThickness="0"
                  CornerRadius="8"
