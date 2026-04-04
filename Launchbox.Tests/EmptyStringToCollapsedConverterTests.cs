@@ -39,11 +39,14 @@ public class EmptyStringToCollapsedConverterTests
         Assert.Equal(Visibility.Collapsed, result);
     }
 
-    [Fact]
-    public void ConvertBack_ThrowsNotSupportedException()
+    [Theory]
+    [InlineData(Visibility.Visible)]
+    [InlineData(Visibility.Collapsed)]
+    [InlineData(null)]
+    public void ConvertBack_ThrowsNotSupportedException(object? value)
     {
         var converter = new EmptyStringToCollapsedConverter();
         Assert.Throws<NotSupportedException>(() =>
-            converter.ConvertBack(Visibility.Visible, typeof(string), null!, "en-US"));
+            converter.ConvertBack(value!, typeof(string), null!, "en-US"));
     }
 }
