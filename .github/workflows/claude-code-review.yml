@@ -37,6 +37,7 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
+            PR AUTHOR: ${{ github.event.pull_request.user.login }}
 
             Perform a thorough code review of this pull request. Start by fetching the
             diff, then review all changed files.
@@ -81,8 +82,9 @@ jobs:
             - Post a **top-level summary comment** covering: what the PR does, overall
               assessment, and any blocking issues
             - Skip inline comments for nitpicks that don't affect correctness or standards
-            - If there are any blocking issues or required changes, end the top-level
-              summary with: "@jules please address the issues noted above"
+            - If the PR AUTHOR is "google-labs-jules[bot]" and there are blocking issues
+              or required changes, end the top-level summary with:
+              "@jules please address the issues noted above"
 
           allowed_bots: '*'
           claude_args: >-
