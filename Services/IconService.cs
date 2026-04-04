@@ -241,29 +241,32 @@ public class IconService(IFileSystem fileSystem) : IIconService
         var result = GetWithExpirationRetry(
             _directoryCache,
             directoryPath,
-            static (dir, fs) => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() =>
-            {
-                bool exists = fs.DirectoryExists(dir);
-                HashSet<string>? files = null;
-                if (exists)
-                {
-                    try
-                    {
-                        var fileList = fs.EnumerateFiles(dir);
-                        files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
-                    }
-                    catch
-                    {
-                        files = null;
-                    }
-                }
-                return (exists, files, DateTime.UtcNow);
-            }),
+            static (dir, fs) => new Lazy<(bool Exists, HashSet<string>? Files, DateTime Timestamp)>(() => LoadDirectoryInfo(dir, fs)),
             _fileSystem,
             static entry => (DateTime.UtcNow - entry.Timestamp) >= CACHE_DURATION
         );
 
         return (result.Exists, result.Files);
+    }
+
+    private static (bool Exists, HashSet<string>? Files, DateTime Timestamp) LoadDirectoryInfo(string dir, IFileSystem fs)
+    {
+        if (!fs.DirectoryExists(dir))
+        {
+            return (false, null, DateTime.UtcNow);
+        }
+
+        try
+        {
+            var fileList = fs.EnumerateFiles(dir);
+            var files = new HashSet<string>(fileList, StringComparer.OrdinalIgnoreCase);
+            return (true, files, DateTime.UtcNow);
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to enumerate .icons directory: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return (true, null, DateTime.UtcNow);
+        }
     }
 
     private DateTime GetCachedLastWriteTime(string path)
