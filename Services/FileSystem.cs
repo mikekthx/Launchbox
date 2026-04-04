@@ -128,4 +128,80 @@ public class FileSystem : IFileSystem
         if (PathSecurity.IsUnsafePath(path)) throw new UnauthorizedAccessException($"Access to path '{PathSecurity.RedactPath(path)}' is denied.");
         return new FileInfo(path).Length;
     }
+
+    public IDisposable WatchDirectory(string path, Action callback)
+    {
+        if (PathSecurity.IsUnsafePath(path) || !Directory.Exists(path))
+            return NullDisposable.INSTANCE;
+
+        try
+        {
+            var watcher = new FileSystemWatcher(path)
+            {
+                NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite,
+                IncludeSubdirectories = false,
+            };
+
+            FileSystemEventHandler handler = (_, _) => callback();
+            RenamedEventHandler renamedHandler = (_, _) => callback();
+            // Log buffer overflow and force a reload so missed events are recovered.
+            // InternalBufferOverflowException is raised when the OS-level event buffer fills
+            // up (default 8 KB), which can happen on busy folders.
+            ErrorEventHandler errorHandler = (_, e) =>
+            {
+                Trace.WriteLine($"FileSystemWatcher buffer overflow for {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(e.GetException())}");
+                callback();
+            };
+
+            watcher.Created += handler;
+            watcher.Deleted += handler;
+            watcher.Changed += handler;
+            watcher.Renamed += renamedHandler;
+            watcher.Error += errorHandler;
+
+            // Subscribe all handlers before enabling events to eliminate the small window
+            // where events could fire before handlers are attached.
+            watcher.EnableRaisingEvents = true;
+
+            return new WatcherHandle(watcher, handler, renamedHandler, errorHandler);
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to watch directory {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return NullDisposable.INSTANCE;
+        }
+    }
+
+    private sealed class NullDisposable : IDisposable
+    {
+        internal static readonly NullDisposable INSTANCE = new();
+        public void Dispose() { }
+    }
+
+    private sealed class WatcherHandle : IDisposable
+    {
+        private readonly FileSystemWatcher _watcher;
+        private readonly FileSystemEventHandler _handler;
+        private readonly RenamedEventHandler _renamedHandler;
+        private readonly ErrorEventHandler _errorHandler;
+
+        internal WatcherHandle(FileSystemWatcher watcher, FileSystemEventHandler handler, RenamedEventHandler renamedHandler, ErrorEventHandler errorHandler)
+        {
+            _watcher = watcher;
+            _handler = handler;
+            _renamedHandler = renamedHandler;
+            _errorHandler = errorHandler;
+        }
+
+        public void Dispose()
+        {
+            _watcher.EnableRaisingEvents = false;
+            _watcher.Created -= _handler;
+            _watcher.Deleted -= _handler;
+            _watcher.Changed -= _handler;
+            _watcher.Renamed -= _renamedHandler;
+            _watcher.Error -= _errorHandler;
+            _watcher.Dispose();
+        }
+    }
 }

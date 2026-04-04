@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Production code compiles into Launchbox.Tests.dll via file-linking, so we
+               must explicitly include the test assembly and filter by production namespaces. -->
+          <IncludeTestAssembly>true</IncludeTestAssembly>
+          <Include>[Launchbox.Tests]Launchbox.*</Include>
+          <Exclude>[Launchbox.Tests]Launchbox.Tests.*</Exclude>
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,Obsolete</ExcludeByAttribute>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

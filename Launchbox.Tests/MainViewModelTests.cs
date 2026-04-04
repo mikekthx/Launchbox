@@ -450,6 +450,69 @@ public class MainViewModelTests
         Assert.Empty(viewModel.Apps);
     }
 
+    // --- FOLDER WATCHER TESTS ---
+
+    [Fact]
+    public async Task LoadAppsAsync_RegistersWatcherForEachFolder()
+    {
+        // Arrange
+        const string folder1 = @"C:\Shortcuts1";
+        const string folder2 = @"C:\Shortcuts2";
+        _fileSystem.AddDirectory(folder1);
+        _fileSystem.AddDirectory(folder2);
+        _settingsService.AddShortcutFolder(folder1);
+        _settingsService.AddShortcutFolder(folder2);
+
+        var viewModel = CreateViewModel();
+
+        // Act
+        await viewModel.LoadAppsAsync();
+
+        // Assert: one watcher per folder was registered
+        Assert.Equal(1, _fileSystem.GetWatcherCount(folder1));
+        Assert.Equal(1, _fileSystem.GetWatcherCount(folder2));
+    }
+
+    [Fact]
+    public async Task LoadAppsAsync_ReplacesWatchersOnReload()
+    {
+        // Arrange
+        const string folderPath = @"C:\Shortcuts";
+        _fileSystem.AddDirectory(folderPath);
+        _settingsService.AddShortcutFolder(folderPath);
+
+        var viewModel = CreateViewModel();
+
+        // Act: load twice with same folder list — second load should skip rebuild (no-op)
+        await viewModel.LoadAppsAsync();
+        await viewModel.LoadAppsAsync();
+
+        // Assert: still exactly one watcher (unchanged folder list reuses existing watcher)
+        Assert.Equal(1, _fileSystem.GetWatcherCount(folderPath));
+    }
+
+    [Fact]
+    public async Task Dispose_RemovesAllFolderWatchers()
+    {
+        // Arrange
+        const string folder1 = @"C:\Shortcuts1";
+        const string folder2 = @"C:\Shortcuts2";
+        _fileSystem.AddDirectory(folder1);
+        _fileSystem.AddDirectory(folder2);
+        _settingsService.AddShortcutFolder(folder1);
+        _settingsService.AddShortcutFolder(folder2);
+
+        var viewModel = CreateViewModel();
+        await viewModel.LoadAppsAsync();
+
+        // Act
+        viewModel.Dispose();
+
+        // Assert: watchers were disposed and unregistered from MockFileSystem
+        Assert.Equal(0, _fileSystem.GetWatcherCount(folder1));
+        Assert.Equal(0, _fileSystem.GetWatcherCount(folder2));
+    }
+
     // --- MULTI-FOLDER TESTS ---
 
     private SettingsService CreateSettingsServiceWithFolders(params (string path, string label, int order)[] folderDefs)

@@ -15,4 +15,12 @@ public interface IFileSystem
     Stream OpenRead(string path);
     DateTime GetLastWriteTime(string path);
     long GetFileSize(string path);
+
+    /// <summary>
+    /// Watches a directory for file additions, deletions, renames, and changes,
+    /// invoking <paramref name="callback"/> on any event. Returns a disposable handle
+    /// that stops watching when disposed. Returns a no-op disposable if the path does
+    /// not exist or is unsafe.
+    /// </summary>
+    IDisposable WatchDirectory(string path, Action callback);
 }

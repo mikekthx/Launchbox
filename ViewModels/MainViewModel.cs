@@ -27,6 +27,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
     private CancellationTokenSource? _loadCts;
+    private List<IDisposable> _folderWatchers = [];
+    private List<string> _watchedPaths = [];
+    private readonly object _watcherLock = new();
+    private bool _isDisposed;
 
     public BulkObservableCollection<AppItem> Apps { get; } = [];
 
@@ -266,6 +270,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             var groupedData = BuildGroupedData(orderedItems, folders);
 
             ct.ThrowIfCancellationRequested();
+
+            // Only the winning (non-cancelled) load rebuilds watchers so each folder
+            // automatically triggers a fresh reload when its contents change.
+            RebuildFolderWatchers(folders);
 
             await UpdateUIAsync(orderedItems, groupedData);
 
@@ -519,6 +527,42 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Apps.CollectionChanged += Apps_CollectionChanged;
     }
 
+    private void RebuildFolderWatchers(IReadOnlyList<ShortcutFolder> folders)
+    {
+        var newPaths = folders.Select(f => f.ExpandedPath).ToList();
+
+        // Build watchers outside the lock to keep lock duration short.
+        // WatchDirectory returns NullDisposable for missing/unsafe paths — safe to hold.
+        List<IDisposable> newWatchers = [];
+        foreach (var folder in folders)
+            newWatchers.Add(_fileSystem.WatchDirectory(folder.ExpandedPath, () => _ = LoadAppsAsync()));
+
+        List<IDisposable> oldWatchers;
+        lock (_watcherLock)
+        {
+            if (_isDisposed)
+            {
+                // Disposed while building — discard without installing.
+                foreach (var w in newWatchers) w.Dispose();
+                return;
+            }
+
+            // Skip swap if folder list is unchanged — avoids an event-drop gap when a
+            // watcher-triggered reload fires but the folder configuration has not changed.
+            if (_watchedPaths.SequenceEqual(newPaths, StringComparer.OrdinalIgnoreCase))
+            {
+                foreach (var w in newWatchers) w.Dispose();
+                return;
+            }
+
+            oldWatchers = _folderWatchers;
+            _folderWatchers = newWatchers;
+            _watchedPaths = newPaths;
+        }
+
+        foreach (var w in oldWatchers) w.Dispose();
+    }
+
     public void Dispose()
     {
         // Cancel only — see LoadAppsAsync for why Dispose is intentionally omitted.
@@ -526,6 +570,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
         Apps.CollectionChanged -= Apps_CollectionChanged;
+
+        List<IDisposable> watchers;
+        lock (_watcherLock)
+        {
+            _isDisposed = true;
+            watchers = _folderWatchers;
+            _folderWatchers = [];
+            _watchedPaths = [];
+        }
+        foreach (var w in watchers) w.Dispose();
+
         GC.SuppressFinalize(this);
     }
 }

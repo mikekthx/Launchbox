@@ -10,6 +10,7 @@ public class MockFileSystem : IFileSystem
 {
     private readonly HashSet<string> _directories = new();
     private readonly Dictionary<string, List<string>> _files = new();
+    private readonly Dictionary<string, List<Action>> _watchers = [];
     private readonly Dictionary<string, string> _iniValues = new();
     private readonly Dictionary<string, byte[]> _fileContents = new();
     private readonly Dictionary<string, long> _fileSizes = new();
@@ -146,5 +147,43 @@ public class MockFileSystem : IFileSystem
         if (_fileSizes.TryGetValue(path, out var size))
             return size;
         throw new FileNotFoundException(path);
+    }
+
+    public IDisposable WatchDirectory(string path, Action callback)
+    {
+        if (!_watchers.TryGetValue(path, out var list))
+        {
+            list = [];
+            _watchers[path] = list;
+        }
+        list.Add(callback);
+        return new MockWatcherHandle(list, callback);
+    }
+
+    /// <summary>Returns the number of active watchers on <paramref name="directoryPath"/>.</summary>
+    public int GetWatcherCount(string directoryPath) =>
+        _watchers.TryGetValue(directoryPath, out var list) ? list.Count : 0;
+
+    /// <summary>Simulates a file system change in the given directory, firing all registered callbacks.</summary>
+    public void SimulateChange(string directoryPath)
+    {
+        if (_watchers.TryGetValue(directoryPath, out var callbacks))
+        {
+            foreach (var cb in new List<Action>(callbacks)) cb();
+        }
+    }
+
+    private sealed class MockWatcherHandle : IDisposable
+    {
+        private readonly List<Action> _list;
+        private readonly Action _callback;
+
+        internal MockWatcherHandle(List<Action> list, Action callback)
+        {
+            _list = list;
+            _callback = callback;
+        }
+
+        public void Dispose() => _list.Remove(_callback);
     }
 }

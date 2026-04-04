@@ -32,6 +32,7 @@ public class IconServiceOptimizationTests
         public byte[] ReadAllBytes(string path) => _inner.ReadAllBytes(path);
         public Stream OpenRead(string path) => _inner.OpenRead(path);
         public long GetFileSize(string path) => _inner.GetFileSize(path);
+        public IDisposable WatchDirectory(string path, Action callback) => _inner.WatchDirectory(path, callback);
 
         public DateTime GetLastWriteTime(string path)
         {

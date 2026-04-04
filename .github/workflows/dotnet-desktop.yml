@@ -124,8 +124,25 @@ jobs:
           ${{ runner.os }}-obj-${{ matrix.configuration }}-
 
     # Execute all unit tests in the specific test project
+    # coverlet.runsettings forces IncludeTestAssembly=true and filters to production namespaces
+    # so that file-linked production code in Launchbox.Tests.dll is measured correctly.
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --results-directory ./TestResults
+      run: dotnet test $env:Test_Project_Path --configuration ${{ matrix.configuration }} --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
+
+    # Fail the build if line coverage of production code drops below 80%
+    - name: Check coverage threshold
+      run: |
+        $file = Get-ChildItem -Recurse -Filter "coverage.cobertura.xml" ./TestResults | Select-Object -First 1
+        if (-not $file) { Write-Error "No coverage file found"; exit 1 }
+        $xml = [xml](Get-Content $file.FullName)
+        $rate = [float]::Parse($xml.coverage.'line-rate', [System.Globalization.CultureInfo]::InvariantCulture)
+        $pct = [math]::Round($rate * 100, 1)
+        Write-Host "Line coverage (production code): $pct%"
+        if ($rate -lt 0.80) {
+          Write-Error "Coverage $pct% is below the 80% minimum threshold"
+          exit 1
+        }
+        Write-Host "Coverage check passed ($pct%)"
 
     # Turn that TRX file into a beautiful UI report in GitHub
     - name: Publish Test Report
