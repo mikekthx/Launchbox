@@ -20,6 +20,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     private readonly SettingsService _settingsService;
     private readonly IWindowService _windowService;
     private readonly IFilePickerService _filePickerService;
+    private readonly IDispatcher _dispatcher;
     private readonly SemaphoreSlim _startupToggleLock = new(1, 1);
     private bool _pendingStartupValue;
 
@@ -84,11 +85,12 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     public ObservableCollection<ShortcutFolder> Folders { get; } = [];
 
-    public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService)
+    public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService, IDispatcher dispatcher)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
         _filePickerService = filePickerService ?? throw new ArgumentNullException(nameof(filePickerService));
+        _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
 
         _pendingStartupValue = _settingsService.IsRunAtStartup;
         _settingsService.PropertyChanged += OnServicePropertyChanged;
@@ -152,11 +154,17 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private void RefreshFolders()
     {
-        Folders.Clear();
-        foreach (var f in _settingsService.GetShortcutFolders())
+        // Marshal through the dispatcher: SettingsService PropertyChanged is raised synchronously
+        // on the calling thread. All current callers are UI-thread-affine, but marshalling here
+        // protects against collection mutation on a worker thread if that changes in future.
+        _dispatcher.TryEnqueue(() =>
         {
-            Folders.Add(f);
-        }
+            Folders.Clear();
+            foreach (var f in _settingsService.GetShortcutFolders())
+            {
+                Folders.Add(f);
+            }
+        });
     }
 
     private async Task SetRunAtStartupSafeAsync(bool value)
@@ -171,13 +179,14 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             return;
         }
 
+        Exception? startupException = null;
         try
         {
             await _settingsService.SetRunAtStartupAsync(value);
         }
         catch (Exception ex)
         {
-            Trace.WriteLine($"Failed to set run at startup: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            startupException = ex;
         }
         finally
         {
@@ -190,39 +199,67 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
                 // Window closed between WaitAsync and Release — safe to ignore.
             }
         }
+
+        if (startupException != null)
+        {
+            // Revert pending state: the exception means IsRunAtStartup never changed,
+            // so OnServicePropertyChanged won't fire to sync it back automatically.
+            // Deferred to after the finally block so the lock is released before notifying
+            // listeners, and dispatched for consistency with OnServicePropertyChanged.
+            _dispatcher.TryEnqueue(() =>
+            {
+                _pendingStartupValue = _settingsService.IsRunAtStartup;
+                OnPropertyChanged(nameof(RunAtStartup));
+            });
+            Trace.WriteLine($"Failed to set run at startup: {PathSecurity.GetSafeExceptionMessage(startupException)}");
+        }
     }
 
     private void OnServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(SettingsService.IsRunAtStartup))
+        // Marshal all binding notifications and collection mutations to the UI thread.
+        // SettingsService raises PropertyChanged synchronously on the calling thread; all
+        // current callers are UI-thread-affine, but dispatching here future-proofs against
+        // background mutations without requiring callers to know about UI threading rules.
+        _dispatcher.TryEnqueue(() =>
         {
-            _pendingStartupValue = _settingsService.IsRunAtStartup;
-            OnPropertyChanged(nameof(RunAtStartup));
-        }
-        else if (e.PropertyName == nameof(SettingsService.HotkeyModifiers))
-            OnPropertyChanged(nameof(SelectedModifier));
-        else if (e.PropertyName == nameof(SettingsService.HotkeyKey))
-            OnPropertyChanged(nameof(HotkeyKeyString));
-        else if (e.PropertyName == nameof(SettingsService.GridSize))
-            OnPropertyChanged(nameof(SelectedGridSize));
-        else if (e.PropertyName == nameof(SettingsService.KeepCentered))
-            OnPropertyChanged(nameof(KeepCentered));
-        else if (e.PropertyName == SettingsService.SHORTCUT_FOLDERS_KEY)
-            RefreshFolders();
-        else if (e.PropertyName == nameof(SettingsService.FolderViewMode))
-            OnPropertyChanged(nameof(SelectedViewModeOption));
-        else if (e.PropertyName == nameof(SettingsService.CollapsibleGroups))
-            OnPropertyChanged(nameof(CollapsibleGroups));
+            if (e.PropertyName == nameof(SettingsService.IsRunAtStartup))
+            {
+                // Only sync pending state when no toggle is in flight; otherwise a rapid
+                // toggle would overwrite _pendingStartupValue with an intermediate committed
+                // state and cause the UI toggle to bounce momentarily.
+                if (_startupToggleLock.CurrentCount == 1)
+                    _pendingStartupValue = _settingsService.IsRunAtStartup;
+                OnPropertyChanged(nameof(RunAtStartup));
+            }
+            else if (e.PropertyName == nameof(SettingsService.HotkeyModifiers))
+                OnPropertyChanged(nameof(SelectedModifier));
+            else if (e.PropertyName == nameof(SettingsService.HotkeyKey))
+                OnPropertyChanged(nameof(HotkeyKeyString));
+            else if (e.PropertyName == nameof(SettingsService.GridSize))
+                OnPropertyChanged(nameof(SelectedGridSize));
+            else if (e.PropertyName == nameof(SettingsService.KeepCentered))
+                OnPropertyChanged(nameof(KeepCentered));
+            else if (e.PropertyName == SettingsService.SHORTCUT_FOLDERS_KEY)
+                RefreshFolders();
+            else if (e.PropertyName == nameof(SettingsService.FolderViewMode))
+                OnPropertyChanged(nameof(SelectedViewModeOption));
+            else if (e.PropertyName == nameof(SettingsService.CollapsibleGroups))
+                OnPropertyChanged(nameof(CollapsibleGroups));
+        });
     }
 
     public bool RunAtStartup
     {
-        get => _settingsService.IsRunAtStartup;
+        // Return the optimistic pending state so TwoWay bindings don't snap back to the
+        // old committed value during an in-flight async toggle.
+        get => _pendingStartupValue;
         set
         {
             if (_pendingStartupValue != value)
             {
                 _pendingStartupValue = value;
+                OnPropertyChanged(); // notify immediately so bindings see the new pending state
                 _ = SetRunAtStartupSafeAsync(value);
             }
         }

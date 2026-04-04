@@ -32,7 +32,7 @@ public class SettingsViewModelTests
         var pickerService = new MockFilePickerService();
         var windowService = new MockWindowService();
 
-        var viewModel = new SettingsViewModel(settingsService, windowService, pickerService);
+        var viewModel = new SettingsViewModel(settingsService, windowService, pickerService, new MockDispatcher());
 
         return (settingsService, startupService, pickerService, viewModel);
     }
@@ -161,7 +161,7 @@ public class SettingsViewModelTests
         }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
         Assert.Equal("Medium", vm.SelectedGridSize.Value);
     }
 
@@ -175,7 +175,7 @@ public class SettingsViewModelTests
         }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
         vm.SelectedGridSize = vm.GridSizeOptions.First(o => o.Value == "Large");
         Assert.Equal(GridSize.Large, settingsService.GridSize);
     }
@@ -190,7 +190,7 @@ public class SettingsViewModelTests
         }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
 
         string? changed = null;
         vm.PropertyChanged += (_, e) => changed = e.PropertyName;
@@ -209,7 +209,7 @@ public class SettingsViewModelTests
         }));
         var store = new MockSettingsStore();
         var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
         Assert.Equal(3, vm.GridSizeOptions.Count);
         Assert.Equal("Small", vm.GridSizeOptions[0].Value);
         Assert.Equal("Medium", vm.GridSizeOptions[1].Value);
@@ -366,7 +366,7 @@ public class SettingsViewModelTests
             store,
             new MockStartupService(),
             new ShortcutFolderManager(store));
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService());
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
 
         vm.SetFolderSequence([@"C:\Desktop\B", @"C:\Desktop\A"]);
 
@@ -390,11 +390,100 @@ public class SettingsViewModelTests
             new MockStartupService(),
             new ShortcutFolderManager(store));
         var picker = new MockFilePickerService { RenameResult = "NewLabel" };
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), picker);
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), picker, new MockDispatcher());
 
         await vm.RenameFolderCommand.ExecuteAsync(vm.Folders[0]);
 
         Assert.Equal("NewLabel", vm.Folders[0].Label);
+    }
+
+    [Fact]
+    public void RunAtStartup_Setter_FiresPropertyChanged_Immediately()
+    {
+        // Bug: setter had no OnPropertyChanged() call, so UI was not notified synchronously.
+        var (_, _, _, vm) = CreateViewModel();
+        bool notified = false;
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsViewModel.RunAtStartup)) notified = true;
+        };
+
+        vm.RunAtStartup = true;
+
+        Assert.True(notified);
+    }
+
+    [Fact]
+    public void RunAtStartup_Getter_ReturnsPendingState_WhileAsyncInFlight()
+    {
+        // Bug: getter returned _settingsService.IsRunAtStartup (committed state), not the
+        // pending UI state. When the async was in flight the getter returned the stale
+        // committed value, causing TwoWay bindings to snap back mid-toggle.
+        var store = new MockSettingsStore();
+        var neverCompletes = new TaskCompletionSource<bool>();
+        var startupService = new MockStartupService { EnableTask = neverCompletes.Task };
+        var settingsService = new SettingsService(store, startupService, new ShortcutFolderManager(store));
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
+            { "GridSize_Small", "Small" }, { "GridSize_Medium", "Medium" }, { "GridSize_Large", "Large" },
+            { "Settings_ViewMode_Merged", "Merged" }, { "Settings_ViewMode_Grouped", "Grouped" },
+        }));
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
+        Assert.False(vm.RunAtStartup);
+
+        vm.RunAtStartup = true; // async in flight, neverCompletes.Task never resolves
+
+        // Committed state is still false (async hasn't finished)
+        Assert.False(settingsService.IsRunAtStartup);
+        // UI must show pending state, not stale committed state
+        Assert.True(vm.RunAtStartup);
+
+        neverCompletes.TrySetCanceled(TestContext.Current.CancellationToken); // cleanup
+    }
+
+    [Fact]
+    public async Task RunAtStartup_Setter_Reverts_WhenServiceThrows()
+    {
+        // Critical: SetRunAtStartupSafeAsync catch block was not reverting _pendingStartupValue.
+        // If the async throws, IsRunAtStartup never changes so OnServicePropertyChanged never fires,
+        // leaving the UI toggle permanently stuck at the user-requested (but uncommitted) value.
+        var (_, startup, _, vm) = CreateViewModel();
+        startup.ShouldFail = true;
+
+        vm.RunAtStartup = true;
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        // Startup service threw — the value must revert
+        Assert.False(vm.RunAtStartup);
+    }
+
+    [Fact]
+    public void RefreshFolders_IsMarshalled_ThroughDispatcher()
+    {
+        // Guard: RefreshFolders must marshal collection mutations via IDispatcher
+        // so it is safe to call even when SettingsService PropertyChanged fires on a worker thread.
+        var store = new MockSettingsStore();
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
+
+        int dispatchCount = 0;
+        var trackingDispatcher = new TrackingMockDispatcher(() => dispatchCount++);
+        Localization.SetProvider(new MockStringProvider(new()
+        {
+            { "Modifier_Alt", "Alt" }, { "Modifier_Ctrl", "Ctrl" }, { "Modifier_Shift", "Shift" }, { "Modifier_Win", "Win" },
+            { "GridSize_Small", "Small" }, { "GridSize_Medium", "Medium" }, { "GridSize_Large", "Large" },
+            { "Settings_ViewMode_Merged", "Merged" }, { "Settings_ViewMode_Grouped", "Grouped" },
+        }));
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), trackingDispatcher);
+
+        // Constructor calls RefreshFolders once; capture baseline
+        int baseline = dispatchCount;
+
+        // Trigger a folder change → OnServicePropertyChanged → RefreshFolders
+        settingsService.AddShortcutFolder(@"C:\Test");
+
+        Assert.True(dispatchCount > baseline); // at least one more dispatch happened
+        Assert.Contains(vm.Folders, f => f.Path == @"C:\Test");
     }
 
     [Fact]
@@ -412,7 +501,7 @@ public class SettingsViewModelTests
             new MockStartupService(),
             new ShortcutFolderManager(store));
         var picker = new MockFilePickerService { RenameResult = null };
-        var vm = new SettingsViewModel(settingsService, new MockWindowService(), picker);
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), picker, new MockDispatcher());
 
         await vm.RenameFolderCommand.ExecuteAsync(vm.Folders[0]);
 

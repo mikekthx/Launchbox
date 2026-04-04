@@ -17,10 +17,17 @@ public class MockStartupService : IStartupService
         return Task.FromResult(IsEnabled);
     }
 
+    /// <summary>
+    /// When non-null, returned from <see cref="TryEnableStartupAsync"/> instead of completing immediately.
+    /// Lets tests simulate an in-flight async operation.
+    /// </summary>
+    public Task<bool>? EnableTask { get; set; }
+
     public Task<bool> TryEnableStartupAsync()
     {
         if (ShouldFail) throw new Exception("Enable startup failed");
         if (!Success) return Task.FromResult(false);
+        if (EnableTask != null) return EnableTask;
         IsEnabled = true;
         return Task.FromResult(true);
     }

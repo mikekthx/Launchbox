@@ -24,7 +24,7 @@ public sealed partial class SettingsWindow : Window
         _filePickerService = filePickerService;
         _previousOwnerWindow = filePickerService.OwnerWindow;
         filePickerService.OwnerWindow = this;
-        ViewModel = new SettingsViewModel(settingsService, windowService, filePickerService);
+        ViewModel = new SettingsViewModel(settingsService, windowService, filePickerService, new WinUIDispatcher(this.DispatcherQueue));
 
         this.InitializeComponent();
         SettingsContent.DataContext = this;
