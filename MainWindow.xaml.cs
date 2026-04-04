@@ -30,6 +30,12 @@ public sealed partial class MainWindow : Window
     private Windows.Graphics.PointInt32 _dragStartWindowPos;
     private NativeMethods.POINT _dragStartCursorPos;
 
+    // Set when the window transitions from hidden to visible (Alt+S show path).
+    // Consumed in MainWindow_Activated to gate filter-clear and SearchBox focus.
+    // Without this, every focus-regain (e.g., returning from a dialog) would silently
+    // discard the user's active search filter.
+    private bool _freshShow;
+
     public MainWindow()
     {
         var settingsStore = new LocalSettingsStore();
@@ -88,6 +94,7 @@ public sealed partial class MainWindow : Window
         this.Activated += MainWindow_Activated;
         this.Closed += MainWindow_Closed;
         _windowService.HotkeyRegistrationFailed += WindowService_HotkeyRegistrationFailed;
+        _windowService.VisibilityChanged += WindowService_VisibilityChanged;
 
         // 4. LOAD APPS
         if (ViewModel.LoadAppsCommand.CanExecute(null))
@@ -161,6 +168,12 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    private void WindowService_VisibilityChanged(object? sender, bool isVisible)
+    {
+        if (isVisible)
+            _freshShow = true;
+    }
+
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
         _windowService.OnActivated(args.WindowActivationState == WindowActivationState.Deactivated);
@@ -169,8 +182,16 @@ public sealed partial class MainWindow : Window
         if (args.WindowActivationState != WindowActivationState.Deactivated)
         {
             _ = _backdropService.UpdateBackdropAsync();
-            ViewModel.FilterText = string.Empty;
-            SearchBox.Focus(FocusState.Programmatic);
+
+            // Only reset filter and focus on a fresh show (Alt+S), not on every focus-regain.
+            // Without this guard, returning focus from a dialog would silently discard the
+            // user's active search filter.
+            if (_freshShow)
+            {
+                _freshShow = false;
+                ViewModel.FilterText = string.Empty;
+                SearchBox.Focus(FocusState.Programmatic);
+            }
         }
     }
 
@@ -194,6 +215,7 @@ public sealed partial class MainWindow : Window
         this.Closed -= MainWindow_Closed;
 
         _windowService.HotkeyRegistrationFailed -= WindowService_HotkeyRegistrationFailed;
+        _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
         // so that a failure in one does not prevent the others from being cleaned up.
