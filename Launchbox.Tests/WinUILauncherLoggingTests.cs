@@ -1,5 +1,5 @@
-using Launchbox.Services;
 using Launchbox.Helpers;
+using Launchbox.Services;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +8,7 @@ using Xunit;
 namespace Launchbox.Tests;
 
 [Trait("Category", "Logging")]
+[Collection("TraceListeners")]
 public class WinUILauncherLoggingTests : IDisposable
 {
     private readonly MockFileSystem _fileSystem;
