@@ -420,24 +420,38 @@ public class WindowService : IWindowService, IDisposable
 
             if (!needsResize && !offScreenHorizontally && !offScreenVertically) return;
 
-            ApplyClampedSizeAndPosition(needsResize, clampedWidth, clampedHeight, pos, offScreenHorizontally, offScreenVertically, workArea);
+            ApplyClampedSizeAndPosition(
+                _appWindow,
+                needsResize,
+                clampedWidth,
+                clampedHeight,
+                pos,
+                offScreenHorizontally,
+                offScreenVertically,
+                workArea);
         }
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to clamp window to work area: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            _suppressSave = false;
         }
     }
 
-    private void ApplyClampedSizeAndPosition(bool needsResize, int clampedWidth, int clampedHeight, Windows.Graphics.PointInt32 pos, bool offScreenHorizontally, bool offScreenVertically, Windows.Graphics.RectInt32 workArea)
+    private void ApplyClampedSizeAndPosition(
+        AppWindow appWindow,
+        bool needsResize,
+        int clampedWidth,
+        int clampedHeight,
+        Windows.Graphics.PointInt32 pos,
+        bool offScreenHorizontally,
+        bool offScreenVertically,
+        Windows.Graphics.RectInt32 workArea)
     {
-        // Suppress save so clamped dimensions are not persisted
         _suppressSave = true;
         try
         {
             if (needsResize)
             {
-                _appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
+                appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
             }
 
             int newX = pos.X;
@@ -458,7 +472,7 @@ public class WindowService : IWindowService, IDisposable
 
             if (needsMove)
             {
-                _appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
+                appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
             }
         }
         finally
