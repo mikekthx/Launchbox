@@ -1,22 +1,23 @@
-# Auto-detect text files and normalize line endings to CRLF in the repo
-* text=auto eol=crlf
+# Normalize all text files to LF in the repo and on checkout.
+# core.autocrlf=true on Windows is overridden by explicit eol=lf here.
+* text=auto eol=lf
 
-# Force CRLF for source files
-*.cs text eol=crlf
-*.xaml text eol=crlf
-*.csproj text eol=crlf
-*.sln text eol=crlf
-*.json text eol=crlf
-*.yml text eol=crlf
-*.yaml text eol=crlf
-*.md text eol=crlf
-*.xml text eol=crlf
-*.resw text eol=crlf
-*.editorconfig text eol=crlf
-*.props text eol=crlf
-*.targets text eol=crlf
-*.manifest text eol=crlf
-*.pubxml text eol=crlf
+# Explicit LF for source files (defense-in-depth against eol drift from GitHub/CI)
+*.cs text eol=lf
+*.xaml text eol=lf
+*.csproj text eol=lf
+*.sln text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.xml text eol=lf
+*.resw text eol=lf
+*.editorconfig text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+*.manifest text eol=lf
+*.pubxml text eol=lf
 
 # Binary files
 *.png binary
