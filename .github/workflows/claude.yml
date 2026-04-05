@@ -46,7 +46,7 @@ jobs:
         with:
           github_token: ${{ secrets.CLAUDE_PAT }}
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          claude_args: "--allowed-tools Bash(gh pr:*)"
+          claude_args: "--allowed-tools Bash(gh pr:*),Bash(gh api:*)"
           show_full_output: true
           track_progress: false
           allowed_bots: '*'
