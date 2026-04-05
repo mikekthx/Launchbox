@@ -32,6 +32,7 @@ public class WinUILauncherLoggingTests : IDisposable
     {
         Trace.Listeners.Remove(_traceListener);
         _traceListener.Dispose();
+        _stringWriter.Dispose();
     }
 
     [Fact]
