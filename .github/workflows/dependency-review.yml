@@ -7,11 +7,11 @@ on:
       - '**/*.csproj'
       - '**/packages.lock.json'
       - 'global.json'
-      - '.github/workflows/**'
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
+  id-token: write
 
 jobs:
   dependency-review:
@@ -20,8 +20,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
+      - name: Submit dependency snapshot
+        uses: advanced-security/component-detection-dependency-submission-action@9c110eb34dee187cd9eca76a652b9f6a0ed22927 # v0.1.1
+        with:
+          detectorsCategories: NuGet
+
       - name: Dependency Review
         uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
         with:
           fail-on-severity: high
           comment-summary-in-pr: always
+          retry-on-snapshot-warnings: true
