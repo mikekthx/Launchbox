@@ -34,7 +34,7 @@ public class FileSystemTests : IDisposable
             }
             catch (UnauthorizedAccessException)
             {
-                // FileSystemWatcher handles may still be open briefly after Dispose
+                // Ignore transient file lock errors during teardown
             }
         }
     }
@@ -177,28 +177,31 @@ public class FileSystemTests : IDisposable
     public void FileSystem_WatchDirectory_FiresCallbackOnChange()
     {
         var waitEvent = new ManualResetEventSlim(false);
-        int callbackCount = 0;
 
         var watcher = _fileSystem.WatchDirectory(_tempDirectory, () =>
         {
-            Interlocked.Increment(ref callbackCount);
             waitEvent.Set();
         });
 
         Assert.NotNull(watcher);
 
-        // Trigger change
-        string path = Path.Combine(_tempDirectory, "watch.txt");
-        File.WriteAllText(path, "test");
+        try
+        {
+            // Trigger change
+            string path = Path.Combine(_tempDirectory, "watch.txt");
+            File.WriteAllText(path, "test");
 
-        // Wait for callback
-        bool signalled = waitEvent.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+            // Wait for callback
+            bool signalled = waitEvent.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
-        Assert.True(signalled);
-
-        // Wait briefly for OS handles (like FileSystemWatcher) to be fully released before teardown
-        watcher.Dispose();
-        Thread.Sleep(50);
+            Assert.True(signalled);
+        }
+        finally
+        {
+            // Wait briefly for OS handles (like FileSystemWatcher) to be fully released before teardown
+            watcher.Dispose();
+            Thread.Sleep(50);
+        }
     }
 
     [Fact]
