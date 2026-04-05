@@ -52,7 +52,7 @@ public class WinUILauncherLoggingTests : IDisposable
     {
         var launcher = new WinUILauncher(_shortcutResolver, _processStarter, _fileSystem);
         string missingPath = @"C:\safe\missing.exe";
-
+        string missingPath = @"C:\safe\missing.lnk";
         launcher.Launch(missingPath);
         _traceListener.Flush();
 
