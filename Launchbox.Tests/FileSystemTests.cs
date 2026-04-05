@@ -2,7 +2,7 @@ using Launchbox.Services;
 using System;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using Xunit;
 
@@ -26,8 +26,6 @@ public class FileSystemTests : IDisposable
         {
             try
             {
-                // Wait briefly for OS handles (like FileSystemWatcher) to be fully released
-                Thread.Sleep(50);
                 Directory.Delete(_tempDirectory, true);
             }
             catch (IOException)
@@ -168,7 +166,7 @@ public class FileSystemTests : IDisposable
         File.WriteAllText(path, content);
 
         long size = _fileSystem.GetFileSize(path);
-        Assert.Equal(content.Length, size);
+        Assert.Equal(Encoding.UTF8.GetByteCount(content), size);
     }
 
     [Fact]
@@ -194,6 +192,10 @@ public class FileSystemTests : IDisposable
 
         Assert.True(signalled);
         Assert.True(callbackCount > 0);
+
+        // Wait briefly for OS handles (like FileSystemWatcher) to be fully released before teardown
+        watcher.Dispose();
+        Thread.Sleep(50);
     }
 
     [Fact]
@@ -202,7 +204,5 @@ public class FileSystemTests : IDisposable
         string missingDir = Path.Combine(_tempDirectory, "missing");
         using var watcher = _fileSystem.WatchDirectory(missingDir, () => { });
         Assert.NotNull(watcher);
-        // It's a NullDisposable, dispose shouldn't crash
-        watcher.Dispose();
     }
 }
