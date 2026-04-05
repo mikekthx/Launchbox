@@ -296,14 +296,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
         List<AppItem> localAppItems = [];
         List<string> allFiles = [];
 
-        foreach (var folder in folders.OrderBy(f => f.Order))
-        {
-            // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-            var files = await Task.Run(() =>
-                _shortcutService.GetShortcutFiles(
-                    folder.ExpandedPath,
-                    Constants.ALLOWED_EXTENSIONS, ct), ct);
+        var tasks = folders
+            .OrderBy(f => f.Order)
+            .Select(async folder =>
+            {
+                // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+                var files = await Task.Run(() =>
+                    _shortcutService.GetShortcutFiles(
+                        folder.ExpandedPath,
+                        Constants.ALLOWED_EXTENSIONS, ct), ct);
 
+                return (Folder: folder, Files: files);
+            })
+            .ToArray();
+
+        var results = await Task.WhenAll(tasks);
+
+        foreach (var (folder, files) in results)
+        {
             if (files != null)
             {
                 allFiles.AddRange(files);
@@ -322,7 +332,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                        Trace.WriteLine(
+                            $"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
                     }
                 }
             }
