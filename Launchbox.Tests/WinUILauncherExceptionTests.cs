@@ -6,6 +6,9 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
+// Trace.Listeners is a global mutable collection — serialize this class against any
+// other class that also mutates it to prevent concurrent structural modification.
+[Collection("TraceListeners")]
 [Trait("Category", "Reliability")]
 public class WinUILauncherExceptionTests
 {
@@ -35,7 +38,7 @@ public class WinUILauncherExceptionTests
         _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
 
         using var stringWriter = new StringWriter();
-        var listener = new TextWriterTraceListener(stringWriter);
+        using var listener = new TextWriterTraceListener(stringWriter);
         Trace.Listeners.Add(listener);
 
         try
@@ -64,7 +67,7 @@ public class WinUILauncherExceptionTests
         _fileSystem.AddDirectory(@"C:\safe\folder");
 
         using var stringWriter = new StringWriter();
-        var listener = new TextWriterTraceListener(stringWriter);
+        using var listener = new TextWriterTraceListener(stringWriter);
         Trace.Listeners.Add(listener);
 
         try
