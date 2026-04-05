@@ -6,9 +6,6 @@ using Xunit;
 
 namespace Launchbox.Tests;
 
-// Trace.Listeners is a global mutable collection — serialize this class against any
-// other class that also mutates it to prevent concurrent structural modification.
-[Collection("TraceListeners")]
 [Trait("Category", "Reliability")]
 public class WinUILauncherExceptionTests
 {
