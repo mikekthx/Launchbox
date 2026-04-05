@@ -424,6 +424,15 @@ public class WindowService : IWindowService, IDisposable
             _suppressSave = true;
             try
             {
+                ApplyWindowChanges();
+            }
+            finally
+            {
+                _suppressSave = false;
+            }
+
+            void ApplyWindowChanges()
+            {
                 if (needsResize)
                 {
                     _appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
@@ -449,10 +458,6 @@ public class WindowService : IWindowService, IDisposable
                 {
                     _appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
                 }
-            }
-            finally
-            {
-                _suppressSave = false;
             }
         }
         catch (Exception ex)
