@@ -155,7 +155,7 @@ public class FileSystemTests : IDisposable
         File.WriteAllText(path, "Hello");
 
         var date = _fileSystem.GetLastWriteTime(path);
-        Assert.True(date > DateTime.MinValue);
+        Assert.True(date >= DateTime.UtcNow.AddMinutes(-5));
     }
 
     [Fact]
@@ -175,7 +175,7 @@ public class FileSystemTests : IDisposable
         var waitEvent = new ManualResetEventSlim(false);
         int callbackCount = 0;
 
-        using var watcher = _fileSystem.WatchDirectory(_tempDirectory, () =>
+        var watcher = _fileSystem.WatchDirectory(_tempDirectory, () =>
         {
             callbackCount++;
             waitEvent.Set();
@@ -199,7 +199,7 @@ public class FileSystemTests : IDisposable
     }
 
     [Fact]
-    public void FileSystem_WatchDirectory_ReturnsNullDisposable_ForMissingDir()
+    public void FileSystem_WatchDirectory_ReturnsSentinelDisposable_ForMissingDir()
     {
         string missingDir = Path.Combine(_tempDirectory, "missing");
         using var watcher = _fileSystem.WatchDirectory(missingDir, () => { });
