@@ -155,7 +155,7 @@ public class FileSystemTests : IDisposable
         File.WriteAllText(path, "Hello");
 
         var date = _fileSystem.GetLastWriteTime(path);
-        Assert.True(date >= DateTime.Now.AddMinutes(-5));
+        Assert.True(date >= DateTime.UtcNow.AddMinutes(-5));
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public class FileSystemTests : IDisposable
 
         var watcher = _fileSystem.WatchDirectory(_tempDirectory, () =>
         {
-            callbackCount++;
+            Interlocked.Increment(ref callbackCount);
             waitEvent.Set();
         });
 
@@ -191,7 +191,6 @@ public class FileSystemTests : IDisposable
         bool signalled = waitEvent.Wait(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
 
         Assert.True(signalled);
-        Assert.True(callbackCount > 0);
 
         // Wait briefly for OS handles (like FileSystemWatcher) to be fully released before teardown
         watcher.Dispose();
