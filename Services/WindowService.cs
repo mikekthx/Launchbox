@@ -424,6 +424,7 @@ public class WindowService : IWindowService, IDisposable
 
             void ApplyClampedSizeAndPosition()
             {
+                // Suppress save so clamped dimensions are not persisted.
                 _suppressSave = true;
                 try
                 {
