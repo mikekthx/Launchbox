@@ -41,6 +41,10 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
     // Also true during base-class construction (field initializer runs before base ctor).
     private bool _suppressGuard = true;
 
+    public new void Add(AppItem item) =>
+        throw new NotSupportedException(
+            $"Direct Add/Insert bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
+
     // Wraps ReplaceAll with the mutation guard suppressed, so ApplyFilter and ApplyCollapseState
     // can batch-replace the visible collection without the guard interfering.
     private void ReplaceAllGuarded(IEnumerable<AppItem> items)
