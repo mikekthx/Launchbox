@@ -276,4 +276,26 @@ public class WinUILauncherSecurityTests
         // Should not throw
         launcher.OpenFolder(folderPath);
     }
+
+    [Fact]
+    public void OpenFolder_Blocks_UnsafePath()
+    {
+        var shortcutResolver = new MockShortcutResolver();
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        launcher.OpenFolder(@"\\attacker\share\folder");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
+    public void OpenFolder_Blocks_FolderNotFound()
+    {
+        var shortcutResolver = new MockShortcutResolver();
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        launcher.OpenFolder(@"C:\safe\missing_folder");
+
+        Assert.False(_processStarter.WasStarted);
+    }
 }

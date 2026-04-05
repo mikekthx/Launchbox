@@ -1,6 +1,7 @@
 using Launchbox.Services;
 using System;
 using System.Diagnostics;
+using System.IO;
 using Xunit;
 
 namespace Launchbox.Tests;
@@ -33,10 +34,25 @@ public class WinUILauncherExceptionTests
 
         _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
 
-        // Should not throw, the exception should be caught and logged
-        var exception = Record.Exception(() => launcher.Launch(@"C:\safe\shortcut.lnk"));
+        using var stringWriter = new StringWriter();
+        var listener = new TextWriterTraceListener(stringWriter);
+        Trace.Listeners.Add(listener);
 
-        Assert.Null(exception);
+        try
+        {
+            // Should not throw, the exception should be caught and logged
+            var exception = Record.Exception(() => launcher.Launch(@"C:\safe\shortcut.lnk"));
+
+            Assert.Null(exception);
+
+            Trace.Flush();
+            string traceOutput = stringWriter.ToString();
+            Assert.Contains("Failed to launch ...\\shortcut.lnk: [InvalidOperationException]", traceOutput);
+        }
+        finally
+        {
+            Trace.Listeners.Remove(listener);
+        }
     }
 
     [Fact]
@@ -47,9 +63,24 @@ public class WinUILauncherExceptionTests
 
         _fileSystem.AddDirectory(@"C:\safe\folder");
 
-        // Should not throw, the exception should be caught and logged
-        var exception = Record.Exception(() => launcher.OpenFolder(@"C:\safe\folder"));
+        using var stringWriter = new StringWriter();
+        var listener = new TextWriterTraceListener(stringWriter);
+        Trace.Listeners.Add(listener);
 
-        Assert.Null(exception);
+        try
+        {
+            // Should not throw, the exception should be caught and logged
+            var exception = Record.Exception(() => launcher.OpenFolder(@"C:\safe\folder"));
+
+            Assert.Null(exception);
+
+            Trace.Flush();
+            string traceOutput = stringWriter.ToString();
+            Assert.Contains("Failed to open folder ...\\folder: [InvalidOperationException]", traceOutput);
+        }
+        finally
+        {
+            Trace.Listeners.Remove(listener);
+        }
     }
 }
