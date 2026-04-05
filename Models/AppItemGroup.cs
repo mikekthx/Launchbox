@@ -41,6 +41,9 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
     // Also true during base-class construction (field initializer runs before base ctor).
     private bool _suppressGuard = true;
 
+    // Shadows the non-virtual base Add method to provide an immediate failure at the AppItemGroup API surface.
+    // While InsertItem also guards against mutations, it depends on virtual dispatch. This shadow prevents
+    // accidental bypassing by callers using the AppItemGroup type directly, acting as self-documenting code.
     public new void Add(AppItem item) =>
         throw new NotSupportedException(
             $"Direct Add/Insert bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
