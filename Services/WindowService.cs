@@ -420,64 +420,48 @@ public class WindowService : IWindowService, IDisposable
 
             if (!needsResize && !offScreenHorizontally && !offScreenVertically) return;
 
-            ApplyClampedSizeAndPosition(
-                _appWindow,
-                needsResize,
-                clampedWidth,
-                clampedHeight,
-                pos,
-                offScreenHorizontally,
-                offScreenVertically,
-                workArea);
+            ApplyClampedSizeAndPosition();
+
+            void ApplyClampedSizeAndPosition()
+            {
+                _suppressSave = true;
+                try
+                {
+                    if (needsResize)
+                    {
+                        _appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
+                    }
+
+                    int newX = pos.X;
+                    int newY = pos.Y;
+                    bool needsMove = false;
+
+                    if (offScreenHorizontally)
+                    {
+                        newX = workArea.X + (workArea.Width - clampedWidth) / 2;
+                        needsMove = true;
+                    }
+
+                    if (offScreenVertically)
+                    {
+                        newY = workArea.Y + (workArea.Height - clampedHeight) / 2;
+                        needsMove = true;
+                    }
+
+                    if (needsMove)
+                    {
+                        _appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
+                    }
+                }
+                finally
+                {
+                    _suppressSave = false;
+                }
+            }
         }
         catch (Exception ex)
         {
             Trace.WriteLine($"Failed to clamp window to work area: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
-    }
-
-    private void ApplyClampedSizeAndPosition(
-        AppWindow appWindow,
-        bool needsResize,
-        int clampedWidth,
-        int clampedHeight,
-        Windows.Graphics.PointInt32 pos,
-        bool offScreenHorizontally,
-        bool offScreenVertically,
-        Windows.Graphics.RectInt32 workArea)
-    {
-        _suppressSave = true;
-        try
-        {
-            if (needsResize)
-            {
-                appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
-            }
-
-            int newX = pos.X;
-            int newY = pos.Y;
-            bool needsMove = false;
-
-            if (offScreenHorizontally)
-            {
-                newX = workArea.X + (workArea.Width - clampedWidth) / 2;
-                needsMove = true;
-            }
-
-            if (offScreenVertically)
-            {
-                newY = workArea.Y + (workArea.Height - clampedHeight) / 2;
-                needsMove = true;
-            }
-
-            if (needsMove)
-            {
-                appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
-            }
-        }
-        finally
-        {
-            _suppressSave = false;
         }
     }
 
