@@ -43,7 +43,6 @@ public class WinUILauncherExceptionTests
 
         try
         {
-            // Should not throw, the exception should be caught and logged
             var exception = Record.Exception(() => launcher.Launch(@"C:\safe\shortcut.lnk"));
 
             Assert.Null(exception);
@@ -72,7 +71,6 @@ public class WinUILauncherExceptionTests
 
         try
         {
-            // Should not throw, the exception should be caught and logged
             var exception = Record.Exception(() => launcher.OpenFolder(@"C:\safe\folder"));
 
             Assert.Null(exception);

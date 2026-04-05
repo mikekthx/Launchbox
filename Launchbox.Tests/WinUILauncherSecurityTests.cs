@@ -289,7 +289,7 @@ public class WinUILauncherSecurityTests
     }
 
     [Fact]
-    public void OpenFolder_Blocks_FolderNotFound()
+    public void OpenFolder_SkipsLaunch_WhenDirectoryNotFound()
     {
         var shortcutResolver = new MockShortcutResolver();
         var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
