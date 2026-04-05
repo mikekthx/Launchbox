@@ -34,6 +34,7 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
             PR AUTHOR: ${{ github.event.pull_request.user.login }}
+            EVENT TYPE: ${{ github.event_name }}/${{ github.event.action }}
 
             Perform a thorough code review of this pull request. Start by fetching the
             diff, then review all changed files.
@@ -72,6 +73,42 @@ jobs:
                  ko, pl, pt-BR, ru, tr, zh-Hans, zh-Hant)
                - XAML uses x:Uid for in-tree elements; code-behind uses Localization.GetString()
 
+            ## Thread Resolution (synchronize events only)
+
+            When this review is triggered by a `synchronize` event (new commits pushed),
+            BEFORE posting new inline comments:
+
+            1. Fetch all unresolved review threads via GraphQL:
+               ```bash
+               gh api graphql -f query='{
+                 repository(owner: "OWNER", name: "REPO") {
+                   pullRequest(number: PR_NUMBER) {
+                     reviewThreads(first: 50) {
+                       nodes {
+                         id isResolved isOutdated
+                         comments(first: 1) {
+                           nodes { body path line author { login } }
+                         }
+                       }
+                     }
+                   }
+                 }
+               }'
+               ```
+            2. For each unresolved thread, examine the current file content at that path
+               using `gh api repos/OWNER/REPO/contents/PATH?ref=HEAD_SHA` or the PR diff
+               to determine whether the concern was addressed in the new commits.
+            3. Resolve threads where the issue is fixed using:
+               ```bash
+               gh api graphql -f query='mutation { resolveReviewThread(input: {threadId: "THREAD_ID"}) { thread { id isResolved } } }'
+               ```
+               Resolve a thread if: the thread is outdated AND the concern it raised is no
+               longer present in the current code, OR the change clearly and directly
+               addresses the feedback.
+            4. Do NOT resolve threads where the issue persists or where the fix is unclear.
+            5. Post a top-level comment summarising what was resolved and what still needs
+               attention — do this before any new inline comments.
+
             ## Output Format
 
             - Post **inline comments** using `mcp__github_inline_comment__create_inline_comment`
@@ -87,4 +124,4 @@ jobs:
           allowed_bots: '*'
           claude_args: >-
             --allowedTools
-            "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api:*)"
+            "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api:*),Bash(gh api graphql:*)"
