@@ -32,6 +32,10 @@ public class FileSystemTests : IDisposable
             {
                 // Ignore transient file lock errors during teardown
             }
+            catch (UnauthorizedAccessException)
+            {
+                // FileSystemWatcher handles may still be open briefly after Dispose
+            }
         }
     }
 
@@ -155,7 +159,7 @@ public class FileSystemTests : IDisposable
         File.WriteAllText(path, "Hello");
 
         var date = _fileSystem.GetLastWriteTime(path);
-        Assert.True(date >= DateTime.UtcNow.AddMinutes(-5));
+        Assert.True(date >= DateTime.Now.AddMinutes(-5));
     }
 
     [Fact]
