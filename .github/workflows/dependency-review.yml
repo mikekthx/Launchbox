@@ -7,7 +7,6 @@ on:
       - '**/*.csproj'
       - '**/packages.lock.json'
       - 'global.json'
-      - '.github/workflows/**'
 
 permissions:
   contents: write
