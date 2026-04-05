@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
+using System.Threading;
 
 namespace Launchbox.Models;
 
@@ -28,10 +29,11 @@ public record ShortcutFolder
     /// including after <c>with</c>-expressions that change <see cref="Path"/>.
     /// </summary>
     [JsonIgnore]
-    public string ExpandedPath => System.Threading.LazyInitializer.EnsureInitialized(ref _expandedPath, () => Environment.ExpandEnvironmentVariables(Path));
+    public string ExpandedPath => LazyInitializer.EnsureInitialized(ref _expandedPath, () => Environment.ExpandEnvironmentVariables(Path));
 
     // Custom equality is required to prevent the compiler-synthesized record equality
-    // from including the private `_expandedPath` cache field, which would break equality semantics.
+    // from including the `ExpandedPath` public property, which would inadvertently
+    // trigger lazy initialization as a side-effect of equality comparisons.
     public virtual bool Equals(ShortcutFolder? other)
     {
         if (other is null) return false;
