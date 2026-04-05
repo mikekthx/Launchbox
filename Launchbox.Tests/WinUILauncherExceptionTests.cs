@@ -11,11 +11,13 @@ public class WinUILauncherExceptionTests
 {
     private readonly MockFileSystem _fileSystem;
     private readonly MockShortcutResolver _shortcutResolver;
+    private readonly ExceptionThrowingProcessStarter _processStarter;
 
     public WinUILauncherExceptionTests()
     {
         _fileSystem = new MockFileSystem();
         _shortcutResolver = new MockShortcutResolver();
+        _processStarter = new ExceptionThrowingProcessStarter();
     }
 
     private class ExceptionThrowingProcessStarter : IProcessStarter
@@ -29,8 +31,7 @@ public class WinUILauncherExceptionTests
     [Fact]
     public void Constructor_ThrowsArgumentNullException_ForNullShortcutResolver()
     {
-        var processStarter = new ExceptionThrowingProcessStarter();
-        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(null!, processStarter, _fileSystem));
+        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(null!, _processStarter, _fileSystem));
         Assert.Equal("shortcutResolver", ex.ParamName);
     }
 
@@ -44,16 +45,14 @@ public class WinUILauncherExceptionTests
     [Fact]
     public void Constructor_ThrowsArgumentNullException_ForNullFileSystem()
     {
-        var processStarter = new ExceptionThrowingProcessStarter();
-        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(_shortcutResolver, processStarter, null!));
+        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(_shortcutResolver, _processStarter, null!));
         Assert.Equal("fileSystem", ex.ParamName);
     }
 
     [Fact]
     public void Launch_CatchesAndLogsException()
     {
-        var processStarter = new ExceptionThrowingProcessStarter();
-        var launcher = new WinUILauncher(_shortcutResolver, processStarter, _fileSystem);
+        var launcher = new WinUILauncher(_shortcutResolver, _processStarter, _fileSystem);
 
         _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
 
@@ -66,8 +65,7 @@ public class WinUILauncherExceptionTests
     [Fact]
     public void OpenFolder_CatchesAndLogsException()
     {
-        var processStarter = new ExceptionThrowingProcessStarter();
-        var launcher = new WinUILauncher(_shortcutResolver, processStarter, _fileSystem);
+        var launcher = new WinUILauncher(_shortcutResolver, _processStarter, _fileSystem);
 
         _fileSystem.AddDirectory(@"C:\safe\folder");
 
