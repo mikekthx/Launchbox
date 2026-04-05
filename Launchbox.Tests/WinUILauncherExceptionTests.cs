@@ -26,6 +26,29 @@ public class WinUILauncherExceptionTests
     }
 
     [Fact]
+    public void Constructor_ThrowsArgumentNullException_ForNullShortcutResolver()
+    {
+        var processStarter = new ExceptionThrowingProcessStarter();
+        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(null!, processStarter, _fileSystem));
+        Assert.Equal("shortcutResolver", ex.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_ThrowsArgumentNullException_ForNullProcessStarter()
+    {
+        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(_shortcutResolver, null!, _fileSystem));
+        Assert.Equal("processStarter", ex.ParamName);
+    }
+
+    [Fact]
+    public void Constructor_ThrowsArgumentNullException_ForNullFileSystem()
+    {
+        var processStarter = new ExceptionThrowingProcessStarter();
+        var ex = Assert.Throws<ArgumentNullException>(() => new WinUILauncher(_shortcutResolver, processStarter, null!));
+        Assert.Equal("fileSystem", ex.ParamName);
+    }
+
+    [Fact]
     public void Launch_CatchesAndLogsException()
     {
         var processStarter = new ExceptionThrowingProcessStarter();
