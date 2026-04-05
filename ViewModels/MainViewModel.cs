@@ -300,20 +300,34 @@ public partial class MainViewModel : ObservableObject, IDisposable
             .OrderBy(f => f.Order)
             .Select(async folder =>
             {
-                // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-                var files = await Task.Run(() =>
-                    _shortcutService.GetShortcutFiles(
-                        folder.ExpandedPath,
-                        Constants.ALLOWED_EXTENSIONS, ct), ct);
+                try
+                {
+                    // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+                    var files = await Task.Run(() =>
+                        _shortcutService.GetShortcutFiles(
+                            folder.ExpandedPath,
+                            Constants.ALLOWED_EXTENSIONS, ct), ct).ConfigureAwait(false);
 
-                return (Folder: folder, Files: files);
+                    return (Folder: folder, Files: files, Error: (Exception?)null);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    return (Folder: folder, Files: (string[]?)null, Error: ex);
+                }
             })
             .ToArray();
 
-        var results = await Task.WhenAll(tasks);
+        var results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
-        foreach (var (folder, files) in results)
+        foreach (var (folder, files, error) in results)
         {
+            if (error != null)
+            {
+                Trace.WriteLine(
+                    $"Unexpected error loading folder {PathSecurity.RedactPath(folder.Path)}: {PathSecurity.GetSafeExceptionMessage(error)}");
+                continue;
+            }
+
             if (files != null)
             {
                 allFiles.AddRange(files);
