@@ -155,7 +155,7 @@ public class FileSystemTests : IDisposable
         File.WriteAllText(path, "Hello");
 
         var date = _fileSystem.GetLastWriteTime(path);
-        Assert.True(date >= DateTime.UtcNow.AddMinutes(-5));
+        Assert.True(date >= DateTime.Now.AddMinutes(-5));
     }
 
     [Fact]
