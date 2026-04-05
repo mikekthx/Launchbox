@@ -5,7 +5,7 @@ namespace Launchbox.Tests;
 [CollectionDefinition("TraceListeners", DisableParallelization = true)]
 public class TraceListenersCollection
 {
-    // This class has no code, and is never created. Its purpose is simply
-    // to be the place to apply [CollectionDefinition] and all the
-    // ICollectionFixture<> interfaces.
+    // Disable parallelization because tests in this collection mutate the global
+    // Trace.Listeners state. Running them concurrently would interleave trace output
+    // and cause flaky assertions when capturing logs via TextWriterTraceListener.
 }
