@@ -94,7 +94,7 @@ public class FileSystemTests : IDisposable
     [Fact]
     public void FileSystem_GetIniValue_ReturnsValue_SmallBuffer()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        Skip.IfNot(OperatingSystem.IsWindows(), "GetPrivateProfileString is a Windows API");
 
         string path = Path.Combine(_tempDirectory, "test.ini");
         File.WriteAllText(path, "[Section]\r\nKey=Value\r\n");
@@ -106,7 +106,7 @@ public class FileSystemTests : IDisposable
     [Fact]
     public void FileSystem_GetIniValue_ReturnsValue_LargeBuffer()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        Skip.IfNot(OperatingSystem.IsWindows(), "GetPrivateProfileString is a Windows API");
 
         string path = Path.Combine(_tempDirectory, "large.ini");
         string largeValue = new string('A', 1000); // Exceeds 512, falls back to ArrayPool
@@ -117,17 +117,24 @@ public class FileSystemTests : IDisposable
     }
 
     [Fact]
-    public void FileSystem_GetIniValue_ReturnsEmpty_ForMissingKeyOrFile()
+    public void FileSystem_GetIniValue_ReturnsEmpty_ForMissingFile()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        Skip.IfNot(OperatingSystem.IsWindows(), "GetPrivateProfileString is a Windows API");
 
         string path = Path.Combine(_tempDirectory, "missing.ini");
         string result = _fileSystem.GetIniValue(path, "Section", "Key");
         Assert.Equal(string.Empty, result);
+    }
 
+    [Fact]
+    public void FileSystem_GetIniValue_ReturnsEmpty_ForMissingKey()
+    {
+        Skip.IfNot(OperatingSystem.IsWindows(), "GetPrivateProfileString is a Windows API");
+
+        string path = Path.Combine(_tempDirectory, "nokey.ini");
         File.WriteAllText(path, "[Section]\r\nOtherKey=Value\r\n");
-        string result2 = _fileSystem.GetIniValue(path, "Section", "Key");
-        Assert.Equal(string.Empty, result2);
+        string result = _fileSystem.GetIniValue(path, "Section", "Key");
+        Assert.Equal(string.Empty, result);
     }
 
     [Fact]
@@ -159,7 +166,7 @@ public class FileSystemTests : IDisposable
         File.WriteAllText(path, "Hello");
 
         var date = _fileSystem.GetLastWriteTime(path);
-        Assert.True(date >= DateTime.Now.AddMinutes(-5));
+        Assert.InRange(date, DateTime.Now.AddMinutes(-5), DateTime.Now.AddMinutes(1));
     }
 
     [Fact]
