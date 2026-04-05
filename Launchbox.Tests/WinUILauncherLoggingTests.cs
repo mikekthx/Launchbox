@@ -14,7 +14,7 @@ public class WinUILauncherLoggingTests : IDisposable
     private readonly MockFileSystem _fileSystem;
     private readonly MockShortcutResolver _shortcutResolver;
     private readonly MockProcessStarter _processStarter;
-    private readonly StringWriter _stringWriter;
+    private readonly ThreadSafeStringWriter _stringWriter;
     private readonly TextWriterTraceListener _traceListener;
 
     public WinUILauncherLoggingTests()
@@ -23,7 +23,7 @@ public class WinUILauncherLoggingTests : IDisposable
         _shortcutResolver = new MockShortcutResolver();
         _processStarter = new MockProcessStarter();
 
-        _stringWriter = new StringWriter();
+        _stringWriter = new ThreadSafeStringWriter();
         _traceListener = new TextWriterTraceListener(_stringWriter);
         Trace.Listeners.Add(_traceListener);
     }

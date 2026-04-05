@@ -6,6 +6,7 @@ using Xunit;
 namespace Launchbox.Tests;
 
 [Trait("Category", "Reliability")]
+[Collection("TraceListeners")]
 public class WinUILauncherExceptionTests
 {
     private readonly MockFileSystem _fileSystem;
