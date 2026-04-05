@@ -14,6 +14,7 @@ public record ShortcutFolder
         init
         {
             _path = value;
+            // Necessary to prevent a stale cache from being carried through `with`-expressions
             _expandedPath = null;
         }
     }
@@ -27,8 +28,10 @@ public record ShortcutFolder
     /// including after <c>with</c>-expressions that change <see cref="Path"/>.
     /// </summary>
     [JsonIgnore]
-    public string ExpandedPath => _expandedPath ??= Environment.ExpandEnvironmentVariables(Path);
+    public string ExpandedPath => System.Threading.LazyInitializer.EnsureInitialized(ref _expandedPath, () => Environment.ExpandEnvironmentVariables(Path));
 
+    // Custom equality is required to prevent the compiler-synthesized record equality
+    // from including the private `_expandedPath` cache field, which would break equality semantics.
     public virtual bool Equals(ShortcutFolder? other)
     {
         if (other is null) return false;
