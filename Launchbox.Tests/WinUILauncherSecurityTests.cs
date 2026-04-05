@@ -124,7 +124,7 @@ public class WinUILauncherSecurityTests
     [Fact]
     public void Launch_Allows_LnkFile_When_MetadataTarget_Is_Empty()
     {
-        // metadata is resolved but target string is empty — shell may still handle it
+        // metadata is resolved but target string is empty - shell may still handle it
         var shortcutResolver = new MockShortcutResolver(target: string.Empty);
         var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
 
@@ -138,7 +138,7 @@ public class WinUILauncherSecurityTests
     [Fact]
     public void Launch_Blocks_LnkFile_When_Resolve_Returns_Null()
     {
-        // Resolve() returns null (COM failure, truncation) — must fail closed
+        // Resolve() returns null (COM failure, truncation) - must fail closed
         var shortcutResolver = new MockShortcutResolver(returnNull: true);
         var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
 
@@ -152,7 +152,7 @@ public class WinUILauncherSecurityTests
     [Fact]
     public void Launch_Blocks_UrlFile_When_Resolve_Returns_Null()
     {
-        // Resolve() returns null — must fail closed for .url too
+        // Resolve() returns null - must fail closed for .url too
         var shortcutResolver = new MockShortcutResolver(returnNull: true);
         var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
 
