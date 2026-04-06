@@ -296,13 +296,37 @@ public partial class MainViewModel : ObservableObject, IDisposable
         List<AppItem> localAppItems = [];
         List<string> allFiles = [];
 
-        foreach (var folder in folders.OrderBy(f => f.Order))
+        var tasks = folders
+            .OrderBy(f => f.Order)
+            .Select(async folder =>
+            {
+                try
+                {
+                    // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+                    var files = await Task.Run(() =>
+                        _shortcutService.GetShortcutFiles(
+                            folder.ExpandedPath,
+                            Constants.ALLOWED_EXTENSIONS, ct), ct).ConfigureAwait(false);
+
+                    return (Folder: folder, Files: files, Error: (Exception?)null);
+                }
+                catch (Exception ex) when (ex is not OperationCanceledException)
+                {
+                    return (Folder: folder, Files: (string[]?)null, Error: ex);
+                }
+            })
+            .ToArray();
+
+        var results = await Task.WhenAll(tasks).ConfigureAwait(false);
+
+        foreach (var (folder, files, error) in results)
         {
-            // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-            var files = await Task.Run(() =>
-                _shortcutService.GetShortcutFiles(
-                    folder.ExpandedPath,
-                    Constants.ALLOWED_EXTENSIONS, ct), ct);
+            if (error != null)
+            {
+                Trace.WriteLine(
+                    $"Unexpected error loading folder {PathSecurity.RedactPath(folder.Path)}: {PathSecurity.GetSafeExceptionMessage(error)}");
+                continue;
+            }
 
             if (files != null)
             {
@@ -322,7 +346,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     }
                     catch (Exception ex)
                     {
-                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                        Trace.WriteLine(
+                            $"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
                     }
                 }
             }

@@ -16,3 +16,7 @@
 ## 2026-03-29 - Cache Environment Variable Expansion
 **Learning:** Expanding environment variables via `Environment.ExpandEnvironmentVariables` is a PInvoke that is slow on Windows. Repeatedly calling this in loops or hot paths (e.g., during app loading) introduces measurable overhead.
 **Action:** Expand environment variables once when retrieving paths from external sources (e.g., settings) and cache the result in a property (e.g., `ExpandedPath`) to avoid redundant expansions. Use `[JsonIgnore]` to prevent the machine-specific expanded path from being serialized.
+
+## 2026-04-05 - Parallelize Sequential Async Tasks in Loops
+**Learning:** Awaiting `Task.Run` inside a `foreach` loop forces sequential execution of tasks that could otherwise run in parallel. This is particularly inefficient for I/O-bound operations across multiple folders or drives. `Task.WhenAll` preserves the input order in its result array, allowing for easy, ordered post-processing.
+**Action:** When performing independent async or offloaded synchronous operations in a loop, collect the tasks into a list and use `await Task.WhenAll(tasks)`. Process the results in a subsequent sequential loop if thread safety or specific ordering of side effects is required.
