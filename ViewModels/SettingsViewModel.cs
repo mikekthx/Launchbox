@@ -152,6 +152,19 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     public void SetFolderSequence(IReadOnlyList<string> orderedPaths) => _settingsService.SetShortcutFolderSequence(orderedPaths);
 
+    public void PersistFolderSequence()
+    {
+        try
+        {
+            var orderedPaths = Folders.Select(f => f.Path).ToList();
+            _settingsService.SetShortcutFolderSequence(orderedPaths);
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to persist folder sequence: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+    }
+
     private void RefreshFolders()
     {
         // Marshal through the dispatcher: SettingsService PropertyChanged is raised synchronously

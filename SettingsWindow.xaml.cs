@@ -48,9 +48,4 @@ public sealed partial class SettingsWindow : Window
         ViewModel.Dispose();
     }
 
-    private void FolderList_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-    {
-        var orderedPaths = sender.Items.OfType<ShortcutFolder>().Select(f => f.Path).ToList();
-        ViewModel.SetFolderSequence(orderedPaths);
-    }
 }

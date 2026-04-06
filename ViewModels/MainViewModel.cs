@@ -513,18 +513,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public void PersistItemOrder()
     {
-        var orders = FilteredApps
-            .GroupBy(a => a.FolderPath)
-            .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
-        // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
-        // that failed to load) produces no items in FilteredApps and must not lose its saved order.
-        _settingsService.MergeItemOrders(orders);
+        try
+        {
+            var orders = FilteredApps
+                .GroupBy(a => a.FolderPath)
+                .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
+            // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
+            // that failed to load) produces no items in FilteredApps and must not lose its saved order.
+            _settingsService.MergeItemOrders(orders);
 
-        // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
-        // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
-        Apps.CollectionChanged -= Apps_CollectionChanged;
-        Apps.ReplaceAll(FilteredApps);
-        Apps.CollectionChanged += Apps_CollectionChanged;
+            // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
+            // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
+            Apps.CollectionChanged -= Apps_CollectionChanged;
+            Apps.ReplaceAll(FilteredApps);
+            Apps.CollectionChanged += Apps_CollectionChanged;
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to persist item order: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
     }
 
     private void RebuildFolderWatchers(IReadOnlyList<ShortcutFolder> folders)
