@@ -51,6 +51,13 @@ public sealed partial class SettingsWindow : Window
     private void FolderList_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
         var orderedPaths = sender.Items.OfType<ShortcutFolder>().Select(f => f.Path).ToList();
-        ViewModel.SetFolderSequence(orderedPaths);
+        try
+        {
+            ViewModel.SetFolderSequence(orderedPaths);
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to persist folder sequence: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
     }
 }

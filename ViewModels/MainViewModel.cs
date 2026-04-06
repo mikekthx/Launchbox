@@ -298,37 +298,46 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var folder in folders.OrderBy(f => f.Order))
         {
-            // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-            var files = await Task.Run(() =>
-                _shortcutService.GetShortcutFiles(
-                    folder.ExpandedPath,
-                    Constants.ALLOWED_EXTENSIONS, ct), ct);
-
-            if (files != null)
+            try
             {
-                allFiles.AddRange(files);
-                foreach (var file in files)
+                // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+                var files = await Task.Run(() =>
+                    _shortcutService.GetShortcutFiles(
+                        folder.ExpandedPath,
+                        Constants.ALLOWED_EXTENSIONS, ct), ct);
+
+                if (files != null)
                 {
-                    try
+                    allFiles.AddRange(files);
+                    foreach (var file in files)
                     {
-                        var name = Path.GetFileNameWithoutExtension(file);
-                        localAppItems.Add(new AppItem
+                        try
                         {
-                            Name = name,
-                            Path = file,
-                            FolderLabel = folder.Label,
-                            FolderPath = folder.Path
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        Trace.WriteLine($"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                            var name = Path.GetFileNameWithoutExtension(file);
+                            localAppItems.Add(new AppItem
+                            {
+                                Name = name,
+                                Path = file,
+                                FolderLabel = folder.Label,
+                                FolderPath = folder.Path
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            Trace.WriteLine(
+                                $"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                        }
                     }
                 }
+                else
+                {
+                    Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
+                Trace.WriteLine(
+                    $"Error loading shortcuts from {PathSecurity.RedactPath(folder.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             }
         }
 
