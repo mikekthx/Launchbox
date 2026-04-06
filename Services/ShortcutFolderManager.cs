@@ -180,9 +180,14 @@ public class ShortcutFolderManager
         var json = JsonSerializer.Serialize(folders);
         if (System.Text.Encoding.UTF8.GetByteCount(json) > MAX_JSON_BYTES)
         {
+            System.Diagnostics.Trace.WriteLine($"Failed to persist {FOLDERS_KEY}: serialized size exceeds {MAX_JSON_BYTES} bytes");
             return false;
         }
-        if (!_store.SetValue(FOLDERS_KEY, json)) return false;
+        if (!_store.SetValue(FOLDERS_KEY, json))
+        {
+            System.Diagnostics.Trace.WriteLine($"Failed to persist {FOLDERS_KEY}: store write returned false");
+            return false;
+        }
         _cache = ValidateAndNormalize(folders);
         return true;
     }

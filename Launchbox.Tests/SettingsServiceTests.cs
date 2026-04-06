@@ -394,16 +394,36 @@ public class SettingsServiceTests
     public void PersistItemOrders_FiresPropertyChanged_EvenOnWriteFailure()
     {
         var store = new MockSettingsStore();
-        store.FailSetValueKeys.Add("ShortcutItemOrders");
+        store.FailSetValueKeys.Add(SettingsService.ITEM_ORDERS_KEY);
         var svc = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
 
         bool notified = false;
         svc.PropertyChanged += (_, e) =>
         {
-            if (e.PropertyName == "ShortcutItemOrders") notified = true;
+            if (e.PropertyName == SettingsService.ITEM_ORDERS_KEY) notified = true;
         };
 
         var result = svc.SetItemOrder(@"C:\Folder", ["A.lnk"]);
+
+        Assert.False(result);
+        Assert.True(notified);
+    }
+
+    [Fact]
+    public void PersistItemOrders_FiresPropertyChanged_EvenOnSizeLimitExceeded()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
+
+        bool notified = false;
+        svc.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == SettingsService.ITEM_ORDERS_KEY) notified = true;
+        };
+
+        // Build a dict large enough to exceed the 7168-byte limit
+        var hugeNames = Enumerable.Range(0, 500).Select(i => $"VeryLongShortcutName_{i:D4}.lnk").ToList();
+        var result = svc.SetItemOrder(@"C:\Shortcuts", hugeNames);
 
         Assert.False(result);
         Assert.True(notified);
