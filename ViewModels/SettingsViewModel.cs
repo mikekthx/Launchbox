@@ -150,8 +150,6 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private void ApplyRename(int order, string newLabel) => _settingsService.RenameShortcutFolder(order, newLabel);
 
-    public void SetFolderSequence(IReadOnlyList<string> orderedPaths) => _settingsService.SetShortcutFolderSequence(orderedPaths);
-
     public void PersistFolderSequence()
     {
         try
