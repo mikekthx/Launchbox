@@ -259,7 +259,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             if (_pendingStartupValue != value)
             {
                 _pendingStartupValue = value;
-                OnPropertyChanged(); // notify immediately so bindings see the new pending state
+                OnPropertyChanged(nameof(RunAtStartup)); // notify immediately so bindings see the new pending state
                 _ = SetRunAtStartupSafeAsync(value);
             }
         }
