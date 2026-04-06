@@ -352,7 +352,7 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public void PersistFolderSequence_ReordersAndRefreshesFolders()
+    public void SetFolderSequence_ReordersAndRefreshesFolders()
     {
         var store = new MockSettingsStore();
         var folders = new System.Collections.Generic.List<ShortcutFolder>
@@ -368,19 +368,11 @@ public class SettingsViewModelTests
             new ShortcutFolderManager(store));
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
 
-        // Simulate ListView reordering the underlying collection directly
-        var folderA = vm.Folders[0];
-        var folderB = vm.Folders[1];
-        vm.Folders.Clear();
-        vm.Folders.Add(folderB);
-        vm.Folders.Add(folderA);
+        vm.SetFolderSequence([@"C:\Desktop\B", @"C:\Desktop\A"]);
 
-        vm.PersistFolderSequence();
-
-        var updatedFolders = settingsService.GetShortcutFolders();
-        Assert.Equal(2, updatedFolders.Count);
-        Assert.Equal("B", updatedFolders[0].Label);
-        Assert.Equal("A", updatedFolders[1].Label);
+        Assert.Equal(2, vm.Folders.Count);
+        Assert.Equal("B", vm.Folders[0].Label);
+        Assert.Equal("A", vm.Folders[1].Label);
     }
 
     [Fact]

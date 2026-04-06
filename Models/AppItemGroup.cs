@@ -41,16 +41,6 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
     // Also true during base-class construction (field initializer runs before base ctor).
     private bool _suppressGuard = true;
 
-    // Shadows the non-virtual base Add to give callers an immediate, unambiguous
-    // failure. InsertItem also throws as defense-in-depth, but that requires going
-    // through the virtual dispatch chain; this makes the prohibition self-documenting
-    // on the public API. Internal ReplaceAllGuarded uses Collection<T>.Add →
-    // InsertItem (compile-time dispatch via BulkObservableCollection<T>) and never
-    // reaches this shadow.
-    public new void Add(AppItem item) =>
-        throw new NotSupportedException(
-            $"Direct Add/Insert bypasses _allItems and corrupts filter state. Use the {nameof(AppItemGroup)}-level APIs.");
-
     // Wraps ReplaceAll with the mutation guard suppressed, so ApplyFilter and ApplyCollapseState
     // can batch-replace the visible collection without the guard interfering.
     private void ReplaceAllGuarded(IEnumerable<AppItem> items)
