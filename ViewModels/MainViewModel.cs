@@ -306,35 +306,28 @@ public partial class MainViewModel : ObservableObject, IDisposable
                         folder.ExpandedPath,
                         Constants.ALLOWED_EXTENSIONS, ct), ct);
 
-                if (files != null)
+                allFiles.AddRange(files);
+                foreach (var file in files)
                 {
-                    allFiles.AddRange(files);
-                    foreach (var file in files)
+                    try
                     {
-                        try
+                        var name = Path.GetFileNameWithoutExtension(file);
+                        localAppItems.Add(new AppItem
                         {
-                            var name = Path.GetFileNameWithoutExtension(file);
-                            localAppItems.Add(new AppItem
-                            {
-                                Name = name,
-                                Path = file,
-                                FolderLabel = folder.Label,
-                                FolderPath = folder.Path
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            Trace.WriteLine(
-                                $"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                        }
+                            Name = name,
+                            Path = file,
+                            FolderLabel = folder.Label,
+                            FolderPath = folder.Path
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.WriteLine(
+                            $"Failed to load app {PathSecurity.RedactPath(file)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
                     }
                 }
-                else
-                {
-                    Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
-                }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 Trace.WriteLine(
                     $"Error loading shortcuts from {PathSecurity.RedactPath(folder.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
