@@ -90,37 +90,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
     public bool HasNoMatches =>
         Apps.Count > 0 && !string.IsNullOrEmpty(_filterText) && FilteredApps.Count == 0;
 
-    private const int ITEM_WIDTH_SMALL = 80;
-    private const int ITEM_WIDTH_MEDIUM = 110;
-    private const int ITEM_WIDTH_LARGE = 140;
-
-    private const int ITEM_HEIGHT_SMALL = 96;
-    private const int ITEM_HEIGHT_MEDIUM = 130;
-    private const int ITEM_HEIGHT_LARGE = 165;
-
-    private const int ICON_SIZE_SMALL = 32;
-    private const int ICON_SIZE_MEDIUM = 56;
-    private const int ICON_SIZE_LARGE = 72;
-
     public int ItemWidth => _settingsService.GridSize switch
     {
-        GridSize.Small => ITEM_WIDTH_SMALL,
-        GridSize.Large => ITEM_WIDTH_LARGE,
-        _ => ITEM_WIDTH_MEDIUM,
+        GridSize.Small => Constants.ITEM_WIDTH_SMALL,
+        GridSize.Large => Constants.ITEM_WIDTH_LARGE,
+        _ => Constants.ITEM_WIDTH_MEDIUM,
     };
 
     public int ItemHeight => _settingsService.GridSize switch
     {
-        GridSize.Small => ITEM_HEIGHT_SMALL,
-        GridSize.Large => ITEM_HEIGHT_LARGE,
-        _ => ITEM_HEIGHT_MEDIUM,
+        GridSize.Small => Constants.ITEM_HEIGHT_SMALL,
+        GridSize.Large => Constants.ITEM_HEIGHT_LARGE,
+        _ => Constants.ITEM_HEIGHT_MEDIUM,
     };
 
     public int IconSize => _settingsService.GridSize switch
     {
-        GridSize.Small => ICON_SIZE_SMALL,
-        GridSize.Large => ICON_SIZE_LARGE,
-        _ => ICON_SIZE_MEDIUM,
+        GridSize.Small => Constants.ICON_SIZE_SMALL,
+        GridSize.Large => Constants.ICON_SIZE_LARGE,
+        _ => Constants.ICON_SIZE_MEDIUM,
     };
 
     public string ToggleWindowText => _windowService.IsVisible
