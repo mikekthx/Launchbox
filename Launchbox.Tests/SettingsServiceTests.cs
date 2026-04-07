@@ -370,4 +370,62 @@ public class SettingsServiceTests
         // UI toggle must revert — the disable failed, so startup is still enabled
         Assert.True(service.IsRunAtStartup);
     }
+
+    [Fact]
+    public void AddShortcutFolder_FiresPropertyChanged_EvenOnWriteFailure()
+    {
+        var store = new MockSettingsStore();
+        store.FailSetValueKeys.Add(SettingsService.SHORTCUT_FOLDERS_KEY);
+        var svc = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
+
+        bool notified = false;
+        svc.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == SettingsService.SHORTCUT_FOLDERS_KEY) notified = true;
+        };
+
+        var result = svc.AddShortcutFolder(@"C:\Test");
+
+        Assert.False(result);
+        Assert.True(notified);
+    }
+
+    [Fact]
+    public void PersistItemOrders_FiresPropertyChanged_EvenOnWriteFailure()
+    {
+        var store = new MockSettingsStore();
+        store.FailSetValueKeys.Add(SettingsService.ITEM_ORDERS_KEY);
+        var svc = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
+
+        bool notified = false;
+        svc.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == SettingsService.ITEM_ORDERS_KEY) notified = true;
+        };
+
+        var result = svc.SetItemOrder(@"C:\Folder", ["A.lnk"]);
+
+        Assert.False(result);
+        Assert.True(notified);
+    }
+
+    [Fact]
+    public void PersistItemOrders_FiresPropertyChanged_EvenOnSizeLimitExceeded()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(new MockSettingsStore()));
+
+        bool notified = false;
+        svc.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == SettingsService.ITEM_ORDERS_KEY) notified = true;
+        };
+
+        // Build a dict large enough to exceed the 7168-byte limit
+        var hugeNames = Enumerable.Range(0, 500).Select(i => $"VeryLongShortcutName_{i:D4}.lnk").ToList();
+        var result = svc.SetItemOrder(@"C:\Shortcuts", hugeNames);
+
+        Assert.False(result);
+        Assert.True(notified);
+    }
 }

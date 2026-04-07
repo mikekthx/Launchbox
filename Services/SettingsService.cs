@@ -51,55 +51,40 @@ public class SettingsService : ObservableObject
 
     public bool AddShortcutFolder(string path, string? label = null)
     {
-        if (_folderManager.AddFolder(path, label))
-        {
-            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
-            return true;
-        }
-        return false;
+        bool result = _folderManager.AddFolder(path, label);
+        OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
+        return result;
     }
 
     public bool RemoveShortcutFolder(int order)
     {
-        if (_folderManager.RemoveFolder(order))
-        {
-            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
-            return true;
-        }
-        return false;
+        bool result = _folderManager.RemoveFolder(order);
+        OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
+        return result;
     }
 
     public bool ReorderShortcutFolder(int fromOrder, int toOrder)
     {
-        if (_folderManager.ReorderFolder(fromOrder, toOrder))
-        {
-            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
-            return true;
-        }
-        return false;
+        bool result = _folderManager.ReorderFolder(fromOrder, toOrder);
+        OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
+        return result;
     }
 
     public bool RenameShortcutFolder(int order, string newLabel)
     {
-        if (_folderManager.RenameFolder(order, newLabel))
-        {
-            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
-            return true;
-        }
-        return false;
+        bool result = _folderManager.RenameFolder(order, newLabel);
+        OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
+        return result;
     }
 
     public bool SetShortcutFolderSequence(IReadOnlyList<string> orderedPaths)
     {
-        if (_folderManager.SetFolderSequence(orderedPaths))
-        {
-            OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
-            return true;
-        }
-        return false;
+        bool result = _folderManager.SetFolderSequence(orderedPaths);
+        OnPropertyChanged(SHORTCUT_FOLDERS_KEY);
+        return result;
     }
 
-    private const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
+    internal const string ITEM_ORDERS_KEY = "ShortcutItemOrders";
     internal const string SHORTCUT_FOLDERS_KEY = "ShortcutFolders";
     // 7KB safety margin under the 8KB LocalSettings per-value limit
     private const int MAX_ITEM_ORDERS_BYTES = 7168;
@@ -175,13 +160,20 @@ public class SettingsService : ObservableObject
     {
         var json = JsonSerializer.Serialize(orders);
         if (System.Text.Encoding.UTF8.GetByteCount(json) > MAX_ITEM_ORDERS_BYTES)
+        {
+            Trace.WriteLine($"Failed to persist {ITEM_ORDERS_KEY}: serialized size exceeds {MAX_ITEM_ORDERS_BYTES} bytes");
+            OnPropertyChanged(ITEM_ORDERS_KEY);
             return false;
+        }
 
-        if (!_store.SetValue(ITEM_ORDERS_KEY, json))
-            return false;
+        bool result = _store.SetValue(ITEM_ORDERS_KEY, json);
+        if (!result)
+        {
+            Trace.WriteLine($"Failed to persist {ITEM_ORDERS_KEY}: store write returned false");
+        }
 
         OnPropertyChanged(ITEM_ORDERS_KEY);
-        return true;
+        return result;
     }
 
     public FolderViewMode FolderViewMode

@@ -25,3 +25,7 @@
 ## 2026-03-22 - [Reliability] Prevent unhandled exceptions in async void methods
 **Learning:** In WinUI/WPF applications, unhandled exceptions within `async void` event handlers (e.g., calling `await dialog.ShowAsync()`) bypass standard exception handling and crash the application because they cannot be observed by an awaiter.
 **Action:** Always wrap the bodies of `async void` methods in a `try/catch` block and log the exception rather than letting it crash the entire process.
+
+## 2026-04-05 - [Reliability] Prevent UI desync on persistence failure
+**Learning:** In the `SettingsService`, if a `SetValue` write to the underlying store fails, the `OnPropertyChanged` notification must still be triggered. This forces the UI (via the ViewModel) to re-read the setting from the store, which will return the old value and revert the UI's optimistic state.
+**Action:** Always call `OnPropertyChanged` after an attempted change in `SettingsService`, even if the write operation returns `false`.
