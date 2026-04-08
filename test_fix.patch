@@ -1,0 +1,22 @@
+--- Launchbox.Tests/OrderAppItemsBenchmark.cs
++++ Launchbox.Tests/OrderAppItemsBenchmark.cs
+@@ -10,17 +10,17 @@
+ namespace Launchbox.Tests;
+
+ public class OrderAppItemsBenchmark
+ {
+     private readonly ITestOutputHelper _output;
+
+     public OrderAppItemsBenchmark(ITestOutputHelper output)
+     {
+         _output = output;
+     }
+
+-    [Fact]
+-    public void BenchmarkOrdering()
++    // Disabled because it is a benchmark and causes CI runs to be too long
++    // [Fact]
++    public void BenchmarkOrdering_NotATest()
+     {
+         // Generate test data
+         var items = new List<AppItem>();
