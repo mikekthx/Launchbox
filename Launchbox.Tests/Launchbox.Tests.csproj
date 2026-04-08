@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <Compile Include="..\Helpers\PathSecurity.cs" Link="Helpers\PathSecurity.cs" />
+    <Compile Include="..\Helpers\AppItemSorter.cs" Link="Helpers\AppItemSorter.cs" />
     <Compile Include="..\Services\ISettingsStore.cs" Link="Services\ISettingsStore.cs" />
     <Compile Include="..\Services\ISettingsContainer.cs" Link="Services\ISettingsContainer.cs" />
     <Compile Include="..\Services\LocalSettingsStore.cs" Link="Services\LocalSettingsStore.cs" />
