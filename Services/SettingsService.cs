@@ -139,12 +139,12 @@ public class SettingsService : ObservableObject
     private Dictionary<string, List<string>> DeserializeItemOrders()
     {
         if (!_store.TryGetValue(ITEM_ORDERS_KEY, out var val) || val is not string json)
-            return [];
+            return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
             var deserialized = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
-            if (deserialized == null) return [];
+            if (deserialized == null) return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
             // Windows paths are case-insensitive; rebuild with OrdinalIgnoreCase so a casing
             // mismatch between stored keys and lookup keys never silently loses order data.
             return new Dictionary<string, List<string>>(deserialized, StringComparer.OrdinalIgnoreCase);
@@ -152,7 +152,7 @@ public class SettingsService : ObservableObject
         catch (JsonException ex)
         {
             Trace.WriteLine($"Corrupt {ITEM_ORDERS_KEY} JSON: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            return [];
+            return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
         }
     }
 
