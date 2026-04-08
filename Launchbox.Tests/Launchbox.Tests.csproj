@@ -2,6 +2,7 @@
 
   <!-- Test project for Launchbox -->
   <PropertyGroup>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <IsPackable>false</IsPackable>
     <OutputType>Exe</OutputType>
     <!-- Disable CsWinRT AOT source generator to prevent duplicate partial class members

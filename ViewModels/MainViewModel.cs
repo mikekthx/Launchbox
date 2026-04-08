@@ -356,20 +356,22 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 if (customOrder.Count == 0)
                     return (IEnumerable<AppItem>)g.OrderBy(a => a.Name);
 
-                var byName = g.ToDictionary(
-                    a => Path.GetFileName(a.Path),
-                    StringComparer.OrdinalIgnoreCase);
+                var orderIndex = new Dictionary<string, int>(customOrder.Count, StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < customOrder.Count; i++)
+                {
+                    orderIndex.TryAdd(customOrder[i], i);
+                }
 
-                // Items with a custom position first, then new/unlisted items alphabetically.
-                var ordered = customOrder
-                    .Where(name => byName.ContainsKey(name))
-                    .Select(name => byName[name])
-                    .ToList();
-                var listed = new HashSet<string>(customOrder, StringComparer.OrdinalIgnoreCase);
-                ordered.AddRange(g
-                    .Where(a => !listed.Contains(Path.GetFileName(a.Path)))
-                    .OrderBy(a => a.Name));
-                return ordered;
+                var orderedWithIndex = g.Select(a => (Item: a, Index: orderIndex.TryGetValue(Path.GetFileName(a.Path), out int idx) ? idx : int.MaxValue))
+                                        .ToList();
+                orderedWithIndex.Sort((a, b) =>
+                {
+                    int cmp = a.Index.CompareTo(b.Index);
+                    if (cmp != 0) return cmp;
+                    return StringComparer.CurrentCulture.Compare(a.Item.Name, b.Item.Name);
+                });
+
+                return orderedWithIndex.Select(x => x.Item);
             })
             .ToList();
     }
