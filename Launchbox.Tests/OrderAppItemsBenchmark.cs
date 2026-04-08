@@ -1,11 +1,10 @@
+using Launchbox.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Launchbox.Models;
 using Xunit;
-
 
 namespace Launchbox.Tests;
 
@@ -78,7 +77,8 @@ public class OrderAppItemsBenchmark
         var res2 = OptimizedOrderAppItems(items, customOrders);
 
         Assert.Equal(res1.Count, res2.Count);
-        for(int i=0; i<res1.Count; i++) {
+        for (int i = 0; i < res1.Count; i++)
+        {
             Assert.Equal(res1[i].Path, res2[i].Path);
         }
     }
