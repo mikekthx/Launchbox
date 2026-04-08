@@ -307,7 +307,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
                         Constants.ALLOWED_EXTENSIONS, ct), ct);
 
                 if (files is null)
+                {
+                    // GetShortcutFiles returns null when the directory does not exist (already
+                    // logs for IO/permission errors internally).
+                    Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
                     continue;
+                }
 
                 allFiles.AddRange(files);
                 foreach (var file in files)
