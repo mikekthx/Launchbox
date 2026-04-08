@@ -348,30 +348,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private List<AppItem> OrderAppItems(List<AppItem> items)
     {
         // Apply custom item order per folder, falling back to alphabetical for unordered items.
-        return items
-            .GroupBy(a => a.FolderPath)
-            .SelectMany(g =>
-            {
-                var customOrder = _settingsService.GetItemOrder(g.Key);
-                if (customOrder.Count == 0)
-                    return (IEnumerable<AppItem>)g.OrderBy(a => a.Name);
-
-                var byName = g.ToDictionary(
-                    a => Path.GetFileName(a.Path),
-                    StringComparer.OrdinalIgnoreCase);
-
-                // Items with a custom position first, then new/unlisted items alphabetically.
-                var ordered = customOrder
-                    .Where(name => byName.ContainsKey(name))
-                    .Select(name => byName[name])
-                    .ToList();
-                var listed = new HashSet<string>(customOrder, StringComparer.OrdinalIgnoreCase);
-                ordered.AddRange(g
-                    .Where(a => !listed.Contains(Path.GetFileName(a.Path)))
-                    .OrderBy(a => a.Name));
-                return ordered;
-            })
-            .ToList();
+        return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
     }
 
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
