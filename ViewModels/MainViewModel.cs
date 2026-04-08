@@ -348,7 +348,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private List<AppItem> OrderAppItems(List<AppItem> items)
     {
         // Apply custom item order per folder, falling back to alphabetical for unordered items.
-        return AppItemSorter.OrderAppItems(items, folderPath => _settingsService.GetItemOrder(folderPath));
+        return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
     }
 
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
