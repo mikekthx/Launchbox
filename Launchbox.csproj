@@ -12,7 +12,7 @@
     <WinUISDKReferences>false</WinUISDKReferences>
     <EnableMsixTooling>true</EnableMsixTooling>
     <DefaultLanguage>en-US</DefaultLanguage>
-  <EnableWindowsTargeting>true</EnableWindowsTargeting></PropertyGroup>
+  </PropertyGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png" />
@@ -50,7 +50,7 @@
   -->
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
-  <EnableWindowsTargeting>true</EnableWindowsTargeting></PropertyGroup>
+  </PropertyGroup>
 
   <!-- Publish Properties -->
   <!-- Thumbprint is supplied at build time via CERT_THUMBPRINT env var (CI) or /p:PackageCertificateThumbprint. -->
@@ -59,7 +59,7 @@
     <PackageCertificateThumbprint>$(CERT_THUMBPRINT)</PackageCertificateThumbprint>
     <AppxPackageSigningEnabled Condition="'$(PackageCertificateThumbprint)' != ''">True</AppxPackageSigningEnabled>
     <AppxPackageSigningEnabled Condition="'$(PackageCertificateThumbprint)' == ''">False</AppxPackageSigningEnabled>
-  <EnableWindowsTargeting>true</EnableWindowsTargeting></PropertyGroup>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' != 'Debug' and '$(RuntimeIdentifier)' != '' and '$(GenerateAppxPackageOnBuild)' != 'true'">
     <PublishReadyToRun>True</PublishReadyToRun>
@@ -67,5 +67,5 @@
     <TrimMode>partial</TrimMode>
     <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
     <SelfContained>True</SelfContained>
-  <EnableWindowsTargeting>true</EnableWindowsTargeting></PropertyGroup>
+  </PropertyGroup>
 </Project>
