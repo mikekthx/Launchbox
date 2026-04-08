@@ -48,7 +48,7 @@
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4">
                         <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
-                          <TextBlock Text="{x:Bind Path}" FontSize="12" Opacity="0.6"
+                          <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                      TextTrimming="CharacterEllipsis"
                                      ToolTipService.ToolTip="{x:Bind Path}" />
                         </StackPanel>
