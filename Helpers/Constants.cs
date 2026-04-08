@@ -20,7 +20,22 @@ public static class Constants
     public const int VK_S = 0x53;
     public const int HOTKEY_ID = 9000;
 
-    // Icon constants — 256 covers up to ~457% DPI when displayed at 56 DIPs
+    // Display dimensions (DIPs) for the UI grid
+    public const int ITEM_WIDTH_SMALL = 80;
+    public const int ITEM_WIDTH_MEDIUM = 110;
+    public const int ITEM_WIDTH_LARGE = 140;
+
+    public const int ITEM_HEIGHT_SMALL = 96;
+    public const int ITEM_HEIGHT_MEDIUM = 130;
+    public const int ITEM_HEIGHT_LARGE = 165;
+
+    // Display sizes (DIPs) for the icons in the UI grid
+    public const int ICON_SIZE_SMALL = 32;
+    public const int ICON_SIZE_MEDIUM = 56;
+    public const int ICON_SIZE_LARGE = 72;
+
+    // Icon extraction constants — 256 covers up to ~457% DPI when displayed at 56 DIPs
+    // Note: ICON_SIZE is the extraction resolution, whereas ICON_SIZE_SMALL/MEDIUM/LARGE are UI display sizes.
     public const int ICON_SIZE = 256;
     public const int MIN_VALID_YEAR = 1900;
     public const long MAX_ICON_FILE_SIZE_BYTES = 5 * 1024 * 1024;

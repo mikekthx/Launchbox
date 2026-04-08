@@ -92,23 +92,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public int ItemWidth => _settingsService.GridSize switch
     {
-        GridSize.Small => 80,
-        GridSize.Large => 140,
-        _ => 110,
+        GridSize.Small => Constants.ITEM_WIDTH_SMALL,
+        GridSize.Large => Constants.ITEM_WIDTH_LARGE,
+        _ => Constants.ITEM_WIDTH_MEDIUM,
     };
 
     public int ItemHeight => _settingsService.GridSize switch
     {
-        GridSize.Small => 96,
-        GridSize.Large => 165,
-        _ => 130,
+        GridSize.Small => Constants.ITEM_HEIGHT_SMALL,
+        GridSize.Large => Constants.ITEM_HEIGHT_LARGE,
+        _ => Constants.ITEM_HEIGHT_MEDIUM,
     };
 
     public int IconSize => _settingsService.GridSize switch
     {
-        GridSize.Small => 32,
-        GridSize.Large => 72,
-        _ => 56,
+        GridSize.Small => Constants.ICON_SIZE_SMALL,
+        GridSize.Large => Constants.ICON_SIZE_LARGE,
+        _ => Constants.ICON_SIZE_MEDIUM,
     };
 
     public string ToggleWindowText => _windowService.IsVisible
