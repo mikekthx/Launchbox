@@ -3,6 +3,7 @@ using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
@@ -355,11 +356,11 @@ public class SettingsViewModelTests
     public void SetFolderSequence_ReordersAndRefreshesFolders()
     {
         var store = new MockSettingsStore();
-        var folders = new System.Collections.Generic.List<ShortcutFolder>
-        {
+        List<ShortcutFolder> folders =
+        [
             new() { Path = @"C:\Desktop\A", Label = "A", Order = 0 },
             new() { Path = @"C:\Desktop\B", Label = "B", Order = 1 },
-        };
+        ];
         store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
 
         var settingsService = new SettingsService(

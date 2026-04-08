@@ -306,6 +306,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
                         folder.ExpandedPath,
                         Constants.ALLOWED_EXTENSIONS, ct), ct);
 
+                if (files is null)
+                    continue;
+
                 allFiles.AddRange(files);
                 foreach (var file in files)
                 {
