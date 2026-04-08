@@ -42,7 +42,7 @@
                           CanReorderItems="True"
                           AllowDrop="True"
                           CanDragItems="True"
-                          DragItemsCompleted="{x:Bind ViewModel.PersistFolderSequence}">
+                          DragItemsCompleted="FolderList_DragItemsCompleted">
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4">

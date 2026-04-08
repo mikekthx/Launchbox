@@ -197,8 +197,8 @@ public class ShortcutFolderManager
     {
         var valid = folders
             .Where(f => !string.IsNullOrEmpty(f.Path))
-            // Expand and validate each path. We re-expand here directly for security checks.
-            // Callers that need the expanded path later will use the lazy-cached f.ExpandedPath.
+            // Expand and validate each path — ExpandedPath is now a pure computed property,
+            // so no explicit assignment is needed; the expansion is re-evaluated on demand.
             .Where(f => !PathSecurity.IsUnsafePath(Environment.ExpandEnvironmentVariables(f.Path)))
             // Deduplicate by path so corrupted persisted state never leaks into _cache.
             .GroupBy(f => f.Path, StringComparer.OrdinalIgnoreCase)

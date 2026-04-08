@@ -296,40 +296,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
         List<AppItem> localAppItems = [];
         List<string> allFiles = [];
 
-        var tasks = folders
-            .OrderBy(f => f.Order)
-            .Select(async folder =>
-            {
-                try
-                {
-                    // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
-                    var files = await Task.Run(() =>
-                        _shortcutService.GetShortcutFiles(
-                            folder.ExpandedPath,
-                            Constants.ALLOWED_EXTENSIONS, ct), ct).ConfigureAwait(false);
-
-                    return (Folder: folder, Files: files, Error: (Exception?)null);
-                }
-                catch (Exception ex) when (ex is not OperationCanceledException)
-                {
-                    return (Folder: folder, Files: (string[]?)null, Error: ex);
-                }
-            })
-            .ToArray();
-
-        var results = await Task.WhenAll(tasks).ConfigureAwait(false);
-
-        foreach (var (folder, files, error) in results)
+        foreach (var folder in folders.OrderBy(f => f.Order))
         {
-            if (error != null)
+            try
             {
-                Trace.WriteLine(
-                    $"Unexpected error loading folder {PathSecurity.RedactPath(folder.Path)}: {PathSecurity.GetSafeExceptionMessage(error)}");
-                continue;
-            }
+                // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
+                var files = await Task.Run(() =>
+                    _shortcutService.GetShortcutFiles(
+                        folder.ExpandedPath,
+                        Constants.ALLOWED_EXTENSIONS, ct), ct);
 
-            if (files != null)
-            {
+                if (files is null)
+                {
+                    // GetShortcutFiles returns null when the directory does not exist (already
+                    // logs for IO/permission errors internally).
+                    Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
+                    continue;
+                }
+
                 allFiles.AddRange(files);
                 foreach (var file in files)
                 {
@@ -351,9 +335,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     }
                 }
             }
-            else
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                Trace.WriteLine($"Shortcut folder not found: {PathSecurity.RedactPath(folder.Path)}");
+                Trace.WriteLine(
+                    $"Error loading shortcuts from {PathSecurity.RedactPath(folder.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             }
         }
 
@@ -538,25 +523,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public void PersistItemOrder()
     {
-        try
-        {
-            var orders = FilteredApps
-                .GroupBy(a => a.FolderPath)
-                .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
-            // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
-            // that failed to load) produces no items in FilteredApps and must not lose its saved order.
-            _settingsService.MergeItemOrders(orders);
+        var orders = FilteredApps
+            .GroupBy(a => a.FolderPath)
+            .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
+        // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
+        // that failed to load) produces no items in FilteredApps and must not lose its saved order.
+        _settingsService.MergeItemOrders(orders);
 
-            // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
-            // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
-            Apps.CollectionChanged -= Apps_CollectionChanged;
-            Apps.ReplaceAll(FilteredApps);
-            Apps.CollectionChanged += Apps_CollectionChanged;
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Failed to persist item order: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
+        // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
+        // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
+        Apps.CollectionChanged -= Apps_CollectionChanged;
+        Apps.ReplaceAll(FilteredApps);
+        Apps.CollectionChanged += Apps_CollectionChanged;
     }
 
     private void RebuildFolderWatchers(IReadOnlyList<ShortcutFolder> folders)

@@ -150,18 +150,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private void ApplyRename(int order, string newLabel) => _settingsService.RenameShortcutFolder(order, newLabel);
 
-    public void PersistFolderSequence()
-    {
-        try
-        {
-            var orderedPaths = Folders.Select(f => f.Path).ToList();
-            _settingsService.SetShortcutFolderSequence(orderedPaths);
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Failed to persist folder sequence: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
-    }
+    public void SetFolderSequence(IReadOnlyList<string> orderedPaths) => _settingsService.SetShortcutFolderSequence(orderedPaths);
 
     private void RefreshFolders()
     {
@@ -270,7 +259,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             if (_pendingStartupValue != value)
             {
                 _pendingStartupValue = value;
-                OnPropertyChanged(nameof(RunAtStartup)); // notify immediately so bindings see the new pending state
+                OnPropertyChanged(); // notify immediately so bindings see the new pending state
                 _ = SetRunAtStartupSafeAsync(value);
             }
         }
