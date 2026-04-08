@@ -373,6 +373,12 @@ public class SettingsViewModelTests
         Assert.Equal(2, vm.Folders.Count);
         Assert.Equal("B", vm.Folders[0].Label);
         Assert.Equal("A", vm.Folders[1].Label);
+
+        // Also verify the reorder was actually persisted to the store.
+        var persisted = settingsService.GetShortcutFolders();
+        Assert.Equal(2, persisted.Count);
+        Assert.Equal("B", persisted[0].Label);
+        Assert.Equal("A", persisted[1].Label);
     }
 
     [Fact]
