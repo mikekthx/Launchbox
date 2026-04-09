@@ -360,11 +360,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
             .GroupBy(app => app.FolderPath)
             .Select(group =>
             {
-                string folderPath = group.Key;
-                bool isKnownFolder = folderLookup.TryGetValue(folderPath, out ShortcutFolder? folder);
+                var folderPath = group.Key;
+                var isKnownFolder = folderLookup.TryGetValue(folderPath, out ShortcutFolder? folder);
 
-                string groupLabel = isKnownFolder ? folder!.Label : (Path.GetFileName(folderPath) ?? folderPath);
-                int sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
+                var groupLabel = isKnownFolder ? folder!.Label : (Path.GetFileName(folderPath) ?? folderPath);
+                var sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
 
                 return (
                     Group: new AppItemGroup(groupLabel, folderPath, group),
