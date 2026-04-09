@@ -361,7 +361,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             .Select(group =>
             {
                 var folderPath = group.Key;
-                var isKnownFolder = folderLookup.TryGetValue(folderPath, out ShortcutFolder? folder);
+                var isKnownFolder = folderLookup.TryGetValue(folderPath, out var folder);
 
                 var groupLabel = isKnownFolder ? folder!.Label : (Path.GetFileName(folderPath) ?? folderPath);
                 var sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
