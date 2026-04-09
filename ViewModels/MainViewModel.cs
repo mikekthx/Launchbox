@@ -351,10 +351,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
     }
 
-    /// <summary>
-    /// Groups the loaded apps by their origin folder, applying the configured folder order and label.
-    /// Falls back to the raw folder name for apps whose origin folder is no longer configured.
-    /// </summary>
+    // Falls back to the raw folder name for apps whose origin folder is no longer configured.
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
         var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
