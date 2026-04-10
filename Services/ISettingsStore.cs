@@ -9,4 +9,5 @@ public interface ISettingsStore
 {
     bool TryGetValue(string key, out object? value);
     bool SetValue(string key, object? value);
+    bool SetValues(System.Collections.Generic.IReadOnlyDictionary<string, object?> values);
 }

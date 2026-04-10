@@ -30,6 +30,18 @@ public class LocalSettingsStoreTests
             }
             Store[key] = value;
         }
+
+        public void SetValues(IReadOnlyDictionary<string, object?> values)
+        {
+            if (ThrowOnWrite)
+            {
+                throw new Exception("Simulated write failure");
+            }
+            foreach (var kvp in values)
+            {
+                Store[kvp.Key] = kvp.Value;
+            }
+        }
     }
 
     [Fact]
