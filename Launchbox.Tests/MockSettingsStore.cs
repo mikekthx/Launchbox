@@ -60,7 +60,10 @@ public class MockSettingsStore : ISettingsStore
             {
                 return false;
             }
+        }
 
+        foreach (var kvp in values)
+        {
             if (kvp.Value != null)
             {
                 _store[kvp.Key] = kvp.Value;

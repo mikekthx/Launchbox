@@ -69,45 +69,43 @@ public class WindowPositionManager
         // Capture previous values before writing so we can roll back on partial failure
         bool hadPrevious = TryGetWindowPosition(out int oldX, out int oldY, out int oldW, out int oldH);
 
-        int successfulWrites = 0;
-
-        if (!_settings.SetValue(SETTING_KEY_X, x)) goto Fallback;
-        successfulWrites++;
-
-        if (!_settings.SetValue(SETTING_KEY_Y, y)) goto Fallback;
-        successfulWrites++;
-
-        if (!_settings.SetValue(SETTING_KEY_WIDTH, width)) goto Fallback;
-        successfulWrites++;
-
-        if (!_settings.SetValue(SETTING_KEY_HEIGHT, height)) goto Fallback;
-
-        return true;
-
-    Fallback:
-        Trace.WriteLine("Failed to save window position: SetValue returned false");
-
-        // Only roll back if we had valid previous values — avoid writing zeros
-        if (hadPrevious)
+        var values = new System.Collections.Generic.Dictionary<string, object?>
         {
-            RollbackPartialSave(successfulWrites, oldX, oldY, oldW, oldH);
+            { SETTING_KEY_X, x },
+            { SETTING_KEY_Y, y },
+            { SETTING_KEY_WIDTH, width },
+            { SETTING_KEY_HEIGHT, height }
+        };
+
+        if (!_settings.SetValues(values))
+        {
+            Trace.WriteLine("Failed to save window position: SetValues returned false");
+
+            // Only roll back if we had valid previous values — avoid writing zeros
+            if (hadPrevious)
+            {
+                RollbackPartialSave(oldX, oldY, oldW, oldH);
+            }
+
+            return false;
         }
 
-        return false;
+        return true;
     }
 
-    private void RollbackPartialSave(int successfulWrites, int oldX, int oldY, int oldW, int oldH)
+    private void RollbackPartialSave(int oldX, int oldY, int oldW, int oldH)
     {
-        if (successfulWrites > 0 && !_settings.SetValue(SETTING_KEY_X, oldX))
-            Trace.WriteLine($"Failed to roll back window position for {SETTING_KEY_X}");
+        var rollback = new System.Collections.Generic.Dictionary<string, object?>
+        {
+            { SETTING_KEY_X, oldX },
+            { SETTING_KEY_Y, oldY },
+            { SETTING_KEY_WIDTH, oldW },
+            { SETTING_KEY_HEIGHT, oldH }
+        };
 
-        if (successfulWrites > 1 && !_settings.SetValue(SETTING_KEY_Y, oldY))
-            Trace.WriteLine($"Failed to roll back window position for {SETTING_KEY_Y}");
-
-        if (successfulWrites > 2 && !_settings.SetValue(SETTING_KEY_WIDTH, oldW))
-            Trace.WriteLine($"Failed to roll back window position for {SETTING_KEY_WIDTH}");
-
-        if (successfulWrites > 3 && !_settings.SetValue(SETTING_KEY_HEIGHT, oldH))
-            Trace.WriteLine($"Failed to roll back window position for {SETTING_KEY_HEIGHT}");
+        if (!_settings.SetValues(rollback))
+        {
+            Trace.WriteLine("Failed to roll back window position.");
+        }
     }
 }
