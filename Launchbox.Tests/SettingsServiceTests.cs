@@ -281,7 +281,7 @@ public class SettingsServiceTests
 
         // Retrieve with different casing — must find the persisted order
         var order = svc.GetItemOrder(@"c:\foo\bar");
-        Assert.NotEmpty(order);
+        Assert.Equal(["Alpha.lnk", "Beta.lnk"], order);
     }
 
     [Fact]
