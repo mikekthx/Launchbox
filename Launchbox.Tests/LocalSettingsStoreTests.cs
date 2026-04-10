@@ -139,7 +139,7 @@ public class LocalSettingsStoreTests
         // Arrange
         var mockContainer = new MockSettingsContainer();
         var store = new LocalSettingsStore(mockContainer);
-        var values = new Dictionary<string, object?>
+        Dictionary<string, object?> values = new()
         {
             ["TestKey1"] = "Value1",
             ["TestKey2"] = 2
@@ -160,7 +160,7 @@ public class LocalSettingsStoreTests
         // Arrange
         var mockContainer = new MockSettingsContainer { ThrowOnWrite = true };
         var store = new LocalSettingsStore(mockContainer);
-        var values = new Dictionary<string, object?>
+        Dictionary<string, object?> values = new()
         {
             ["TestKey1"] = "Value1"
         };
