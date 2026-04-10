@@ -351,22 +351,28 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
     }
 
+    // Falls back to the raw folder name for apps whose origin folder is no longer configured.
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
-        // Build grouped data structure — group by FolderPath (unique), display Label
         var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
+
         return orderedItems
-            .GroupBy(a => a.FolderPath)
-            .Select(g =>
+            .GroupBy(app => app.FolderPath)
+            .Select(group =>
             {
-                var found = folderLookup.TryGetValue(g.Key, out var f);
+                var folderPath = group.Key;
+                var isKnownFolder = folderLookup.TryGetValue(folderPath, out var folder);
+
+                var groupLabel = isKnownFolder ? folder!.Label : (Path.GetFileName(folderPath) ?? folderPath);
+                var sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
+
                 return (
-                    Group: new AppItemGroup(found ? f!.Label : Path.GetFileName(g.Key) ?? g.Key, g.Key, g),
-                    Order: found ? f!.Order : int.MaxValue
+                    Group: new AppItemGroup(groupLabel, folderPath, group),
+                    Order: sortOrder
                 );
             })
-            .OrderBy(x => x.Order)
-            .Select(x => x.Group)
+            .OrderBy(item => item.Order)
+            .Select(item => item.Group)
             .ToList();
     }
 
