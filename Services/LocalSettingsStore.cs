@@ -1,5 +1,6 @@
 using Launchbox.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.Storage;
 
@@ -46,7 +47,7 @@ public class LocalSettingsStore : ISettingsStore
         }
     }
 
-    public bool SetValues(System.Collections.Generic.IReadOnlyDictionary<string, object?> values)
+    public bool SetValues(IReadOnlyDictionary<string, object?> values)
     {
         try
         {
@@ -79,7 +80,7 @@ public class LocalSettingsStore : ISettingsStore
             _container.Values[key] = value;
         }
 
-        public void SetValues(System.Collections.Generic.IReadOnlyDictionary<string, object?> values)
+        public void SetValues(IReadOnlyDictionary<string, object?> values)
         {
             foreach (var kvp in values)
             {

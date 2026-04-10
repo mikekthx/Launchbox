@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Launchbox.Services;
@@ -69,7 +70,7 @@ public class WindowPositionManager
         // Capture previous values before writing so we can roll back on partial failure
         bool hadPrevious = TryGetWindowPosition(out int oldX, out int oldY, out int oldW, out int oldH);
 
-        var values = new System.Collections.Generic.Dictionary<string, object?>
+        var values = new Dictionary<string, object?>
         {
             { SETTING_KEY_X, x },
             { SETTING_KEY_Y, y },
@@ -95,7 +96,7 @@ public class WindowPositionManager
 
     private void RollbackPartialSave(int oldX, int oldY, int oldW, int oldH)
     {
-        var rollback = new System.Collections.Generic.Dictionary<string, object?>
+        var rollback = new Dictionary<string, object?>
         {
             { SETTING_KEY_X, oldX },
             { SETTING_KEY_Y, oldY },
