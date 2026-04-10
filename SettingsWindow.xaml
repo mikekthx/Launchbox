@@ -35,7 +35,7 @@
                 <TextBlock x:Name="FolderListHeader" x:Uid="Settings_FolderList" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,8" />
 
                 <ListView x:Name="FolderList"
-                          AutomationProperties.LabeledBy="{x:Bind FolderListHeader}"
+                          AutomationProperties.LabeledBy="{Binding ElementName=FolderListHeader}"
                           ItemsSource="{x:Bind ViewModel.Folders}"
                           SelectionMode="None"
                           MaxHeight="200"
@@ -85,7 +85,7 @@
 
                 <!-- View Mode -->
                 <TextBlock x:Name="ViewModeHeader" x:Uid="Settings_ViewMode" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,8" />
-                <ComboBox AutomationProperties.LabeledBy="{x:Bind ViewModeHeader}"
+                <ComboBox AutomationProperties.LabeledBy="{Binding ElementName=ViewModeHeader}"
                           ItemsSource="{x:Bind ViewModel.ViewModeOptions}"
                           SelectedItem="{x:Bind ViewModel.SelectedViewModeOption, Mode=TwoWay}"
                           DisplayMemberPath="DisplayName" Width="150" />
@@ -109,7 +109,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                         <TextBlock x:Name="IconSizeLabel" x:Uid="Settings_IconSizeLabel" VerticalAlignment="Center"/>
                         <ComboBox x:Uid="Settings_IconSizeCombo"
-                                  AutomationProperties.LabeledBy="{x:Bind IconSizeLabel}"
+                                  AutomationProperties.LabeledBy="{Binding ElementName=IconSizeLabel}"
                                   ItemsSource="{x:Bind ViewModel.GridSizeOptions}"
                                   SelectedItem="{x:Bind ViewModel.SelectedGridSize, Mode=TwoWay}"
                                   Width="120" />
