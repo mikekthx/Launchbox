@@ -132,4 +132,36 @@ public class LocalSettingsStoreTests
         // Assert
         Assert.False(result);
     }
+
+    [Fact]
+    public void SetValues_StoresAllValues_WhenSuccess()
+    {
+        // Arrange
+        var mockContainer = new MockSettingsContainer();
+        var store = new LocalSettingsStore(mockContainer);
+        var values = new Dictionary<string, object?> { { "Key1", "Val1" }, { "Key2", 42 } };
+
+        // Act
+        bool result = store.SetValues(values);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal("Val1", mockContainer.Store["Key1"]);
+        Assert.Equal(42, mockContainer.Store["Key2"]);
+    }
+
+    [Fact]
+    public void SetValues_ReturnsFalse_OnException()
+    {
+        // Arrange
+        var mockContainer = new MockSettingsContainer { ThrowOnWrite = true };
+        var store = new LocalSettingsStore(mockContainer);
+        var values = new Dictionary<string, object?> { { "Key1", "Val1" } };
+
+        // Act
+        bool result = store.SetValues(values);
+
+        // Assert
+        Assert.False(result);
+    }
 }

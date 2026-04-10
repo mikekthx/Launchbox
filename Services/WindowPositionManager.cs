@@ -80,7 +80,7 @@ public class WindowPositionManager
 
         if (!_settings.SetValues(values))
         {
-            Trace.WriteLine("Failed to save window position: SetValues returned false");
+            Trace.WriteLine($"Failed to save window position: SetValues returned false for keys [{string.Join(", ", values.Keys)}]");
 
             // Only roll back if we had valid previous values — avoid writing zeros
             if (hadPrevious)
