@@ -72,15 +72,15 @@ public class WindowPositionManager
 
         var values = new Dictionary<string, object?>
         {
-            { SETTING_KEY_X, x },
-            { SETTING_KEY_Y, y },
-            { SETTING_KEY_WIDTH, width },
-            { SETTING_KEY_HEIGHT, height }
+            [SETTING_KEY_X] = x,
+            [SETTING_KEY_Y] = y,
+            [SETTING_KEY_WIDTH] = width,
+            [SETTING_KEY_HEIGHT] = height
         };
 
         if (!_settings.SetValues(values))
         {
-            Trace.WriteLine($"Failed to save window position: SetValues returned false for keys [{string.Join(", ", values.Keys)}]");
+            Trace.WriteLine($"Failed to save window position: SetValues returned false for keys: {string.Join(", ", values.Keys)}");
 
             // Only roll back if we had valid previous values — avoid writing zeros
             if (hadPrevious)
@@ -98,15 +98,15 @@ public class WindowPositionManager
     {
         var rollback = new Dictionary<string, object?>
         {
-            { SETTING_KEY_X, oldX },
-            { SETTING_KEY_Y, oldY },
-            { SETTING_KEY_WIDTH, oldW },
-            { SETTING_KEY_HEIGHT, oldH }
+            [SETTING_KEY_X] = oldX,
+            [SETTING_KEY_Y] = oldY,
+            [SETTING_KEY_WIDTH] = oldW,
+            [SETTING_KEY_HEIGHT] = oldH
         };
 
         if (!_settings.SetValues(rollback))
         {
-            Trace.WriteLine("Failed to roll back window position.");
+            Trace.WriteLine($"Failed to roll back window position for keys: {string.Join(", ", rollback.Keys)}");
         }
     }
 }

@@ -139,15 +139,19 @@ public class LocalSettingsStoreTests
         // Arrange
         var mockContainer = new MockSettingsContainer();
         var store = new LocalSettingsStore(mockContainer);
-        var values = new Dictionary<string, object?> { { "Key1", "Val1" }, { "Key2", 42 } };
+        var values = new Dictionary<string, object?>
+        {
+            ["TestKey1"] = "Value1",
+            ["TestKey2"] = 2
+        };
 
         // Act
         bool result = store.SetValues(values);
 
         // Assert
         Assert.True(result);
-        Assert.Equal("Val1", mockContainer.Store["Key1"]);
-        Assert.Equal(42, mockContainer.Store["Key2"]);
+        Assert.Equal("Value1", mockContainer.Store["TestKey1"]);
+        Assert.Equal(2, mockContainer.Store["TestKey2"]);
     }
 
     [Fact]
@@ -156,7 +160,10 @@ public class LocalSettingsStoreTests
         // Arrange
         var mockContainer = new MockSettingsContainer { ThrowOnWrite = true };
         var store = new LocalSettingsStore(mockContainer);
-        var values = new Dictionary<string, object?> { { "Key1", "Val1" } };
+        var values = new Dictionary<string, object?>
+        {
+            ["TestKey1"] = "Value1"
+        };
 
         // Act
         bool result = store.SetValues(values);
