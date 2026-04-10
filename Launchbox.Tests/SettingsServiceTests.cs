@@ -264,6 +264,27 @@ public class SettingsServiceTests
     }
 
     [Fact]
+    public void MergeItemOrders_CaseInsensitivePathLookup()
+    {
+        // Regression: MergeItemOrders used a case-sensitive dictionary so a casing mismatch
+        // between sessions caused the persisted order to be silently lost.
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        svc.MergeItemOrders(new Dictionary<string, List<string>>
+        {
+            [@"C:\Foo\Bar"] = ["Alpha.lnk", "Beta.lnk"],
+        });
+
+        // Retrieve with different casing — must find the persisted order
+        var order = svc.GetItemOrder(@"c:\foo\bar");
+        Assert.Equal(["Alpha.lnk", "Beta.lnk"], order);
+    }
+
+    [Fact]
     public void MergeItemOrders_PreservesAbsentFolderOrders()
     {
         var store = new MockSettingsStore();
