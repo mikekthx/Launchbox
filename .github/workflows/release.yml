@@ -98,7 +98,7 @@ jobs:
       # Generate a CycloneDX SBOM scoped to NuGet transitive dependencies
       - name: Generate SBOM
         run: |
-          dotnet tool install --global CycloneDX --version 6.1.1
+          dotnet tool update --global CycloneDX --version 6.1.1
           dotnet CycloneDX $env:Project_Path --json --out sbom-output
           Rename-Item -Path sbom-output\bom.json -NewName launchbox-sbom.cdx.json
 
