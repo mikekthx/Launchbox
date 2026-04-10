@@ -89,11 +89,18 @@ jobs:
         with:
           subject-path: AppPackages/**/*.msixbundle
 
+      # Generate a CycloneDX SBOM scoped to NuGet transitive dependencies
+      - name: Generate SBOM
+        run: |
+          dotnet tool install --global CycloneDX
+          dotnet CycloneDX $env:Project_Path --json --out sbom-output
+          Rename-Item -Path sbom-output\bom.json -NewName launchbox-sbom.cdx.json
+
       - name: Create GitHub Release
         run: |
           $bundle = Get-ChildItem -Recurse AppPackages -Filter "*.msixbundle" | Select-Object -First 1
           if (-not $bundle) { Write-Error "No .msixbundle found in AppPackages"; exit 1 }
-          $releaseArgs = @("${{ github.ref_name }}", "--title", "${{ github.ref_name }}", "--generate-notes", $bundle.FullName)
+          $releaseArgs = @("${{ github.ref_name }}", "--title", "${{ github.ref_name }}", "--generate-notes", $bundle.FullName, "sbom-output\launchbox-sbom.cdx.json")
           if ("${{ github.ref_name }}" -match '-') { $releaseArgs += "--prerelease" }
           gh release create @releaseArgs
         env:
