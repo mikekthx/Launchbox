@@ -1,5 +1,6 @@
 using Launchbox.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Windows.Storage;
 
@@ -46,6 +47,20 @@ public class LocalSettingsStore : ISettingsStore
         }
     }
 
+    public bool SetValues(IReadOnlyDictionary<string, object?> values)
+    {
+        try
+        {
+            _settings.SetValues(values);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to write batched settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            return false;
+        }
+    }
+
     private class ApplicationDataContainerWrapper : ISettingsContainer
     {
         private readonly ApplicationDataContainer _container;
@@ -63,6 +78,14 @@ public class LocalSettingsStore : ISettingsStore
         public void SetValue(string key, object? value)
         {
             _container.Values[key] = value;
+        }
+
+        public void SetValues(IReadOnlyDictionary<string, object?> values)
+        {
+            foreach (var kvp in values)
+            {
+                _container.Values[kvp.Key] = kvp.Value;
+            }
         }
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Launchbox.Services;
 
 /// <summary>
@@ -9,4 +11,5 @@ public interface ISettingsContainer
 {
     bool TryGetValue(string key, out object? value);
     void SetValue(string key, object? value);
+    void SetValues(IReadOnlyDictionary<string, object?> values);
 }

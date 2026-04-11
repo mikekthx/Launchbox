@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Launchbox.Services;
@@ -69,49 +70,43 @@ public class WindowPositionManager
         // Capture previous values before writing so we can roll back on partial failure
         bool hadPrevious = TryGetWindowPosition(out int oldX, out int oldY, out int oldW, out int oldH);
 
-        (string Key, object Value)[] entries =
-        [
-            (SETTING_KEY_X, x),
-            (SETTING_KEY_Y, y),
-            (SETTING_KEY_WIDTH, width),
-            (SETTING_KEY_HEIGHT, height),
-        ];
-
-        for (int i = 0; i < entries.Length; i++)
+        Dictionary<string, object?> values = new()
         {
-            if (!_settings.SetValue(entries[i].Key, entries[i].Value))
+            [SETTING_KEY_X] = x,
+            [SETTING_KEY_Y] = y,
+            [SETTING_KEY_WIDTH] = width,
+            [SETTING_KEY_HEIGHT] = height
+        };
+
+        if (!_settings.SetValues(values))
+        {
+            Trace.WriteLine($"Failed to save window position: SetValues returned false for keys: {string.Join(", ", values.Keys)}");
+
+            // Only roll back if we had valid previous values — avoid writing zeros
+            if (hadPrevious)
             {
-                Trace.WriteLine($"Failed to save window position: SetValue returned false for {entries[i].Key}");
-
-                // Only roll back if we had valid previous values — avoid writing zeros
-                if (hadPrevious)
-                {
-                    RollbackPartialSave(i, oldX, oldY, oldW, oldH);
-                }
-
-                return false;
+                RollbackPartialSave(oldX, oldY, oldW, oldH);
             }
+
+            return false;
         }
 
         return true;
     }
 
-    private void RollbackPartialSave(int successfulWrites, int oldX, int oldY, int oldW, int oldH)
+    private void RollbackPartialSave(int oldX, int oldY, int oldW, int oldH)
     {
-        (string Key, object Value)[] rollback =
-        [
-            (SETTING_KEY_X, oldX),
-            (SETTING_KEY_Y, oldY),
-            (SETTING_KEY_WIDTH, oldW),
-            (SETTING_KEY_HEIGHT, oldH),
-        ];
-
-        for (int j = 0; j < successfulWrites; j++)
+        Dictionary<string, object?> rollback = new()
         {
-            if (!_settings.SetValue(rollback[j].Key, rollback[j].Value))
-            {
-                Trace.WriteLine($"Failed to roll back window position for {rollback[j].Key}");
-            }
+            [SETTING_KEY_X] = oldX,
+            [SETTING_KEY_Y] = oldY,
+            [SETTING_KEY_WIDTH] = oldW,
+            [SETTING_KEY_HEIGHT] = oldH
+        };
+
+        if (!_settings.SetValues(rollback))
+        {
+            Trace.WriteLine($"Failed to roll back window position for keys: {string.Join(", ", rollback.Keys)}");
         }
     }
 }

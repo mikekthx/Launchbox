@@ -30,6 +30,18 @@ public class LocalSettingsStoreTests
             }
             Store[key] = value;
         }
+
+        public void SetValues(IReadOnlyDictionary<string, object?> values)
+        {
+            if (ThrowOnWrite)
+            {
+                throw new Exception("Simulated write failure");
+            }
+            foreach (var kvp in values)
+            {
+                Store[kvp.Key] = kvp.Value;
+            }
+        }
     }
 
     [Fact]
@@ -116,6 +128,45 @@ public class LocalSettingsStoreTests
 
         // Act
         bool result = store.SetValue("TestKey", "TestValue");
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void SetValues_StoresAllValues_WhenSuccess()
+    {
+        // Arrange
+        var mockContainer = new MockSettingsContainer();
+        var store = new LocalSettingsStore(mockContainer);
+        Dictionary<string, object?> values = new()
+        {
+            ["TestKey1"] = "Value1",
+            ["TestKey2"] = 2
+        };
+
+        // Act
+        bool result = store.SetValues(values);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal("Value1", mockContainer.Store["TestKey1"]);
+        Assert.Equal(2, mockContainer.Store["TestKey2"]);
+    }
+
+    [Fact]
+    public void SetValues_ReturnsFalse_OnException()
+    {
+        // Arrange
+        var mockContainer = new MockSettingsContainer { ThrowOnWrite = true };
+        var store = new LocalSettingsStore(mockContainer);
+        Dictionary<string, object?> values = new()
+        {
+            ["TestKey1"] = "Value1"
+        };
+
+        // Act
+        bool result = store.SetValues(values);
 
         // Assert
         Assert.False(result);

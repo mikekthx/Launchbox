@@ -46,4 +46,33 @@ public class MockSettingsStore : ISettingsStore
         }
         return true;
     }
+
+    public bool SetValues(IReadOnlyDictionary<string, object?> values)
+    {
+        if (ShouldThrow)
+        {
+            throw new Exception("Settings store failure");
+        }
+
+        foreach (var kvp in values)
+        {
+            if (FailSetValueKeys.Contains(kvp.Key))
+            {
+                return false;
+            }
+        }
+
+        foreach (var kvp in values)
+        {
+            if (kvp.Value != null)
+            {
+                _store[kvp.Key] = kvp.Value;
+            }
+            else
+            {
+                _store.Remove(kvp.Key);
+            }
+        }
+        return true;
+    }
 }
