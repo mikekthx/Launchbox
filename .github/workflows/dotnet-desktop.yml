@@ -3,7 +3,6 @@ name: .NET Core Desktop
 on:
   push:
     branches: [ "main" ]
-    tags: [ "v*.*.*" ]
   pull_request:
     branches: [ "main" ]
   schedule:
@@ -12,9 +11,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
-  attestations: write
-  artifact-metadata: write
   security-events: write
   checks: write
   actions: read
@@ -41,7 +37,7 @@ jobs:
         uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v4
 
   build:
-    # Skip build/test/package on scheduled runs (schedule is for CodeQL only)
+    # Skip build/test on scheduled runs — schedule is for CodeQL only
     if: github.event_name != 'schedule'
 
     concurrency:
@@ -52,7 +48,6 @@ jobs:
 
     env:
       Solution_Name: Launchbox.sln
-      Project_Directory: .
       Project_Path: Launchbox.csproj
       Test_Project_Path: Launchbox.Tests\Launchbox.Tests.csproj
 
@@ -62,17 +57,11 @@ jobs:
       with:
         fetch-depth: 0
 
-    # Install the .NET Core workload
     - name: Install .NET Core
       uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
       with:
         global-json-file: global.json
 
-    # Check if the code follows your style rules
-    - name: Verify Code Format
-      run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
-
-    # Cache NuGet packages to speed up future builds
     - name: Cache NuGet packages
       uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
       with:
@@ -81,17 +70,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nuget-
 
-    # On tag pushes, derive the 4-part MSIX version from the tag (v1.2.3 → 1.2.3.0).
-    # On branch pushes the variable is unused (packaging is skipped).
-    - name: Extract version from tag
-      if: startsWith(github.ref, 'refs/tags/v')
-      run: |
-        $tag = "${{ github.ref_name }}".TrimStart('v')
-        echo "APP_VERSION=$tag.0" >> $env:GITHUB_ENV
+    - name: Verify Code Format
+      run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
 
-    # Execute all unit tests in the specific test project
-    # coverlet.runsettings forces IncludeTestAssembly=true and filters to production namespaces
-    # so that file-linked production code in Launchbox.Tests.dll is measured correctly.
     - name: Execute unit tests
       run: dotnet test $env:Test_Project_Path --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
 
@@ -110,7 +91,6 @@ jobs:
         }
         Write-Host "Coverage check passed ($pct%)"
 
-    # Turn that TRX file into a beautiful UI report in GitHub
     - name: Publish Test Report
       uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3
       if: always()
@@ -119,7 +99,6 @@ jobs:
         path: "**/test-results.trx"
         reporter: dotnet-trx
 
-    # Upload coverage report as an artifact for tracking over time
     - name: Upload coverage report
       uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
       if: always()
@@ -128,66 +107,6 @@ jobs:
         path: TestResults/**/coverage.cobertura.xml
         if-no-files-found: warn
 
-    # Build the full WinUI app to catch XAML/binding compile errors (tests only link a subset of files)
+    # Build the full WinUI app to catch XAML/binding compile errors
     - name: Build the application
       run: dotnet build $env:Project_Path --configuration Release -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
-
-    # Decode and install the base 64 encoded pfx
-    - name: Decode and install the pfx
-      if: startsWith(github.ref, 'refs/tags/v')
-      run: |
-        $pfx_cert_byte = [System.Convert]::FromBase64String($env:BASE64_PFX)
-        $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
-        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-        $pwd = ConvertTo-SecureString -String $env:PFX_KEY -Force -AsPlainText
-        $cert = Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $pwd
-        echo "CERT_THUMBPRINT=$($cert.Thumbprint)" >> $env:GITHUB_ENV
-      env:
-        BASE64_PFX: ${{ secrets.Base64_Encoded_Pfx }}
-        PFX_KEY: ${{ secrets.Pfx_Key }}
-
-    # Create the app package by building and packaging the single-project MSIX
-    - name: Create the app package
-      if: startsWith(github.ref, 'refs/tags/v')
-      run: dotnet build $env:Project_Path --configuration Release -p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode -p:AppxBundle=$env:Appx_Bundle -p:AppxBundlePlatforms=$env:Appx_Bundle_Platforms -p:GenerateAppxPackageOnBuild=true -p:PackageCertificateThumbprint=$env:CERT_THUMBPRINT -p:NoWarn=APPX0107 -p:AppxPackageVersion=$env:APP_VERSION -p:AppxSymbolPackageEnabled=false
-      env:
-        Appx_Bundle: Always
-        Appx_Bundle_Platforms: x64|arm64
-        Appx_Package_Build_Mode: StoreUpload
-
-    # Remove the pfx file and the imported cert from the machine store — always(), so
-    # signing material is cleaned up even if the packaging step fails mid-run.
-    - name: Remove the pfx and cert
-      if: always() && startsWith(github.ref, 'refs/tags/v')
-      run: |
-        Remove-Item -Path $env:Project_Directory\GitHubActionsWorkflow.pfx -ErrorAction SilentlyContinue
-        if ($env:CERT_THUMBPRINT) {
-          Get-ChildItem Cert:\CurrentUser\My\$env:CERT_THUMBPRINT -ErrorAction SilentlyContinue | Remove-Item
-        }
-
-    # Upload the MSIX package
-    - name: Upload build artifacts
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
-      with:
-        name: MSIX Package
-        path: ${{ env.Project_Directory }}\AppPackages
-
-    # Generate the unforgeable birth certificate for the installer
-    - name: Generate artifact attestation
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
-      with:
-        subject-path: AppPackages/**/*.msixbundle
-
-    # Submit to the Microsoft Store.
-    # Requires secrets: STORE_PRODUCT_ID, AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET
-    - name: Submit to Microsoft Store
-      if: startsWith(github.ref, 'refs/tags/v')
-      uses: microsoft/store-submission-action@v1
-      with:
-        product-id: ${{ secrets.STORE_PRODUCT_ID }}
-        package-path: AppPackages/**/*.msixupload
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}

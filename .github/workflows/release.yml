@@ -9,15 +9,18 @@ permissions:
   contents: write
   id-token: write
   attestations: write
+  checks: write
 
 jobs:
   release:
-    name: Build and Publish Release
+    name: Build, Submit, and Draft Release
     runs-on: windows-latest
 
     env:
+      Solution_Name: Launchbox.sln
       Project_Directory: .
       Project_Path: Launchbox.csproj
+      Test_Project_Path: Launchbox.Tests\Launchbox.Tests.csproj
 
     steps:
       - name: Checkout
@@ -39,10 +42,40 @@ jobs:
             ${{ runner.os }}-nuget-release-
             ${{ runner.os }}-nuget-
 
-      # Derive a valid 4-part MSIX version from the tag (e.g. v1.2.3 → 1.2.3.0)
-      - name: Compute MSIX version
+      - name: Verify Code Format
+        run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
+
+      - name: Execute unit tests
+        run: dotnet test $env:Test_Project_Path --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
+
+      - name: Check coverage threshold
         run: |
-          $tag = "${{ github.ref_name }}".TrimStart('v')
+          $file = Get-ChildItem -Recurse -Filter "coverage.cobertura.xml" ./TestResults | Select-Object -First 1
+          if (-not $file) { Write-Error "No coverage file found"; exit 1 }
+          $xml = [xml](Get-Content $file.FullName)
+          $rate = [float]::Parse($xml.coverage.'line-rate', [System.Globalization.CultureInfo]::InvariantCulture)
+          $pct = [math]::Round($rate * 100, 1)
+          Write-Host "Line coverage (production code): $pct%"
+          if ($rate -lt 0.80) {
+            Write-Error "Coverage $pct% is below the 80% minimum threshold"
+            exit 1
+          }
+          Write-Host "Coverage check passed ($pct%)"
+
+      - name: Publish Test Report
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3
+        if: always()
+        with:
+          name: Release Test Results
+          path: "**/test-results.trx"
+          reporter: dotnet-trx
+
+      # Derive a valid 4-part MSIX version from the tag (e.g. v1.2.3 → 1.2.3.0, v1.2.3-beta.1 → 1.2.3.0)
+      - name: Compute MSIX version
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          $tag = $env:REF_NAME.TrimStart('v')
           $base = ($tag -split '-')[0]
           $parts = $base.Split('.')
           $ver = if ($parts.Count -ge 3) { "$($parts[0]).$($parts[1]).$($parts[2]).0" } else { "$base.0" }
@@ -74,7 +107,7 @@ jobs:
           -p:NoWarn=APPX0107
           -p:AppxSymbolPackageEnabled=false
 
-      # Clean up signing material from disk and cert store immediately after packaging
+      # Always clean up signing material — even if packaging fails mid-run
       - name: Remove pfx and cert
         if: always()
         run: |
@@ -83,8 +116,7 @@ jobs:
             Get-ChildItem Cert:\CurrentUser\My\$env:CERT_THUMBPRINT -ErrorAction SilentlyContinue | Remove-Item
           }
 
-      # Attest the bundle before publishing — links artifact to this workflow run
-      - name: Generate artifact attestation
+      - name: Attest MSIX bundle
         uses: actions/attest@59d89421af93a897026c735860bf21b6eb4f7b26 # v4
         with:
           subject-path: AppPackages/**/*.msixbundle
@@ -95,7 +127,6 @@ jobs:
           path: ~/.dotnet/tools
           key: ${{ runner.os }}-dotnet-tools-cyclonedx-6.1.1
 
-      # Generate a CycloneDX SBOM scoped to NuGet transitive dependencies
       - name: Generate SBOM
         run: |
           dotnet tool update --global CycloneDX --version 6.1.1
@@ -107,12 +138,51 @@ jobs:
         with:
           subject-path: sbom-output/launchbox-sbom.cdx.json
 
-      - name: Create GitHub Release
+      # Install the MSStore Developer CLI — the official Microsoft tool for Store submissions.
+      # Replaces the non-existent microsoft/store-submission-action; requires PARTNER_CENTER_SELLER_ID secret.
+      - name: Setup Microsoft Store Developer CLI
+        uses: microsoft/microsoft-store-apppublisher@b76227f539d68e6465f79bbbc82ed92f61081aa4 # v1.3
+
+      - name: Configure Microsoft Store Developer CLI
+        run: |
+          msstore settings --enableTelemetry false
+          msstore reconfigure `
+            --tenantId $env:AZURE_TENANT_ID `
+            --sellerId $env:PARTNER_CENTER_SELLER_ID `
+            --clientId $env:AZURE_CLIENT_ID `
+            --clientSecret $env:AZURE_CLIENT_SECRET
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          PARTNER_CENTER_SELLER_ID: ${{ secrets.PARTNER_CENTER_SELLER_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      # Submit the .msixupload to the Store. The CLI commits the submission but does NOT wait
+      # for certification — store-sync.yml handles the wait and publishes the draft release when ready.
+      - name: Submit to Microsoft Store
+        run: |
+          $msixupload = Get-ChildItem -Recurse AppPackages -Filter "*.msixupload" | Select-Object -First 1
+          if (-not $msixupload) { Write-Error "No .msixupload found in AppPackages"; exit 1 }
+          msstore publish . --inputFile $msixupload.FullName --appId $env:STORE_PRODUCT_ID
+        env:
+          STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+
+      # Create a draft release — invisible to users until store-sync.yml publishes it after certification.
+      # Tags with a pre-release suffix (e.g. v1.2.3-beta.1) are marked as pre-release.
+      - name: Create draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
           $bundle = Get-ChildItem -Recurse AppPackages -Filter "*.msixbundle" | Select-Object -First 1
           if (-not $bundle) { Write-Error "No .msixbundle found in AppPackages"; exit 1 }
-          $releaseArgs = @("${{ github.ref_name }}", "--title", "${{ github.ref_name }}", "--generate-notes", $bundle.FullName, "sbom-output\launchbox-sbom.cdx.json")
-          if ("${{ github.ref_name }}" -match '-') { $releaseArgs += "--prerelease" }
+          $releaseArgs = @(
+            $env:REF_NAME,
+            "--title", $env:REF_NAME,
+            "--generate-notes",
+            "--draft",
+            $bundle.FullName,
+            "sbom-output\launchbox-sbom.cdx.json"
+          )
+          if ($env:REF_NAME -match '-') { $releaseArgs += "--prerelease" }
           gh release create @releaseArgs
-        env:
-          GH_TOKEN: ${{ github.token }}

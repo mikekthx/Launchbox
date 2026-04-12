@@ -1,0 +1,106 @@
+name: Store Sync
+
+# Polls the Microsoft Store every 6 hours and publishes the matching draft GitHub Release
+# once the submitted version is certified. Can also be triggered manually.
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: store-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    name: Publish Draft When Store Certifies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Store certification and publish draft release
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          # 1. Get Partner Center API access token using Azure AD client credentials
+          $body = @{
+            grant_type    = "client_credentials"
+            client_id     = $env:AZURE_CLIENT_ID
+            client_secret = $env:AZURE_CLIENT_SECRET
+            scope         = "https://manage.devcenter.microsoft.com/.default"
+          }
+          $token = (Invoke-RestMethod `
+            "https://login.microsoftonline.com/$env:AZURE_TENANT_ID/oauth2/v2.0/token" `
+            -Method POST -Body $body).access_token
+          $headers = @{ Authorization = "Bearer $token" }
+
+          # 2. Get the application and its last published submission
+          $app = Invoke-RestMethod `
+            "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:STORE_PRODUCT_ID" `
+            -Headers $headers
+
+          if (-not $app.lastPublishedApplicationSubmission) {
+            Write-Host "No published submission found in Partner Center. Certification may still be in progress."
+            exit 0
+          }
+
+          # 3. Fetch the published submission to read its package version
+          $submissionId = $app.lastPublishedApplicationSubmission.id
+          $submission = Invoke-RestMethod `
+            "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:STORE_PRODUCT_ID/submissions/$submissionId" `
+            -Headers $headers
+
+          $publishedVersion = $submission.applicationPackages |
+            Where-Object { $_.version } |
+            Select-Object -First 1 -ExpandProperty version
+
+          if (-not $publishedVersion) {
+            Write-Host "Could not read a package version from the published submission. Skipping."
+            exit 0
+          }
+          Write-Host "Published Store version: $publishedVersion"
+
+          # 4. Find all draft GitHub releases (limit 100 to avoid missing old drafts)
+          $all = gh release list --json tagName,isDraft --limit 100 | ConvertFrom-Json
+          $drafts = $all | Where-Object { $_.isDraft -eq $true }
+
+          if ($drafts.Count -eq 0) {
+            Write-Host "No draft releases found. Nothing to do."
+            exit 0
+          }
+
+          # 5. Match each draft to the published Store version.
+          #    Mirrors the version computation in release.yml:
+          #      v1.2.3     → 1.2.3.0
+          #      v1.2.3-beta.1 → 1.2.3.0
+          $published = $false
+          foreach ($draft in $drafts) {
+            $tagBase = ($draft.tagName.TrimStart('v') -split '-')[0]
+            $parts   = $tagBase.Split('.')
+            $expected = if ($parts.Count -ge 3) {
+              "$($parts[0]).$($parts[1]).$($parts[2]).0"
+            } else {
+              "$tagBase.0"
+            }
+
+            if ($expected -eq $publishedVersion) {
+              Write-Host "Store version $publishedVersion matches draft release $($draft.tagName). Publishing..."
+              gh release edit $draft.tagName --draft=false
+              Write-Host "GitHub release $($draft.tagName) is now public."
+              $published = $true
+              # Only one Store version is published at a time — stop after first match
+              # to avoid accidentally publishing a pre-release draft with the same base version.
+              break
+            }
+          }
+
+          if (-not $published) {
+            Write-Host "No draft release matches Store version $publishedVersion. Will check again at the next scheduled run."
+          }
