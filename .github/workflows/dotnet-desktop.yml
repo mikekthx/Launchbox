@@ -184,7 +184,7 @@ jobs:
     # Requires secrets: STORE_PRODUCT_ID, AZURE_TENANT_ID, AZURE_CLIENT_ID, AZURE_CLIENT_SECRET
     - name: Submit to Microsoft Store
       if: startsWith(github.ref, 'refs/tags/v')
-      uses: microsoft/store-submission-action@v1
+      uses: microsoft/store-submission@v1
       with:
         product-id: ${{ secrets.STORE_PRODUCT_ID }}
         package-path: AppPackages/**/*.msixupload
