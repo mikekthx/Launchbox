@@ -298,12 +298,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         foreach (var folder in folders.OrderBy(f => f.Order))
         {
+            var expandedPath = folder.ExpandedPath;
             try
             {
                 // Avoid blocking the UI thread when the shortcuts folder is on a slow or sleeping drive
                 var files = await Task.Run(() =>
                     _shortcutService.GetShortcutFiles(
-                        folder.ExpandedPath,
+                        expandedPath,
                         Constants.ALLOWED_EXTENSIONS, ct), ct);
 
                 if (files is null)
