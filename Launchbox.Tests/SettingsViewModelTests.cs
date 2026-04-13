@@ -466,6 +466,23 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public async Task RunAtStartup_Setter_Reverts_WhenOSDeniesWithoutException()
+    {
+        // Bug: TryEnableStartupAsync returns false (OS silent denial — no exception).
+        // SettingsService.SetRunAtStartupAsync calls IsRunAtStartup = false, but SetProperty
+        // detects no change (was already false) and skips PropertyChanged. The ViewModel
+        // never gets notified, leaving the UI toggle permanently stuck "On".
+        var (_, startup, _, vm) = CreateViewModel();
+        startup.Success = false; // Simulate silent OS denial: returns false, no exception
+
+        vm.RunAtStartup = true;
+        await Task.Delay(50, TestContext.Current.CancellationToken);
+
+        // OS denied silently — toggle must revert to Off
+        Assert.False(vm.RunAtStartup);
+    }
+
+    [Fact]
     public void RefreshFolders_IsMarshalled_ThroughDispatcher()
     {
         // Guard: RefreshFolders must marshal collection mutations via IDispatcher

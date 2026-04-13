@@ -169,15 +169,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     private async Task SetRunAtStartupSafeAsync(bool value)
     {
-        try
-        {
-            await _startupToggleLock.WaitAsync();
-        }
-        catch (ObjectDisposedException)
-        {
-            // Window is closing and Dispose() was called — operation is moot.
-            return;
-        }
+        await _startupToggleLock.WaitAsync();
 
         Exception? startupException = null;
         try
@@ -190,29 +182,23 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            try
-            {
-                _startupToggleLock.Release();
-            }
-            catch (ObjectDisposedException)
-            {
-                // Window closed between WaitAsync and Release — safe to ignore.
-            }
+            _startupToggleLock.Release();
         }
 
         if (startupException != null)
-        {
-            // Revert pending state: the exception means IsRunAtStartup never changed,
-            // so OnServicePropertyChanged won't fire to sync it back automatically.
-            // Deferred to after the finally block so the lock is released before notifying
-            // listeners, and dispatched for consistency with OnServicePropertyChanged.
-            _dispatcher.TryEnqueue(() =>
-            {
-                _pendingStartupValue = _settingsService.IsRunAtStartup;
-                OnPropertyChanged(nameof(RunAtStartup));
-            });
             Trace.WriteLine($"Failed to set run at startup: {PathSecurity.GetSafeExceptionMessage(startupException)}");
-        }
+
+        // Always sync _pendingStartupValue to the actual committed state after the async write.
+        // SettingsService.SetProperty skips PropertyChanged when the value is unchanged — this
+        // happens when TryEnableStartupAsync returns false and IsRunAtStartup was already false
+        // (OS silent denial). Without this, the UI toggle stays stuck in the requested state.
+        // Deferred so the lock is released before notifying listeners, consistent with
+        // OnServicePropertyChanged.
+        _dispatcher.TryEnqueue(() =>
+        {
+            _pendingStartupValue = _settingsService.IsRunAtStartup;
+            OnPropertyChanged(nameof(RunAtStartup));
+        });
     }
 
     private void OnServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -352,7 +338,8 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _settingsService.PropertyChanged -= OnServicePropertyChanged;
-        _startupToggleLock.Dispose();
+        // SemaphoreSlim used only for async coordination holds no unmanaged resources —
+        // omitting Dispose() avoids ObjectDisposedException on in-flight WaitAsync callers.
         GC.SuppressFinalize(this);
     }
 }

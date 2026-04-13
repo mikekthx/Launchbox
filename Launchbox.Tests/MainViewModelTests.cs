@@ -820,6 +820,33 @@ public class MainViewModelTests
         Assert.Equal(0, filterRebuildCount);
     }
 
+    [Fact]
+    public async Task PersistItemOrder_GroupedMode_ReadsFromGroupedAppsNotFilteredApps()
+    {
+        // Bug: PersistItemOrder always read from FilteredApps. In Grouped view, WinUI mutates
+        // the per-group AppItemGroup collection during drag — FilteredApps is never touched.
+        // The stale order in FilteredApps was written to the settings store, discarding the reorder.
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "A App.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "B App.lnk"));
+
+        _settingsService.FolderViewMode = FolderViewMode.Grouped;
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        // Simulate a stale FilteredApps with a different order than GroupedApps (as if a drag
+        // happened in merged view but not in grouped view).
+        var aItem = vm.FilteredApps.First(a => a.Name == "A App");
+        var bItem = vm.FilteredApps.First(a => a.Name == "B App");
+        vm.FilteredApps.Move(vm.FilteredApps.IndexOf(aItem), vm.FilteredApps.IndexOf(bItem));
+        // FilteredApps is now [B App, A App]; GroupedApps[0].AllItems is still [A App, B App]
+
+        vm.PersistItemOrder();
+
+        // Must persist from GroupedApps (A first, B second), not the stale FilteredApps order
+        var persisted = _settingsService.GetItemOrder(_shortcutFolder);
+        Assert.Equal(["A App.lnk", "B App.lnk"], persisted);
+    }
+
     // --- TOGGLE GROUP / CLEAR FILTER TESTS ---
 
     [Fact]

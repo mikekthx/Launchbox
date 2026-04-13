@@ -33,6 +33,12 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
     // Backup of the full item list — populated on construction, used for expand/restore
     private readonly List<AppItem> _allItems;
 
+    /// <summary>
+    /// The canonical item list in their current order, unaffected by filter or collapse state.
+    /// Use this when reading the order for persistence (e.g. after a drag-and-drop reorder).
+    /// </summary>
+    public IReadOnlyList<AppItem> AllItems => _allItems;
+
     // Tracks the active filter text so expand can re-apply it
     private string? _activeFilter;
 
