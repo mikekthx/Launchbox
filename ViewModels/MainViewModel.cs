@@ -460,6 +460,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 ? firstFolder!.ExpandedPath
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
 
+            // Security: reject paths that resolve to UNC shares or other unsafe locations
+            // before creating directories or launching the explorer shell.
+            if (PathSecurity.IsUnsafePath(shortcutFolder)) return;
+
             if (!_fileSystem.DirectoryExists(shortcutFolder))
             {
                 _fileSystem.CreateDirectory(shortcutFolder);

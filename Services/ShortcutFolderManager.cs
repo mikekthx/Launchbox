@@ -54,7 +54,7 @@ public class ShortcutFolderManager
         if (_store.TryGetValue(LEGACY_KEY, out var legacyVal) && legacyVal is string legacyPath
             && !string.IsNullOrEmpty(legacyPath))
         {
-            var label = Path.GetFileName(legacyPath) ?? "Shortcuts";
+            var label = FolderLabel(legacyPath);
             var migrated = new List<ShortcutFolder>
             {
                 new() { Path = legacyPath, Label = label, Order = 0 }
@@ -81,7 +81,7 @@ public class ShortcutFolderManager
         {
             if (folders.Count >= MAX_FOLDERS) return false;
             if (folders.Any(f => string.Equals(f.Path, path, StringComparison.OrdinalIgnoreCase))) return false;
-            label ??= Path.GetFileName(path) ?? path;
+            label ??= FolderLabel(path);
             folders.Add(new ShortcutFolder { Path = path, Label = label, Order = folders.Count });
             return true;
         });
@@ -211,5 +211,16 @@ public class ShortcutFolderManager
     private static List<ShortcutFolder> Renumber(List<ShortcutFolder> folders)
     {
         return folders.Select((f, i) => f with { Order = i }).ToList();
+    }
+
+    /// <summary>
+    /// Returns a display label for a folder path. Trims trailing separators so that
+    /// drive roots (e.g. <c>C:\</c>) produce the drive letter rather than an empty string,
+    /// which is what <see cref="Path.GetFileName"/> returns for bare roots.
+    /// </summary>
+    private static string FolderLabel(string path)
+    {
+        var name = Path.GetFileName(path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        return string.IsNullOrEmpty(name) ? path : name;
     }
 }

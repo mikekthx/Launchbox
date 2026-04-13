@@ -35,6 +35,7 @@ public class WindowService : IWindowService, IDisposable
     public bool IsVisible => _window.Visible;
 
     public event EventHandler<bool>? VisibilityChanged;
+    public event EventHandler? Showing;
     public event EventHandler<string>? HotkeyRegistrationFailed;
 
     public WindowService(Window window, WindowPositionManager positionManager, SettingsService settingsService, IFilePickerService filePickerService, IDispatcher dispatcher)
@@ -80,7 +81,7 @@ public class WindowService : IWindowService, IDisposable
         _savePositionTimer = _window.DispatcherQueue.CreateTimer();
         _savePositionTimer.Interval = TimeSpan.FromMilliseconds(500);
         _savePositionTimer.IsRepeating = false;
-        _savePositionTimer.Tick += (_, _) => SaveWindowPosition();
+        _savePositionTimer.Tick += SavePositionTimer_Tick;
 
         // Hotkey
         UpdateHotkey();
@@ -124,6 +125,10 @@ public class WindowService : IWindowService, IDisposable
                 if (NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)_currentMod, (uint)_currentKey))
                 {
                     Trace.WriteLine($"Restored previous hotkey: {_currentMod}+{_currentKey}");
+                    // Write back the restored values so persisted settings stay in sync with Win32 state.
+                    // This prevents the failed hotkey from being reloaded on next launch.
+                    _settingsService.HotkeyModifiers = _currentMod;
+                    _settingsService.HotkeyKey = _currentKey;
                 }
                 else
                 {
@@ -218,6 +223,10 @@ public class WindowService : IWindowService, IDisposable
             }
 
             ClampToWorkArea();
+            // Raise Showing before AppWindow.Show so subscribers can set state that must be
+            // ready before the Activated event fires (Activated is synchronous with SetForegroundWindow
+            // and can fire before the async VisibilityChanged event).
+            Showing?.Invoke(this, EventArgs.Empty);
             _appWindow.Show();
 
             if (NativeMethods.IsIconic(_hWnd))
@@ -316,6 +325,7 @@ public class WindowService : IWindowService, IDisposable
 
         if (_savePositionTimer != null)
         {
+            _savePositionTimer.Tick -= SavePositionTimer_Tick;
             if (_savePositionTimer.IsRunning)
             {
                 _savePositionTimer.Stop();
@@ -357,7 +367,7 @@ public class WindowService : IWindowService, IDisposable
         try
         {
             var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
-            int height = Math.Min(Constants.WINDOW_HEIGHT, displayArea.WorkArea.Height - 40);
+            int height = Math.Min(Constants.WINDOW_HEIGHT, Math.Max(Constants.MIN_WINDOW_HEIGHT, displayArea.WorkArea.Height - 40));
             _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
             CenterOnCurrentDisplay();
         }
@@ -403,11 +413,11 @@ public class WindowService : IWindowService, IDisposable
             var pos = _appWindow.Position;
             var size = _appWindow.Size;
 
-            int maxHeight = workArea.Height - 40;
+            int maxHeight = Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - 40);
             bool needsResize = size.Height > maxHeight;
             int clampedHeight = needsResize ? maxHeight : size.Height;
 
-            int maxWidth = workArea.Width - 40;
+            int maxWidth = Math.Max(Constants.MIN_WINDOW_WIDTH, workArea.Width - 40);
             bool needsWidthClamp = size.Width > maxWidth;
             int clampedWidth = needsWidthClamp ? maxWidth : size.Width;
             needsResize = needsResize || needsWidthClamp;
@@ -461,6 +471,8 @@ public class WindowService : IWindowService, IDisposable
             _suppressSave = false;
         }
     }
+
+    private void SavePositionTimer_Tick(DispatcherQueueTimer sender, object args) => SaveWindowPosition();
 
     private void SaveWindowPosition()
     {

@@ -94,6 +94,7 @@ public sealed partial class MainWindow : Window
         this.Activated += MainWindow_Activated;
         this.Closed += MainWindow_Closed;
         _windowService.HotkeyRegistrationFailed += WindowService_HotkeyRegistrationFailed;
+        _windowService.Showing += WindowService_Showing;
         _windowService.VisibilityChanged += WindowService_VisibilityChanged;
 
         // 4. LOAD APPS
@@ -168,11 +169,15 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    private void WindowService_VisibilityChanged(object? sender, bool isVisible)
+    // Set _freshShow before AppWindow.Show() fires so it is ready when Activated arrives.
+    // VisibilityChanged is raised asynchronously after Show(), so it can arrive after Activated
+    // and miss the fresh-show window. Showing fires synchronously before Show().
+    private void WindowService_Showing(object? sender, EventArgs e)
     {
-        if (isVisible)
-            _freshShow = true;
+        _freshShow = true;
     }
+
+    private void WindowService_VisibilityChanged(object? sender, bool isVisible) { }
 
     private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
@@ -215,6 +220,7 @@ public sealed partial class MainWindow : Window
         this.Closed -= MainWindow_Closed;
 
         _windowService.HotkeyRegistrationFailed -= WindowService_HotkeyRegistrationFailed;
+        _windowService.Showing -= WindowService_Showing;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated

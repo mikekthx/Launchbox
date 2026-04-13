@@ -7,8 +7,9 @@ public class MockWindowService : IWindowService
 {
     public bool IsVisible { get; set; }
     public event EventHandler<bool>? VisibilityChanged;
-    // Suppress CS0067: event is required by IWindowService but not raised in most tests
+    // Suppress CS0067: events required by IWindowService but not raised in most tests
 #pragma warning disable CS0067
+    public event EventHandler? Showing;
     public event EventHandler<string>? HotkeyRegistrationFailed;
 #pragma warning restore CS0067
 

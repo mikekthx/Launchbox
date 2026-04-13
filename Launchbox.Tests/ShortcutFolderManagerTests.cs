@@ -556,4 +556,51 @@ public class ShortcutFolderManagerTests
         // Every thread got a non-null result
         Assert.All(snapshots, s => Assert.NotNull(s));
     }
+
+    // --- FOLDER LABEL (DRIVE ROOT) ---
+
+    [Fact]
+    public void AddFolder_DriveRoot_UsesPathAsLabel_WhenNoLabelProvided()
+    {
+        var store = new MockSettingsStore();
+        var manager = new ShortcutFolderManager(store);
+
+        // C:\ is a drive root — Path.GetFileName(@"C:\") returns ""; label must not be empty.
+        var result = manager.AddFolder(@"C:\", null);
+
+        Assert.True(result);
+        var added = manager.GetFolders().First(f => string.Equals(f.Path, @"C:\", StringComparison.OrdinalIgnoreCase));
+        Assert.False(string.IsNullOrEmpty(added.Label));
+        // Drive root has no meaningful last segment; the path itself is used as the label.
+        Assert.Equal(@"C:\", added.Label);
+    }
+
+    [Fact]
+    public void AddFolder_NormalPath_UsesFolderNameAsLabel_WhenNoLabelProvided()
+    {
+        var store = new MockSettingsStore();
+        var manager = new ShortcutFolderManager(store);
+
+        var result = manager.AddFolder(SafePath("MyApps"), null);
+
+        Assert.True(result);
+        var added = manager.GetFolders().First(f => f.Path == SafePath("MyApps"));
+        Assert.Equal("MyApps", added.Label);
+    }
+
+    [Fact]
+    public void LoadFolders_Migration_DriveRoot_UsesPathAsLabel()
+    {
+        var store = new MockSettingsStore();
+        // Simulate a legacy single-path setting pointing to a drive root
+        store.SetValue("ShortcutsPath", @"C:\");
+        var manager = new ShortcutFolderManager(store);
+
+        var folders = manager.GetFolders();
+
+        Assert.Single(folders);
+        // Label must not be empty — drive root label falls back to the path itself.
+        Assert.False(string.IsNullOrEmpty(folders[0].Label));
+        Assert.Equal(@"C:\", folders[0].Label);
+    }
 }

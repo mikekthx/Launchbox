@@ -56,12 +56,10 @@ public partial class App : Application
 
     private static bool IsRecoverable(Exception ex)
     {
-        // Only truly fatal exceptions should terminate the app; everything else is survivable
-        return ex is not (OutOfMemoryException
-            or StackOverflowException
-            or AccessViolationException
-            or SEHException
-            or TypeInitializationException);
+        // Only COMException (transient WinUI/WinRT failures such as RPC_E_DISCONNECTED) is
+        // genuinely recoverable. Swallowing NullReferenceException, InvalidOperationException,
+        // etc. masks real bugs and leaves the app in a broken state.
+        return ex is COMException;
     }
 
     private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)

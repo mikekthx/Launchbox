@@ -15,6 +15,12 @@ public interface IWindowService : IDisposable
     event EventHandler<bool>? VisibilityChanged;
 
     /// <summary>
+    /// Occurs immediately before the window is shown (before AppWindow.Show is called).
+    /// Subscribe here to set state that must be ready before the first Activated event fires.
+    /// </summary>
+    event EventHandler? Showing;
+
+    /// <summary>
     /// Occurs when registering a global hotkey fails.
     /// </summary>
     event EventHandler<string>? HotkeyRegistrationFailed;
