@@ -29,7 +29,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: |
-          # 1. Get Partner Center API access token using Azure AD client credentials
+          # --- 1. CHECK DRAFTS FIRST (no auth needed) ---
+          # Exit immediately when nothing is pending to avoid unnecessary Partner Center API calls.
+          $all    = gh release list --json tagName,isDraft --limit 100 | ConvertFrom-Json
+          $drafts = $all | Where-Object { $_.isDraft -eq $true }
+
+          if ($drafts.Count -eq 0) {
+            Write-Host "No draft releases found. Nothing to do."
+            exit 0
+          }
+
+          $draftNames = ($drafts | Select-Object -ExpandProperty tagName) -join ', '
+          Write-Host "Draft releases pending publication: $draftNames"
+
+          # --- 2. AUTHENTICATE WITH PARTNER CENTER ---
           $body = @{
             grant_type    = "client_credentials"
             client_id     = $env:AZURE_CLIENT_ID
@@ -41,19 +54,53 @@ jobs:
             -Method POST -Body $body).access_token
           $headers = @{ Authorization = "Bearer $token" }
 
-          # 2. Get the application and its last published submission
+          # --- 3. GET APP INFO ---
           $app = Invoke-RestMethod `
             "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:STORE_PRODUCT_ID" `
             -Headers $headers
 
-          if (-not $app.lastPublishedApplicationSubmission) {
-            Write-Host "No published submission found in Partner Center. Certification may still be in progress."
+          # --- 4. CHECK PENDING SUBMISSION FOR DEFINITIVE FAILURE SIGNAL ---
+          # The pending submission exposes an explicit status field — use that rather than
+          # absence-of-success inference, which produces false positives.
+          if ($app.pendingApplicationSubmission) {
+            $pendingId  = $app.pendingApplicationSubmission.id
+            $pending    = Invoke-RestMethod `
+              "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:STORE_PRODUCT_ID/submissions/$pendingId" `
+              -Headers $headers
+
+            $failedStatuses = @('CommitFailed', 'PreProcessingFailed', 'CertificationFailed', 'PublishFailed')
+
+            if ($pending.status -in $failedStatuses) {
+              @"
+## :x: Store Certification Failed
+
+The pending Store submission has failed with status **$($pending.status)**.
+
+**Affected draft releases:** $draftNames
+
+### Next steps
+1. Open Partner Center and review the rejection details
+2. Fix the issue in code and commit it
+3. Delete the draft release(s): ``gh release delete <tag> --yes``
+4. Delete and re-push the tag to trigger a new release build
+
+"@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+              Write-Host "::error::Store certification failed: $($pending.status)"
+              exit 1
+            }
+
+            Write-Host "Certification in progress (status: $($pending.status)). Will check again at the next scheduled run."
             exit 0
           }
 
-          # 3. Fetch the published submission to read its package version
+          # --- 5. NO PENDING SUBMISSION — READ PUBLISHED VERSION ---
+          if (-not $app.lastPublishedApplicationSubmission) {
+            Write-Host "No published submission found in Partner Center. Skipping."
+            exit 0
+          }
+
           $submissionId = $app.lastPublishedApplicationSubmission.id
-          $submission = Invoke-RestMethod `
+          $submission   = Invoke-RestMethod `
             "https://manage.devcenter.microsoft.com/v1.0/my/applications/$env:STORE_PRODUCT_ID/submissions/$submissionId" `
             -Headers $headers
 
@@ -67,23 +114,13 @@ jobs:
           }
           Write-Host "Published Store version: $publishedVersion"
 
-          # 4. Find all draft GitHub releases (limit 100 to avoid missing old drafts)
-          $all = gh release list --json tagName,isDraft --limit 100 | ConvertFrom-Json
-          $drafts = $all | Where-Object { $_.isDraft -eq $true }
-
-          if ($drafts.Count -eq 0) {
-            Write-Host "No draft releases found. Nothing to do."
-            exit 0
-          }
-
-          # 5. Match each draft to the published Store version.
-          #    Mirrors the version computation in release.yml:
-          #      v1.2.3     → 1.2.3.0
-          #      v1.2.3-beta.1 → 1.2.3.0
+          # --- 6. MATCH DRAFT TO PUBLISHED VERSION AND PUBLISH ---
+          # Mirrors the version computation in release.yml: v1.2.3 → 1.2.3.0, v1.2.3-beta.1 → 1.2.3.0
+          # gh release list returns newest first, so the first match is the most recently created draft.
           $published = $false
           foreach ($draft in $drafts) {
-            $tagBase = ($draft.tagName.TrimStart('v') -split '-')[0]
-            $parts   = $tagBase.Split('.')
+            $tagBase  = ($draft.tagName.TrimStart('v') -split '-')[0]
+            $parts    = $tagBase.Split('.')
             $expected = if ($parts.Count -ge 3) {
               "$($parts[0]).$($parts[1]).$($parts[2]).0"
             } else {
@@ -95,12 +132,25 @@ jobs:
               gh release edit $draft.tagName --draft=false
               Write-Host "GitHub release $($draft.tagName) is now public."
               $published = $true
-              # Only one Store version is published at a time — stop after first match
-              # to avoid accidentally publishing a pre-release draft with the same base version.
+              # Stop after first match — only one Store version is published at a time.
+              # This prevents accidentally publishing a pre-release draft with the same base version.
               break
             }
           }
 
           if (-not $published) {
+            # Draft releases exist but don't match the current published Store version.
+            # This is normal if the submission was recently committed and is still being processed.
+            # If it persists across many polling intervals, check Partner Center manually.
+            @"
+## :hourglass_flowing_sand: Draft Release Pending — No Match Yet
+
+Draft releases ($draftNames) do not match the current published Store version ($publishedVersion).
+
+This is expected while a new submission is processing. If this message persists for more than
+48 hours, open Partner Center to check the submission status — a failure may have occurred
+without an explicit status change.
+
+"@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
             Write-Host "No draft release matches Store version $publishedVersion. Will check again at the next scheduled run."
           }

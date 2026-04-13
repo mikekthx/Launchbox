@@ -4,6 +4,27 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: >
+          Dry run: build, sign, and upload the package to a Partner Center draft submission
+          without submitting it for certification. No GitHub Release is created.
+          Use this to validate the full pipeline before an actual release.
+          Select the version tag from the "Run workflow from" dropdown above.
+        type: boolean
+        default: true
+      skip_quality_checks:
+        description: >
+          Emergency bypass: skip format, test, and coverage checks.
+          Only use for genuine hotfixes where shipping speed outweighs test coverage.
+          bypass_reason is required when this is enabled.
+        type: boolean
+        default: false
+      bypass_reason:
+        description: 'Required when skip_quality_checks is true — explain why checks are being bypassed (recorded in the release)'
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -28,6 +49,25 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Validate workflow_dispatch inputs before spending time on a build.
+      # Tag push triggers bypass this step entirely.
+      - name: Validate dispatch inputs
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          SKIP_CHECKS: ${{ inputs.skip_quality_checks }}
+          BYPASS_REASON: ${{ inputs.bypass_reason }}
+        run: |
+          if ($env:REF_NAME -notmatch '^v\d+\.\d+\.\d+') {
+            Write-Error "This workflow must be triggered from a version tag (e.g. v1.2.3). Got: '$env:REF_NAME'. Select the tag from the 'Run workflow from' dropdown."
+            exit 1
+          }
+          if ($env:SKIP_CHECKS -eq 'true' -and [string]::IsNullOrWhiteSpace($env:BYPASS_REASON)) {
+            Write-Error "bypass_reason is required when skip_quality_checks is true. Describe why checks are being bypassed."
+            exit 1
+          }
+          Write-Host "Dispatch validation passed. Tag: $env:REF_NAME, Dry run: ${{ inputs.dry_run }}, Skip checks: $env:SKIP_CHECKS"
+
       - name: Install .NET Core
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
         with:
@@ -42,13 +82,18 @@ jobs:
             ${{ runner.os }}-nuget-release-
             ${{ runner.os }}-nuget-
 
+      # Format check is always mandatory — it runs in under 30 seconds and catches
+      # malformed files that would fail the build anyway.
       - name: Verify Code Format
         run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
 
       - name: Execute unit tests
+        id: run_tests
+        if: inputs.skip_quality_checks != 'true'
         run: dotnet test $env:Test_Project_Path --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
 
       - name: Check coverage threshold
+        if: inputs.skip_quality_checks != 'true'
         run: |
           $file = Get-ChildItem -Recurse -Filter "coverage.cobertura.xml" ./TestResults | Select-Object -First 1
           if (-not $file) { Write-Error "No coverage file found"; exit 1 }
@@ -62,9 +107,10 @@ jobs:
           }
           Write-Host "Coverage check passed ($pct%)"
 
+      # Guard against the test reporter crashing when tests were skipped via skip_quality_checks.
       - name: Publish Test Report
         uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3
-        if: always()
+        if: always() && steps.run_tests.outcome != 'skipped'
         with:
           name: Release Test Results
           path: "**/test-results.trx"
@@ -139,7 +185,6 @@ jobs:
           subject-path: sbom-output/launchbox-sbom.cdx.json
 
       # Install the MSStore Developer CLI — the official Microsoft tool for Store submissions.
-      # Replaces the non-existent microsoft/store-submission-action; requires PARTNER_CENTER_SELLER_ID secret.
       - name: Setup Microsoft Store Developer CLI
         uses: microsoft/microsoft-store-apppublisher@b76227f539d68e6465f79bbbc82ed92f61081aa4 # v1.3
 
@@ -157,19 +202,28 @@ jobs:
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      # Submit the .msixupload to the Store. The CLI commits the submission but does NOT wait
-      # for certification — store-sync.yml handles the wait and publishes the draft release when ready.
+      # Dry run: uploads the package to a Partner Center draft submission but does NOT submit
+      # it for certification (--noCommit). Useful for validating the full pipeline pre-release.
+      # Normal run: commits the submission and kicks off Store certification.
       - name: Submit to Microsoft Store
+        env:
+          STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
           $msixupload = Get-ChildItem -Recurse AppPackages -Filter "*.msixupload" | Select-Object -First 1
           if (-not $msixupload) { Write-Error "No .msixupload found in AppPackages"; exit 1 }
-          msstore publish . --inputFile $msixupload.FullName --appId $env:STORE_PRODUCT_ID
-        env:
-          STORE_PRODUCT_ID: ${{ secrets.STORE_PRODUCT_ID }}
+          $publishArgs = @('.', '--inputFile', $msixupload.FullName, '--appId', $env:STORE_PRODUCT_ID)
+          if ($env:DRY_RUN -eq 'true') {
+            $publishArgs += '--noCommit'
+            Write-Host "Dry run: package will be uploaded to a Partner Center draft but not submitted for certification."
+          }
+          msstore publish @publishArgs
 
       # Create a draft release — invisible to users until store-sync.yml publishes it after certification.
+      # Skipped on dry runs (no certification is triggered, so there is nothing to publish later).
       # Tags with a pre-release suffix (e.g. v1.2.3-beta.1) are marked as pre-release.
       - name: Create draft GitHub Release
+        if: inputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REF_NAME: ${{ github.ref_name }}
@@ -186,3 +240,18 @@ jobs:
           )
           if ($env:REF_NAME -match '-') { $releaseArgs += "--prerelease" }
           gh release create @releaseArgs
+
+      # When quality checks are bypassed, append an audit notice to the draft release body
+      # so the bypass is permanently visible in the release history.
+      - name: Annotate release with bypass notice
+        if: inputs.skip_quality_checks == 'true' && inputs.dry_run != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REF_NAME: ${{ github.ref_name }}
+          BYPASS_REASON: ${{ inputs.bypass_reason }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          $existing  = gh release view $env:REF_NAME --json body | ConvertFrom-Json | Select-Object -ExpandProperty body
+          $timestamp = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd HH:mm UTC')
+          $notice    = "`n`n---`n> **:warning: Quality gate bypassed** by @$env:ACTOR on $timestamp`n> **Reason:** $env:BYPASS_REASON"
+          gh release edit $env:REF_NAME --notes "$existing$notice"
