@@ -188,15 +188,17 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         if (startupException != null)
             Trace.WriteLine($"Failed to set run at startup: {PathSecurity.GetSafeExceptionMessage(startupException)}");
 
-        // Always sync _pendingStartupValue to the actual committed state after the async write.
+        // Always notify after the async write so the UI reflects the committed state.
         // SettingsService.SetProperty skips PropertyChanged when the value is unchanged — this
         // happens when TryEnableStartupAsync returns false and IsRunAtStartup was already false
-        // (OS silent denial). Without this, the UI toggle stays stuck in the requested state.
-        // Deferred so the lock is released before notifying listeners, consistent with
-        // OnServicePropertyChanged.
+        // (OS silent denial). Without this unconditional notification, the toggle stays stuck.
+        // Guard _pendingStartupValue the same way OnServicePropertyChanged does: skip the
+        // assignment when a newer rapid re-toggle is already in flight (CurrentCount == 0),
+        // so the newer optimistic value is not overwritten and the toggle doesn't bounce.
         _dispatcher.TryEnqueue(() =>
         {
-            _pendingStartupValue = _settingsService.IsRunAtStartup;
+            if (_startupToggleLock.CurrentCount == 1)
+                _pendingStartupValue = _settingsService.IsRunAtStartup;
             OnPropertyChanged(nameof(RunAtStartup));
         });
     }
