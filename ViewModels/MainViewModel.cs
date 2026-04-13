@@ -513,27 +513,32 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// Groups items by folder and writes all ordered file names in a single store write.
     /// Also syncs <see cref="Apps"/> to match so filter rebuilds stay consistent.
     /// </summary>
-    [RelayCommand]
     public void PersistItemOrder()
+    {
+        IEnumerable<AppItem> source = IsGroupedMode
+            ? GroupedApps.SelectMany(g => g.AllItems)
+            : (IEnumerable<AppItem>)FilteredApps;
+
+        var orders = source
+            .GroupBy(a => a.FolderPath)
+            .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
+        // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
+        // that failed to load) produces no items in the source and must not lose its saved order.
+        _settingsService.MergeItemOrders(orders);
+
+        // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
+        // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
+        Apps.CollectionChanged -= Apps_CollectionChanged;
+        Apps.ReplaceAll(source);
+        Apps.CollectionChanged += Apps_CollectionChanged;
+    }
+
+    [RelayCommand]
+    private void PersistItemOrderCommand()
     {
         try
         {
-            IEnumerable<AppItem> source = IsGroupedMode
-                ? GroupedApps.SelectMany(g => g.AllItems)
-                : (IEnumerable<AppItem>)FilteredApps;
-
-            var orders = source
-                .GroupBy(a => a.FolderPath)
-                .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
-            // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
-            // that failed to load) produces no items in the source and must not lose its saved order.
-            _settingsService.MergeItemOrders(orders);
-
-            // Sync Apps without triggering a redundant RebuildFilteredApps — FilteredApps == Apps
-            // when no filter is active (CanReorderItems is bound to IsFilterEmpty).
-            Apps.CollectionChanged -= Apps_CollectionChanged;
-            Apps.ReplaceAll(source);
-            Apps.CollectionChanged += Apps_CollectionChanged;
+            PersistItemOrder();
         }
         catch (Exception ex)
         {

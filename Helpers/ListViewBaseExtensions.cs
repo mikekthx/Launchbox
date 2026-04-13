@@ -1,7 +1,3 @@
-// WinUI XAML attached-property resolution requires the field name to match "[Name]Property"
-// (PascalCase), which conflicts with the project's static readonly UPPER_SNAKE_CASE rule.
-#pragma warning disable IDE1006
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Windows.Input;
@@ -14,6 +10,10 @@ namespace Launchbox.Helpers;
 /// </summary>
 public static class ListViewBaseExtensions
 {
+    // The field name must match the "[Name]Property" convention to avoid static readonly
+    // UPPER_SNAKE_CASE analyzer warnings, but WinUI XAML property resolution is technically
+    // based on the string registered below, not the C# field name. We disable IDE1006 locally.
+#pragma warning disable IDE1006
     public static readonly DependencyProperty CommandProperty =
         DependencyProperty.RegisterAttached(
             "Command",
@@ -90,9 +90,10 @@ public static class ListViewBaseExtensions
     private static void OnDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
     {
         var command = GetDragItemsCompletedCommand(sender);
-        if (command != null && command.CanExecute(args))
+        if (command != null && command.CanExecute(null))
         {
-            command.Execute(args);
+            command.Execute(null);
         }
     }
+#pragma warning restore IDE1006
 }

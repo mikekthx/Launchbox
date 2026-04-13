@@ -60,6 +60,38 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void PersistFolderSequenceCommand_ReadsCurrentFoldersAndPersists()
+    {
+        var store = new MockSettingsStore();
+        List<ShortcutFolder> folders =
+        [
+            new() { Path = @"C:\Desktop\A", Label = "A", Order = 0 },
+            new() { Path = @"C:\Desktop\B", Label = "B", Order = 1 },
+        ];
+        store.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
+
+        var settingsService = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(store));
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
+
+        // Simulate a drag-and-drop reorder directly in the Folders collection
+        var firstFolder = vm.Folders[0];
+        vm.Folders.RemoveAt(0);
+        vm.Folders.Add(firstFolder);
+
+        // Act
+        vm.PersistFolderSequenceCommand.Execute(null);
+
+        // Verify the reorder was persisted to the store correctly
+        var persisted = settingsService.GetShortcutFolders();
+        Assert.Equal(2, persisted.Count);
+        Assert.Equal("B", persisted[0].Label);
+        Assert.Equal("A", persisted[1].Label);
+    }
+
+    [Fact]
     public void SelectedModifier_ConvertsToConstants()
     {
         var (service, _, _, vm) = CreateViewModel();

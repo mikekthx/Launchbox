@@ -155,6 +155,8 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void PersistFolderSequence()
     {
+        // When drag-and-drop completes, WinUI has already mutated the Folders
+        // ObservableCollection in-place to reflect the new sequence.
         var orderedPaths = Folders.Select(f => f.Path).ToList();
         try
         {
