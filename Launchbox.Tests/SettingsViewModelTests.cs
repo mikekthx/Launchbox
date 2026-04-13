@@ -68,9 +68,6 @@ public class SettingsViewModelTests
             new() { Path = @"C:\Desktop\A", Label = "A", Order = 0 },
         ];
 
-        var tempStore = new MockSettingsStore();
-        tempStore.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
-
         var settingsService = new SettingsService(
             store, // The service will use the store that throws
             new MockStartupService(),

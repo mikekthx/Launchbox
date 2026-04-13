@@ -10,8 +10,8 @@ namespace Launchbox.Helpers;
 /// </summary>
 public static class ListViewBaseExtensions
 {
-    // Suppress IDE1006 to allow PascalCase field names (CommandProperty) instead of UPPER_SNAKE_CASE,
-    // avoiding conflicts with WinUI 3 [PropertyName]Property conventions required for compiled bindings.
+    // WinUI DependencyProperty fields follow the [PropertyName]Property PascalCase convention,
+    // which conflicts with this project's UPPER_SNAKE_CASE rule for static readonly fields.
 #pragma warning disable IDE1006
     public static readonly DependencyProperty CommandProperty =
         DependencyProperty.RegisterAttached(
