@@ -386,8 +386,10 @@ public class WindowService : IWindowService, IDisposable
             var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
             var currentSize = _appWindow.Size;
             // Add display origin so centering works on secondary monitors (non-zero WorkArea.X/Y)
-            var x = displayArea.WorkArea.X + (displayArea.WorkArea.Width - currentSize.Width) / 2;
-            var y = displayArea.WorkArea.Y + (displayArea.WorkArea.Height - currentSize.Height) / 2;
+            // Clamp to work-area origin so the window never starts off the top or left edge
+            // on a display smaller than the window (the OS min-size hook still prevents resizing below MIN_WINDOW_*).
+            var x = Math.Max(displayArea.WorkArea.X, displayArea.WorkArea.X + (displayArea.WorkArea.Width - currentSize.Width) / 2);
+            var y = Math.Max(displayArea.WorkArea.Y, displayArea.WorkArea.Y + (displayArea.WorkArea.Height - currentSize.Height) / 2);
             _appWindow.Move(new Windows.Graphics.PointInt32(x, y));
         }
         catch (Exception ex)
@@ -445,13 +447,17 @@ public class WindowService : IWindowService, IDisposable
 
                 if (offScreenHorizontally)
                 {
-                    newX = workArea.X + (workArea.Width - clampedWidth) / 2;
+                    // Clamp so the window never starts left of the work area (can happen when
+                    // clampedWidth > workArea.Width on an extremely narrow display).
+                    newX = Math.Max(workArea.X, workArea.X + (workArea.Width - clampedWidth) / 2);
                     needsMove = true;
                 }
 
                 if (offScreenVertically)
                 {
-                    newY = workArea.Y + (workArea.Height - clampedHeight) / 2;
+                    // Clamp so the window never starts above the work area (can happen when
+                    // clampedHeight > workArea.Height on an extremely short display).
+                    newY = Math.Max(workArea.Y, workArea.Y + (workArea.Height - clampedHeight) / 2);
                     needsMove = true;
                 }
 
