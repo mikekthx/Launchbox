@@ -4,7 +4,7 @@ name: Store Sync
 # once the submitted version is certified. Can also be triggered manually.
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 * * * *'
   workflow_dispatch:
 
 permissions:
