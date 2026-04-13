@@ -31,10 +31,7 @@ public class BulkObservableCollection<T> : ObservableCollection<T>
         }
         finally
         {
-            _isSuppressingNotifications = false;
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-            OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            OnBatchComplete();
         }
     }
 
@@ -51,11 +48,16 @@ public class BulkObservableCollection<T> : ObservableCollection<T>
         }
         finally
         {
-            _isSuppressingNotifications = false;
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
-            OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            OnBatchComplete();
         }
+    }
+
+    private void OnBatchComplete()
+    {
+        _isSuppressingNotifications = false;
+        OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+        OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
     protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
