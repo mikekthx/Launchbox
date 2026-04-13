@@ -143,7 +143,7 @@
                   CanReorderItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   AllowDrop="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   CanDragItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
-                  DragItemsCompleted="AppGrid_DragItemsCompleted"
+                  helpers:ListViewBaseExtensions.DragItemsCompletedCommand="{x:Bind ViewModel.PersistItemOrderCommand}"
                   ItemTemplate="{StaticResource AppItemTemplate}">
         </GridView>
 
