@@ -60,6 +60,46 @@ public class SettingsViewModelTests
     }
 
     [Fact]
+    public void PersistFolderSequenceCommand_CatchesExceptionAndLogs_WhenManagerThrows()
+    {
+        var store = new MockSettingsStore { ShouldThrow = true }; // Force a failure when persisting
+        List<ShortcutFolder> folders =
+        [
+            new() { Path = @"C:\Desktop\A", Label = "A", Order = 0 },
+        ];
+
+        var tempStore = new MockSettingsStore();
+        tempStore.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(folders));
+
+        var settingsService = new SettingsService(
+            store, // The service will use the store that throws
+            new MockStartupService(),
+            new ShortcutFolderManager(store)); // Provide the throwing store to manager as well
+
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
+        vm.Folders.Add(folders[0]); // Manually populate viewmodel to bypass initialization failure from store
+
+        using var stringWriter = new System.IO.StringWriter();
+        var listener = new System.Diagnostics.TextWriterTraceListener(stringWriter);
+        System.Diagnostics.Trace.Listeners.Add(listener);
+
+        try
+        {
+            // Act
+            var ex = Record.Exception(() => vm.PersistFolderSequenceCommand.Execute(null));
+
+            // Verify exception is caught and logged, not propagated
+            Assert.Null(ex);
+            listener.Flush();
+            Assert.Contains("Failed to persist folder sequence", stringWriter.ToString());
+        }
+        finally
+        {
+            System.Diagnostics.Trace.Listeners.Remove(listener);
+        }
+    }
+
+    [Fact]
     public void PersistFolderSequenceCommand_ReadsCurrentFoldersAndPersists()
     {
         var store = new MockSettingsStore();

@@ -534,7 +534,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
-    private void PersistItemOrderCommand()
+    private void PersistItemOrderExecute()
     {
         try
         {
