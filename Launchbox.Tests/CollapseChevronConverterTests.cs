@@ -1,4 +1,5 @@
 using Launchbox.Helpers;
+using Microsoft.UI.Xaml;
 using System;
 using Xunit;
 
@@ -26,10 +27,10 @@ public class CollapseChevronConverterTests
     }
 
     [Fact]
-    public void ConvertBack_ThrowsNotSupportedException()
+    public void ConvertBack_ReturnsUnsetValue()
     {
         var converter = new CollapseChevronConverter();
-        Assert.Throws<NotSupportedException>(() =>
-            converter.ConvertBack("\uE76C", typeof(bool), null!, "en-US"));
+        var result = converter.ConvertBack("\uE76C", typeof(bool), null!, "en-US");
+        Assert.Equal(DependencyProperty.UnsetValue, result);
     }
 }

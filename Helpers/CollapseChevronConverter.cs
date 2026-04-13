@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using System;
 
@@ -10,5 +11,5 @@ public class CollapseChevronConverter : IValueConverter
         value is true ? "\uE76C" : "\uE76E";
 
     public object ConvertBack(object value, Type targetType, object parameter, string _) =>
-        throw new NotSupportedException();
+        DependencyProperty.UnsetValue;
 }

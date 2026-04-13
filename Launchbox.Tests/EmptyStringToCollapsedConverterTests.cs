@@ -43,10 +43,10 @@ public class EmptyStringToCollapsedConverterTests
     [InlineData(Visibility.Visible)]
     [InlineData(Visibility.Collapsed)]
     [InlineData(null)]
-    public void ConvertBack_ThrowsNotSupportedException(object? value)
+    public void ConvertBack_ReturnsUnsetValue(object? value)
     {
         var converter = new EmptyStringToCollapsedConverter();
-        Assert.Throws<NotSupportedException>(() =>
-            converter.ConvertBack(value!, typeof(string), null!, "en-US"));
+        var result = converter.ConvertBack(value!, typeof(string), null!, "en-US");
+        Assert.Equal(DependencyProperty.UnsetValue, result);
     }
 }

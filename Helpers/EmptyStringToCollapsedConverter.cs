@@ -13,5 +13,5 @@ public class EmptyStringToCollapsedConverter : IValueConverter
         value is string s && !string.IsNullOrEmpty(s) ? Visibility.Visible : Visibility.Collapsed;
 
     public object ConvertBack(object value, Type targetType, object parameter, string _) =>
-        throw new NotSupportedException();
+        DependencyProperty.UnsetValue;
 }
