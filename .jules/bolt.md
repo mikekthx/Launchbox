@@ -20,3 +20,7 @@
 ## 2026-04-07 - Sequential vs Parallel Multi-Folder Loading
 **Learning:** Loading shortcut folders with `Task.WhenAll` (parallel) bounds total load time to the slowest drive, but a single faulting folder can complicate per-folder error isolation. Switching to a sequential `foreach/await` with a per-folder try/catch makes error isolation trivial and simplifies the code, at the cost of additive load time when folders span multiple slow drives (e.g. one fast SSD + one NAS).
 **Action:** Use sequential `foreach` with per-folder try/catch in `MainViewModel.LoadAppItemsAsync`. For a typical user with 1–5 folders on the same drive the difference is imperceptible; the improved resilience (a faulting folder logs a warning and loading continues) outweighs the parallelism benefit. If profiling ever shows load time is the bottleneck for multi-drive setups, revisit with `Task.WhenAll` and explicit per-task error handling.
+
+## 2024-04-13 - [Deduplicate Before Expensive Operations]
+**Learning:** Performing expensive operations (like `Environment.ExpandEnvironmentVariables` or I/O validations) inside LINQ `Where` or `Select` clauses before `GroupBy` causes redundant work when processing lists with duplicates.
+**Action:** Always hoist structural deduplication (like `GroupBy`) ahead of expensive transformations or validations in LINQ chains. This guarantees that expensive work is only performed once per unique item.

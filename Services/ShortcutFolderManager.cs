@@ -197,12 +197,13 @@ public class ShortcutFolderManager
     {
         var valid = folders
             .Where(f => !string.IsNullOrEmpty(f.Path))
-            // Expand and validate each path — ExpandedPath is now a pure computed property,
-            // so no explicit assignment is needed; the expansion is re-evaluated on demand.
-            .Where(f => !PathSecurity.IsUnsafePath(Environment.ExpandEnvironmentVariables(f.Path)))
-            // Deduplicate by path so corrupted persisted state never leaks into _cache.
+            // Deduplicate by path first so we don't redundantly expand environment variables
+            // or perform expensive validations on duplicate entries.
             .GroupBy(f => f.Path, StringComparer.OrdinalIgnoreCase)
             .Select(g => g.First())
+            // Expand and validate each path — ExpandedPath is a pure computed property
+            // that handles the actual expansion.
+            .Where(f => !PathSecurity.IsUnsafePath(f.ExpandedPath))
             .ToList();
 
         return Renumber(valid).AsReadOnly();
