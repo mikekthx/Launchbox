@@ -351,7 +351,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
     }
 
-    // Falls back to the raw folder name for apps whose origin folder is no longer configured.
+    /// <summary>
+    /// Builds the list of app groups based on the folders they belong to.
+    /// Falls back to the raw folder name for apps whose origin folder is no longer configured.
+    /// </summary>
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
         var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
@@ -363,9 +366,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var folderPath = group.Key;
                 var isKnownFolder = folderLookup.TryGetValue(folderPath, out var folder);
 
-                // Path.GetFileName(@"C:\") returns "" for drive roots — fall back to the path itself.
-                var rawName = Path.GetFileName(folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                var groupLabel = isKnownFolder ? folder!.Label : (string.IsNullOrEmpty(rawName) ? folderPath : rawName);
+                string groupLabel;
+                if (isKnownFolder)
+                {
+                    groupLabel = folder!.Label;
+                }
+                else
+                {
+                    // Path.GetFileName(@"C:\") returns "" for drive roots — fall back to the path itself.
+                    var rawName = Path.GetFileName(folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                    bool isDriveRoot = string.IsNullOrEmpty(rawName);
+                    groupLabel = isDriveRoot ? folderPath : rawName;
+                }
+
                 var sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
 
                 return (
