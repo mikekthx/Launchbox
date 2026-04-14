@@ -351,10 +351,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
     }
 
-    /// <summary>
-    /// Builds the list of app groups based on the folders they belong to.
-    /// Falls back to the raw folder name for apps whose origin folder is no longer configured.
-    /// </summary>
+    // Falls back to the raw folder name for apps whose origin folder is no longer configured.
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
         var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
@@ -375,8 +372,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 {
                     // Path.GetFileName(@"C:\") returns "" for drive roots — fall back to the path itself.
                     var rawName = Path.GetFileName(folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                    bool isDriveRoot = string.IsNullOrEmpty(rawName);
-                    groupLabel = isDriveRoot ? folderPath : rawName;
+                    groupLabel = string.IsNullOrEmpty(rawName) ? folderPath : rawName;
                 }
 
                 var sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
