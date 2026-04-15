@@ -363,9 +363,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 var folderPath = group.Key;
                 var isKnownFolder = folderLookup.TryGetValue(folderPath, out var folder);
 
-                // Path.GetFileName(@"C:\") returns "" for drive roots — fall back to the path itself.
-                var rawName = Path.GetFileName(folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-                var groupLabel = isKnownFolder ? folder!.Label : (string.IsNullOrEmpty(rawName) ? folderPath : rawName);
+                string groupLabel;
+                if (isKnownFolder)
+                {
+                    groupLabel = folder!.Label;
+                }
+                else
+                {
+                    // Path.GetFileName(@"C:\") returns "" for drive roots — fall back to the path itself.
+                    var rawName = Path.GetFileName(folderPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+                    groupLabel = string.IsNullOrEmpty(rawName) ? folderPath : rawName;
+                }
+
                 var sortOrder = isKnownFolder ? folder!.Order : int.MaxValue;
 
                 return (
