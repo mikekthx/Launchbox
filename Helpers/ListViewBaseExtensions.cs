@@ -19,6 +19,13 @@ public static class ListViewBaseExtensions
             typeof(ICommand),
             typeof(ListViewBaseExtensions),
             new PropertyMetadata(null, OnCommandPropertyChanged));
+
+    public static readonly DependencyProperty DragItemsCompletedCommandProperty =
+        DependencyProperty.RegisterAttached(
+            "DragItemsCompletedCommand",
+            typeof(ICommand),
+            typeof(ListViewBaseExtensions),
+            new PropertyMetadata(null, OnDragItemsCompletedCommandPropertyChanged));
 #pragma warning restore IDE1006
 
     public static void SetCommand(DependencyObject d, ICommand value)
@@ -56,15 +63,6 @@ public static class ListViewBaseExtensions
             }
         }
     }
-
-#pragma warning disable IDE1006
-    public static readonly DependencyProperty DragItemsCompletedCommandProperty =
-        DependencyProperty.RegisterAttached(
-            "DragItemsCompletedCommand",
-            typeof(ICommand),
-            typeof(ListViewBaseExtensions),
-            new PropertyMetadata(null, OnDragItemsCompletedCommandPropertyChanged));
-#pragma warning restore IDE1006
 
     public static void SetDragItemsCompletedCommand(DependencyObject d, ICommand value)
     {

@@ -850,15 +850,11 @@ public class MainViewModelTests
     [Fact]
     public async Task PersistItemOrderExecuteCommand_CatchesExceptionAndLogs_WhenManagerThrows()
     {
-        _settingsStore.ShouldThrow = true; // Force a failure when persisting
         _fileSystem.AddFile(Path.Combine(_shortcutFolder, "A App.lnk"));
 
         var vm = CreateViewModel();
-        // Since load will also fail reading from settings due to the forced throw,
-        // we manually bypass the initial failure to focus on the persist call
-        _settingsStore.ShouldThrow = false;
         await vm.LoadAppsAsync();
-        _settingsStore.ShouldThrow = true; // turn back on for the target act
+        _settingsStore.ShouldThrow = true; // Force a failure when persisting
 
         using var stringWriter = new System.IO.StringWriter();
         var listener = new System.Diagnostics.TextWriterTraceListener(stringWriter);
