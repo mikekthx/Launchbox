@@ -196,6 +196,7 @@
                  CornerRadius="8"
                  Padding="12,8"
                  Margin="8,4,8,8"
+                 ClearButtonVisible="True"
                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
             <TextBox.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Escape" Invoked="{x:Bind ViewModel.ClearFilter}" />
