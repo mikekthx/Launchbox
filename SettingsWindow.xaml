@@ -2,7 +2,6 @@
     x:Class="Launchbox.SettingsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:helpers="using:Launchbox.Helpers"
     xmlns:local="using:Launchbox"
     xmlns:models="using:Launchbox.Models"
     xmlns:viewmodels="using:Launchbox.ViewModels">
