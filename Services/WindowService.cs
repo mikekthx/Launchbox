@@ -367,7 +367,7 @@ public class WindowService : IWindowService, IDisposable
         try
         {
             var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
-            int height = Math.Min(Constants.WINDOW_HEIGHT, Math.Max(Constants.MIN_WINDOW_HEIGHT, displayArea.WorkArea.Height - 40));
+            int height = Math.Min(Constants.WINDOW_HEIGHT, Math.Max(Constants.MIN_WINDOW_HEIGHT, displayArea.WorkArea.Height - Constants.WINDOW_WORKAREA_MARGIN));
             _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
             CenterOnCurrentDisplay();
         }
@@ -415,11 +415,11 @@ public class WindowService : IWindowService, IDisposable
             var pos = _appWindow.Position;
             var size = _appWindow.Size;
 
-            int maxHeight = Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - 40);
+            int maxHeight = Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - Constants.WINDOW_WORKAREA_MARGIN);
             bool needsResize = size.Height > maxHeight;
             int clampedHeight = needsResize ? maxHeight : size.Height;
 
-            int maxWidth = Math.Max(Constants.MIN_WINDOW_WIDTH, workArea.Width - 40);
+            int maxWidth = Math.Max(Constants.MIN_WINDOW_WIDTH, workArea.Width - Constants.WINDOW_WORKAREA_MARGIN);
             bool needsWidthClamp = size.Width > maxWidth;
             int clampedWidth = needsWidthClamp ? maxWidth : size.Width;
             needsResize = needsResize || needsWidthClamp;
