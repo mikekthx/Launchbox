@@ -45,7 +45,18 @@ public class WinUILauncher : IAppLauncher
         // Validate shortcut target (Defense-in-depth)
         if (extension == ".lnk" || extension == ".url")
         {
-            var metadata = _shortcutResolver.Resolve(path);
+            ShortcutMetadata? metadata;
+            try
+            {
+                metadata = _shortcutResolver.Resolve(path);
+            }
+            catch (Exception ex)
+            {
+                // Fail closed: treat any resolver exception (e.g. COM failure on a malformed .lnk)
+                // as unresolvable metadata so one bad shortcut doesn't crash the launcher.
+                Trace.WriteLine($"Blocked execution: resolver threw for {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                return;
+            }
 
             // Security: fail closed if the resolver could not produce metadata at all
             // (COM failure, buffer truncation, non-Windows platform, or exception).
