@@ -62,19 +62,19 @@ public class SettingsViewModelTests
     [Fact]
     public void PersistFolderSequenceCommand_CatchesExceptionAndLogs_WhenManagerThrows()
     {
-        var store = new MockSettingsStore { ShouldThrow = true }; // Force a failure when persisting
-        List<ShortcutFolder> folders =
-        [
-            new() { Path = @"C:\Desktop\A", Label = "A", Order = 0 },
-        ];
-
+        // Initialize with ShouldThrow = false so ShortcutFolderManager.LoadFolders() can
+        // run in the constructor without throwing — then arm the throw before the command.
+        var store = new MockSettingsStore();
         var settingsService = new SettingsService(
-            store, // The service will use the store that throws
+            store,
             new MockStartupService(),
-            new ShortcutFolderManager(store)); // Provide the throwing store to manager as well
+            new ShortcutFolderManager(store));
 
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
-        vm.Folders.Add(folders[0]); // Manually populate viewmodel to bypass initialization failure from store
+        vm.Folders.Add(new ShortcutFolder { Path = @"C:\Desktop\A", Label = "A", Order = 0 });
+
+        // Arm the throw only after initialization so it fires during the persist call.
+        store.ShouldThrow = true;
 
         using var stringWriter = new System.IO.StringWriter();
         var listener = new System.Diagnostics.TextWriterTraceListener(stringWriter);

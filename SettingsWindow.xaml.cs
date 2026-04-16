@@ -1,13 +1,9 @@
 using Launchbox.Helpers;
-using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using Windows.Graphics;
 
 namespace Launchbox;
