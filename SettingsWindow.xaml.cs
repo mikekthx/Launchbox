@@ -1,13 +1,9 @@
 using Launchbox.Helpers;
-using Launchbox.Models;
 using Launchbox.Services;
 using Launchbox.ViewModels;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System;
-using System.Diagnostics;
-using System.Linq;
 using Windows.Graphics;
 
 namespace Launchbox;
@@ -48,16 +44,4 @@ public sealed partial class SettingsWindow : Window
         ViewModel.Dispose();
     }
 
-    private void FolderList_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-    {
-        var orderedPaths = sender.Items.OfType<ShortcutFolder>().Select(f => f.Path).ToList();
-        try
-        {
-            ViewModel.SetFolderSequence(orderedPaths);
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Failed to persist folder sequence: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
-    }
 }

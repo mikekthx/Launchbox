@@ -542,6 +542,19 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Apps.CollectionChanged += Apps_CollectionChanged;
     }
 
+    [RelayCommand]
+    private void PersistItemOrderExecute()
+    {
+        try
+        {
+            PersistItemOrder();
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"Failed to persist item order: {PathSecurity.GetSafeExceptionMessage(ex)}");
+        }
+    }
+
     private void RebuildFolderWatchers(IReadOnlyList<ShortcutFolder> folders)
     {
         var newPaths = folders.Select(f => f.ExpandedPath).ToList();

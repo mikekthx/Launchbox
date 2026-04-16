@@ -847,6 +847,35 @@ public class MainViewModelTests
         Assert.Equal(["A App.lnk", "B App.lnk"], persisted);
     }
 
+    [Fact]
+    public async Task PersistItemOrderExecuteCommand_CatchesExceptionAndLogs_WhenManagerThrows()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "A App.lnk"));
+
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        _settingsStore.ShouldThrow = true; // Force a failure when persisting
+
+        using var stringWriter = new System.IO.StringWriter();
+        var listener = new System.Diagnostics.TextWriterTraceListener(stringWriter);
+        System.Diagnostics.Trace.Listeners.Add(listener);
+
+        try
+        {
+            // Act
+            var ex = Record.Exception(() => vm.PersistItemOrderExecuteCommand.Execute(null));
+
+            // Verify exception is caught and logged, not propagated
+            Assert.Null(ex);
+            listener.Flush();
+            Assert.Contains("Failed to persist item order", stringWriter.ToString());
+        }
+        finally
+        {
+            System.Diagnostics.Trace.Listeners.Remove(listener);
+        }
+    }
+
     // --- TOGGLE GROUP / CLEAR FILTER TESTS ---
 
     [Fact]
