@@ -962,4 +962,31 @@ public class MainViewModelTests
         Assert.Equal(string.Empty, group[0].Name); // placeholder sentinel
         Assert.Equal(string.Empty, vm.FilterText);
     }
+
+    // --- WATCHER INTEGRATION TESTS ---
+
+    [Fact]
+    public async Task FileWatcherCallback_TriggersReload_AndPicksUpNewFile()
+    {
+        // Arrange: initial load with one file
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        Assert.Single(vm.FilteredApps);
+
+        // Add a second file AFTER the initial load so the watcher reload picks it up
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
+
+        var reloadTcs = new TaskCompletionSource();
+        vm.FilteredApps.CollectionChanged += (_, _) => reloadTcs.TrySetResult();
+
+        // Act: simulate a directory change event — fires the registered watcher callback
+        // which calls _ = LoadAppsAsync() internally
+        _fileSystem.SimulateChange(_shortcutFolder);
+
+        await reloadTcs.Task.WaitAsync(TimeSpan.FromSeconds(2), TestContext.Current.CancellationToken);
+
+        // Assert: both files are visible after the watcher-triggered reload
+        Assert.Equal(2, vm.FilteredApps.Count);
+    }
 }

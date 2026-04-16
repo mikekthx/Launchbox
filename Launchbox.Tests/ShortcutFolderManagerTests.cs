@@ -603,4 +603,28 @@ public class ShortcutFolderManagerTests
         Assert.False(string.IsNullOrEmpty(folders[0].Label));
         Assert.Equal(@"C:\", folders[0].Label);
     }
+
+    [Fact]
+    public void AddFolder_EnvVarThatExpandsToUncPath_IsRejected()
+    {
+        // An env var whose expansion yields a UNC path bypasses a naive path check.
+        // ShortcutFolderManager must expand the variable before validating.
+        const string envVar = "LAUNCHBOX_TEST_UNC_PATH";
+        Environment.SetEnvironmentVariable(envVar, @"\\attacker\share");
+        try
+        {
+            var store = new MockSettingsStore();
+            var manager = new ShortcutFolderManager(store);
+
+            var result = manager.AddFolder($@"%{envVar}%\Apps", "Bad");
+
+            Assert.False(result);
+            // Store must not have been updated with the unsafe path
+            Assert.DoesNotContain(manager.GetFolders(), f => f.Path.Contains(envVar));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(envVar, null);
+        }
+    }
 }
