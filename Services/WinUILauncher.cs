@@ -102,14 +102,7 @@ public class WinUILauncher : IAppLauncher
             }
         }
 
-        try
-        {
-            using var process = _processStarter.Start(new ProcessStartInfo(path) { UseShellExecute = true });
-        }
-        catch (Exception ex)
-        {
-            Trace.WriteLine($"Failed to launch {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-        }
+        TryStartProcess(path, "Failed to launch");
     }
 
     public void OpenFolder(string path)
@@ -122,18 +115,23 @@ public class WinUILauncher : IAppLauncher
 
         if (_fileSystem.DirectoryExists(path))
         {
-            try
-            {
-                using var process = _processStarter.Start(new ProcessStartInfo(path) { UseShellExecute = true });
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to open folder {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            }
+            TryStartProcess(path, "Failed to open folder");
         }
         else
         {
             Trace.WriteLine($"Folder not found: {PathSecurity.RedactPath(path)}");
+        }
+    }
+
+    private void TryStartProcess(string path, string failurePrefix)
+    {
+        try
+        {
+            using var process = _processStarter.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            Trace.WriteLine($"{failurePrefix} {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
         }
     }
 }
