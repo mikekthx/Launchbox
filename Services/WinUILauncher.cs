@@ -54,8 +54,6 @@ public class WinUILauncher : IAppLauncher
             {
                 // Fail closed: a malformed .lnk can cause COM to throw during resolution.
                 // Return early so one bad shortcut doesn't crash the launcher.
-                // Fail closed: treat any resolver exception (e.g. COM failure on a malformed .lnk)
-                // as unresolvable metadata so one bad shortcut doesn't crash the launcher.
                 Trace.WriteLine($"Blocked execution: resolver threw for {PathSecurity.RedactPath(path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
                 return;
             }
