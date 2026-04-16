@@ -57,3 +57,8 @@
 **Vulnerability:** `WindowsShortcutResolver.ResolveUrl` returned the raw URL string from `.url` files after expanding environment variables, without validating the scheme. This allowed `.url` files to be used to execute local files (via `file://`) or other unsafe protocols, bypassing extension-based restrictions.
 **Learning:** Validating file extensions is not enough when the file content can specify a protocol that redirects execution to unintended targets. For `.url` files, the resulting URI must be explicitly whitelisted to safe schemes.
 **Prevention:** For any shortcut format that resolves to a URI, always validate the resulting absolute URI scheme against a strict whitelist (e.g., `http` and `https`) before returning it for execution.
+
+## 2026-04-11 - Unsafe Directory Creation
+**Vulnerability:** `MainViewModel.OpenShortcutsFolder` extracted an expanded path from settings and called `_fileSystem.CreateDirectory(shortcutFolder)` without verifying if the path was safe, allowing a manipulated environment variable to trick the application into actively creating an unsafe UNC path before it could be blocked by the launcher.
+**Learning:** Pre-execution security checks like `PathSecurity.IsUnsafePath` must be placed immediately before *any* file system interaction (including existence checks and directory creation), not just before the final application launch.
+**Prevention:** Add an explicit `PathSecurity.IsUnsafePath` guard in `MainViewModel.OpenShortcutsFolder` prior to checking `DirectoryExists` or calling `CreateDirectory`.

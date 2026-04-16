@@ -460,6 +460,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 ? firstFolder!.ExpandedPath
                 : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Shortcuts");
 
+            if (PathSecurity.IsUnsafePath(shortcutFolder))
+            {
+                Trace.WriteLine($"Blocked opening of unsafe folder: {PathSecurity.RedactPath(shortcutFolder)}");
+                return;
+            }
+
             if (!_fileSystem.DirectoryExists(shortcutFolder))
             {
                 _fileSystem.CreateDirectory(shortcutFolder);
