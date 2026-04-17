@@ -619,8 +619,8 @@ public class ShortcutFolderManagerTests
             var result = manager.AddFolder($@"%{envVar}%\Apps", "Bad");
 
             Assert.False(result);
-            // Store must not have been updated with the unsafe path
-            Assert.DoesNotContain(manager.GetFolders(), f => f.Path.Contains(envVar));
+            // Store must not have been updated with either the raw env-var form or the expanded UNC path
+            Assert.DoesNotContain(manager.GetFolders(), f => f.Path.Contains(envVar) || f.Path.Contains(@"\\attacker\share"));
         }
         finally
         {

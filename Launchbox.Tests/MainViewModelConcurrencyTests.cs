@@ -82,11 +82,13 @@ public class MainViewModelConcurrencyTests
         {
             if (Interlocked.Increment(ref _callCount) == 1)
             {
-                // Signal that we're about to block, then wait without observing cancellation.
+                // Signal that we're about to block, then wait without observing the load's cancellation token.
                 // The point of this test is that the CTS is cancelled WHILE we're blocked, and
                 // ct.ThrowIfCancellationRequested() after we unblock discards our results.
+                // TestContext.Current.CancellationToken is orthogonal — it lets the test runner reclaim
+                // this thread-pool thread on timeout without affecting the race the test is modelling.
                 BlockingStarted.TrySetResult();
-                _gate.Wait();
+                _gate.Wait(TestContext.Current.CancellationToken);
                 return _blockedCallFiles;
             }
             return _fastCallFiles;
