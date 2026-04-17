@@ -613,6 +613,8 @@ public class SettingsViewModelTests
         var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
 
         var revertTcs = new TaskCompletionSource();
+        // PropertyChanged for RunAtStartup fires only after the async revert completes, not
+        // optimistically on set — so the first notification here reflects the reverted false value.
         vm.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SettingsViewModel.RunAtStartup))

@@ -978,7 +978,12 @@ public class MainViewModelTests
         _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Beta.lnk"));
 
         var reloadTcs = new TaskCompletionSource();
-        vm.FilteredApps.CollectionChanged += (_, _) => reloadTcs.TrySetResult();
+        vm.FilteredApps.CollectionChanged += (_, _) =>
+        {
+            // Guard on Count so a Reset/clear event before the Add does not resolve the TCS early.
+            if (vm.FilteredApps.Count == 2)
+                reloadTcs.TrySetResult();
+        };
 
         // Act: simulate a directory change event — fires the registered watcher callback
         // which calls _ = LoadAppsAsync() internally
