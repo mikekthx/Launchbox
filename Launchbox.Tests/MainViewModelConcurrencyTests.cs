@@ -56,11 +56,9 @@ public class MainViewModelConcurrencyTests
         new(shortcutService, _iconService, _imageFactory, _dispatcher,
             _appLauncher, _fileSystem, _settingsService, _windowService);
 
-    /// <summary>
-    /// Shortcut service that blocks the first call on a semaphore gate,
-    /// allowing tests to verify that a stale (superseded) load cannot overwrite
-    /// a newer completed load.
-    /// </summary>
+    // Shortcut service that blocks the first call on a semaphore gate,
+    // allowing tests to verify that a stale (superseded) load cannot overwrite
+    // a newer completed load.
     private sealed class GatedShortcutService : IShortcutService
     {
         private readonly SemaphoreSlim _gate;
@@ -68,7 +66,7 @@ public class MainViewModelConcurrencyTests
         private readonly string[] _fastCallFiles;
         private int _callCount;
 
-        /// <summary>Signals when the first (blocking) call has started waiting on the gate.</summary>
+        // Signals when the first (blocking) call has started waiting on the gate.
         public TaskCompletionSource BlockingStarted { get; } = new();
 
         public GatedShortcutService(SemaphoreSlim gate, string[] blockedCallFiles, string[] fastCallFiles)
