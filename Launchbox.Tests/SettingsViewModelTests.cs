@@ -601,4 +601,31 @@ public class SettingsViewModelTests
         Assert.Equal("OldLabel", vm.Folders[0].Label);
     }
 
+    [Fact]
+    public async Task RunAtStartup_WhenStartupServiceUnsupported_RevertsToFalse()
+    {
+        // When IsSupported is false, SetRunAtStartupAsync returns early without changing
+        // IsRunAtStartup. The ViewModel should revert _pendingStartupValue to match the
+        // committed state (false), so the toggle does not appear stuck in the requested state.
+        var store = new MockSettingsStore();
+        var startupService = new MockStartupService { IsSupported = false };
+        var settingsService = new SettingsService(store, startupService, new ShortcutFolderManager(store));
+        var vm = new SettingsViewModel(settingsService, new MockWindowService(), new MockFilePickerService(), new MockDispatcher());
+
+        var revertTcs = new TaskCompletionSource();
+        // PropertyChanged for RunAtStartup fires only after the async revert completes, not
+        // optimistically on set — so the first notification here reflects the reverted false value.
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsViewModel.RunAtStartup))
+                revertTcs.TrySetResult();
+        };
+
+        vm.RunAtStartup = true;
+
+        await revertTcs.Task.WaitAsync(TimeSpan.FromSeconds(1), TestContext.Current.CancellationToken);
+
+        Assert.False(vm.RunAtStartup);
+        Assert.False(startupService.IsEnabled);
+    }
 }
