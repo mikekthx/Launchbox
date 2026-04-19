@@ -19,7 +19,6 @@ public static class Constants
     public const int MAX_VIRTUAL_KEY = 0xFE;
 
     public const int VK_S = 0x53;
-    public const int VK_A = 0x41;
     public const int HOTKEY_ID = 9000;
 
     // Display dimensions (DIPs) for the UI grid

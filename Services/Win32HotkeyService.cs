@@ -1,6 +1,9 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Launchbox.Services;
+
+[ExcludeFromCodeCoverage]
 
 /// <summary>
 /// Production implementation of <see cref="INativeHotkeyService"/> that delegates

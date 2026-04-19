@@ -1,8 +1,11 @@
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Launchbox.Services;
+
+[ExcludeFromCodeCoverage]
 
 /// <summary>
 /// Production adapter that wraps <see cref="AppWindow"/> and a WinUI <see cref="Window"/>

@@ -6,6 +6,7 @@ namespace Launchbox.Tests;
 
 public class WindowServiceTests
 {
+    private const int VK_A = 0x41;
     // Creates a WindowService wired to test doubles.
     // positionStore: pre-populate with WinX/WinY/WinW/WinH (int) to simulate a saved position.
     private static (WindowService svc, MockAppWindowAdapter adapter, MockNativeHotkeyService hotkey, SettingsService settings)
@@ -205,8 +206,83 @@ public class WindowServiceTests
         // If _isHotkeyRegistered were still true, 2+ new calls would occur.
         hotkey.RegisterResults.Enqueue(false); // step 3 attempt fails
         int callsBefore = hotkey.RegisterCalls.Count;
-        settings.HotkeyKey = Constants.VK_A;
+        settings.HotkeyKey = VK_A;
 
         Assert.Equal(callsBefore + 1, hotkey.RegisterCalls.Count);
+    }
+
+    // --- Hide ---
+
+    [Fact]
+    public void Hide_HidesAdapter()
+    {
+        var (svc, adapter, _, _) = CreateSut();
+        svc.Hide();
+        Assert.Equal(1, adapter.HideCount);
+    }
+
+    // --- Dispose ---
+
+    [Fact]
+    public void Dispose_UnregistersHotkey()
+    {
+        var (svc, _, hotkey, _) = CreateSut();
+        svc.Dispose();
+        Assert.True(hotkey.UnregisterCalls.Count >= 1);
+    }
+
+    [Fact]
+    public void Dispose_Idempotent()
+    {
+        var (svc, _, hotkey, _) = CreateSut();
+        svc.Dispose();
+        int countAfterFirst = hotkey.UnregisterCalls.Count;
+        svc.Dispose();
+        Assert.Equal(countAfterFirst, hotkey.UnregisterCalls.Count);
+    }
+
+    // --- ToggleVisibility (KeepCentered) ---
+
+    [Fact]
+    public void ToggleVisibility_KeepCentered_FirstShow_CentersWindow()
+    {
+        var (svc, adapter, _, settings) = CreateSut();
+        settings.KeepCentered = true;
+
+        svc.ToggleVisibility();
+
+        Assert.True(adapter.MoveCalls.Count >= 1);
+    }
+
+    [Fact]
+    public void ToggleVisibility_KeepCentered_SubsequentShow_CentersAgain()
+    {
+        var (svc, adapter, _, settings) = CreateSut();
+        settings.KeepCentered = true;
+        svc.ToggleVisibility();
+        adapter.IsVisible = false;
+        int movesBefore = adapter.MoveCalls.Count;
+
+        svc.ToggleVisibility();
+
+        Assert.True(adapter.MoveCalls.Count > movesBefore);
+    }
+
+    // --- RestoreWindowPosition (off-screen) ---
+
+    [Fact]
+    public void ToggleVisibility_SavedPositionOffScreen_CentersInstead()
+    {
+        // Saved position exists but IsRectOnAnyDisplay returns false — RestoreWindowPosition
+        // should fall through and CenterWindow() centers instead.
+        var positionStore = SavedPosition(5000, 5000, Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT);
+        var (svc, adapter, _, _) = CreateSut(positionStore);
+        adapter.RectOnAnyDisplay = false;
+
+        svc.ToggleVisibility();
+
+        // MoveAndResize is NOT called (restore skipped); Move IS called (centered).
+        Assert.Empty(adapter.MoveAndResizeCalls);
+        Assert.True(adapter.MoveCalls.Count >= 1);
     }
 }
