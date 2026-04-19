@@ -20,10 +20,10 @@
 ## 2026-04-07 - Sequential vs Parallel Multi-Folder Loading
 **Learning:** Loading shortcut folders with `Task.WhenAll` (parallel) bounds total load time to the slowest drive, but a single faulting folder can complicate per-folder error isolation. Switching to a sequential `foreach/await` with a per-folder try/catch makes error isolation trivial and simplifies the code, at the cost of additive load time when folders span multiple slow drives (e.g. one fast SSD + one NAS).
 **Action:** Use sequential `foreach` with per-folder try/catch in `MainViewModel.LoadAppItemsAsync`. For a typical user with 1–5 folders on the same drive the difference is imperceptible; the improved resilience (a faulting folder logs a warning and loading continues) outweighs the parallelism benefit. If profiling ever shows load time is the bottleneck for multi-drive setups, revisit with `Task.WhenAll` and explicit per-task error handling.
-## 2026-05-18 - Deferring Empty State UI Components
+## 2026-04-19 - Deferring Empty State UI Components
 **Learning:** Initial application rendering pays a heavy penalty instantiating unused elements when properties start as false. Standard `Visibility` bindings still instantiate all elements (like scalable icons or interactive buttons) into the visual tree.
 **Action:** Replace `Visibility="{x:Bind ..., Mode=OneWay}"` with `x:Load="{x:Bind ..., Mode=OneWay}"` and ensure an `x:Name` is present for non-essential UI sections (e.g. empty/fallback states) to completely skip their object creation and rendering phases on startup until actually needed.
 
-## 2026-05-18 - Missing FindName with x:Load
-**Learning:** Using `x:Load` requires the code-behind class to have a `FindName` method to find elements in the visual tree when lazily loading. In standard `Page` or `UserControl` this is typically handled by the framework, but for a raw `Window` it can fail to generate if you are targeting specific SDK setups.
-**Action:** When using `x:Load` in a `Window`, manually define `public object? FindName(string name) => (this.Content as FrameworkElement)?.FindName(name);` in the code-behind to satisfy the XAML compiler if it complains.
+## 2026-04-19 - FindName Compilation Errors with x:Load
+**Learning:** Using `x:Load` requires the code-behind class to have a `FindName` method to resolve elements in the visual tree when lazily loading. WinUI 3 automatically generates this method for `Window` partial classes in modern Windows App SDKs.
+**Action:** Do not manually define `public object? FindName(string name)` in the code-behind of a `Window` when using `x:Load`, as this will conflict with the XAML compiler's auto-generated code and cause a `CS0111` build failure. Let the compiler handle it.
