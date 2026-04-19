@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 
 namespace Launchbox.Services;
 
-public class WindowService : IWindowService, IDisposable
+public sealed class WindowService : IWindowService, IDisposable
 {
     private readonly Window? _window;
     private readonly WindowPositionManager _positionManager;

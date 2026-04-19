@@ -5,6 +5,10 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Launchbox.Services;
 
+/// <summary>
+/// Production adapter that wraps <see cref="AppWindow"/> and a WinUI <see cref="Window"/>
+/// to implement <see cref="IAppWindowAdapter"/>.
+/// </summary>
 [ExcludeFromCodeCoverage]
 
 /// <summary>
