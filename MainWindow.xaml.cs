@@ -104,11 +104,6 @@ public sealed partial class MainWindow : Window
         }
     }
 
-    public object? FindName(string name)
-    {
-        return (this.Content as FrameworkElement)?.FindName(name);
-    }
-
     // --- WINDOW DRAGGING ---
     private void RootGrid_PointerPressed(object sender, PointerRoutedEventArgs e)
     {
