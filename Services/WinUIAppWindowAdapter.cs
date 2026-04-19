@@ -10,11 +10,7 @@ namespace Launchbox.Services;
 /// to implement <see cref="IAppWindowAdapter"/>.
 /// </summary>
 [ExcludeFromCodeCoverage]
-
-/// <summary>
-/// Production adapter that wraps <see cref="AppWindow"/> and a WinUI <see cref="Window"/>
-/// to implement <see cref="IAppWindowAdapter"/>.
-/// </summary>
+public sealed class WinUIAppWindowAdapter : IAppWindowAdapter, IDisposable
 public sealed class WinUIAppWindowAdapter : IAppWindowAdapter, IDisposable
 {
     private readonly AppWindow _appWindow;
