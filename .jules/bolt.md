@@ -23,3 +23,7 @@
 ## 2026-05-18 - Deferring Empty State UI Components
 **Learning:** Initial application rendering pays a heavy penalty instantiating unused elements when properties start as false. Standard `Visibility` bindings still instantiate all elements (like scalable icons or interactive buttons) into the visual tree.
 **Action:** Replace `Visibility="{x:Bind ..., Mode=OneWay}"` with `x:Load="{x:Bind ..., Mode=OneWay}"` and ensure an `x:Name` is present for non-essential UI sections (e.g. empty/fallback states) to completely skip their object creation and rendering phases on startup until actually needed.
+
+## 2026-05-18 - Missing FindName with x:Load
+**Learning:** Using `x:Load` requires the code-behind class to have a `FindName` method to find elements in the visual tree when lazily loading. In standard `Page` or `UserControl` this is typically handled by the framework, but for a raw `Window` it can fail to generate if you are targeting specific SDK setups.
+**Action:** When using `x:Load` in a `Window`, manually define `public object? FindName(string name) => (this.Content as FrameworkElement)?.FindName(name);` in the code-behind to satisfy the XAML compiler if it complains.

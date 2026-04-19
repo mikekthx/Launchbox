@@ -1,12 +1,11 @@
 using Microsoft.UI.Xaml;
 
-namespace Launchbox
+namespace Launchbox;
+
+public partial class MainWindow : Window
 {
-    public partial class MainWindow : Window
+    public object? FindName(string name)
     {
-        public object? FindName(string name)
-        {
-            return (this.Content as FrameworkElement)?.FindName(name);
-        }
+        return (this.Content as FrameworkElement)?.FindName(name);
     }
 }
