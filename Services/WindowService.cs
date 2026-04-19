@@ -86,6 +86,9 @@ public class WindowService : IWindowService, IDisposable
 
     public void Initialize()
     {
+        // Initialize() is only called on instances created via the public constructor.
+        // The internal test constructor sets _adapter directly and never calls Initialize().
+        System.Diagnostics.Debug.Assert(_window != null, "Initialize() called on test-constructed WindowService");
         _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window!);
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(_hWnd);
         var appWindow = AppWindow.GetFromWindowId(windowId);
