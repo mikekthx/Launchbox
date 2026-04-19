@@ -11,12 +11,13 @@ namespace Launchbox.Services;
 
 public class WindowService : IWindowService, IDisposable
 {
-    private readonly Window _window;
+    private readonly Window? _window;
     private readonly WindowPositionManager _positionManager;
     private readonly SettingsService _settingsService;
-    private readonly IFilePickerService _filePickerService;
+    private readonly IFilePickerService? _filePickerService;
     private readonly IDispatcher _dispatcher;
-    private AppWindow? _appWindow;
+    private IAppWindowAdapter? _adapter;
+    private INativeHotkeyService? _hotkeyService;
     private IntPtr _hWnd;
     private IntPtr _oldWndProc;
     private WndProcDelegate? _wndProcDelegate;
@@ -32,7 +33,7 @@ public class WindowService : IWindowService, IDisposable
     // temporarily reduced size on a small display is not saved as the user's intent.
     private bool _suppressSave;
 
-    public bool IsVisible => _window.Visible;
+    public bool IsVisible => _adapter?.IsVisible ?? false;
 
     public event EventHandler<bool>? VisibilityChanged;
     public event EventHandler? Showing;
@@ -56,6 +57,28 @@ public class WindowService : IWindowService, IDisposable
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
     }
 
+    internal WindowService(
+        IAppWindowAdapter adapter,
+        INativeHotkeyService hotkeyService,
+        WindowPositionManager positionManager,
+        SettingsService settingsService,
+        IDispatcher dispatcher)
+    {
+        ArgumentNullException.ThrowIfNull(adapter);
+        ArgumentNullException.ThrowIfNull(hotkeyService);
+        ArgumentNullException.ThrowIfNull(positionManager);
+        ArgumentNullException.ThrowIfNull(settingsService);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+
+        _adapter = adapter;
+        _hotkeyService = hotkeyService;
+        _positionManager = positionManager;
+        _settingsService = settingsService;
+        _dispatcher = dispatcher;
+
+        _settingsService.PropertyChanged += SettingsService_PropertyChanged;
+    }
+
     private void Window_VisibilityChanged(object sender, WindowVisibilityChangedEventArgs args)
     {
         VisibilityChanged?.Invoke(this, args.Visible);
@@ -63,19 +86,21 @@ public class WindowService : IWindowService, IDisposable
 
     public void Initialize()
     {
-        _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window);
+        _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(_window!);
         var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(_hWnd);
-        _appWindow = AppWindow.GetFromWindowId(windowId);
+        var appWindow = AppWindow.GetFromWindowId(windowId);
+        _adapter = new WinUIAppWindowAdapter(appWindow, _window!);
+        _hotkeyService = new Win32HotkeyService();
 
         // Window Setup
-        _window.ExtendsContentIntoTitleBar = true;
-        _appWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
-        _appWindow.IsShownInSwitchers = false;
+        _window!.ExtendsContentIntoTitleBar = true;
+        appWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
+        appWindow.IsShownInSwitchers = false;
 
         // Start Off-Screen
-        _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT));
-        _appWindow.Move(new Windows.Graphics.PointInt32(-10000, -10000));
-        _appWindow.Changed += AppWindow_Changed;
+        _adapter.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, Constants.WINDOW_HEIGHT));
+        _adapter.Move(new Windows.Graphics.PointInt32(-10000, -10000));
+        _adapter.PositionOrSizeChanged += Adapter_PositionOrSizeChanged;
 
         // Debounce timer for window position persistence — saves after 500ms of no movement
         _savePositionTimer = _window.DispatcherQueue.CreateTimer();
@@ -112,9 +137,9 @@ public class WindowService : IWindowService, IDisposable
         int key = _settingsService.HotkeyKey;
 
         // Unregister existing first
-        NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
+        _hotkeyService?.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
 
-        if (!NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key))
+        if (!(_hotkeyService?.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key) ?? false))
         {
             var errorMessage = $"Failed to register hotkey: {mod}+{key}";
             Trace.WriteLine(errorMessage);
@@ -122,7 +147,7 @@ public class WindowService : IWindowService, IDisposable
 
             if (_isHotkeyRegistered)
             {
-                if (NativeMethods.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)_currentMod, (uint)_currentKey))
+                if (_hotkeyService?.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)_currentMod, (uint)_currentKey) ?? false)
                 {
                     Trace.WriteLine($"Restored previous hotkey: {_currentMod}+{_currentKey}");
                     // Write back the restored values so persisted settings stay in sync with Win32 state.
@@ -146,11 +171,11 @@ public class WindowService : IWindowService, IDisposable
         }
     }
 
-    private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
+    private void Adapter_PositionOrSizeChanged(object? sender, EventArgs e)
     {
         if (_suppressSave) return;
 
-        if (_hasPositioned && (args.DidPositionChange || args.DidSizeChange))
+        if (_hasPositioned)
         {
             // Reset the debounce timer — only persists after 500ms of no movement
             _savePositionTimer?.Stop();
@@ -187,15 +212,15 @@ public class WindowService : IWindowService, IDisposable
     /// </summary>
     public void ToggleVisibility()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
 
         try
         {
-            bool isWindowCurrentlyVisible = _window.Visible && _hasPositioned;
+            bool isWindowCurrentlyVisible = _adapter.IsVisible && _hasPositioned;
 
             if (isWindowCurrentlyVisible)
             {
-                _appWindow.Hide();
+                _adapter.Hide();
                 return;
             }
 
@@ -223,11 +248,11 @@ public class WindowService : IWindowService, IDisposable
             }
 
             ClampToWorkArea();
-            // Raise Showing before AppWindow.Show so subscribers can set state that must be
+            // Raise Showing before adapter.Show so subscribers can set state that must be
             // ready before the Activated event fires (Activated is synchronous with SetForegroundWindow
             // and can fire before the async VisibilityChanged event).
             Showing?.Invoke(this, EventArgs.Empty);
-            _appWindow.Show();
+            _adapter.Show();
 
             if (NativeMethods.IsIconic(_hWnd))
             {
@@ -244,10 +269,10 @@ public class WindowService : IWindowService, IDisposable
 
     public void Hide()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
         try
         {
-            _appWindow.Hide();
+            _adapter.Hide();
         }
         catch (Exception ex)
         {
@@ -257,7 +282,7 @@ public class WindowService : IWindowService, IDisposable
 
     public void Exit()
     {
-        _window.Close();
+        _window?.Close();
     }
 
     private void SettingsWindow_Closed(object sender, WindowEventArgs args)
@@ -279,7 +304,7 @@ public class WindowService : IWindowService, IDisposable
 
         try
         {
-            _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService);
+            _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService!);
             _settingsWindow.Closed += SettingsWindow_Closed;
             _settingsWindow.Activate();
         }
@@ -291,13 +316,13 @@ public class WindowService : IWindowService, IDisposable
 
     public void ResetPosition()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
 
         try
         {
             _hasPositioned = true;
             CenterWindow();
-            _appWindow.Show();
+            _adapter.Show();
             NativeMethods.SetForegroundWindow(_hWnd);
             SaveWindowPosition();
         }
@@ -315,12 +340,13 @@ public class WindowService : IWindowService, IDisposable
         _disposed = true;
 
         // Unsubscribe managed events
-        _window.VisibilityChanged -= Window_VisibilityChanged;
+        _window?.VisibilityChanged -= Window_VisibilityChanged;
         _settingsService.PropertyChanged -= SettingsService_PropertyChanged;
 
-        if (_appWindow != null)
+        if (_adapter != null)
         {
-            _appWindow.Changed -= AppWindow_Changed;
+            _adapter.PositionOrSizeChanged -= Adapter_PositionOrSizeChanged;
+            (_adapter as IDisposable)?.Dispose();
         }
 
         if (_savePositionTimer != null)
@@ -346,7 +372,7 @@ public class WindowService : IWindowService, IDisposable
         // UI thread), not in a finalizer which runs on the GC thread.
         try
         {
-            NativeMethods.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
+            _hotkeyService?.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
 
             if (_oldWndProc != IntPtr.Zero)
             {
@@ -362,13 +388,13 @@ public class WindowService : IWindowService, IDisposable
 
     private void CenterWindow()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
 
         try
         {
-            var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
-            int height = Math.Min(Constants.WINDOW_HEIGHT, Math.Max(Constants.MIN_WINDOW_HEIGHT, displayArea.WorkArea.Height - Constants.WINDOW_WORKAREA_MARGIN));
-            _appWindow.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
+            var workArea = _adapter.GetWorkArea();
+            int height = Math.Min(Constants.WINDOW_HEIGHT, Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - Constants.WINDOW_WORKAREA_MARGIN));
+            _adapter.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
             CenterOnCurrentDisplay();
         }
         catch (Exception ex)
@@ -379,18 +405,18 @@ public class WindowService : IWindowService, IDisposable
 
     private void CenterOnCurrentDisplay()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
 
         try
         {
-            var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
-            var currentSize = _appWindow.Size;
+            var workArea = _adapter.GetWorkArea();
+            var currentSize = _adapter.Size;
             // Add display origin so centering works on secondary monitors (non-zero WorkArea.X/Y)
             // Clamp to work-area origin so the window never starts off the top or left edge
             // on a display smaller than the window (the OS min-size hook still prevents resizing below MIN_WINDOW_*).
-            var x = Math.Max(displayArea.WorkArea.X, displayArea.WorkArea.X + (displayArea.WorkArea.Width - currentSize.Width) / 2);
-            var y = Math.Max(displayArea.WorkArea.Y, displayArea.WorkArea.Y + (displayArea.WorkArea.Height - currentSize.Height) / 2);
-            _appWindow.Move(new Windows.Graphics.PointInt32(x, y));
+            var x = Math.Max(workArea.X, workArea.X + (workArea.Width - currentSize.Width) / 2);
+            var y = Math.Max(workArea.Y, workArea.Y + (workArea.Height - currentSize.Height) / 2);
+            _adapter.Move(new Windows.Graphics.PointInt32(x, y));
         }
         catch (Exception ex)
         {
@@ -406,14 +432,13 @@ public class WindowService : IWindowService, IDisposable
     /// </summary>
     private void ClampToWorkArea()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
 
         try
         {
-            var displayArea = DisplayArea.GetFromWindowId(_appWindow.Id, DisplayAreaFallback.Primary);
-            var workArea = displayArea.WorkArea;
-            var pos = _appWindow.Position;
-            var size = _appWindow.Size;
+            var workArea = _adapter.GetWorkArea();
+            var pos = _adapter.Position;
+            var size = _adapter.Size;
 
             int maxHeight = Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - Constants.WINDOW_WORKAREA_MARGIN);
             bool needsResize = size.Height > maxHeight;
@@ -438,7 +463,7 @@ public class WindowService : IWindowService, IDisposable
             {
                 if (needsResize)
                 {
-                    _appWindow.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
+                    _adapter.Resize(new Windows.Graphics.SizeInt32(clampedWidth, clampedHeight));
                 }
 
                 int newX = pos.X;
@@ -463,7 +488,7 @@ public class WindowService : IWindowService, IDisposable
 
                 if (needsMove)
                 {
-                    _appWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
+                    _adapter.Move(new Windows.Graphics.PointInt32(newX, newY));
                 }
             }
             finally
@@ -482,12 +507,12 @@ public class WindowService : IWindowService, IDisposable
 
     private void SaveWindowPosition()
     {
-        if (_appWindow == null) return;
+        if (_adapter == null) return;
 
         try
         {
-            var pos = _appWindow.Position;
-            var size = _appWindow.Size;
+            var pos = _adapter.Position;
+            var size = _adapter.Size;
             _positionManager.SaveWindowPosition(pos.X, pos.Y, size.Width, size.Height);
         }
         catch (Exception ex)
@@ -498,19 +523,18 @@ public class WindowService : IWindowService, IDisposable
 
     private bool RestoreWindowPosition()
     {
-        if (_appWindow == null) return false;
+        if (_adapter == null) return false;
 
         try
         {
             if (_positionManager.TryGetWindowPosition(out int x, out int y, out int w, out int h))
             {
                 var rect = new Windows.Graphics.RectInt32(x, y, w, h);
-                // Fallback.None returns null if the saved position is off all connected displays
+                // IsRectOnAnyDisplay returns false if the saved position is off all connected displays
                 // (e.g., after disconnecting a monitor). We detect this and center the window instead.
-                var displayArea = DisplayArea.GetFromRect(rect, DisplayAreaFallback.None);
-                if (displayArea != null)
+                if (_adapter.IsRectOnAnyDisplay(rect))
                 {
-                    _appWindow.MoveAndResize(rect);
+                    _adapter.MoveAndResize(rect);
                     return true;
                 }
             }
@@ -524,7 +548,7 @@ public class WindowService : IWindowService, IDisposable
 
     public void OnActivated(bool isDeactivated)
     {
-        if (_appWindow != null && isDeactivated)
+        if (_adapter != null && isDeactivated)
         {
             // Flush any pending debounced save before hiding
             if (_savePositionTimer != null && _savePositionTimer.IsRunning)
@@ -532,7 +556,7 @@ public class WindowService : IWindowService, IDisposable
                 _savePositionTimer.Stop();
                 SaveWindowPosition();
             }
-            _appWindow.Hide();
+            _adapter.Hide();
         }
     }
 }
