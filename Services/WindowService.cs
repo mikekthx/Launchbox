@@ -141,7 +141,8 @@ public sealed class WindowService : IWindowService, IDisposable
         int key = _settingsService.HotkeyKey;
 
         // Unregister existing first
-        _hotkeyService?.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
+        if (_hotkeyService == null) return;
+        _hotkeyService.UnregisterHotKey(_hWnd, Constants.HOTKEY_ID);
 
         if (!(_hotkeyService?.RegisterHotKey(_hWnd, Constants.HOTKEY_ID, (uint)mod, (uint)key) ?? false))
         {
