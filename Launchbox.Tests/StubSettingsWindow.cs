@@ -5,7 +5,7 @@ namespace Launchbox;
 
 // Compilation stub — SettingsWindow is referenced by WindowService but never instantiated
 // via the internal test constructor (which has no IFilePickerService).
-public sealed partial class SettingsWindow : Window
+internal sealed partial class SettingsWindow : Window
 {
     public SettingsWindow(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService) { }
 }
