@@ -28,7 +28,8 @@ public sealed class WindowService : IWindowService, IDisposable
     private int _currentMod;
     private int _currentKey;
     private bool _isHotkeyRegistered;
-    private DispatcherQueueTimer? _savePositionTimer;
+    private DispatcherQueueTimer? _savePositionTimer; // null for test-constructed instances; all call sites use ?.
+
     // Suppresses position persistence during display-time clamping so that a
     // temporarily reduced size on a small display is not saved as the user's intent.
     private bool _suppressSave;
@@ -257,6 +258,7 @@ public sealed class WindowService : IWindowService, IDisposable
             Showing?.Invoke(this, EventArgs.Empty);
             _adapter.Show();
 
+            // _hWnd is IntPtr.Zero for test-constructed instances, making these calls safe no-ops.
             if (NativeMethods.IsIconic(_hWnd))
             {
                 NativeMethods.ShowWindow(_hWnd, NativeMethods.SW_RESTORE);
@@ -307,7 +309,7 @@ public sealed class WindowService : IWindowService, IDisposable
 
         try
         {
-            _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService!);
+            _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService!); // ! safe: OpenSettings is never called on test-constructed instances
             _settingsWindow.Closed += SettingsWindow_Closed;
             _settingsWindow.Activate();
         }
@@ -326,7 +328,7 @@ public sealed class WindowService : IWindowService, IDisposable
             _hasPositioned = true;
             CenterWindow();
             _adapter.Show();
-            NativeMethods.SetForegroundWindow(_hWnd);
+            NativeMethods.SetForegroundWindow(_hWnd); // no-op for test instances (_hWnd == IntPtr.Zero)
             SaveWindowPosition();
         }
         catch (Exception ex)
