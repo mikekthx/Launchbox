@@ -994,4 +994,29 @@ public class MainViewModelTests
         // Assert: both files are visible after the watcher-triggered reload
         Assert.Equal(2, vm.FilteredApps.Count);
     }
+
+    [Fact]
+    public void CanLaunchApp_ReturnsTrue_WhenAppHasName()
+    {
+        using var vm = CreateViewModel();
+        var app = new AppItem { Name = "ValidApp" };
+        Assert.True(vm.LaunchAppCommand.CanExecute(app));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public void CanLaunchApp_ReturnsFalse_WhenAppHasNoName(string? name)
+    {
+        using var vm = CreateViewModel();
+        var app = new AppItem { Name = name! };
+        Assert.False(vm.LaunchAppCommand.CanExecute(app));
+    }
+
+    [Fact]
+    public void CanLaunchApp_ReturnsFalse_WhenParameterIsNotAppItem()
+    {
+        using var vm = CreateViewModel();
+        Assert.False(vm.LaunchAppCommand.CanExecute(new object()));
+    }
 }
