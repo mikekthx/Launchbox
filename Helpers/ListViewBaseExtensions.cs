@@ -1,6 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using System.Windows.Input;
+using Windows.System;
 
 namespace Launchbox.Helpers;
 
@@ -26,6 +28,13 @@ public static class ListViewBaseExtensions
             typeof(ICommand),
             typeof(ListViewBaseExtensions),
             new PropertyMetadata(null, OnDragItemsCompletedCommandPropertyChanged));
+
+    public static readonly DependencyProperty EnterCommandProperty =
+        DependencyProperty.RegisterAttached(
+            "EnterCommand",
+            typeof(ICommand),
+            typeof(ListViewBaseExtensions),
+            new PropertyMetadata(null, OnEnterCommandPropertyChanged));
 #pragma warning restore IDE1006
 
     public static void SetCommand(DependencyObject d, ICommand value)
@@ -93,6 +102,49 @@ public static class ListViewBaseExtensions
         if (command != null && command.CanExecute(null))
         {
             command.Execute(null);
+        }
+    }
+
+    public static void SetEnterCommand(DependencyObject d, ICommand value)
+    {
+        d.SetValue(EnterCommandProperty, value);
+    }
+
+    public static ICommand GetEnterCommand(DependencyObject d)
+    {
+        return (ICommand)d.GetValue(EnterCommandProperty);
+    }
+
+    private static void OnEnterCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is ListViewBase listViewBase)
+        {
+            listViewBase.KeyDown -= OnListViewBaseKeyDown;
+
+            if (e.NewValue is ICommand)
+            {
+                listViewBase.KeyDown += OnListViewBaseKeyDown;
+            }
+        }
+    }
+
+    private static void OnListViewBaseKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter) return;
+
+        e.Handled = true;
+
+        if (sender is ListViewBase listViewBase)
+        {
+            var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
+            if (focused != null)
+            {
+                var command = GetEnterCommand(listViewBase);
+                if (command != null && command.CanExecute(focused.DataContext))
+                {
+                    command.Execute(focused.DataContext);
+                }
+            }
         }
     }
 }

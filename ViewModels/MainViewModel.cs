@@ -443,7 +443,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         });
     }
 
-    [RelayCommand]
+    private bool CanLaunchApp(object? parameter)
+    {
+        return parameter is AppItem app && !string.IsNullOrEmpty(app.Name);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanLaunchApp))]
     private void LaunchApp(object? parameter)
     {
         if (parameter is AppItem app)

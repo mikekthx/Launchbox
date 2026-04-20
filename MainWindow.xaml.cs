@@ -250,19 +250,6 @@ public sealed partial class MainWindow : Window
     private object? FindName(string name) => ((FrameworkElement)Content).FindName(name);
 
     // --- KEYBOARD NAVIGATION ---
-    // WinUI GridView with IsItemClickEnabled does not fire ItemClick on Enter,
-    // so we query the focused element manually.
-    private void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key != VirtualKey.Enter) return;
-        // Always consume Enter at the grid level — prevent bubbling to parent scroll containers.
-        e.Handled = true;
-        if (sender is not GridView gridView) return;
-        var focused = FocusManager.GetFocusedElement(gridView.XamlRoot) as GridViewItem;
-        if (focused?.DataContext is AppItem item && !string.IsNullOrEmpty(item.Name))
-            ViewModel.LaunchAppCommand.Execute(item);
-    }
-
     // Typing while the grid has focus redirects characters to the search box,
     // so the user can start typing to filter without clicking the search box first.
     private void Grid_CharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
