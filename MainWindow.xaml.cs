@@ -244,6 +244,11 @@ public sealed partial class MainWindow : Window
         }
     }
 
+    // x:Load generates FindName calls in the XAML compiler output. Window does not inherit
+    // FrameworkElement, so FindName is absent from the base class; this delegates to the root
+    // content element to satisfy the generated code's contract.
+    private object? FindName(string name) => ((FrameworkElement)Content).FindName(name);
+
     // --- KEYBOARD NAVIGATION ---
     // WinUI GridView with IsItemClickEnabled does not fire ItemClick on Enter,
     // so we query the focused element manually.
