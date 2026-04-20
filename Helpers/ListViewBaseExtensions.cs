@@ -132,9 +132,6 @@ public static class ListViewBaseExtensions
     {
         if (e.Key != VirtualKey.Enter) return;
 
-        // Always consume Enter at the grid level — prevent bubbling to parent scroll containers.
-        e.Handled = true;
-
         if (sender is ListViewBase listViewBase)
         {
             // Cast to FrameworkElement instead of GridViewItem to support any ListViewBase
@@ -145,6 +142,8 @@ public static class ListViewBaseExtensions
                 var command = GetEnterCommand(listViewBase);
                 if (command is not null && command.CanExecute(focused.DataContext))
                 {
+                    // Only consume Enter if the command actually executes.
+                    e.Handled = true;
                     command.Execute(focused.DataContext);
                 }
             }
