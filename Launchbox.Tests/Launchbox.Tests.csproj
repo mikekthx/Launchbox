@@ -57,6 +57,7 @@
     <Compile Include="..\Services\NativeMethods.cs" Link="Services\NativeMethods.cs" />
     <Compile Include="..\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
     <Compile Include="..\Helpers\ImageHeaderParser.cs" Link="Helpers\ImageHeaderParser.cs" />
+    <!-- ListViewBaseExtensions.cs intentionally excluded: UI element dependency blocks testing without WinUI host -->
     <Compile Include="..\Helpers\IconHelper.cs" Link="Helpers\IconHelper.cs" />
     <Compile Include="..\Services\IconCacheEntry.cs" Link="Services\IconCacheEntry.cs" />
     <Compile Include="..\Services\SettingsService.cs" Link="Services\SettingsService.cs" />
@@ -81,7 +82,6 @@
     <Compile Include="..\Services\ShortcutFolderManager.cs" Link="Services\ShortcutFolderManager.cs" />
     <Compile Include="..\Models\AppItemGroup.cs" Link="Models\AppItemGroup.cs" />
     <Compile Include="..\Helpers\CollapseChevronConverter.cs" Link="Helpers\CollapseChevronConverter.cs" />
-
     <Compile Include="..\Services\IAppWindowAdapter.cs" Link="Services\IAppWindowAdapter.cs" />
     <Compile Include="..\Services\INativeHotkeyService.cs" Link="Services\INativeHotkeyService.cs" />
     <Compile Include="..\Services\WinUIAppWindowAdapter.cs" Link="Services\WinUIAppWindowAdapter.cs" />
