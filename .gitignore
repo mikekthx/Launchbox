@@ -6,6 +6,9 @@
 # Superpowers brainstorm session files
 .superpowers/
 
+# Superpowers plan/spec docs (local planning artifacts)
+docs/
+
 # dotenv files
 .env
 

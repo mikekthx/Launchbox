@@ -81,6 +81,11 @@
     <Compile Include="..\Services\ShortcutFolderManager.cs" Link="Services\ShortcutFolderManager.cs" />
     <Compile Include="..\Models\AppItemGroup.cs" Link="Models\AppItemGroup.cs" />
     <Compile Include="..\Helpers\CollapseChevronConverter.cs" Link="Helpers\CollapseChevronConverter.cs" />
+    <Compile Include="..\Services\IAppWindowAdapter.cs" Link="Services\IAppWindowAdapter.cs" />
+    <Compile Include="..\Services\INativeHotkeyService.cs" Link="Services\INativeHotkeyService.cs" />
+    <Compile Include="..\Services\WinUIAppWindowAdapter.cs" Link="Services\WinUIAppWindowAdapter.cs" />
+    <Compile Include="..\Services\Win32HotkeyService.cs" Link="Services\Win32HotkeyService.cs" />
+    <Compile Include="..\Services\WindowService.cs" Link="Services\WindowService.cs" />
   </ItemGroup>
 
 </Project>
