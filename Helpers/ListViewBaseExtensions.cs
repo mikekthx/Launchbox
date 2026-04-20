@@ -137,6 +137,8 @@ public static class ListViewBaseExtensions
 
         if (sender is ListViewBase listViewBase)
         {
+            // Cast to FrameworkElement instead of GridViewItem to support any ListViewBase
+            // and cases where focus lands on a child element inside the item template.
             var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
             if (focused is not null)
             {
