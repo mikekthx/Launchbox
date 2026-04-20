@@ -11,7 +11,6 @@ namespace Launchbox.Services;
 /// </summary>
 [ExcludeFromCodeCoverage]
 public sealed class WinUIAppWindowAdapter : IAppWindowAdapter, IDisposable
-public sealed class WinUIAppWindowAdapter : IAppWindowAdapter, IDisposable
 {
     private readonly AppWindow _appWindow;
     private readonly Window _window;
