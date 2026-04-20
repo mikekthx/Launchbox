@@ -132,15 +132,16 @@ public static class ListViewBaseExtensions
     {
         if (e.Key != VirtualKey.Enter) return;
 
+        // Always consume Enter at the grid level — prevent bubbling to parent scroll containers.
         e.Handled = true;
 
         if (sender is ListViewBase listViewBase)
         {
             var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
-            if (focused != null)
+            if (focused is not null)
             {
                 var command = GetEnterCommand(listViewBase);
-                if (command != null && command.CanExecute(focused.DataContext))
+                if (command is not null && command.CanExecute(focused.DataContext))
                 {
                     command.Execute(focused.DataContext);
                 }
