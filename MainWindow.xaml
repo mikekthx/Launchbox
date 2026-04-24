@@ -203,14 +203,23 @@
             </TextBox.KeyboardAccelerators>
         </TextBox>
 
-        <TextBlock x:Uid="MainWindow_NoMatches"
-                   x:Name="NoMatchesTextBlock"
-                   Grid.Row="0"
-                   Grid.RowSpan="2"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   FontSize="16"
-                   FontWeight="SemiBold"
-                   x:Load="{x:Bind ViewModel.HasNoMatches, Mode=OneWay}" />
+        <StackPanel x:Name="NoMatchesPanel"
+                    Grid.Row="0"
+                    Grid.RowSpan="2"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Spacing="12"
+                    x:Load="{x:Bind ViewModel.HasNoMatches, Mode=OneWay}">
+            <SymbolIcon Symbol="Find" RenderTransformOrigin="0.5,0.5"
+                        AutomationProperties.AccessibilityView="Raw">
+                <SymbolIcon.RenderTransform>
+                    <ScaleTransform ScaleX="2" ScaleY="2"/>
+                </SymbolIcon.RenderTransform>
+            </SymbolIcon>
+            <TextBlock x:Uid="MainWindow_NoMatches"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center"/>
+        </StackPanel>
     </Grid>
 </Window>
