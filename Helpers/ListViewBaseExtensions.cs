@@ -130,6 +130,8 @@ public static class ListViewBaseExtensions
 
     private static void OnListViewBaseKeyDown(object sender, KeyRoutedEventArgs e)
     {
+        if (e.Key != VirtualKey.Enter) return;
+
         if (sender is ListViewBase listViewBase)
         {
             // Cast to FrameworkElement instead of GridViewItem to support any ListViewBase
