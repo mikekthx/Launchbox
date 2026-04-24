@@ -1,8 +1,8 @@
+using System;
 using System.Windows.Input;
+using Launchbox.Helpers;
 using Windows.System;
 using Xunit;
-using Launchbox.Helpers;
-using System;
 
 namespace Launchbox.Tests;
 
