@@ -130,23 +130,33 @@ public static class ListViewBaseExtensions
 
     private static void OnListViewBaseKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key != VirtualKey.Enter) return;
-
         if (sender is ListViewBase listViewBase)
         {
             // Cast to FrameworkElement instead of GridViewItem to support any ListViewBase
             // and cases where focus lands on a child element inside the item template.
             var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
-            if (focused is not null)
+            var command = GetEnterCommand(listViewBase);
+
+            if (TryExecuteEnterCommand(e.Key, command, focused?.DataContext))
             {
-                var command = GetEnterCommand(listViewBase);
-                if (command is not null && command.CanExecute(focused.DataContext))
-                {
-                    // Only consume Enter if the command actually executes.
-                    e.Handled = true;
-                    command.Execute(focused.DataContext);
-                }
+                // Only consume Enter if the command actually executes.
+                e.Handled = true;
             }
         }
+    }
+
+    // Extracted as an internal method for isolated unit testing without requiring
+    // the WinUI host to instantiate FocusManager or KeyRoutedEventArgs.
+    internal static bool TryExecuteEnterCommand(VirtualKey key, ICommand? command, object? dataContext)
+    {
+        if (key != VirtualKey.Enter) return false;
+
+        if (command is not null && dataContext is not null && command.CanExecute(dataContext))
+        {
+            command.Execute(dataContext);
+            return true;
+        }
+
+        return false;
     }
 }
