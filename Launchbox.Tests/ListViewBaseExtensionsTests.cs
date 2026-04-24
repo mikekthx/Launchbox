@@ -1,6 +1,6 @@
+using Launchbox.Helpers;
 using System;
 using System.Windows.Input;
-using Launchbox.Helpers;
 using Windows.System;
 using Xunit;
 
@@ -14,7 +14,7 @@ public class ListViewBaseExtensionsTests
         public object? ExecutedParameter { get; private set; }
         public bool WasExecuted { get; private set; }
 
-        public event EventHandler? CanExecuteChanged { add {} remove {} }
+        public event EventHandler? CanExecuteChanged { add { } remove { } }
 
         public bool CanExecute(object? parameter) => CanExecuteResult;
 
