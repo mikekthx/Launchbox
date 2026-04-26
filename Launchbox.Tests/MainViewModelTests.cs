@@ -1019,4 +1019,11 @@ public class MainViewModelTests
         using var vm = CreateViewModel();
         Assert.False(vm.LaunchAppCommand.CanExecute(new object()));
     }
+
+    [Fact]
+    public void CanLaunchApp_ReturnsFalse_WhenParameterIsNull()
+    {
+        using var vm = CreateViewModel();
+        Assert.False(vm.LaunchAppCommand.CanExecute(null));
+    }
 }
