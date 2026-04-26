@@ -1,6 +1,6 @@
 name: Store Sync
 
-# Polls the Microsoft Store every 6 hours and publishes the matching draft GitHub Release
+# Polls the Microsoft Store every hour and publishes the matching draft GitHub Release
 # once the submitted version is certified. Can also be triggered manually.
 on:
   schedule:
@@ -18,6 +18,7 @@ jobs:
   sync:
     name: Publish Draft When Store Certifies
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Check Store certification and publish draft release
