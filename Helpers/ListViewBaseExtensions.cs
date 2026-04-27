@@ -1,4 +1,3 @@
-using Launchbox.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -67,9 +66,9 @@ public static class ListViewBaseExtensions
         {
             var command = GetCommand(listViewBase);
             var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as SelectorItem;
-            if (focused?.DataContext is AppItem item && !string.IsNullOrEmpty(item.Name) && command != null && command.CanExecute(item))
+            if (focused?.DataContext != null && command != null && command.CanExecute(focused.DataContext))
             {
-                command.Execute(item);
+                command.Execute(focused.DataContext);
             }
         }
     }
