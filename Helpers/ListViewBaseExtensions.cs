@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using System.Windows.Input;
 using Windows.System;
 
@@ -64,10 +65,10 @@ public static class ListViewBaseExtensions
         if (sender is ListViewBase listViewBase)
         {
             var command = GetCommand(listViewBase);
-            var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
-            if (focused?.DataContext != null && command != null && command.CanExecute(focused.DataContext))
+            var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as SelectorItem;
+            if (focused?.DataContext is Models.AppItem item && !string.IsNullOrEmpty(item.Name) && command != null && command.CanExecute(item))
             {
-                command.Execute(focused.DataContext);
+                command.Execute(item);
             }
         }
     }
