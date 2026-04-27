@@ -139,7 +139,6 @@
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
-                  KeyDown="Grid_KeyDown"
                   CharacterReceived="Grid_CharacterReceived"
                   CanReorderItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   AllowDrop="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
@@ -162,7 +161,6 @@
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
-                  KeyDown="Grid_KeyDown"
                   CharacterReceived="Grid_CharacterReceived"
                   ItemTemplate="{StaticResource AppItemTemplate}">
 
