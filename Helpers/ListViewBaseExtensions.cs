@@ -1,6 +1,9 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
 using System.Windows.Input;
+using Windows.System;
 
 namespace Launchbox.Helpers;
 
@@ -44,10 +47,28 @@ public static class ListViewBaseExtensions
         {
             // Unsubscribe first to prevent duplicate handler registration if the command changes.
             listViewBase.ItemClick -= OnItemClick;
+            listViewBase.KeyDown -= OnKeyDown;
 
             if (e.NewValue is ICommand)
             {
                 listViewBase.ItemClick += OnItemClick;
+                listViewBase.KeyDown += OnKeyDown;
+            }
+        }
+    }
+
+    private static void OnKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter) return;
+        // Always consume Enter at the grid level — prevent bubbling to parent scroll containers.
+        e.Handled = true;
+        if (sender is ListViewBase listViewBase)
+        {
+            var command = GetCommand(listViewBase);
+            var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as SelectorItem;
+            if (focused?.DataContext != null && command != null && command.CanExecute(focused.DataContext))
+            {
+                command.Execute(focused.DataContext);
             }
         }
     }
