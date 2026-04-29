@@ -4,6 +4,7 @@ Launchbox is a modern, lightweight Windows desktop application launcher built wi
 
 [![Build](https://img.shields.io/github/actions/workflow/status/mikekthx/Launchbox/dotnet-desktop.yml?style=for-the-badge&label=Build)](https://github.com/mikekthx/Launchbox/actions/workflows/dotnet-desktop.yml)
 [![CodeQL](https://img.shields.io/badge/CodeQL-Passing-brightgreen?style=for-the-badge)](https://github.com/mikekthx/Launchbox/security/code-scanning)
+[![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/mikekthx/Launchbox?style=for-the-badge&label=Scorecard)](https://securityscorecards.dev/viewer/?uri=github.com/mikekthx/Launchbox)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512bd4?style=for-the-badge)](https://dotnet.microsoft.com/)
 [![WinUI](https://img.shields.io/badge/WinUI-3-0078d4?style=for-the-badge)](https://learn.microsoft.com/en-us/windows/apps/winui/)
 [![License](https://img.shields.io/github/license/mikekthx/Launchbox?style=for-the-badge)](https://github.com/mikekthx/Launchbox/blob/main/LICENSE)
