@@ -1,0 +1,36 @@
+name: Stale
+
+on:
+  schedule:
+    # Run daily at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/stale@b5d41d4e1d5dceea10e7104786b73624c18a190f # v10.2.0
+        with:
+          days-before-stale: 60
+          days-before-close: 7
+          stale-issue-message: >
+            This issue has had no activity for 60 days. It will be closed in 7 days
+            if there is no further activity. Add a comment or label to keep it open.
+          stale-pr-message: >
+            This PR has had no activity for 60 days and has been marked as stale.
+            Push a commit or comment to keep it open.
+          close-issue-message: 'Closing due to inactivity. Reopen if this is still relevant.'
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: 'pinned,security,bug'
+          exempt-pr-labels: 'pinned,security,bug'
+          # Don't close PRs automatically — only issues. Stale PRs stay open for
+          # manual review since they may contain useful work-in-progress.
+          days-before-pr-close: -1
