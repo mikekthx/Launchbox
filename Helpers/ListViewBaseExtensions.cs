@@ -38,7 +38,7 @@ public static class ListViewBaseExtensions
             new PropertyMetadata(null, OnEnterCommandPropertyChanged));
 #pragma warning restore IDE1006
 
-    // Every member below is WinUI attached-property plumbing: DP get/set accessors or event
+    // Most members below are WinUI attached-property plumbing: DP get/set accessors or event
     // handlers that subscribe to ListViewBase events. None can be exercised from the file-linked
     // xUnit test project without a live WinUI host (which throws COMException in unpackaged test
     // contexts). The pure decision logic is hoisted into TryExecuteEnterCommand, which IS covered.
@@ -135,6 +135,7 @@ public static class ListViewBaseExtensions
     {
         if (d is ListViewBase listViewBase)
         {
+            // Unsubscribe first to prevent duplicate handler registration if the command changes.
             listViewBase.KeyDown -= OnListViewBaseKeyDown;
 
             if (e.NewValue is ICommand)
@@ -148,19 +149,17 @@ public static class ListViewBaseExtensions
     private static void OnListViewBaseKeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (e.Key != VirtualKey.Enter) return;
+        if (sender is not ListViewBase listViewBase) return;
 
-        if (sender is ListViewBase listViewBase)
+        // Cast to FrameworkElement instead of GridViewItem to support any ListViewBase
+        // and cases where focus lands on a child element inside the item template.
+        var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
+        var command = GetEnterCommand(listViewBase);
+
+        if (TryExecuteEnterCommand(e.Key, command, focused?.DataContext))
         {
-            // Cast to FrameworkElement instead of GridViewItem to support any ListViewBase
-            // and cases where focus lands on a child element inside the item template.
-            var focused = FocusManager.GetFocusedElement(listViewBase.XamlRoot) as FrameworkElement;
-            var command = GetEnterCommand(listViewBase);
-
-            if (TryExecuteEnterCommand(e.Key, command, focused?.DataContext))
-            {
-                // Only consume Enter if the command actually executes.
-                e.Handled = true;
-            }
+            // Only consume Enter if the command actually executes.
+            e.Handled = true;
         }
     }
 

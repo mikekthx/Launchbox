@@ -30,9 +30,8 @@ public class ShortcutService : IShortcutService
 
         try
         {
-            var allowedExtensionsSet = new HashSet<string>(allowedExtensions, StringComparer.OrdinalIgnoreCase);
             return _fileSystem.EnumerateFiles(folderPath)
-                .Where(f => allowedExtensionsSet.Contains(Path.GetExtension(f) ?? string.Empty))
+                .Where(f => allowedExtensions.Contains(Path.GetExtension(f) ?? string.Empty, StringComparer.OrdinalIgnoreCase))
                 .OrderBy(f => Path.GetFileName(f))
                 .ToArray();
         }
