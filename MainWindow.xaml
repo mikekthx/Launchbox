@@ -173,7 +173,7 @@
                         Background="Transparent"
                         AutomationProperties.Name="{x:Bind Label}"
                         ToolTipService.ToolTip="{x:Bind Label}"
-                        AutomationProperties.ExpandCollapseState="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseStateConverter}}"
+                        AutomationProperties.ItemStatus="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseStateConverter}}"
                         helpers:UIElementExtensions.TappedCommand="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.ToggleGroupCommand}"
                         helpers:UIElementExtensions.TappedCommandParameter="{Binding}">
                     <FontIcon Glyph="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
