@@ -36,10 +36,10 @@ jobs:
   release:
     name: Build, Submit, and Draft Release
     runs-on: windows-latest
+    timeout-minutes: 60
 
     env:
       Solution_Name: Launchbox.sln
-      Project_Directory: .
       Project_Path: Launchbox.csproj
       Test_Project_Path: Launchbox.Tests\Launchbox.Tests.csproj
 
@@ -131,7 +131,9 @@ jobs:
       - name: Decode and install the pfx
         run: |
           $pfx_cert_byte = [System.Convert]::FromBase64String($env:BASE64_PFX)
-          $certificatePath = Join-Path -Path $env:Project_Directory -ChildPath GitHubActionsWorkflow.pfx
+          $certificatePath = Join-Path -Path $env:RUNNER_TEMP -ChildPath GitHubActionsWorkflow.pfx
+          # Write path immediately so cleanup step can find the file even if later steps fail
+          echo "PFX_PATH=$certificatePath" >> $env:GITHUB_ENV
           [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
           $pwd = ConvertTo-SecureString -String $env:PFX_KEY -Force -AsPlainText
           $cert = Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $pwd
@@ -157,7 +159,7 @@ jobs:
       - name: Remove pfx and cert
         if: always()
         run: |
-          Remove-Item -Path $env:Project_Directory\GitHubActionsWorkflow.pfx -ErrorAction SilentlyContinue
+          Remove-Item -Path "$env:PFX_PATH" -ErrorAction SilentlyContinue
           if ($env:CERT_THUMBPRINT) {
             Get-ChildItem Cert:\CurrentUser\My\$env:CERT_THUMBPRINT -ErrorAction SilentlyContinue | Remove-Item
           }

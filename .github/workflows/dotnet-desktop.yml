@@ -20,6 +20,7 @@ jobs:
   analyze:
     name: Security Scan (CodeQL)
     runs-on: windows-latest
+    timeout-minutes: 15
     concurrency:
       group: ${{ github.workflow }}-analyze-${{ github.ref }}
       cancel-in-progress: true
@@ -39,6 +40,8 @@ jobs:
   build:
     # Skip build/test on scheduled runs — schedule is for CodeQL only
     if: github.event_name != 'schedule'
+
+    timeout-minutes: 20
 
     concurrency:
       group: ${{ github.workflow }}-build-${{ github.ref }}
