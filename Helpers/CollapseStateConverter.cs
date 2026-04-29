@@ -1,5 +1,5 @@
-using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Automation;
+using Microsoft.UI.Xaml.Data;
 using System;
 
 namespace Launchbox.Helpers;
