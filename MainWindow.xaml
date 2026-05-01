@@ -118,7 +118,7 @@
                     Style="{ThemeResource AccentButtonStyle}"
                     Margin="0,8,0,0">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <SymbolIcon Symbol="Folder" />
+                    <SymbolIcon Symbol="Folder" AutomationProperties.AccessibilityView="Raw" />
                     <TextBlock x:Uid="MainWindow_OpenFolderText" />
                 </StackPanel>
             </Button>
@@ -176,6 +176,7 @@
                         helpers:UIElementExtensions.TappedCommandParameter="{Binding}">
                     <FontIcon Glyph="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
+                              AutomationProperties.AccessibilityView="Raw"
                               Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled,
                                            Converter={StaticResource BooleanToVisibilityConverter}}" />
                     <TextBlock Grid.Column="1" Text="{x:Bind Label}"
