@@ -8,14 +8,13 @@ namespace Launchbox.Helpers;
 
 internal static class AppItemSorter
 {
-    public static List<AppItem> OrderAppItems(List<AppItem> items, Func<string, IReadOnlyList<string>> getCustomOrder)
+    public static List<AppItem> OrderAppItems(List<AppItem> items, IReadOnlyDictionary<string, IReadOnlyList<string>> customOrders)
     {
         return items
             .GroupBy(a => a.FolderPath)
             .SelectMany(g =>
             {
-                var customOrder = getCustomOrder(g.Key);
-                if (customOrder.Count == 0)
+                if (!customOrders.TryGetValue(g.Key, out var customOrder) || customOrder.Count == 0)
                     return (IEnumerable<AppItem>)g.OrderBy(a => a.Name);
 
                 var orderIndex = new Dictionary<string, int>(customOrder.Count, StringComparer.OrdinalIgnoreCase);

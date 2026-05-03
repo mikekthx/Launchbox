@@ -90,6 +90,20 @@ public class SettingsService : ObservableObject
     private const int MAX_ITEM_ORDERS_BYTES = 7168;
 
     /// <summary>
+    /// Returns all custom display orders for all folders in a single call.
+    /// </summary>
+    public IReadOnlyDictionary<string, IReadOnlyList<string>> GetItemOrders()
+    {
+        var dict = DeserializeItemOrders();
+        var result = new Dictionary<string, IReadOnlyList<string>>(dict.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (var kvp in dict)
+        {
+            result[kvp.Key] = kvp.Value;
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Returns the custom display order for shortcuts in <paramref name="folderPath"/>
     /// as an ordered list of file names (e.g. "Notepad.lnk").
     /// Returns an empty list if no custom order has been saved.
@@ -97,9 +111,11 @@ public class SettingsService : ObservableObject
     public IReadOnlyList<string> GetItemOrder(string folderPath)
     {
         var dict = DeserializeItemOrders();
-        var key = dict.Keys.FirstOrDefault(
-            k => k.Equals(folderPath, StringComparison.OrdinalIgnoreCase));
-        return key != null ? dict[key] : [];
+        if (dict.TryGetValue(folderPath, out var order))
+        {
+            return order;
+        }
+        return [];
     }
 
     /// <summary>
