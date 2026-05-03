@@ -196,6 +196,37 @@ public class SettingsServiceTests
     }
 
     [Fact]
+    public void GetItemOrders_ReturnsEmpty_WhenNotSet()
+    {
+        var svc = new SettingsService(
+            new MockSettingsStore(),
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        var orders = svc.GetItemOrders();
+
+        Assert.NotNull(orders);
+        Assert.Empty(orders);
+    }
+
+    [Fact]
+    public void GetItemOrders_ReturnsCaseInsensitiveDictionary()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        svc.SetItemOrder(@"C:\FolderA", ["A1.lnk"]);
+
+        var orders = svc.GetItemOrders();
+
+        Assert.Single(orders);
+        Assert.Equal(["A1.lnk"], orders[@"c:\foldera"]);
+    }
+
+    [Fact]
     public void SetItemOrder_PersistsAndRetrievesOrder()
     {
         var store = new MockSettingsStore();
