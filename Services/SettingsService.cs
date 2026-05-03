@@ -95,12 +95,10 @@ public class SettingsService : ObservableObject
     public IReadOnlyDictionary<string, IReadOnlyList<string>> GetItemOrders()
     {
         var dict = DeserializeItemOrders();
-        var result = new Dictionary<string, IReadOnlyList<string>>(dict.Count, StringComparer.OrdinalIgnoreCase);
-        foreach (var kvp in dict)
-        {
-            result[kvp.Key] = kvp.Value;
-        }
-        return result;
+        return dict.ToDictionary(
+            kvp => kvp.Key,
+            kvp => (IReadOnlyList<string>)kvp.Value,
+            StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>

@@ -177,6 +177,25 @@ public class SettingsServiceTests
     }
 
     [Fact]
+    public void GetItemOrders_ReturnsAllPersistedOrders()
+    {
+        var store = new MockSettingsStore();
+        var svc = new SettingsService(
+            store,
+            new MockStartupService(),
+            new ShortcutFolderManager(new MockSettingsStore()));
+
+        svc.SetItemOrder(@"C:\FolderA", ["A1.lnk"]);
+        svc.SetItemOrder(@"C:\FolderB", ["B1.lnk"]);
+
+        var orders = svc.GetItemOrders();
+
+        Assert.Equal(2, orders.Count);
+        Assert.Equal(["A1.lnk"], orders[@"C:\FolderA"]);
+        Assert.Equal(["B1.lnk"], orders[@"C:\FolderB"]);
+    }
+
+    [Fact]
     public void SetItemOrder_PersistsAndRetrievesOrder()
     {
         var store = new MockSettingsStore();
