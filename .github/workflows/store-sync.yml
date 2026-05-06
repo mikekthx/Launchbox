@@ -72,20 +72,19 @@ jobs:
             $failedStatuses = @('CommitFailed', 'PreProcessingFailed', 'CertificationFailed', 'PublishFailed')
 
             if ($pending.status -in $failedStatuses) {
-              @"
-## :x: Store Certification Failed
-
-The pending Store submission has failed with status **$($pending.status)**.
-
-**Affected draft releases:** $draftNames
-
-### Next steps
-1. Open Partner Center and review the rejection details
-2. Fix the issue in code and commit it
-3. Delete the draft release(s): ``gh release delete <tag> --yes``
-4. Delete and re-push the tag to trigger a new release build
-
-"@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+              @(
+                '## :x: Store Certification Failed'
+                ''
+                "The pending Store submission has failed with status **$($pending.status)**."
+                ''
+                "**Affected draft releases:** $draftNames"
+                ''
+                '### Next steps'
+                '1. Open Partner Center and review the rejection details'
+                '2. Fix the issue in code and commit it'
+                '3. Delete the draft release(s): ``gh release delete <tag> --yes``'
+                '4. Delete and re-push the tag to trigger a new release build'
+              ) -join "`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
               Write-Host "::error::Store certification failed: $($pending.status)"
               exit 1
             }
@@ -143,15 +142,14 @@ The pending Store submission has failed with status **$($pending.status)**.
             # Draft releases exist but don't match the current published Store version.
             # This is normal if the submission was recently committed and is still being processed.
             # If it persists across many polling intervals, check Partner Center manually.
-            @"
-## :hourglass_flowing_sand: Draft Release Pending — No Match Yet
-
-Draft releases ($draftNames) do not match the current published Store version ($publishedVersion).
-
-This is expected while a new submission is processing. If this message persists for more than
-48 hours, open Partner Center to check the submission status — a failure may have occurred
-without an explicit status change.
-
-"@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+            @(
+              '## :hourglass_flowing_sand: Draft Release Pending — No Match Yet'
+              ''
+              "Draft releases ($draftNames) do not match the current published Store version ($publishedVersion)."
+              ''
+              'This is expected while a new submission is processing. If this message persists for more than'
+              '48 hours, open Partner Center to check the submission status — a failure may have occurred'
+              'without an explicit status change.'
+            ) -join "`n" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
             Write-Host "No draft release matches Store version $publishedVersion. Will check again at the next scheduled run."
           }

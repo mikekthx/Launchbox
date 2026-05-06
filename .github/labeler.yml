@@ -9,9 +9,10 @@ ui:
 core-logic:
   - changed-files:
     - any-glob-to-any-file:
-      - '**/*.cs'
-      - '!**/*.xaml.cs'
-      - '!**/*.Tests/**/*.cs'
+      - 'Helpers/**/*.cs'
+      - 'Models/**/*.cs'
+      - 'Services/**/*.cs'
+      - 'ViewModels/**/*.cs'
 
 # Categorizes changes to the unit testing project
 tests:
