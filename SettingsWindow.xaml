@@ -79,7 +79,7 @@
 
                 <Button x:Uid="Settings_AddFolder" Command="{x:Bind ViewModel.AddFolderCommand}" Margin="0,8,0,0">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <SymbolIcon Symbol="Add" />
+                        <SymbolIcon Symbol="Add" AutomationProperties.AccessibilityView="Raw" />
                         <TextBlock x:Uid="Settings_AddFolderText" />
                     </StackPanel>
                 </Button>

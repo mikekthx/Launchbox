@@ -244,4 +244,10 @@
   <data name="Settings_RenameFolder_Cancel" xml:space="preserve">
     <value>キャンセル</value>
   </data>
+  <data name="CollapseState_Collapsed" xml:space="preserve">
+    <value>折りたたまれています</value>
+  </data>
+  <data name="CollapseState_Expanded" xml:space="preserve">
+    <value>展開されています</value>
+  </data>
 </root>
