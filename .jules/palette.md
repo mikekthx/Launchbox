@@ -12,3 +12,6 @@
 ## 2026-03-27 - Grid Toggle Button Accessibility
 **Learning:** In custom WinUI layouts, using a `Grid` with a tapped command (e.g., for a collapsible group header) makes it function as a button but entirely lacks accessibility semantics by default. Furthermore, without a `Background` explicitly set (e.g., `Background="Transparent"`), empty space in the Grid does not receive hit test events, making the interaction area unpredictably small.
 **Action:** Always ensure interactive layout panels (like Grids or StackPanels) have `Background="Transparent"` for proper hit-testing, and explicitly define `AutomationProperties.Name` and an appropriate `ToolTipService.ToolTip` so screen readers and mouse users understand the control's purpose. Note that `AutomationProperties.Role` is an HTML/ARIA concept and does not exist in WinUI 3; avoid using it to prevent XAML compilation errors.
+## 2026-05-01 - Screen Reader Noise from Decorative Icons
+**Learning:** Screen readers announce `SymbolIcon` and `FontIcon` elements by default, causing redundant reading when next to a text label, or reading unintelligible unicode characters in icon-only buttons.
+**Action:** Always add `AutomationProperties.AccessibilityView="Raw"` to purely decorative `SymbolIcon` and `FontIcon` elements to remove them from the UI Automation tree and reduce screen reader noise.
