@@ -15,3 +15,6 @@
 ## 2026-05-01 - Screen Reader Noise from Decorative Icons
 **Learning:** Screen readers announce `SymbolIcon` and `FontIcon` elements by default, causing redundant reading when next to a text label, or reading unintelligible unicode characters in icon-only buttons.
 **Action:** Always add `AutomationProperties.AccessibilityView="Raw"` to purely decorative `SymbolIcon` and `FontIcon` elements to remove them from the UI Automation tree and reduce screen reader noise.
+## 2026-05-06 - Hit-Testing Empty Space in WinUI
+**Learning:** In WinUI/UWP/WPF, interactive layout panels (such as `StackPanel` or `Grid`) with a null background do not register pointer events in their empty/transparent spaces.
+**Action:** Explicitly set `Background="Transparent"` to ensure the entire bounds of the element are hit-testable, especially for drag-and-drop or click targets like an `AppItemTemplate`.

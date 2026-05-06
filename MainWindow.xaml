@@ -32,8 +32,10 @@
                  same Tag value). Visibility hides empty-name placeholders in grouped mode;
                  harmless for flat mode where names are always non-empty. -->
             <DataTemplate x:Key="AppItemTemplate" x:DataType="models:AppItem">
+                <!-- Background="Transparent" is required here to make the empty space within the StackPanel hit-testable -->
                 <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
                             Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
+                            Background="Transparent"
                             Spacing="4"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -71,14 +73,14 @@
                                     AutomationProperties.Name="{Binding ViewModel.ToggleWindowText, Mode=OneWay}"
                                     Command="{Binding ViewModel.ToggleWindowCommand}">
                         <MenuFlyoutItem.Icon>
-                            <SymbolIcon Symbol="View" />
+                            <SymbolIcon Symbol="View" AutomationProperties.AccessibilityView="Raw" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                     <MenuFlyoutItem Text="{Binding ViewModel.SettingsMenuText, Mode=OneWay}"
                                     AutomationProperties.Name="{Binding ViewModel.SettingsMenuText, Mode=OneWay}"
                                     Command="{Binding ViewModel.OpenSettingsCommand}">
                         <MenuFlyoutItem.Icon>
-                            <SymbolIcon Symbol="Setting" />
+                            <SymbolIcon Symbol="Setting" AutomationProperties.AccessibilityView="Raw" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                     <MenuFlyoutSeparator />
@@ -86,7 +88,7 @@
                                     AutomationProperties.Name="{Binding ViewModel.ExitMenuText, Mode=OneWay}"
                                     Command="{Binding ViewModel.ExitCommand}">
                         <MenuFlyoutItem.Icon>
-                            <SymbolIcon Symbol="Cancel" />
+                            <SymbolIcon Symbol="Cancel" AutomationProperties.AccessibilityView="Raw" />
                         </MenuFlyoutItem.Icon>
                     </MenuFlyoutItem>
                 </MenuFlyout>
