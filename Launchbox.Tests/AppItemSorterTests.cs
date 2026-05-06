@@ -25,7 +25,7 @@ public class AppItemSorterTests
             { "C:\\Folder1", ["mango.lnk", "apple.lnk"] }
         };
 
-        var result = AppItemSorter.OrderAppItems(items, path => customOrders.TryGetValue(path, out var list) ? list : []);
+        var result = AppItemSorter.OrderAppItems(items, customOrders);
 
         // Expected order:
         // Custom items first: Mango, Apple
@@ -53,7 +53,7 @@ public class AppItemSorterTests
             { "C:\\Folder1", ["apple.lnk"] }
         };
 
-        var result = AppItemSorter.OrderAppItems(items, path => customOrders.TryGetValue(path, out var list) ? list : []);
+        var result = AppItemSorter.OrderAppItems(items, customOrders);
 
         // Custom orders puts apple.lnk items first. They share index 0. Then Zebra.
         Assert.Equal(3, result.Count);

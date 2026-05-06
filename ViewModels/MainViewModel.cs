@@ -348,7 +348,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private List<AppItem> OrderAppItems(List<AppItem> items)
     {
         // Apply custom item order per folder, falling back to alphabetical for unordered items.
-        return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrder);
+        return AppItemSorter.OrderAppItems(items, _settingsService.GetItemOrders());
     }
 
     // Falls back to the raw folder name for apps whose origin folder is no longer configured.
