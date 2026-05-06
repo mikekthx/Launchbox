@@ -14,7 +14,7 @@ Only the latest release receives security fixes.
 **Do not open a public issue for security vulnerabilities.**
 
 Use GitHub's private vulnerability reporting:
-👉 [Report a vulnerability](../../security/advisories/new)
+👉 [Report a vulnerability](https://github.com/mikekthx/Launchbox/security/advisories/new)
 
 We will acknowledge the report within **48 hours** and aim to release a patch within **14 days** for critical issues.
 
