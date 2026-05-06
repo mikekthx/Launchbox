@@ -32,6 +32,7 @@
                  same Tag value). Visibility hides empty-name placeholders in grouped mode;
                  harmless for flat mode where names are always non-empty. -->
             <DataTemplate x:Key="AppItemTemplate" x:DataType="models:AppItem">
+                <!-- Background="Transparent" is required here to make the empty space within the StackPanel hit-testable -->
                 <StackPanel Width="{Binding Tag.ItemWidth, ElementName=AppGrid}"
                             Height="{Binding Tag.ItemHeight, ElementName=AppGrid}"
                             Background="Transparent"
