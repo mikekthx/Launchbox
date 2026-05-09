@@ -46,7 +46,8 @@
                           helpers:ListViewBaseExtensions.DragItemsCompletedCommand="{x:Bind ViewModel.PersistFolderSequenceCommand}">
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
-                      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4">
+                      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
+                            Background="Transparent">
                         <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
                           <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
