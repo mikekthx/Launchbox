@@ -77,20 +77,23 @@ jobs:
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-release-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-nuget-release-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-release-
             ${{ runner.os }}-nuget-
 
+      - name: Restore dependencies
+        run: dotnet restore $env:Solution_Name --locked-mode
+
       # Format check is always mandatory — it runs in under 30 seconds and catches
       # malformed files that would fail the build anyway.
       - name: Verify Code Format
-        run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
+        run: dotnet format $env:Solution_Name --no-restore --verify-no-changes --verbosity minimal
 
       - name: Execute unit tests
         id: run_tests
         if: inputs.skip_quality_checks != 'true'
-        run: dotnet test $env:Test_Project_Path --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
+        run: dotnet test $env:Test_Project_Path --no-restore --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
 
       - name: Check coverage threshold
         if: inputs.skip_quality_checks != 'true'
@@ -145,6 +148,7 @@ jobs:
       - name: Build and package MSIX
         run: >-
           dotnet build $env:Project_Path
+          --no-restore
           --configuration Release
           -p:UapAppxPackageBuildMode=StoreUpload
           -p:AppxBundle=Always

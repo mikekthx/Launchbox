@@ -24,9 +24,12 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
         with:
-          dotnet-version: '10.0.x'
+          global-json-file: global.json
 
       - name: Restore packages
+        # --locked-mode is intentionally absent: this job runs on ubuntu-latest for speed,
+        # and NuGet lock file validation is OS-sensitive for Windows-targeted projects.
+        # Locked restore is enforced by the windows-latest build and release workflows.
         run: dotnet restore Launchbox.sln
 
       - name: Submit dependency snapshot

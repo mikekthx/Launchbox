@@ -69,15 +69,18 @@ jobs:
       uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
       with:
         path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
         restore-keys: |
           ${{ runner.os }}-nuget-
 
+    - name: Restore dependencies
+      run: dotnet restore $env:Solution_Name --locked-mode
+
     - name: Verify Code Format
-      run: dotnet format $env:Solution_Name --verify-no-changes --verbosity minimal
+      run: dotnet format $env:Solution_Name --no-restore --verify-no-changes --verbosity minimal
 
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
+      run: dotnet test $env:Test_Project_Path --no-restore --configuration Release --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage" --settings coverlet.runsettings --results-directory ./TestResults
 
     # Fail the build if line coverage of production code drops below 80%
     - name: Check coverage threshold
@@ -112,4 +115,4 @@ jobs:
 
     # Build the full WinUI app to catch XAML/binding compile errors
     - name: Build the application
-      run: dotnet build $env:Project_Path --configuration Release -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
+      run: dotnet build $env:Project_Path --no-restore --configuration Release -p:AppxPackageSigningEnabled=false -p:GenerateAppxPackageOnBuild=false
