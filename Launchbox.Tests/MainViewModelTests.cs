@@ -372,6 +372,23 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task FilterText_PrefixMatchRanksBeforeSubstringMatch()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "VisualStudio.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Studio.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "AnotherStudio.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "studio";
+
+        var names = vm.FilteredApps.Select(a => a.Name).ToList();
+        Assert.Equal("Studio", names[0]);
+        Assert.Equal(3, names.Count);
+        Assert.DoesNotContain("Studio", names.Skip(1).Select(a => a));
+    }
+
+    [Fact]
     public void ToggleWindowText_ReturnsLocalizedHide_WhenVisible()
     {
         var vm = CreateViewModel();

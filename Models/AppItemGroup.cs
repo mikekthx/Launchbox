@@ -177,5 +177,8 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
     private List<AppItem> GetFilteredItems(string? filterText) =>
         string.IsNullOrEmpty(filterText)
             ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
-            : _allItems.Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+            : _allItems
+                .Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(a => a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .ToList();
 }

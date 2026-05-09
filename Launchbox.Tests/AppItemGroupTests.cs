@@ -128,6 +128,17 @@ public class AppItemGroupTests
     }
 
     [Fact]
+    public void ApplyFilter_PrefixMatchRanksBeforeSubstringMatch()
+    {
+        var group = MakeGroup("VisualStudio", "Studio", "AnotherStudio");
+        group.ApplyFilter("studio");
+
+        var names = group.Select(a => a.Name).ToList();
+        Assert.Equal("Studio", names[0]);
+        Assert.Equal(3, names.Count);
+    }
+
+    [Fact]
     public void Add_Throws_NotSupportedException()
     {
         // Bug: inherited Add bypasses _allItems, silently corrupting filter/expand state.

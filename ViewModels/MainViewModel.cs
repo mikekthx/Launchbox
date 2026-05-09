@@ -81,7 +81,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     {
         var source = string.IsNullOrEmpty(_filterText)
             ? (IEnumerable<AppItem>)Apps
-            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase));
+            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                  .OrderBy(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
         FilteredApps.ReplaceAll(source);
     }
 
