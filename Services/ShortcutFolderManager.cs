@@ -197,8 +197,7 @@ public class ShortcutFolderManager
     {
         var valid = folders
             .Where(f => !string.IsNullOrEmpty(f.Path))
-            // Deduplicate by path so corrupted persisted state never leaks into _cache,
-            // and we do it before expensive validations to avoid redundant work.
+            // Deduplicate by path so corrupted persisted state never leaks into _cache.
             .GroupBy(f => f.Path, StringComparer.OrdinalIgnoreCase)
             .Select(g => g.First())
             // Expand and validate each unique path — ExpandedPath is now a pure computed property,
