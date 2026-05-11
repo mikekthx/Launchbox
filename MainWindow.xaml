@@ -133,8 +133,7 @@
                   Grid.Row="0"
                   Padding="20"
                   Background="Transparent"
-                  SelectionMode="Single"
-                  SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                  SelectionMode="None"
                   IsItemClickEnabled="True"
                   Visibility="{x:Bind helpers:BooleanToVisibilityConverter.ConvertBool(ViewModel.IsMergedModeVisible), Mode=OneWay}"
                   helpers:ListViewBaseExtensions.Command="{x:Bind ViewModel.LaunchAppCommand}"
@@ -156,8 +155,7 @@
                   Grid.Row="0"
                   Padding="20"
                   Background="Transparent"
-                  SelectionMode="Single"
-                  SelectedItem="{x:Bind ViewModel.SelectedItem, Mode=TwoWay}"
+                  SelectionMode="None"
                   IsItemClickEnabled="True"
                   ItemsSource="{Binding Source={StaticResource GroupedAppsSource}}"
                   Visibility="{x:Bind helpers:BooleanToVisibilityConverter.ConvertBool(ViewModel.IsGroupedModeVisible), Mode=OneWay}"
@@ -202,8 +200,7 @@
                  CornerRadius="8"
                  Padding="12,8"
                  Margin="8,4,8,8"
-                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                 KeyDown="SearchBox_KeyDown">
+                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
             <TextBox.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Escape" Invoked="{x:Bind ViewModel.ClearFilter}" />
             </TextBox.KeyboardAccelerators>

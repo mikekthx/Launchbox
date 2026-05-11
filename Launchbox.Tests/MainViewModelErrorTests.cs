@@ -78,35 +78,4 @@ public class MainViewModelErrorTests
         Assert.NotNull(item2);
         Assert.Null(item2.Icon); // Should NOT have icon due to failure, but exists
     }
-
-    [Fact]
-    public async Task LaunchApp_WhenLaunchFails_RaisesLaunchFailedEvent()
-    {
-        _mockShortcutService.SetFiles([@"C:\Apps\Chrome.lnk"]);
-        _appLauncher.ThrowOnLaunch = true;
-        var vm = CreateViewModel();
-        await vm.LoadAppsAsync();
-
-        string? failedName = null;
-        vm.LaunchFailed += (_, name) => failedName = name;
-
-        vm.LaunchAppCommand.Execute(vm.Apps.First());
-
-        Assert.Equal("Chrome", failedName);
-    }
-
-    [Fact]
-    public async Task LaunchApp_WhenLaunchSucceeds_DoesNotRaiseLaunchFailedEvent()
-    {
-        _mockShortcutService.SetFiles([@"C:\Apps\Chrome.lnk"]);
-        var vm = CreateViewModel();
-        await vm.LoadAppsAsync();
-
-        bool eventRaised = false;
-        vm.LaunchFailed += (_, _) => eventRaised = true;
-
-        vm.LaunchAppCommand.Execute(vm.Apps.First());
-
-        Assert.False(eventRaised);
-    }
 }

@@ -184,9 +184,6 @@
   <data name="Error_CriticalTitle" xml:space="preserve">
     <value>Launchbox</value>
   </data>
-  <data name="Error_LaunchFailedMessage" xml:space="preserve">
-    <value>Nie można uruchomić '{0}'.</value>
-  </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Błąd Launchbox</value>
   </data>

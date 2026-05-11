@@ -15,6 +15,44 @@ namespace Launchbox.Tests;
 [Collection("Localization")]
 public class MainViewModelTests
 {
+    [Fact]
+    public void CharacterReceivedCommand_AppendsCharacterAndRaisesEvent()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var eventRaised = false;
+        vm.SearchFocusRequested += (sender, args) => eventRaised = true;
+
+        vm.FilterText = "test";
+
+        // Act
+        vm.CharacterReceivedCommand.Execute("s");
+
+        // Assert
+        Assert.Equal("tests", vm.FilterText);
+        Assert.True(eventRaised);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public void CharacterReceivedCommand_IgnoresNullOrEmptyString(string? input)
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var eventRaised = false;
+        vm.SearchFocusRequested += (sender, args) => eventRaised = true;
+
+        vm.FilterText = "test";
+
+        // Act
+        vm.CharacterReceivedCommand.Execute(input);
+
+        // Assert
+        Assert.Equal("test", vm.FilterText);
+        Assert.False(eventRaised);
+    }
+
     private readonly MockFileSystem _fileSystem;
     private readonly ShortcutService _shortcutService;
     private readonly IconService _iconService;
@@ -369,46 +407,6 @@ public class MainViewModelTests
         await vm.LoadAppsAsync();
 
         Assert.Equal(2, vm.FilteredApps.Count());
-    }
-
-    [Fact]
-    public async Task SelectedItem_WhenFilterActive_IsFirstFilteredResult()
-    {
-        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Chrome.lnk"));
-        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Firefox.lnk"));
-        var vm = CreateViewModel();
-        await vm.LoadAppsAsync();
-
-        vm.FilterText = "ch";
-
-        Assert.NotNull(vm.SelectedItem);
-        Assert.Equal("Chrome", vm.SelectedItem!.Name);
-    }
-
-    [Fact]
-    public async Task SelectedItem_WhenFilterCleared_IsNull()
-    {
-        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Chrome.lnk"));
-        var vm = CreateViewModel();
-        await vm.LoadAppsAsync();
-        vm.FilterText = "ch";
-        Assert.NotNull(vm.SelectedItem);
-
-        vm.FilterText = string.Empty;
-
-        Assert.Null(vm.SelectedItem);
-    }
-
-    [Fact]
-    public async Task SelectedItem_WhenFilterHasNoMatches_IsNull()
-    {
-        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Chrome.lnk"));
-        var vm = CreateViewModel();
-        await vm.LoadAppsAsync();
-
-        vm.FilterText = "zzz";
-
-        Assert.Null(vm.SelectedItem);
     }
 
     [Fact]
