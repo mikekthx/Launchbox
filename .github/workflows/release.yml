@@ -74,7 +74,7 @@ jobs:
           global-json-file: global.json
 
       - name: Cache NuGet packages
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.nuget/packages
           key: ${{ runner.os }}-nuget-release-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
@@ -174,7 +174,7 @@ jobs:
           subject-path: AppPackages/**/*.msixbundle
 
       - name: Cache dotnet global tools
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.dotnet/tools
           key: ${{ runner.os }}-dotnet-tools-cyclonedx-6.1.1
