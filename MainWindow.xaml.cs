@@ -262,6 +262,24 @@ public sealed partial class MainWindow : Window
     private object? FindName(string name) => ((FrameworkElement)Content).FindName(name);
 
     // --- KEYBOARD NAVIGATION ---
+    private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && ViewModel.SelectedItem != null)
+        {
+            if (ViewModel.LaunchAppCommand.CanExecute(ViewModel.SelectedItem))
+            {
+                e.Handled = true;
+                ViewModel.LaunchAppCommand.Execute(ViewModel.SelectedItem);
+            }
+        }
+        else if (e.Key == VirtualKey.Down)
+        {
+            Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
+            activeGrid.Focus(FocusState.Keyboard);
+            e.Handled = true;
+        }
+    }
+
     // Typing while the grid has focus redirects characters to the search box,
     // so the user can start typing to filter without clicking the search box first.
     private void Grid_CharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
