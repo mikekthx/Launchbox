@@ -142,7 +142,7 @@
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
-                  CharacterReceived="Grid_CharacterReceived"
+                  helpers:ListViewBaseExtensions.CharacterReceivedCommand="{x:Bind ViewModel.CharacterReceivedCommand}"
                   CanReorderItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   AllowDrop="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   CanDragItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
@@ -164,7 +164,7 @@
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
-                  CharacterReceived="Grid_CharacterReceived"
+                  helpers:ListViewBaseExtensions.CharacterReceivedCommand="{x:Bind ViewModel.CharacterReceivedCommand}"
                   ItemTemplate="{StaticResource AppItemTemplate}">
 
           <GridView.GroupStyle>

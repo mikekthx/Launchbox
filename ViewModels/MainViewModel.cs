@@ -166,6 +166,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    public event EventHandler? SearchFocusRequested;
+
     public MainViewModel(
         IShortcutService shortcutService,
         IIconService iconService,
@@ -516,6 +518,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 stableGroup.IsCollapsed = !stableGroup.IsCollapsed;
             }
         }
+    }
+
+    [RelayCommand]
+    private void CharacterReceived(string? character)
+    {
+        if (string.IsNullOrEmpty(character)) return;
+        FilterText += character;
+        SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
     public void ClearFilter() => FilterText = string.Empty;

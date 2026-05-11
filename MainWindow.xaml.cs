@@ -102,6 +102,14 @@ public sealed partial class MainWindow : Window
         {
             ViewModel.LoadAppsCommand.Execute(null);
         }
+
+        ViewModel.SearchFocusRequested += ViewModel_SearchFocusRequested;
+    }
+
+    private void ViewModel_SearchFocusRequested(object? sender, EventArgs e)
+    {
+        SearchBox.Focus(FocusState.Programmatic);
+        SearchBox.SelectionStart = SearchBox.Text.Length;
     }
 
     // --- WINDOW DRAGGING ---
@@ -223,6 +231,8 @@ public sealed partial class MainWindow : Window
         _windowService.Showing -= WindowService_Showing;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
 
+        ViewModel.SearchFocusRequested -= ViewModel_SearchFocusRequested;
+
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
         // so that a failure in one does not prevent the others from being cleaned up.
         DisposeService(_windowService);
@@ -248,18 +258,5 @@ public sealed partial class MainWindow : Window
     // FrameworkElement, so FindName is absent from the base class; this delegates to the root
     // content element to satisfy the generated code's contract.
     private object? FindName(string name) => ((FrameworkElement)Content).FindName(name);
-
-    // --- KEYBOARD NAVIGATION ---
-    // Typing while the grid has focus redirects characters to the search box,
-    // so the user can start typing to filter without clicking the search box first.
-    private void Grid_CharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
-    {
-        if (char.IsControl(args.Character)) return;
-        // Route input through the ViewModel so the binding isn't bypassed.
-        ViewModel.FilterText += args.Character;
-        SearchBox.Focus(FocusState.Programmatic);
-        SearchBox.SelectionStart = SearchBox.Text.Length;
-        args.Handled = true;
-    }
 
 }
