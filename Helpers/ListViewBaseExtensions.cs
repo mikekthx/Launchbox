@@ -23,12 +23,12 @@ public static class ListViewBaseExtensions
             typeof(ListViewBaseExtensions),
             new PropertyMetadata(null, OnCommandPropertyChanged));
 
-        public static readonly DependencyProperty CharacterReceivedCommandProperty =
-        DependencyProperty.RegisterAttached(
-            "CharacterReceivedCommand",
-            typeof(ICommand),
-            typeof(ListViewBaseExtensions),
-            new PropertyMetadata(null, OnCharacterReceivedCommandPropertyChanged));
+    public static readonly DependencyProperty CharacterReceivedCommandProperty =
+    DependencyProperty.RegisterAttached(
+        "CharacterReceivedCommand",
+        typeof(ICommand),
+        typeof(ListViewBaseExtensions),
+        new PropertyMetadata(null, OnCharacterReceivedCommandPropertyChanged));
 
     public static readonly DependencyProperty DragItemsCompletedCommandProperty =
         DependencyProperty.RegisterAttached(
