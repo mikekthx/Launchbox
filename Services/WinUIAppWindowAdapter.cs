@@ -57,6 +57,12 @@ public sealed class WinUIAppWindowAdapter : IAppWindowAdapter, IDisposable
         return displayArea.WorkArea;
     }
 
+    public Windows.Graphics.RectInt32 GetWorkAreaForPoint(Windows.Graphics.PointInt32 point)
+    {
+        var displayArea = DisplayArea.GetFromPoint(point, DisplayAreaFallback.Primary);
+        return displayArea.WorkArea;
+    }
+
     public bool IsRectOnAnyDisplay(Windows.Graphics.RectInt32 rect)
     {
         var displayArea = DisplayArea.GetFromRect(rect, DisplayAreaFallback.None);

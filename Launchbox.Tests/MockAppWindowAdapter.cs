@@ -43,6 +43,7 @@ public class MockAppWindowAdapter : IAppWindowAdapter
     }
 
     public Windows.Graphics.RectInt32 GetWorkArea() => WorkArea;
+    public Windows.Graphics.RectInt32 GetWorkAreaForPoint(Windows.Graphics.PointInt32 point) => WorkArea;
     public bool IsRectOnAnyDisplay(Windows.Graphics.RectInt32 rect) => RectOnAnyDisplay;
 
     public void FirePositionOrSizeChanged() => PositionOrSizeChanged?.Invoke(this, EventArgs.Empty);
