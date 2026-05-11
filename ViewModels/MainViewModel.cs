@@ -32,6 +32,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly object _watcherLock = new();
     private bool _isDisposed;
 
+    /// <summary>
+    /// Raised on the calling thread when a launch attempt fails.
+    /// The event argument is the app's display name. Subscribe from the view to show a notification.
+    /// </summary>
+    public event EventHandler<string>? LaunchFailed;
+
     public BulkObservableCollection<AppItem> Apps { get; } = [];
 
     public BulkObservableCollection<AppItemGroup> GroupedApps { get; } = [];
@@ -462,6 +468,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             catch (Exception ex)
             {
                 Trace.WriteLine($"Failed to launch app {PathSecurity.RedactPath(app.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                LaunchFailed?.Invoke(this, app.Name);
             }
         }
     }

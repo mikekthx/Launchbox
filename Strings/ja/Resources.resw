@@ -184,6 +184,9 @@
   <data name="Error_CriticalTitle" xml:space="preserve">
     <value>Launchbox</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>'{0}' を起動できませんでした。</value>
+  </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox エラー</value>
   </data>

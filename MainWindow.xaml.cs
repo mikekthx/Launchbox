@@ -96,6 +96,7 @@ public sealed partial class MainWindow : Window
         _windowService.HotkeyRegistrationFailed += WindowService_HotkeyRegistrationFailed;
         _windowService.Showing += WindowService_Showing;
         _windowService.VisibilityChanged += WindowService_VisibilityChanged;
+        ViewModel.LaunchFailed += ViewModel_LaunchFailed;
 
         // 4. LOAD APPS
         if (ViewModel.LoadAppsCommand.CanExecute(null))
@@ -208,6 +209,16 @@ public sealed partial class MainWindow : Window
         });
     }
 
+    private void ViewModel_LaunchFailed(object? sender, string appName)
+    {
+        this.DispatcherQueue.TryEnqueue(() =>
+        {
+            TrayIcon?.ShowNotification(
+                Localization.GetString("Error_NotificationTitle"),
+                string.Format(Localization.GetString("Error_LaunchFailedMessage"), appName));
+        });
+    }
+
     private void MainWindow_Closed(object sender, WindowEventArgs args)
     {
         RootGrid.PointerPressed -= RootGrid_PointerPressed;
@@ -222,6 +233,7 @@ public sealed partial class MainWindow : Window
         _windowService.HotkeyRegistrationFailed -= WindowService_HotkeyRegistrationFailed;
         _windowService.Showing -= WindowService_Showing;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
+        ViewModel.LaunchFailed -= ViewModel_LaunchFailed;
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
         // so that a failure in one does not prevent the others from being cleaned up.
