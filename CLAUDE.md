@@ -1,6 +1,6 @@
 # Launchbox — Agent Guide
 
-Guidance for AI coding agents working on this codebase. This is the single source of truth — CLAUDE.md and GEMINI.md are symlinks to this file.
+Guidance for AI coding agents working on this codebase. This is the single source of truth — AGENTS.md, GEMINI.md, and CODEX.md are symlinks to this file.
 
 ## Project Overview
 
