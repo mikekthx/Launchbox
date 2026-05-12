@@ -398,10 +398,11 @@ public sealed class WindowService : IWindowService, IDisposable
 
         try
         {
-            var workArea = _adapter.GetWorkArea();
+            NativeMethods.GetCursorPos(out var cursorPos);
+            var workArea = _adapter.GetWorkAreaForPoint(new Windows.Graphics.PointInt32(cursorPos.X, cursorPos.Y));
             int height = Math.Min(Constants.WINDOW_HEIGHT, Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - Constants.WINDOW_WORKAREA_MARGIN));
             _adapter.Resize(new Windows.Graphics.SizeInt32(Constants.WINDOW_WIDTH, height));
-            CenterOnCurrentDisplay();
+            CenterOnCurrentDisplay(workArea);
         }
         catch (Exception ex)
         {
@@ -409,19 +410,25 @@ public sealed class WindowService : IWindowService, IDisposable
         }
     }
 
-    private void CenterOnCurrentDisplay()
+    // workArea is pre-fetched by CenterWindow to avoid a second GetCursorPos call when
+    // size and position must target the same monitor.
+    private void CenterOnCurrentDisplay(Windows.Graphics.RectInt32? workArea = null)
     {
         if (_adapter == null) return;
 
         try
         {
-            var workArea = _adapter.GetWorkArea();
+            if (workArea == null)
+            {
+                NativeMethods.GetCursorPos(out var cursorPos);
+                workArea = _adapter.GetWorkAreaForPoint(new Windows.Graphics.PointInt32(cursorPos.X, cursorPos.Y));
+            }
             var currentSize = _adapter.Size;
-            // Add display origin so centering works on secondary monitors (non-zero WorkArea.X/Y)
+            // Add display origin so centering works on secondary monitors (non-zero WorkArea.X/Y).
             // Clamp to work-area origin so the window never starts off the top or left edge
             // on a display smaller than the window (the OS min-size hook still prevents resizing below MIN_WINDOW_*).
-            var x = Math.Max(workArea.X, workArea.X + (workArea.Width - currentSize.Width) / 2);
-            var y = Math.Max(workArea.Y, workArea.Y + (workArea.Height - currentSize.Height) / 2);
+            var x = Math.Max(workArea.Value.X, workArea.Value.X + (workArea.Value.Width - currentSize.Width) / 2);
+            var y = Math.Max(workArea.Value.Y, workArea.Value.Y + (workArea.Value.Height - currentSize.Height) / 2);
             _adapter.Move(new Windows.Graphics.PointInt32(x, y));
         }
         catch (Exception ex)
