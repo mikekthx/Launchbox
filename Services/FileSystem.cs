@@ -28,20 +28,15 @@ public class FileSystem : IFileSystem
         return File.Exists(path);
     }
 
-    private const int INITIAL_STACK_BUFFER_SIZE = 512;
-    private const int MAX_INI_BUFFER_SIZE = 65536;
-
     public IEnumerable<string> EnumerateFiles(string path)
     {
         if (PathSecurity.IsUnsafePath(path)) return [];
         return Directory.EnumerateFiles(path);
     }
 
-    /// <summary>
-    /// Reads a value from an INI file. It dynamically resizes a buffer from the
-    /// ArrayPool to handle arbitrary length values, returning an empty string or
-    /// truncating the result if the limit is reached.
-    /// </summary>
+    private const int INITIAL_STACK_BUFFER_SIZE = 512;
+    private const int MAX_INI_BUFFER_SIZE = 65536;
+
     public string GetIniValue(string path, string section, string key)
     {
         if (PathSecurity.IsUnsafePath(path)) return string.Empty;
@@ -98,7 +93,7 @@ public class FileSystem : IFileSystem
                 if (newCapacity > MAX_INI_BUFFER_SIZE)
                 {
                     // Safety limit to prevent infinite allocation.
-                    // Accept truncated result if value exceeds the limit to avoid excessive allocation.
+                    // Accept truncated result if value exceeds MAX_INI_BUFFER_SIZE (64 KB) to avoid excessive allocation.
                     return new string(buffer.AsSpan(0, ret));
                 }
 
