@@ -173,7 +173,7 @@
     <value>Mały</value>
   </data>
   <data name="GridSize_Medium" xml:space="preserve">
-    <value>Średni</value>
+    <value>Średnii</value>
   </data>
   <data name="GridSize_Large" xml:space="preserve">
     <value>Duży</value>
@@ -186,6 +186,9 @@
   </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Błąd Launchbox</value>
+  </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>Nie udało się uruchomić {0}</value>
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Ustawienia Launchbox</value>
