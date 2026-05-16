@@ -45,7 +45,7 @@
     <value>未找到快捷方式</value>
   </data>
   <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
-    <value>请将快捷方式添加到您的"桌面/Shortcuts"文件夹</value>
+    <value>请将快捷方式添加到您的“桌面/Shortcuts”文件夹</value>
   </data>
   <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>打开配置的快捷方式文件夹</value>
@@ -186,6 +186,9 @@
   </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox 错误</value>
+  </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>无法启动 {0}</value>
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 设置</value>
