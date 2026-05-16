@@ -42,13 +42,13 @@
 
   <!-- MainWindow.xaml — In-Tree Elements -->
   <data name="MainWindow_NoShortcuts.Text" xml:space="preserve">
-    <value>Aucun raccourci trouvé</value>
+    <value>Aucun raccourci trouv&#233;</value>
   </data>
   <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
-    <value>Ajoutez des raccourcis à votre dossier Bureau/Shortcuts</value>
+    <value>Ajoutez des raccourcis &#224; votre dossier Bureau/Shortcuts</value>
   </data>
   <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Ouvrir votre dossier de raccourcis configuré</value>
+    <value>Ouvrir votre dossier de raccourcis configur&#233;</value>
   </data>
   <data name="MainWindow_OpenFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Ouvrir le dossier des raccourcis</value>
@@ -60,13 +60,13 @@
     <value>Rechercher...</value>
   </data>
   <data name="MainWindow_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Rechercher des raccourcis (Échap pour effacer)</value>
+    <value>Rechercher des raccourcis (&#201;chap pour effacer)</value>
   </data>
   <data name="MainWindow_SearchBox.AutomationProperties.Name" xml:space="preserve">
     <value>Rechercher des raccourcis</value>
   </data>
   <data name="MainWindow_NoMatches.Text" xml:space="preserve">
-    <value>Aucun résultat</value>
+    <value>Aucun r&#233;sultat</value>
   </data>
   <data name="MainWindow_ShortcutsGrid.AutomationProperties.Name" xml:space="preserve">
     <value>Shortcuts Grid</value>
@@ -77,25 +77,25 @@
 
   <!-- SettingsWindow.xaml — In-Tree Elements -->
   <data name="Settings_TitleText.Text" xml:space="preserve">
-    <value>Paramètres Launchbox</value>
+    <value>Param&#232;tres Launchbox</value>
   </data>
   <data name="Settings_GeneralHeader.Text" xml:space="preserve">
-    <value>Général</value>
+    <value>G&#233;n&#233;ral</value>
   </data>
   <data name="Settings_StartupToggle.Header" xml:space="preserve">
-    <value>Lancer au démarrage</value>
+    <value>Lancer au d&#233;marrage</value>
   </data>
   <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Lancer Launchbox automatiquement à l'ouverture de session Windows</value>
+    <value>Lancer Launchbox automatiquement &#224; l&#39;ouverture de session Windows</value>
   </data>
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
-    <value>Lancer au démarrage</value>
+    <value>Lancer au d&#233;marrage</value>
   </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Raccourci clavier global</value>
   </data>
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Sélectionnez une touche de modification (ex. Alt)</value>
+    <value>S&#233;lectionnez une touche de modification (ex. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
     <value>Modificateur de raccourci</value>
@@ -104,7 +104,7 @@
     <value>Touche</value>
   </data>
   <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Entrez une touche (ex. S, F1, Début)</value>
+    <value>Entrez une touche (ex. S, F1, D&#233;but)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
     <value>Touche de raccourci</value>
@@ -113,28 +113,28 @@
     <value>Apparence</value>
   </data>
   <data name="Settings_IconSizeLabel.Text" xml:space="preserve">
-    <value>Taille des icônes</value>
+    <value>Taille des ic&#244;nes</value>
   </data>
   <data name="Settings_IconSizeCombo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Définit la taille des icônes dans la grille</value>
+    <value>D&#233;finit la taille des ic&#244;nes dans la grille</value>
   </data>
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
-    <value>Taille des icônes</value>
+    <value>Taille des ic&#244;nes</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
-    <value>Gestion des fenêtres</value>
+    <value>Gestion des fen&#234;tres</value>
   </data>
   <data name="Settings_ResetPosition.Content" xml:space="preserve">
-    <value>Réinitialiser la position de la fenêtre</value>
+    <value>R&#233;initialiser la position de la fen&#234;tre</value>
   </data>
   <data name="Settings_ResetPosition.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Déplace la fenêtre principale au centre de l'écran</value>
+    <value>D&#233;place la fen&#234;tre principale au centre de l&#39;&#233;cran</value>
   </data>
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
-    <value>Réinitialiser la position de la fenêtre</value>
+    <value>R&#233;initialiser la position de la fen&#234;tre</value>
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
-    <value>Garder la fenêtre centrée</value>
+    <value>Garder la fen&#234;tre centr&#233;e</value>
   </data>
 
   <!-- C# Code Strings -->
@@ -149,13 +149,13 @@
     <value>Afficher</value>
   </data>
   <data name="TrayMenu_Settings" xml:space="preserve">
-    <value>Paramètres</value>
+    <value>Param&#232;tres</value>
   </data>
   <data name="TrayMenu_Exit" xml:space="preserve">
     <value>Quitter</value>
   </data>
   <data name="Tray_AutomationName" xml:space="preserve">
-    <value>Icône Launchbox dans la zone de notification</value>
+    <value>Ic&#244;ne Launchbox dans la zone de notification</value>
   </data>
   <data name="Modifier_Alt" xml:space="preserve">
     <value>Alt</value>
@@ -179,7 +179,7 @@
     <value>Grand</value>
   </data>
   <data name="Error_CriticalMessage" xml:space="preserve">
-    <value>Launchbox a rencontré une erreur critique et doit fermer.</value>
+    <value>Launchbox a rencontr&#233; une erreur critique et doit fermer.</value>
   </data>
   <data name="Error_CriticalTitle" xml:space="preserve">
     <value>Launchbox</value>
@@ -187,8 +187,11 @@
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Erreur Launchbox</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>Impossible de lancer {0}</value>
+  </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
-    <value>Paramètres Launchbox</value>
+    <value>Param&#232;tres Launchbox</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Dossiers de raccourcis</value>
@@ -224,16 +227,16 @@
     <value>Renommer</value>
   </data>
   <data name="Settings_ViewMode.Text" xml:space="preserve">
-    <value>Mode d'affichage</value>
+    <value>Mode d&#39;affichage</value>
   </data>
   <data name="Settings_ViewMode_Merged" xml:space="preserve">
-    <value>Fusionné</value>
+    <value>Fusionn&#233;</value>
   </data>
   <data name="Settings_ViewMode_Grouped" xml:space="preserve">
-    <value>Groupé</value>
+    <value>Group&#233;</value>
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
-    <value>Groupes réductibles</value>
+    <value>Groupes r&#233;ductibles</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Renommer le dossier</value>
@@ -245,9 +248,9 @@
     <value>Annuler</value>
   </data>
   <data name="CollapseState_Collapsed" xml:space="preserve">
-    <value>Réduit</value>
+    <value>R&#233;duit</value>
   </data>
   <data name="CollapseState_Expanded" xml:space="preserve">
-    <value>Développé</value>
+    <value>D&#233;velopp&#233;</value>
   </data>
 </root>

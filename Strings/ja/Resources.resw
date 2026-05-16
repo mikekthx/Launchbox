@@ -187,6 +187,9 @@
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox エラー</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>{0} の起動に失敗しました</value>
+  </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 設定</value>
   </data>

@@ -83,13 +83,13 @@
     <value>Generale</value>
   </data>
   <data name="Settings_StartupToggle.Header" xml:space="preserve">
-    <value>Esegui all'avvio</value>
+    <value>Esegui all&#39;avvio</value>
   </data>
   <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Avvia automaticamente Launchbox all'accesso a Windows</value>
+    <value>Avvia automaticamente Launchbox all&#39;accesso a Windows</value>
   </data>
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
-    <value>Esegui all'avvio</value>
+    <value>Esegui all&#39;avvio</value>
   </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Tasto di scelta rapida globale</value>
@@ -155,7 +155,7 @@
     <value>Esci</value>
   </data>
   <data name="Tray_AutomationName" xml:space="preserve">
-    <value>Icona Launchbox nell'area di notifica</value>
+    <value>Icona Launchbox nell&#39;area di notifica</value>
   </data>
   <data name="Modifier_Alt" xml:space="preserve">
     <value>Alt</value>
@@ -187,6 +187,9 @@
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Errore Launchbox</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>Impossibile avviare {0}</value>
+  </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Impostazioni Launchbox</value>
   </data>
@@ -212,10 +215,10 @@
     <value>Sposta su</value>
   </data>
   <data name="Settings_MoveDown.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Sposta giù</value>
+    <value>Sposta gi&#249;</value>
   </data>
   <data name="Settings_MoveDown.AutomationProperties.Name" xml:space="preserve">
-    <value>Sposta giù</value>
+    <value>Sposta gi&#249;</value>
   </data>
   <data name="Settings_RenameFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Rinomina</value>
@@ -224,7 +227,7 @@
     <value>Rinomina</value>
   </data>
   <data name="Settings_ViewMode.Text" xml:space="preserve">
-    <value>Modalità visualizzazione</value>
+    <value>Modalit&#224; visualizzazione</value>
   </data>
   <data name="Settings_ViewMode_Merged" xml:space="preserve">
     <value>Unificata</value>

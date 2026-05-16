@@ -42,28 +42,28 @@
 
   <!-- MainWindow.xaml — In-Tree Elements -->
   <data name="MainWindow_NoShortcuts.Text" xml:space="preserve">
-    <value>Keine Verknüpfungen gefunden</value>
+    <value>Keine Verkn&#252;pfungen gefunden</value>
   </data>
   <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
-    <value>Fügen Sie Verknüpfungen zu Ihrem Desktop/Shortcuts-Ordner hinzu</value>
+    <value>F&#252;gen Sie Verkn&#252;pfungen zu Ihrem Desktop/Shortcuts-Ordner hinzu</value>
   </data>
   <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Konfigurierten Verknüpfungsordner öffnen</value>
+    <value>Konfigurierten Verkn&#252;pfungsordner &#246;ffnen</value>
   </data>
   <data name="MainWindow_OpenFolder.AutomationProperties.Name" xml:space="preserve">
-    <value>Verknüpfungsordner öffnen</value>
+    <value>Verkn&#252;pfungsordner &#246;ffnen</value>
   </data>
   <data name="MainWindow_OpenFolderText.Text" xml:space="preserve">
-    <value>Verknüpfungsordner öffnen</value>
+    <value>Verkn&#252;pfungsordner &#246;ffnen</value>
   </data>
   <data name="MainWindow_SearchBox.PlaceholderText" xml:space="preserve">
     <value>Suchen...</value>
   </data>
   <data name="MainWindow_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Verknüpfungen suchen (Esc zum Leeren)</value>
+    <value>Verkn&#252;pfungen suchen (Esc zum Leeren)</value>
   </data>
   <data name="MainWindow_SearchBox.AutomationProperties.Name" xml:space="preserve">
-    <value>Verknüpfungen suchen</value>
+    <value>Verkn&#252;pfungen suchen</value>
   </data>
   <data name="MainWindow_NoMatches.Text" xml:space="preserve">
     <value>Keine Treffer</value>
@@ -83,19 +83,19 @@
     <value>Allgemein</value>
   </data>
   <data name="Settings_StartupToggle.Header" xml:space="preserve">
-    <value>Beim Start ausführen</value>
+    <value>Beim Start ausf&#252;hren</value>
   </data>
   <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Launchbox beim Windows-Login automatisch starten</value>
   </data>
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
-    <value>Beim Start ausführen</value>
+    <value>Beim Start ausf&#252;hren</value>
   </data>
   <data name="Settings_HotkeyHeader.Text" xml:space="preserve">
     <value>Globaler Hotkey</value>
   </data>
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Wählen Sie eine Modifikatortaste (z. B. Alt)</value>
+    <value>W&#228;hlen Sie eine Modifikatortaste (z. B. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
     <value>Hotkey-Modifikator</value>
@@ -113,25 +113,25 @@
     <value>Erscheinungsbild</value>
   </data>
   <data name="Settings_IconSizeLabel.Text" xml:space="preserve">
-    <value>Symbolgröße</value>
+    <value>Symbolgr&#246;&#223;e</value>
   </data>
   <data name="Settings_IconSizeCombo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Größe der Symbole im Raster festlegen</value>
+    <value>Gr&#246;&#223;e der Symbole im Raster festlegen</value>
   </data>
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
-    <value>Symbolgröße</value>
+    <value>Symbolgr&#246;&#223;e</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Fensterverwaltung</value>
   </data>
   <data name="Settings_ResetPosition.Content" xml:space="preserve">
-    <value>Fensterposition zurücksetzen</value>
+    <value>Fensterposition zur&#252;cksetzen</value>
   </data>
   <data name="Settings_ResetPosition.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Verschiebt das Hauptfenster in die Bildschirmmitte</value>
   </data>
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
-    <value>Fensterposition zurücksetzen</value>
+    <value>Fensterposition zur&#252;cksetzen</value>
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>Fenster zentriert halten</value>
@@ -176,7 +176,7 @@
     <value>Mittel</value>
   </data>
   <data name="GridSize_Large" xml:space="preserve">
-    <value>Groß</value>
+    <value>Gro&#223;</value>
   </data>
   <data name="Error_CriticalMessage" xml:space="preserve">
     <value>Launchbox hat einen kritischen Fehler festgestellt und muss beendet werden.</value>
@@ -187,17 +187,20 @@
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox-Fehler</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>Fehler beim Starten von {0}</value>
+  </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox Einstellungen</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
-    <value>Verknüpfungsordner</value>
+    <value>Verkn&#252;pfungsordner</value>
   </data>
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
-    <value>Ordner hinzufügen</value>
+    <value>Ordner hinzuf&#252;gen</value>
   </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
-    <value>Ordner hinzufügen</value>
+    <value>Ordner hinzuf&#252;gen</value>
   </data>
   <data name="Settings_RemoveFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Entfernen</value>
@@ -227,7 +230,7 @@
     <value>Ansichtsmodus</value>
   </data>
   <data name="Settings_ViewMode_Merged" xml:space="preserve">
-    <value>Zusammengeführt</value>
+    <value>Zusammengef&#252;hrt</value>
   </data>
   <data name="Settings_ViewMode_Grouped" xml:space="preserve">
     <value>Gruppiert</value>

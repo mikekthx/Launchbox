@@ -77,7 +77,7 @@
 
   <!-- SettingsWindow.xaml — In-Tree Elements -->
   <data name="Settings_TitleText.Text" xml:space="preserve">
-    <value>Configuración de Launchbox</value>
+    <value>Configuraci&#243;n de Launchbox</value>
   </data>
   <data name="Settings_GeneralHeader.Text" xml:space="preserve">
     <value>General</value>
@@ -86,7 +86,7 @@
     <value>Ejecutar al iniciar</value>
   </data>
   <data name="Settings_StartupToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Iniciar Launchbox automáticamente al iniciar sesión en Windows</value>
+    <value>Iniciar Launchbox autom&#225;ticamente al iniciar sesi&#243;n en Windows</value>
   </data>
   <data name="Settings_StartupToggle.AutomationProperties.Name" xml:space="preserve">
     <value>Ejecutar al iniciar</value>
@@ -113,25 +113,25 @@
     <value>Apariencia</value>
   </data>
   <data name="Settings_IconSizeLabel.Text" xml:space="preserve">
-    <value>Tamaño de iconos</value>
+    <value>Tama&#241;o de iconos</value>
   </data>
   <data name="Settings_IconSizeCombo.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Establece el tamaño de los iconos en la cuadrícula</value>
+    <value>Establece el tama&#241;o de los iconos en la cuadr&#237;cula</value>
   </data>
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
-    <value>Tamaño de iconos</value>
+    <value>Tama&#241;o de iconos</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
-    <value>Gestión de ventanas</value>
+    <value>Gesti&#243;n de ventanas</value>
   </data>
   <data name="Settings_ResetPosition.Content" xml:space="preserve">
-    <value>Restablecer posición de ventana</value>
+    <value>Restablecer posici&#243;n de ventana</value>
   </data>
   <data name="Settings_ResetPosition.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Mueve la ventana principal al centro de la pantalla</value>
   </data>
   <data name="Settings_ResetPosition.AutomationProperties.Name" xml:space="preserve">
-    <value>Restablecer posición de ventana</value>
+    <value>Restablecer posici&#243;n de ventana</value>
   </data>
   <data name="Settings_KeepCentered.Header" xml:space="preserve">
     <value>Mantener ventana centrada</value>
@@ -149,7 +149,7 @@
     <value>Mostrar</value>
   </data>
   <data name="TrayMenu_Settings" xml:space="preserve">
-    <value>Configuración</value>
+    <value>Configuraci&#243;n</value>
   </data>
   <data name="TrayMenu_Exit" xml:space="preserve">
     <value>Salir</value>
@@ -164,13 +164,13 @@
     <value>Ctrl</value>
   </data>
   <data name="Modifier_Shift" xml:space="preserve">
-    <value>Mayús</value>
+    <value>May&#250;s</value>
   </data>
   <data name="Modifier_Win" xml:space="preserve">
     <value>Win</value>
   </data>
   <data name="GridSize_Small" xml:space="preserve">
-    <value>Pequeño</value>
+    <value>Peque&#241;o</value>
   </data>
   <data name="GridSize_Medium" xml:space="preserve">
     <value>Mediano</value>
@@ -179,7 +179,7 @@
     <value>Grande</value>
   </data>
   <data name="Error_CriticalMessage" xml:space="preserve">
-    <value>Launchbox encontró un error crítico y debe cerrarse.</value>
+    <value>Launchbox encontr&#243; un error cr&#237;tico y debe cerrarse.</value>
   </data>
   <data name="Error_CriticalTitle" xml:space="preserve">
     <value>Launchbox</value>
@@ -187,8 +187,11 @@
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Error de Launchbox</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>Error al iniciar {0}</value>
+  </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
-    <value>Configuración de Launchbox</value>
+    <value>Configuraci&#243;n de Launchbox</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Carpetas de accesos directos</value>
@@ -233,7 +236,7 @@
     <value>Agrupado</value>
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
-    <value>Grupos contraíbles</value>
+    <value>Grupos contra&#237;bles</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Renombrar carpeta</value>
@@ -245,7 +248,7 @@
     <value>Cancelar</value>
   </data>
   <data name="CollapseState_Collapsed" xml:space="preserve">
-    <value>Contraído</value>
+    <value>Contra&#237;do</value>
   </data>
   <data name="CollapseState_Expanded" xml:space="preserve">
     <value>Expandido</value>
