@@ -24,11 +24,11 @@ public static class ListViewBaseExtensions
             new PropertyMetadata(null, OnCommandPropertyChanged));
 
     public static readonly DependencyProperty CharacterReceivedCommandProperty =
-    DependencyProperty.RegisterAttached(
-        "CharacterReceivedCommand",
-        typeof(ICommand),
-        typeof(ListViewBaseExtensions),
-        new PropertyMetadata(null, OnCharacterReceivedCommandPropertyChanged));
+        DependencyProperty.RegisterAttached(
+            "CharacterReceivedCommand",
+            typeof(ICommand),
+            typeof(ListViewBaseExtensions),
+            new PropertyMetadata(null, OnCharacterReceivedCommandPropertyChanged));
 
     public static readonly DependencyProperty DragItemsCompletedCommandProperty =
         DependencyProperty.RegisterAttached(
@@ -91,7 +91,6 @@ public static class ListViewBaseExtensions
             }
         }
     }
-
 
     public static void SetCharacterReceivedCommand(DependencyObject d, ICommand value)
     {
