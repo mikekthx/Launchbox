@@ -97,9 +97,9 @@ public static class ListViewBaseExtensions
         d.SetValue(CharacterReceivedCommandProperty, value);
     }
 
-    public static ICommand GetCharacterReceivedCommand(DependencyObject d)
+    public static ICommand? GetCharacterReceivedCommand(DependencyObject d)
     {
-        return (ICommand)d.GetValue(CharacterReceivedCommandProperty);
+        return (ICommand?)d.GetValue(CharacterReceivedCommandProperty);
     }
 
     private static void OnCharacterReceivedCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

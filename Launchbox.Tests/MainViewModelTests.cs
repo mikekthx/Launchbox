@@ -410,6 +410,46 @@ public class MainViewModelTests
     }
 
     [Fact]
+    public async Task SelectedItem_WhenFilterActive_IsFirstFilteredResult()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Chrome.lnk"));
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Firefox.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "ch";
+
+        Assert.NotNull(vm.SelectedItem);
+        Assert.Equal("Chrome", vm.SelectedItem!.Name);
+    }
+
+    [Fact]
+    public async Task SelectedItem_WhenFilterCleared_IsNull()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Chrome.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        vm.FilterText = "ch";
+        Assert.NotNull(vm.SelectedItem);
+
+        vm.FilterText = string.Empty;
+
+        Assert.Null(vm.SelectedItem);
+    }
+
+    [Fact]
+    public async Task SelectedItem_WhenFilterHasNoMatches_IsNull()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Chrome.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+
+        vm.FilterText = "zzz";
+
+        Assert.Null(vm.SelectedItem);
+    }
+
+    [Fact]
     public async Task FilterText_PrefixMatchRanksBeforeSubstringMatch()
     {
         _fileSystem.AddFile(Path.Combine(_shortcutFolder, "VisualStudio.lnk"));
