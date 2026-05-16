@@ -34,6 +34,9 @@ public class FileSystem : IFileSystem
         return Directory.EnumerateFiles(path);
     }
 
+    private const int INITIAL_STACK_BUFFER_SIZE = 512;
+    private const int MAX_INI_BUFFER_SIZE = 65536;
+
     public string GetIniValue(string path, string section, string key)
     {
         if (PathSecurity.IsUnsafePath(path)) return string.Empty;
@@ -59,7 +62,7 @@ public class FileSystem : IFileSystem
         }
 
         // Fast-path: allocate buffer on the stack for typical small INI values to avoid ArrayPool rent/return overhead
-        Span<char> stackBuffer = stackalloc char[512];
+        Span<char> stackBuffer = stackalloc char[INITIAL_STACK_BUFFER_SIZE];
         int ret = NativeMethods.GetPrivateProfileString(section, key, string.Empty, ref MemoryMarshal.GetReference(stackBuffer), stackBuffer.Length, path);
 
         if (ret < stackBuffer.Length - 2)
@@ -87,10 +90,10 @@ public class FileSystem : IFileSystem
 
                 // Truncated. Loop to double the buffer size until it fits.
                 int newCapacity = size * 2;
-                if (newCapacity > 65536)
+                if (newCapacity > MAX_INI_BUFFER_SIZE)
                 {
                     // Safety limit to prevent infinite allocation.
-                    // Accept truncated result if value exceeds 64KB limit to avoid excessive allocation.
+                    // Accept truncated result if value exceeds MAX_INI_BUFFER_SIZE (64 KB) to avoid excessive allocation.
                     return new string(buffer.AsSpan(0, ret));
                 }
 
