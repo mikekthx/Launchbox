@@ -155,7 +155,7 @@
     <value>結束</value>
   </data>
   <data name="Tray_AutomationName" xml:space="preserve">
-    <value>Launchbox 系統匠圖示</value>
+    <value>Launchbox 系統匣圖示</value>
   </data>
   <data name="Modifier_Alt" xml:space="preserve">
     <value>Alt</value>
@@ -179,16 +179,16 @@
     <value>大</value>
   </data>
   <data name="Error_CriticalMessage" xml:space="preserve">
-    <value>Launchbox 發生嚴重錢誤，必須關閉。</value>
+    <value>Launchbox 發生嚴重錯誤，必須關閉。</value>
   </data>
   <data name="Error_CriticalTitle" xml:space="preserve">
     <value>Launchbox</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>無法啟動「{0}」。</value>
+  </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox 錯誤</value>
-  </data>
-  <data name="Error_LaunchFailedMessage" xml:space="preserve">
-    <value>無法啟動 {0}</value>
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 設定</value>
@@ -236,7 +236,7 @@
     <value>分組</value>
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
-    <value>可折疊群組</value>
+    <value>可摺疊群組</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>重新命名資料夾</value>
@@ -248,7 +248,7 @@
     <value>取消</value>
   </data>
   <data name="CollapseState_Collapsed" xml:space="preserve">
-    <value>已折疊</value>
+    <value>已摺疊</value>
   </data>
   <data name="CollapseState_Expanded" xml:space="preserve">
     <value>已展開</value>

@@ -184,11 +184,11 @@
   <data name="Error_CriticalTitle" xml:space="preserve">
     <value>Launchbox</value>
   </data>
+  <data name="Error_LaunchFailedMessage" xml:space="preserve">
+    <value>'{0}' başlatılamadı.</value>
+  </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox Hatası</value>
-  </data>
-  <data name="Error_LaunchFailedMessage" xml:space="preserve">
-    <value>{0} başlatılamadı</value>
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox Ayarları</value>
