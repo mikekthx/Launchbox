@@ -104,12 +104,42 @@ public sealed partial class MainWindow : Window
         }
 
         ViewModel.SearchFocusRequested += ViewModel_SearchFocusRequested;
+        ViewModel.LaunchFailed += ViewModel_LaunchFailed;
     }
 
     private void ViewModel_SearchFocusRequested(object? sender, EventArgs e)
     {
         SearchBox.Focus(FocusState.Programmatic);
         SearchBox.SelectionStart = SearchBox.Text.Length;
+    }
+
+    private void ViewModel_LaunchFailed(object? sender, string appName)
+    {
+        this.DispatcherQueue.TryEnqueue(() =>
+        {
+            TrayIcon?.ShowNotification(
+                Localization.GetString("Error_NotificationTitle"),
+                string.Format(Localization.GetString("Error_LaunchFailedMessage"), appName));
+        });
+    }
+
+    // --- KEYBOARD NAVIGATION ---
+    private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && ViewModel.SelectedItem != null)
+        {
+            if (ViewModel.LaunchAppCommand.CanExecute(ViewModel.SelectedItem))
+            {
+                e.Handled = true;
+                ViewModel.LaunchAppCommand.Execute(ViewModel.SelectedItem);
+            }
+        }
+        else if (e.Key == VirtualKey.Down)
+        {
+            Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
+            activeGrid.Focus(FocusState.Keyboard);
+            e.Handled = true;
+        }
     }
 
     // --- WINDOW DRAGGING ---
@@ -232,6 +262,7 @@ public sealed partial class MainWindow : Window
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
 
         ViewModel.SearchFocusRequested -= ViewModel_SearchFocusRequested;
+        ViewModel.LaunchFailed -= ViewModel_LaunchFailed;
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
         // so that a failure in one does not prevent the others from being cleaned up.

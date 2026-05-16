@@ -50,6 +50,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _isEmpty, value);
     }
 
+    private AppItem? _selectedItem;
+    public AppItem? SelectedItem
+    {
+        get => _selectedItem;
+        set => SetProperty(ref _selectedItem, value);
+    }
+
     private string _filterText = string.Empty;
 
     public string FilterText
@@ -73,6 +80,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         {
             group.ApplyFilter(_filterText);
         }
+        if (IsGroupedMode)
+            UpdateSelectedItem();
     }
 
     public BulkObservableCollection<AppItem> FilteredApps { get; } = [];
@@ -84,6 +93,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
             : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
                   .OrderBy(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
         FilteredApps.ReplaceAll(source);
+        if (IsMergedMode)
+            UpdateSelectedItem();
+    }
+
+    private void UpdateSelectedItem()
+    {
+        if (string.IsNullOrEmpty(_filterText))
+        {
+            SelectedItem = null;
+            return;
+        }
+        SelectedItem = IsMergedMode
+            ? FilteredApps.FirstOrDefault()
+            : GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
     }
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
@@ -167,6 +190,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public event EventHandler? SearchFocusRequested;
+
+    public event EventHandler<string>? LaunchFailed;
 
     public MainViewModel(
         IShortcutService shortcutService,
@@ -464,6 +489,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
             catch (Exception ex)
             {
                 Trace.WriteLine($"Failed to launch app {PathSecurity.RedactPath(app.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
+                LaunchFailed?.Invoke(this, app.Name);
             }
         }
     }
