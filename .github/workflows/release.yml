@@ -77,7 +77,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
         with:
           path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-release-${{ hashFiles('**/packages.lock.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-nuget-release-${{ hashFiles('**/packages.lock.json', '**/*.csproj', '.config/dotnet-tools.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-release-
             ${{ runner.os }}-nuget-
@@ -173,16 +173,10 @@ jobs:
         with:
           subject-path: AppPackages/**/*.msixbundle
 
-      - name: Cache dotnet global tools
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
-        with:
-          path: ~/.dotnet/tools
-          key: ${{ runner.os }}-dotnet-tools-cyclonedx-6.1.1
-
       - name: Generate SBOM
         run: |
-          dotnet tool update --global CycloneDX --version 6.1.1
-          dotnet CycloneDX $env:Project_Path --json --out sbom-output
+          dotnet tool restore
+          dotnet tool run dotnet-CycloneDX $env:Project_Path --json --out sbom-output
           Rename-Item -Path sbom-output\bom.json -NewName launchbox-sbom.cdx.json
 
       - name: Attest SBOM
