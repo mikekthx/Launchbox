@@ -42,8 +42,9 @@ public class BackdropService : IBackdropService
                     {
                         return _processService.IsProcessRunning(Constants.DWM_BLUR_GLASS_PROCESS_NAME);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        Trace.WriteLine($"Error checking if process {Constants.DWM_BLUR_GLASS_PROCESS_NAME} is running: {PathSecurity.GetSafeExceptionMessage(ex)}");
                         return false;
                     }
                 });
