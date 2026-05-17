@@ -23,6 +23,13 @@ public static class ListViewBaseExtensions
             typeof(ListViewBaseExtensions),
             new PropertyMetadata(null, OnCommandPropertyChanged));
 
+    public static readonly DependencyProperty CharacterReceivedCommandProperty =
+        DependencyProperty.RegisterAttached(
+            "CharacterReceivedCommand",
+            typeof(ICommand),
+            typeof(ListViewBaseExtensions),
+            new PropertyMetadata(null, OnCharacterReceivedCommandPropertyChanged));
+
     public static readonly DependencyProperty DragItemsCompletedCommandProperty =
         DependencyProperty.RegisterAttached(
             "DragItemsCompletedCommand",
@@ -82,6 +89,43 @@ public static class ListViewBaseExtensions
             {
                 command.Execute(e.ClickedItem);
             }
+        }
+    }
+
+    public static void SetCharacterReceivedCommand(DependencyObject d, ICommand value)
+    {
+        d.SetValue(CharacterReceivedCommandProperty, value);
+    }
+
+    public static ICommand? GetCharacterReceivedCommand(DependencyObject d)
+    {
+        return (ICommand?)d.GetValue(CharacterReceivedCommandProperty);
+    }
+
+    private static void OnCharacterReceivedCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is UIElement element)
+        {
+            element.CharacterReceived -= OnCharacterReceived;
+
+            if (e.NewValue is ICommand)
+            {
+                element.CharacterReceived += OnCharacterReceived;
+            }
+        }
+    }
+
+    private static void OnCharacterReceived(UIElement sender, CharacterReceivedRoutedEventArgs args)
+    {
+        if (char.IsControl(args.Character)) return;
+
+        var command = GetCharacterReceivedCommand(sender);
+        var characterString = args.Character.ToString();
+
+        if (command != null && command.CanExecute(characterString))
+        {
+            command.Execute(characterString);
+            args.Handled = true;
         }
     }
 

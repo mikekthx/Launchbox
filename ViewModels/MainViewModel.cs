@@ -32,12 +32,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private readonly object _watcherLock = new();
     private bool _isDisposed;
 
-    /// <summary>
-    /// Raised on the calling thread when a launch attempt fails.
-    /// The event argument is the app's display name. Subscribe from the view to show a notification.
-    /// </summary>
-    public event EventHandler<string>? LaunchFailed;
-
     public BulkObservableCollection<AppItem> Apps { get; } = [];
 
     public BulkObservableCollection<AppItemGroup> GroupedApps { get; } = [];
@@ -56,6 +50,13 @@ public partial class MainViewModel : ObservableObject, IDisposable
         private set => SetProperty(ref _isEmpty, value);
     }
 
+    private AppItem? _selectedItem;
+    public AppItem? SelectedItem
+    {
+        get => _selectedItem;
+        set => SetProperty(ref _selectedItem, value);
+    }
+
     private string _filterText = string.Empty;
 
     public string FilterText
@@ -71,13 +72,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 ApplyGroupedFilter();
             }
         }
-    }
-
-    private AppItem? _selectedItem;
-    public AppItem? SelectedItem
-    {
-        get => _selectedItem;
-        set => SetProperty(ref _selectedItem, value);
     }
 
     private void ApplyGroupedFilter()
@@ -194,6 +188,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return _trayToolTipText!;
         }
     }
+
+    public event EventHandler? SearchFocusRequested;
+
+    public event EventHandler<string>? LaunchFailed;
 
     public MainViewModel(
         IShortcutService shortcutService,
@@ -546,6 +544,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 stableGroup.IsCollapsed = !stableGroup.IsCollapsed;
             }
         }
+    }
+
+    [RelayCommand]
+    private void CharacterReceived(string? character)
+    {
+        if (string.IsNullOrEmpty(character)) return;
+        FilterText += character;
+        SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
     public void ClearFilter() => FilterText = string.Empty;

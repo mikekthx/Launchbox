@@ -15,6 +15,44 @@ namespace Launchbox.Tests;
 [Collection("Localization")]
 public class MainViewModelTests
 {
+    [Fact]
+    public void CharacterReceivedCommand_AppendsCharacterAndRaisesEvent()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var eventRaised = false;
+        vm.SearchFocusRequested += (sender, args) => eventRaised = true;
+
+        vm.FilterText = "test";
+
+        // Act
+        vm.CharacterReceivedCommand.Execute("s");
+
+        // Assert
+        Assert.Equal("tests", vm.FilterText);
+        Assert.True(eventRaised);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public void CharacterReceivedCommand_IgnoresNullOrEmptyString(string? input)
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var eventRaised = false;
+        vm.SearchFocusRequested += (sender, args) => eventRaised = true;
+
+        vm.FilterText = "test";
+
+        // Act
+        vm.CharacterReceivedCommand.Execute(input);
+
+        // Assert
+        Assert.Equal("test", vm.FilterText);
+        Assert.False(eventRaised);
+    }
+
     private readonly MockFileSystem _fileSystem;
     private readonly ShortcutService _shortcutService;
     private readonly IconService _iconService;

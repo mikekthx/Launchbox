@@ -143,7 +143,7 @@
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
-                  CharacterReceived="Grid_CharacterReceived"
+                  helpers:ListViewBaseExtensions.CharacterReceivedCommand="{x:Bind ViewModel.CharacterReceivedCommand}"
                   CanReorderItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   AllowDrop="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
                   CanDragItems="{x:Bind ViewModel.IsFilterEmpty, Mode=OneWay}"
@@ -166,7 +166,7 @@
                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                   ScrollViewer.VerticalScrollMode="Enabled"
                   ScrollViewer.IsVerticalRailEnabled="True"
-                  CharacterReceived="Grid_CharacterReceived"
+                  helpers:ListViewBaseExtensions.CharacterReceivedCommand="{x:Bind ViewModel.CharacterReceivedCommand}"
                   ItemTemplate="{StaticResource AppItemTemplate}">
 
           <GridView.GroupStyle>
@@ -198,12 +198,12 @@
                  x:Name="SearchBox"
                  Grid.Row="1"
                  Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 KeyDown="SearchBox_KeyDown"
                  BorderThickness="0"
                  CornerRadius="8"
                  Padding="12,8"
                  Margin="8,4,8,8"
-                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                 KeyDown="SearchBox_KeyDown">
+                 Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
             <TextBox.KeyboardAccelerators>
                 <KeyboardAccelerator Key="Escape" Invoked="{x:Bind ViewModel.ClearFilter}" />
             </TextBox.KeyboardAccelerators>
