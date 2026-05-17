@@ -498,8 +498,7 @@ $RECYCLE.BIN/
 
 # AI and Config
 .claude/
-.config/*
-!.config/dotnet-tools.json
+.config/
 .vscode/
 
 # Additional Tools

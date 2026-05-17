@@ -1,5 +1,4 @@
 using Launchbox.Services;
-using System;
 using System.Diagnostics;
 using Xunit;
 
@@ -41,23 +40,23 @@ public class ProcessServiceTests
     }
 
     [Fact]
-    public void IsProcessRunning_ReturnsFalse_WhenGetProcessesThrows()
+    public void IsProcessRunning_ExecutesFinallySafely_WhenGetProcessesThrows()
     {
         // Arrange
         var service = new FaultyProcessService();
 
-        // Act
-        var isRunning = service.IsProcessRunning("TestProcess");
-
-        // Assert
-        Assert.False(isRunning);
+        // Act & Assert
+        // We verify that the exception is propagated correctly,
+        // and that it does NOT throw a NullReferenceException in the finally block.
+        var exception = Assert.Throws<System.InvalidOperationException>(() => service.IsProcessRunning("TestProcess"));
+        Assert.Equal("Simulated exception from GetProcessesByName", exception.Message);
     }
 
     private class FaultyProcessService : ProcessService
     {
         protected override Process[] GetProcessesByName(string processName)
         {
-            throw new InvalidOperationException("Simulated exception from GetProcessesByName");
+            throw new System.InvalidOperationException("Simulated exception from GetProcessesByName");
         }
     }
 }
