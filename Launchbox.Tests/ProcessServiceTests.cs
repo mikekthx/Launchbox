@@ -1,4 +1,5 @@
 using Launchbox.Services;
+using System;
 using System.Diagnostics;
 using Xunit;
 
@@ -56,7 +57,7 @@ public class ProcessServiceTests
     {
         protected override Process[] GetProcessesByName(string processName)
         {
-            throw new System.InvalidOperationException("Simulated exception from GetProcessesByName");
+            throw new InvalidOperationException("Simulated exception from GetProcessesByName");
         }
     }
 }
