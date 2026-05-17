@@ -3,7 +3,7 @@ using SharpFuzz;
 using System.IO;
 using System.Text;
 
-// Single entry point: the first byte selects which code path to exercise so
+// Single entry point: the first byte (mod 5) selects which code path to exercise so
 // one binary covers all five security-sensitive targets. libFuzzer drives
 // input generation; the CI workflow replays a seed corpus for regression.
 Fuzzer.LibFuzzer.Run((ReadOnlySpan<byte> data) =>

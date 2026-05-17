@@ -3,12 +3,13 @@
     <OutputType>Exe</OutputType>
     <!--
       Target net10.0 (no -windows suffix) so the fuzzer builds and runs on the
-      Ubuntu CI runner without WinUI/WAS dependencies.
+      Ubuntu CI runner without WinUI/WAS dependencies. This project is
+      intentionally excluded from Launchbox.sln for the same reason — the
+      Windows solution targets net10.0-windows and cannot build this project.
     -->
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Optimize>true</Optimize>
     <!-- Match the production namespace so linked files compile without changes. -->
     <RootNamespace>Launchbox</RootNamespace>
   </PropertyGroup>
