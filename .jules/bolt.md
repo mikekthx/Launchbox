@@ -30,4 +30,4 @@
 
 ## 2026-04-21 - Convert reflection-based Bindings to x:Bind in DataTemplates
 **Learning:** In WinUI 3 XAML DataTemplates, replacing standard reflection-based `{Binding}` with compiled `{x:Bind}` eliminates runtime reflection overhead, which is especially noticeable for properties evaluated per item (like Visibility converters or AutomationProperties).
-**Action:** Use `{x:Bind PropertyName, Mode=OneWay}` instead of `{Binding}` for data context properties within `DataTemplate`s. Note that `x:Bind` defaults to `Mode=OneTime` in WinUI, so `Mode=OneWay` must be explicitly added to maintain dynamic updates.
+**Action:** Use `{x:Bind PropertyName}` instead of `{Binding}` for data context properties within `DataTemplate`s. Note that `x:Bind` defaults to `Mode=OneTime` in WinUI. Add `Mode=OneWay` when the bound property is mutable after initial render. For stable references (e.g., the DataContext object itself, `init`-only properties, names set once at load), `Mode=OneTime` is more efficient and should be preferred.
