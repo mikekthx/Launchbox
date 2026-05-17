@@ -1,0 +1,72 @@
+name: Fuzzing
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    # Weekly run to catch regressions introduced since last release
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  fuzz:
+    name: SharpFuzz
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5
+        with:
+          global-json-file: global.json
+
+      - name: Build fuzzing target
+        run: dotnet build Fuzz/Fuzz.csproj -c Release
+
+      - name: Run fuzzer against seed corpus
+        shell: bash
+        run: |
+          # Each seed file starts with a tag byte (0-4) that selects the target,
+          # followed by the payload. SharpFuzz replays them as single-shot runs.
+
+          # 0 — ContainsUncPath: UNC patterns and safe URLs
+          printf '\x00\\\\server\\share'                    > /tmp/s0a
+          printf '\x00//server/share'                       > /tmp/s0b
+          printf '\x00https://example.com/path'             > /tmp/s0c
+          printf '\x00ftp://example.com'                    > /tmp/s0d
+
+          # 1 — IsUnsafePath: local drive, UNC, extended-length, NT object path
+          printf '\x01C:\\Users\\file.txt'                  > /tmp/s1a
+          printf '\x01\\\\server\\share'                    > /tmp/s1b
+          printf '\x01\\\\?\\C:\\long\\path\\file.txt'      > /tmp/s1c
+          printf '\x01\\??\\device\\null'                   > /tmp/s1d
+
+          # 2 — RedactPath: paths with and without separators
+          printf '\x02C:\\Users\\secret\\file.txt'          > /tmp/s2a
+          printf '\x02just-a-filename.txt'                  > /tmp/s2b
+          printf '\x02C:\\'                                 > /tmp/s2c
+
+          # 3 — GetPngDimensions: valid header, truncated, garbage
+          printf '\x03\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10' > /tmp/s3a
+          printf '\x03\x89PNG\r\n'                          > /tmp/s3b
+          printf '\x03\xff\xff\xff\xff'                     > /tmp/s3c
+
+          # 4 — GetMaxIcoDimensions: valid two-entry header, zero count, garbage
+          printf '\x04\x00\x00\x01\x00\x02\x00\x10\x10\x00\x00\x01\x00\x20\x00\x00\x00\x00\x00\x20\x20\x00\x00\x01\x00\x20\x00\x00\x00\x00\x00' > /tmp/s4a
+          printf '\x04\x00\x00\x01\x00\x00\x00'            > /tmp/s4b
+          printf '\x04\xff\xff\xff\xff\xff\xff'             > /tmp/s4c
+
+          for seed in /tmp/s{0,1,2,3,4}{a,b,c,d}; do
+            [ -f "$seed" ] || continue
+            if ! dotnet run --project Fuzz/Fuzz.csproj -c Release --no-build -- "$seed" 2>&1; then
+              echo "::error::Crash on $(basename "$seed") — $(xxd "$seed" | head -2)"
+              exit 1
+            fi
+          done
