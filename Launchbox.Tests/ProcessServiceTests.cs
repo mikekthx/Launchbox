@@ -40,7 +40,7 @@ public class ProcessServiceTests
     }
 
     [Fact]
-    public void IsProcessRunning_ExecutesFinallySafely_WhenGetProcessesThrows()
+    public void IsProcessRunning_ReturnsFalse_WhenGetProcessesThrows()
     {
         // Arrange
         var service = new FaultyProcessService();

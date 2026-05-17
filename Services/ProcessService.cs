@@ -1,4 +1,6 @@
+using Launchbox.Helpers;
 using System.Diagnostics;
+using System;
 
 namespace Launchbox.Services;
 
@@ -12,9 +14,9 @@ public class ProcessService : IProcessService
             processes = GetProcessesByName(processName);
             return processes.Length > 0;
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
-            System.Diagnostics.Trace.WriteLine($"Error checking if process {processName} is running: {Launchbox.Helpers.PathSecurity.GetSafeExceptionMessage(ex)}");
+            Trace.WriteLine($"Error checking if process {processName} is running: {PathSecurity.GetSafeExceptionMessage(ex)}");
             return false;
         }
         finally
