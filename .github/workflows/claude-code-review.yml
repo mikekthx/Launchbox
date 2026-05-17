@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize, ready_for_review, reopened]
 
+permissions: read-all
+
 jobs:
   claude-review:
     # Dependabot PRs cannot access repository secrets (GitHub security restriction),
