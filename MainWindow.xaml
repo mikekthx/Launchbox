@@ -41,7 +41,7 @@
                             VerticalAlignment="Center"
                             ToolTipService.ToolTip="{x:Bind Name}"
                             AutomationProperties.Name="{x:Bind Name}"
-                            Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource EmptyStringToCollapsedConverter}}">
+                            Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
                     <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
                            Width="{Binding Tag.IconSize, ElementName=AppGrid}"
                            Height="{Binding Tag.IconSize, ElementName=AppGrid}"
