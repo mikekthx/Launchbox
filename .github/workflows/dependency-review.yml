@@ -1,7 +1,7 @@
 name: Dependency Review
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [ "main" ]
     paths:
       - '**/*.csproj'
@@ -17,6 +17,7 @@ permissions:
 jobs:
   dependency-review:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
     timeout-minutes: 10
     steps:
       - name: Checkout repository

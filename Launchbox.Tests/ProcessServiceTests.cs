@@ -47,8 +47,6 @@ public class ProcessServiceTests
         var service = new FaultyProcessService();
 
         // Act & Assert
-        // We verify that the exception is propagated correctly,
-        // and that it does NOT throw a NullReferenceException in the finally block.
         var exception = Assert.Throws<InvalidOperationException>(() => service.IsProcessRunning("TestProcess"));
         Assert.Equal("Simulated exception from GetProcessesByName", exception.Message);
     }
