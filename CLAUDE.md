@@ -394,7 +394,8 @@ Prefer the smallest verification set that meaningfully exercises the affected be
 
 - The test project uses file-linking, not `<ProjectReference>`; new production files under test must be linked manually in `Launchbox.Tests/Launchbox.Tests.csproj`
 - `AppItem.Icon` intentionally uses `object`; replacing it with a WinUI-specific type will make testing harder and spread UI coupling
-- Out-of-tree XAML elements such as tray and flyout content must use `{Binding}` rather than `{x:Bind}` to avoid compile-time binding/casting failures
+- Out-of-tree XAML elements such as tray and flyout content must use `{Binding}` rather than `{x:Bind}` to avoid compile-time binding/casting failures. `GroupStyle.HeaderTemplate` is also out-of-tree and has the same restriction.
+- `{x:Bind}` with a `Converter` inside any DataTemplate rooted in a `Window` fails to compile with "cannot convert from 'MainWindow' to 'FrameworkElement'" — the generated code passes `this` where `FrameworkElement` is expected, but `Window` does not inherit `FrameworkElement`. Plain `{x:Bind Property}` without a converter compiles fine. Use `{Binding Property, Converter=...}` whenever a converter is needed inside a DataTemplate in `MainWindow.xaml`.
 - Service wiring is manual in `MainWindow`; adding a new service in only one code path will create inconsistent runtime behavior
 - `NativeMethods.cs` is the central location for P/Invoke declarations; avoid scattering Win32 imports into feature files
 - Hotkey, tray, and auto-hide behavior span both window code and services; regressions often come from changing one side without tracing the full event flow
