@@ -41,7 +41,7 @@
                             VerticalAlignment="Center"
                             ToolTipService.ToolTip="{x:Bind Name}"
                             AutomationProperties.Name="{x:Bind Name}"
-                            Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
+                            Visibility="{x:Bind Name, Mode=OneWay, Converter={StaticResource EmptyStringToCollapsedConverter}}">
                     <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
                            Width="{Binding Tag.IconSize, ElementName=AppGrid}"
                            Height="{Binding Tag.IconSize, ElementName=AppGrid}"
@@ -177,10 +177,10 @@
                         Background="Transparent"
                         AutomationProperties.Name="{x:Bind Label}"
                         ToolTipService.ToolTip="{x:Bind Label}"
-                        AutomationProperties.ItemStatus="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseStateConverter}}"
+                        AutomationProperties.ItemStatus="{x:Bind IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseStateConverter}}"
                         helpers:UIElementExtensions.TappedCommand="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.ToggleGroupCommand}"
-                        helpers:UIElementExtensions.TappedCommandParameter="{Binding}">
-                    <FontIcon Glyph="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
+                        helpers:UIElementExtensions.TappedCommandParameter="{x:Bind}">
+                    <FontIcon Glyph="{x:Bind IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseChevronConverter}}"
                               FontSize="12"
                               AutomationProperties.AccessibilityView="Raw"
                               Visibility="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.CollapsibleGroupsEnabled,
