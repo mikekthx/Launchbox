@@ -8,16 +8,16 @@ on:
       - '**/packages.lock.json'
       - 'global.json'
 
-permissions:
-  contents: write
-  pull-requests: write
-  # id-token: write is required for advanced-security/component-detection-dependency-submission-action to interact with GitHub OIDC
-  id-token: write
 
 jobs:
   dependency-review:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      # id-token: write is required for advanced-security/component-detection-dependency-submission-action to interact with GitHub OIDC
+      id-token: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4
