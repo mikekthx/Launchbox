@@ -45,7 +45,7 @@
     <value>未找到快捷方式</value>
   </data>
   <data name="MainWindow_AddShortcuts.Text" xml:space="preserve">
-    <value>请将快捷方式添加到您的“桌面/Shortcuts”文件夹</value>
+    <value>请将快捷方式添加到您的"桌面/Shortcuts"文件夹</value>
   </data>
   <data name="MainWindow_OpenFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>打开配置的快捷方式文件夹</value>
@@ -122,7 +122,7 @@
     <value>图标大小</value>
   </data>
   <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>始终在屏幕中央打开主窗口</value>
+    <value>Always open the main window in the center of the screen</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>窗口管理</value>
@@ -188,7 +188,7 @@
     <value>Launchbox</value>
   </data>
   <data name="Error_LaunchFailedMessage" xml:space="preserve">
-    <value>无法启动“{0}”。</value>
+    <value>无法启动"{0}"。</value>
   </data>
   <data name="Error_NotificationTitle" xml:space="preserve">
     <value>Launchbox 错误</value>
@@ -203,7 +203,7 @@
     <value>添加文件夹</value>
   </data>
   <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>添加新的快捷方式文件夹</value>
+    <value>Add a new shortcuts folder</value>
   </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>添加文件夹</value>
@@ -245,7 +245,7 @@
     <value>可折叠组</value>
   </data>
   <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>按文件夹对快捷方式进行分组并允许折叠分组</value>
+    <value>Enable grouping shortcuts by folder and collapsing those groups</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>重命名文件夹</value>
