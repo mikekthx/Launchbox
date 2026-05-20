@@ -1,0 +1,5 @@
+**What:** Added missing `ToolTipService.ToolTip` localizations for the "Keep Window Centered" toggle, "Collapsible Groups" toggle, and "Add Folder" button in the Settings window.
+
+**Why:** Several interactive settings controls lacked descriptive tooltips. These micro-interactions help mouse and touch users understand what specific settings do without cluttering the UI with permanent description text.
+
+**Accessibility Impacts:** Screen readers can now proactively announce the descriptive tooltip for these controls when they receive focus, significantly improving context for non-visual users.
