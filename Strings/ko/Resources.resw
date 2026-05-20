@@ -122,7 +122,7 @@
     <value>아이콘 크기</value>
   </data>
   <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Force the main window to always open in the center of your screen</value>
+    <value>Always open the main window in the center of your screen</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>창 관리</value>
