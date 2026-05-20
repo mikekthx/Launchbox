@@ -122,7 +122,7 @@
     <value>Rozmiar ikon</value>
   </data>
   <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Zawsze otwiera główne okno na środku ekranu</value>
+    <value>Always open the main window in the center of the screen</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Zarządzanie oknem</value>
@@ -203,7 +203,7 @@
     <value>Dodaj folder</value>
   </data>
   <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Dodaj nowy folder skrótów</value>
+    <value>Add a new shortcuts folder</value>
   </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Dodaj folder</value>
@@ -245,7 +245,7 @@
     <value>Zwijane grupy</value>
   </data>
   <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Grupuje skróty według folderów i umożliwia zwijanie grup</value>
+    <value>Enable grouping shortcuts by folder and collapsing those groups</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Zmień nazwę folderu</value>
