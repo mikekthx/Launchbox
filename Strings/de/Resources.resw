@@ -122,7 +122,7 @@
     <value>Symbolgröße</value>
   </data>
   <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Always open the main window in the center of the screen</value>
+    <value>Öffnet das Hauptfenster immer in der Bildschirmmitte</value>
   </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Fensterverwaltung</value>
@@ -203,7 +203,7 @@
     <value>Ordner hinzufügen</value>
   </data>
   <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Add a new shortcuts folder</value>
+    <value>Einen neuen Verknüpfungsordner hinzufügen</value>
   </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Ordner hinzufügen</value>
@@ -245,7 +245,7 @@
     <value>Einklappbare Gruppen</value>
   </data>
   <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Enable grouping shortcuts by folder and collapsing those groups</value>
+    <value>Gruppiert Verknüpfungen nach Ordner und ermöglicht das Reduzieren der Gruppen</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Ordner umbenennen</value>
