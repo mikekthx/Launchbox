@@ -88,13 +88,27 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void RebuildFilteredApps()
     {
-        var source = string.IsNullOrEmpty(_filterText)
-            ? (IEnumerable<AppItem>)Apps
-            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                  .OrderBy(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
+        IEnumerable<AppItem> source;
+
+        if (string.IsNullOrEmpty(_filterText))
+        {
+            source = Apps;
+        }
+        else
+        {
+            // Filter by substring, then prioritize items that start with the search term.
+            // OrderByDescending with a boolean natively sorts 'true' (match) before 'false'.
+            source = Apps
+                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
+        }
+
         FilteredApps.ReplaceAll(source);
+
         if (IsMergedMode)
+        {
             UpdateSelectedItem();
+        }
     }
 
     private void UpdateSelectedItem()
