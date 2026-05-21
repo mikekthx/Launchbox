@@ -96,8 +96,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            // Filter by substring, then prioritize items that start with the search term.
-            // OrderByDescending with a boolean natively sorts 'true' (match) before 'false'.
             source = Apps
                 .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
