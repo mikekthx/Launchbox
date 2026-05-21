@@ -81,7 +81,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             group.ApplyFilter(_filterText);
         }
         if (IsGroupedMode)
+        {
             UpdateSelectedItem();
+        }
     }
 
     public BulkObservableCollection<AppItem> FilteredApps { get; } = [];
