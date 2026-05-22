@@ -81,20 +81,34 @@ public partial class MainViewModel : ObservableObject, IDisposable
             group.ApplyFilter(_filterText);
         }
         if (IsGroupedMode)
+        {
             UpdateSelectedItem();
+        }
     }
 
     public BulkObservableCollection<AppItem> FilteredApps { get; } = [];
 
     private void RebuildFilteredApps()
     {
-        var source = string.IsNullOrEmpty(_filterText)
-            ? (IEnumerable<AppItem>)Apps
-            : Apps.Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                  .OrderBy(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase) ? 0 : 1);
+        IEnumerable<AppItem> source;
+
+        if (string.IsNullOrEmpty(_filterText))
+        {
+            source = Apps;
+        }
+        else
+        {
+            source = Apps
+                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
+        }
+
         FilteredApps.ReplaceAll(source);
+
         if (IsMergedMode)
+        {
             UpdateSelectedItem();
+        }
     }
 
     private void UpdateSelectedItem()
