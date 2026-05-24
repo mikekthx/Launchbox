@@ -26,10 +26,10 @@ public static class IconHelper
         try
         {
             var image = createInstance();
-            // WinUI BitmapImage.SetSourceAsync requires the stream to remain open for the lifetime of the image.
-            // Prematurely disposing of the stream causes silent rendering failures.
-            // A MemoryStream constructed over a byte array holds no unmanaged resources and is safe for the GC.
-            var stream = new MemoryStream(imageBytes);
+            // The stream only needs to live until SetSourceAsync completes; dispose it immediately after.
+            // MemoryStream over a byte array holds no unmanaged resources, but releasing early avoids
+            // unnecessary GC pressure when many icons are loaded concurrently.
+            using var stream = new MemoryStream(imageBytes);
             await setSourceAction(image, stream);
             return image;
         }
