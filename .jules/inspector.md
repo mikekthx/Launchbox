@@ -1,6 +1,6 @@
-## 2026-02-18 - [Reliability] Prevent premature disposal of BitmapImage source stream
-**Learning:** In WinUI/UWP, `BitmapImage.SetSourceAsync` requires the stream to remain open for the lifetime of the `BitmapImage`. Disposing the stream immediately (via `using`) can cause silent rendering failures or crashes if the image is accessed later.
-**Action:** Avoid `using` on `MemoryStream` when passing it to `BitmapImage.SetSourceAsync`. `MemoryStream` (over byte array) holds no unmanaged resources and is safe for GC.
+## 2026-02-18 - [Reliability] C# using var scope semantics
+**Learning:** C# `using var` disposes at the end of its enclosing scope, not at the declaration line. It does not prematurely dispose resources across an `await` within the same block.
+**Action:** Use `using var` for `MemoryStream` objects when passing them to asynchronous methods like `BitmapImage.SetSourceAsync` within the same block. The stream will remain alive for the duration of the `await` and safely dispose afterwards.
 
 ## 2026-02-18 - [Reliability] GDI+ Concurrency Instability
 **Learning:** `System.Drawing` (GDI+) functions like `Icon.FromHandle`, `Icon.ToBitmap`, and `Image.Save` are not thread-safe and can cause `ExternalException` or random crashes when invoked concurrently from multiple threads (e.g., `Parallel.ForEachAsync`), even on separate instances.
