@@ -121,6 +121,9 @@
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
     <value>Tamaño de iconos</value>
   </data>
+  <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Abre siempre la ventana principal en el centro de la pantalla</value>
+  </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Gestión de ventanas</value>
   </data>
@@ -199,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Agregar carpeta</value>
   </data>
+  <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Agregar una nueva carpeta de accesos directos</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Agregar carpeta</value>
   </data>
@@ -237,6 +243,9 @@
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
     <value>Grupos contraíbles</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Agrupa los accesos directos por carpeta y permite contraer los grupos</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Renombrar carpeta</value>

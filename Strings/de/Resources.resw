@@ -121,6 +121,9 @@
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
     <value>Symbolgröße</value>
   </data>
+  <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Öffnet das Hauptfenster immer in der Bildschirmmitte</value>
+  </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Fensterverwaltung</value>
   </data>
@@ -199,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Ordner hinzufügen</value>
   </data>
+  <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Einen neuen Verknüpfungsordner hinzufügen</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Ordner hinzufügen</value>
   </data>
@@ -237,6 +243,9 @@
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
     <value>Einklappbare Gruppen</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Gruppiert Verknüpfungen nach Ordner und ermöglicht das Reduzieren der Gruppen</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Ordner umbenennen</value>

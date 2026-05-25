@@ -121,6 +121,9 @@
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
     <value>Размер значков</value>
   </data>
+  <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Всегда открывать главное окно в центре экрана</value>
+  </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Управление окном</value>
   </data>
@@ -199,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Добавить папку</value>
   </data>
+  <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Добавить новую папку ярлыков</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Добавить папку</value>
   </data>
@@ -237,6 +243,9 @@
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
     <value>Сворачиваемые группы</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Группирует ярлыки по папкам и позволяет сворачивать группы</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Переименовать папку</value>

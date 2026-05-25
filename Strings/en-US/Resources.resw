@@ -121,6 +121,9 @@
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
     <value>Icon size</value>
   </data>
+  <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Always open the main window in the center of the screen</value>
+  </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>Window Management</value>
   </data>
@@ -199,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Add Folder</value>
   </data>
+  <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a new shortcuts folder</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>Add Folder</value>
   </data>
@@ -237,6 +243,9 @@
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
     <value>Collapsible Groups</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Groups shortcuts by folder with collapsible sections</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>Rename Folder</value>

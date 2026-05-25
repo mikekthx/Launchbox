@@ -121,6 +121,9 @@
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
     <value>アイコンのサイズ</value>
   </data>
+  <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>メインウィンドウを常に画面中央に表示</value>
+  </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>ウィンドウ管理</value>
   </data>
@@ -199,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>フォルダーを追加</value>
   </data>
+  <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>新しいショートカットフォルダーを追加</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>フォルダーを追加</value>
   </data>
@@ -237,6 +243,9 @@
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
     <value>折りたたみ可能なグループ</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ショートカットをフォルダーごとにグループ化し、グループの折りたたみを有効にする</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>フォルダーの名前を変更</value>

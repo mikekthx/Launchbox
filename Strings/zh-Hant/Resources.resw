@@ -121,6 +121,9 @@
   <data name="Settings_IconSizeCombo.AutomationProperties.Name" xml:space="preserve">
     <value>圖示大小</value>
   </data>
+  <data name="Settings_KeepCentered.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>始終在螢幕中央開啟主視窗</value>
+  </data>
   <data name="Settings_WindowHeader.Text" xml:space="preserve">
     <value>視窗管理</value>
   </data>
@@ -199,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>新增資料夾</value>
   </data>
+  <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>新增捷徑資料夾</value>
+  </data>
   <data name="Settings_AddFolderText.Text" xml:space="preserve">
     <value>新增資料夾</value>
   </data>
@@ -237,6 +243,9 @@
   </data>
   <data name="Settings_CollapsibleGroups.Header" xml:space="preserve">
     <value>可摺疊群組</value>
+  </data>
+  <data name="Settings_CollapsibleGroups.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>依資料夾分組捷徑並允許摺疊群組</value>
   </data>
   <data name="Settings_RenameFolder_Title" xml:space="preserve">
     <value>重新命名資料夾</value>
