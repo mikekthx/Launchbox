@@ -113,6 +113,10 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
         }
     }
 
+    /// <summary>
+    /// Removes the specified shortcut folder based on its order and updates the settings.
+    /// </summary>
+    /// <param name="order">The order index of the folder to remove.</param>
     [RelayCommand]
     private void RemoveFolder(int order) => _settingsService.RemoveShortcutFolder(order);
 

@@ -118,14 +118,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SelectedItem = null;
             return;
         }
-        if (IsMergedMode)
-        {
-            SelectedItem = FilteredApps.FirstOrDefault();
-        }
-        else
-        {
-            SelectedItem = GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
-        }
+        SelectedItem = IsMergedMode
+            ? FilteredApps.FirstOrDefault()
+            : GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
     }
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
