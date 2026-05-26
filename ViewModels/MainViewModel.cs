@@ -159,9 +159,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private string? _trayToolTipText;
 
-    /// <summary>
-    /// Gets the tooltip text displayed when hovering over the application tray icon, dynamically formatting the currently configured hotkey.
-    /// </summary>
     public string TrayToolTipText
     {
         get
