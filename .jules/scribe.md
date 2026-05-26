@@ -11,9 +11,5 @@
 **Action:** No direct action needed as the pattern is already encapsulated into a helper method, but this remains a complex area.
 
 ## 2026-05-26 - Refactoring Multi-line Code via Bash
-**Learning:** Using  with inline heredocs for code replacements can often fail due to malformed patch formats or whitespace issues.
-**Action:** Prefer using a targeted Python script with exact  to reliably swap multi-line blocks of code during automated refactoring sessions.
-
-## 2026-05-26 - Refactoring Multi-line Code via Bash
 **Learning:** Using `patch` with inline heredocs for code replacements can often fail due to malformed patch formats or whitespace issues.
 **Action:** Prefer using a targeted Python script with exact `content.replace()` to reliably swap multi-line blocks of code during automated refactoring sessions.

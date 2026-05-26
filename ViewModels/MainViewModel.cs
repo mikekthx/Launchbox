@@ -234,6 +234,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Apps.CollectionChanged += Apps_CollectionChanged;
     }
 
+    /// <summary>
+    /// Handles modifications to the underlying Apps collection by re-evaluating derived states.
+    /// Ensures that UI bindings for filtering and empty states remain synchronized.
+    /// </summary>
     private void Apps_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         RebuildFilteredApps();
@@ -394,9 +398,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     // Falls back to the raw folder name for apps whose origin folder is no longer configured.
-    /// <summary>
-    /// Groups the ordered application items by their source folder and sorts the groups according to the folder configuration.
-    /// </summary>
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
         var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
