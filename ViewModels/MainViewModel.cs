@@ -118,9 +118,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SelectedItem = null;
             return;
         }
-        SelectedItem = IsMergedMode
-            ? FilteredApps.FirstOrDefault()
-            : GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
+
+        if (IsMergedMode)
+        {
+            SelectedItem = FilteredApps.FirstOrDefault();
+        }
+        else
+        {
+            SelectedItem = GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
+        }
     }
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
@@ -234,10 +240,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         Apps.CollectionChanged += Apps_CollectionChanged;
     }
 
-    /// <summary>
-    /// Handles modifications to the underlying Apps collection by re-evaluating derived states.
-    /// Ensures that UI bindings for filtering and empty states remain synchronized.
-    /// </summary>
     private void Apps_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         RebuildFilteredApps();
