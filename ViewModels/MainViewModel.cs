@@ -118,15 +118,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SelectedItem = null;
             return;
         }
-
-        if (IsMergedMode)
-        {
-            SelectedItem = FilteredApps.FirstOrDefault();
-        }
-        else
-        {
-            SelectedItem = GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
-        }
+        SelectedItem = IsMergedMode
+            ? FilteredApps.FirstOrDefault()
+            : GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
     }
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
@@ -165,6 +159,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private string? _trayToolTipText;
 
+    /// <summary>
+    /// Gets the tooltip text displayed when hovering over the application tray icon, dynamically formatting the currently configured hotkey.
+    /// </summary>
     public string TrayToolTipText
     {
         get
