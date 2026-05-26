@@ -190,9 +190,6 @@ public class SettingsService : ObservableObject
         return result;
     }
 
-    /// <summary>
-    /// Gets or sets the folder view mode, determining whether apps are displayed merged or grouped by folder.
-    /// </summary>
     public FolderViewMode FolderViewMode
     {
         get

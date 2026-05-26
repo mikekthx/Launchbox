@@ -394,6 +394,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     // Falls back to the raw folder name for apps whose origin folder is no longer configured.
+    /// <summary>
+    /// Groups the ordered application items by their source folder and sorts the groups according to the folder configuration.
+    /// </summary>
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
         var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
