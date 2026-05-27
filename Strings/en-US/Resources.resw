@@ -202,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Add Folder</value>
   </data>
+  <data name="Settings_AddFolderProgress.AutomationProperties.Name" xml:space="preserve">
+    <value>Adding folder</value>
+  </data>
   <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Add a new shortcuts folder</value>
   </data>

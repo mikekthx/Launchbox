@@ -202,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Добавить папку</value>
   </data>
+  <data name="Settings_AddFolderProgress.AutomationProperties.Name" xml:space="preserve">
+    <value>Добавление папки</value>
+  </data>
   <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Добавить новую папку ярлыков</value>
   </data>

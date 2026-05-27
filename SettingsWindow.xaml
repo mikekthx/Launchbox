@@ -85,7 +85,9 @@
                             <TextBlock x:Uid="Settings_AddFolderText" />
                         </StackPanel>
                     </Button>
-                    <ProgressRing IsActive="{x:Bind ViewModel.AddFolderCommand.IsRunning, Mode=OneWay}"
+                    <ProgressRing x:Uid="Settings_AddFolderProgress"
+                                  IsActive="{x:Bind ViewModel.AddFolderCommand.IsRunning, Mode=OneWay}"
+                                  Visibility="{x:Bind helpers:BooleanToVisibilityConverter.ConvertBool(ViewModel.AddFolderCommand.IsRunning), Mode=OneWay}"
                                   Width="16" Height="16"
                                   VerticalAlignment="Center" />
                 </StackPanel>

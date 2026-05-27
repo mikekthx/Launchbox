@@ -202,6 +202,9 @@
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Agregar carpeta</value>
   </data>
+  <data name="Settings_AddFolderProgress.AutomationProperties.Name" xml:space="preserve">
+    <value>Añadiendo carpeta</value>
+  </data>
   <data name="Settings_AddFolder.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Agregar una nueva carpeta de accesos directos</value>
   </data>
