@@ -9,3 +9,7 @@
 ## 2026-03-24 - GetWithExpirationRetry Clarity
 **Learning:** `IconService` uses a complex `GetWithExpirationRetry` method to handle cache expiration in a concurrent environment. This replaces a previous `while(true)` loop. The method signature and logic are generic but conceptually dense. The inline lambdas for cache expiration logic in `GetCachedDirectoryInfo` and `GetCachedLastWriteTime` are particularly verbose.
 **Action:** No direct action needed as the pattern is already encapsulated into a helper method, but this remains a complex area.
+
+## 2026-05-26 - Refactoring Multi-line Code via Bash
+**Learning:** Using `patch` with inline heredocs for code replacements can often fail due to malformed patch formats or whitespace issues.
+**Action:** Prefer using a targeted Python script with exact `content.replace()` to reliably swap multi-line blocks of code during automated refactoring sessions.
