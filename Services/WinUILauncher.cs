@@ -35,15 +35,15 @@ public class WinUILauncher : IAppLauncher
             return;
         }
 
-        string extension = Path.GetExtension(path).ToLowerInvariant();
-        if (!ALLOWED_EXTENSIONS.Contains(extension))
+        string extension = Path.GetExtension(path);
+        if (!ALLOWED_EXTENSIONS.Contains(extension, StringComparer.OrdinalIgnoreCase))
         {
             Trace.WriteLine($"Blocked execution of unauthorized file: {PathSecurity.RedactPath(path)}");
             return;
         }
 
         // Validate shortcut target (Defense-in-depth)
-        if (extension == ".lnk" || extension == ".url")
+        if (extension.Equals(".lnk", StringComparison.OrdinalIgnoreCase) || extension.Equals(".url", StringComparison.OrdinalIgnoreCase))
         {
             ShortcutMetadata? metadata;
             try
@@ -71,7 +71,7 @@ public class WinUILauncher : IAppLauncher
 
             if (string.IsNullOrEmpty(targetPath))
             {
-                if (extension == ".url")
+                if (extension.Equals(".url", StringComparison.OrdinalIgnoreCase))
                 {
                     // .url MUST have a resolved http/https target; null means unsafe scheme was rejected.
                     Trace.WriteLine($"Blocked execution of .url with unresolvable or unsafe scheme: {PathSecurity.RedactPath(path)}");
@@ -82,7 +82,7 @@ public class WinUILauncher : IAppLauncher
                 // The shell may still be able to handle it, so proceed with arg/workingDir checks.
                 Trace.WriteLine($"Launching .lnk with empty target (COM returned no path): {PathSecurity.RedactPath(path)}");
             }
-            else if (extension == ".lnk")
+            else if (extension.Equals(".lnk", StringComparison.OrdinalIgnoreCase))
             {
                 // Security: validate .lnk target as a filesystem path.
                 // .url targets are http/https URLs already validated by the resolver — IsUnsafePath
@@ -95,7 +95,7 @@ public class WinUILauncher : IAppLauncher
                 Trace.WriteLine($"Shortcut target validated: {PathSecurity.RedactPath(targetPath)}");
             }
 
-            if (extension == ".lnk")
+            if (extension.Equals(".lnk", StringComparison.OrdinalIgnoreCase))
             {
                 string? args = metadata.Arguments;
                 if (PathSecurity.ContainsUncPath(args))
