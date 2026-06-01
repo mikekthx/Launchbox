@@ -568,7 +568,29 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
+
+    public event EventHandler? GridFocusRequested;
+
     public void ClearFilter() => FilterText = string.Empty;
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                e.Handled = true;
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (e.Key == Windows.System.VirtualKey.Down)
+        {
+            GridFocusRequested?.Invoke(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+    }
+
 
     /// <summary>
     /// Persists the current item order after a drag-and-drop reorder.
