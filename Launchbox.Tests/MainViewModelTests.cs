@@ -15,8 +15,6 @@ namespace Launchbox.Tests;
 [Collection("Localization")]
 public class MainViewModelTests
 {
-
-
     [Fact]
     public void SearchBoxKeyDownCommand_EnterWithSelectedItem_LaunchesApp()
     {
