@@ -104,7 +104,7 @@ public static class UIElementExtensions
         }
     }
 
-                private static void Element_KeyDown(object sender, KeyRoutedEventArgs e)
+    private static void Element_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (sender is UIElement element)
         {
