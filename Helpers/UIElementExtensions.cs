@@ -9,9 +9,9 @@ using System.Windows.Input;
 namespace Launchbox.Helpers;
 
 /// <summary>
-/// Attached properties that route <see cref="UIElement.Tapped"/> to an
-/// <see cref="ICommand"/>, enabling MVVM-style tapped-event binding without code-behind
-/// for elements that do not natively support commands (like <see cref="Microsoft.UI.Xaml.Controls.Grid"/>).
+/// Attached properties that route <see cref="UIElement.Tapped"/> and <see cref="UIElement.KeyDown"/>
+/// to an <see cref="ICommand"/>, enabling MVVM-style event binding without code-behind
+/// for elements that do not natively support commands (like <see cref="Microsoft.UI.Xaml.Controls.Grid"/> or <see cref="Microsoft.UI.Xaml.Controls.TextBox"/>).
 /// </summary>
 public static class UIElementExtensions
 {
@@ -111,8 +111,14 @@ public static class UIElementExtensions
             var command = GetKeyDownCommand(element);
             if (command != null && command.CanExecute(e.Key))
             {
-                command.Execute(e.Key);
-                e.Handled = true;
+                // The ViewModel command must process VirtualKey, but standard ICommands return void.
+                // However, since we know these specific keys (Enter, Down) are consumed by the ViewModel
+                // and shouldn't propagate, we handle them here if the command successfully executes.
+                if (e.Key == Windows.System.VirtualKey.Enter || e.Key == Windows.System.VirtualKey.Down)
+                {
+                    command.Execute(e.Key);
+                    e.Handled = true;
+                }
             }
         }
     }

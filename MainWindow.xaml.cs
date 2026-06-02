@@ -114,6 +114,7 @@ public sealed partial class MainWindow : Window
         activeGrid.Focus(FocusState.Keyboard);
     }
 
+
     private void ViewModel_SearchFocusRequested(object? sender, EventArgs e)
     {
         SearchBox.Focus(FocusState.Programmatic);

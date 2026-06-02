@@ -568,11 +568,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
+
     public event EventHandler? GridFocusRequested;
 
     public void ClearFilter() => FilterText = string.Empty;
 
-    [RelayCommand(CanExecute = nameof(CanSearchBoxKeyDown))]
+    [RelayCommand]
     private void SearchBoxKeyDown(Windows.System.VirtualKey key)
     {
         if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
@@ -588,8 +589,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    private bool CanSearchBoxKeyDown(Windows.System.VirtualKey key) =>
-        key == Windows.System.VirtualKey.Enter || key == Windows.System.VirtualKey.Down;
 
     /// <summary>
     /// Persists the current item order after a drag-and-drop reorder.
