@@ -104,21 +104,15 @@ public static class UIElementExtensions
         }
     }
 
-private static void Element_KeyDown(object sender, KeyRoutedEventArgs e)
+    private static void Element_KeyDown(object sender, KeyRoutedEventArgs e)
     {
         if (sender is UIElement element)
         {
             var command = GetKeyDownCommand(element);
             if (command != null && command.CanExecute(e.Key))
             {
-                // The ViewModel command must process VirtualKey, but standard ICommands return void.
-                // However, since we know these specific keys (Enter, Down) are consumed by the ViewModel
-                // and shouldn't propagate, we handle them here if the command successfully executes.
-                if (e.Key == Windows.System.VirtualKey.Enter || e.Key == Windows.System.VirtualKey.Down)
-                {
-                    command.Execute(e.Key);
-                    e.Handled = true;
-                }
+                command.Execute(e.Key);
+                e.Handled = true;
             }
         }
     }
