@@ -15,6 +15,68 @@ namespace Launchbox.Tests;
 [Collection("Localization")]
 public class MainViewModelTests
 {
+
+
+    [Fact]
+    public void SearchBoxKeyDownCommand_EnterWithSelectedItem_LaunchesApp()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var app = new AppItem { Path = "C:\\test.lnk", Name = "test.lnk", FolderPath = "C:\\", FolderLabel = "Test App" };
+        vm.SelectedItem = app;
+
+        // Act
+        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
+
+        // Assert
+        Assert.Equal("C:\\test.lnk", _appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void SearchBoxKeyDownCommand_EnterWithoutSelectedItem_DoesNothing()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        vm.SelectedItem = null;
+
+        // Act
+        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
+
+        // Assert
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void SearchBoxKeyDownCommand_DownKey_RaisesGridFocusRequestedEvent()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var eventRaised = false;
+        vm.GridFocusRequested += (s, e) => eventRaised = true;
+
+        // Act
+        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Down);
+
+        // Assert
+        Assert.True(eventRaised);
+    }
+
+    [Fact]
+    public void SearchBoxKeyDownCommand_OtherKey_DoesNothing()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var eventRaised = false;
+        vm.GridFocusRequested += (s, e) => eventRaised = true;
+
+        // Act
+        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.A);
+
+        // Assert
+        Assert.False(eventRaised);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
     [Fact]
     public void CharacterReceivedCommand_AppendsCharacterAndRaisesEvent()
     {
