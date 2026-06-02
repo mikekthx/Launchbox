@@ -262,4 +262,7 @@
   <data name="CollapseState_Expanded" xml:space="preserve">
     <value>已展开</value>
   </data>
+  <data name="Settings_AddFolderProgress.AutomationProperties.Name" xml:space="preserve">
+    <value>正在添加文件夹</value>
+  </data>
 </root>

@@ -18,3 +18,6 @@
 ## 2026-05-06 - Hit-Testing Empty Space in WinUI
 **Learning:** In WinUI/UWP/WPF, interactive layout panels (such as `StackPanel` or `Grid`) with a null background do not register pointer events in their empty/transparent spaces.
 **Action:** Explicitly set `Background="Transparent"` to ensure the entire bounds of the element are hit-testable, especially for drag-and-drop or click targets like an `AppItemTemplate`.
+## 2026-05-15 - ProgressRing Visibility Binding
+**Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
+**Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.

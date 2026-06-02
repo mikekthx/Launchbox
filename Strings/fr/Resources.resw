@@ -262,4 +262,7 @@
   <data name="CollapseState_Expanded" xml:space="preserve">
     <value>Développé</value>
   </data>
+  <data name="Settings_AddFolderProgress.AutomationProperties.Name" xml:space="preserve">
+    <value>Ajout de dossier</value>
+  </data>
 </root>
