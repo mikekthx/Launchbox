@@ -572,10 +572,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public void ClearFilter() => FilterText = string.Empty;
 
-    private static bool CanSearchBoxKeyDown(Windows.System.VirtualKey key)
-    {
-        return key is Windows.System.VirtualKey.Enter or Windows.System.VirtualKey.Down;
-    }
+    private static bool CanSearchBoxKeyDown(Windows.System.VirtualKey key) =>
+        key is Windows.System.VirtualKey.Enter or Windows.System.VirtualKey.Down;
 
     [RelayCommand(CanExecute = nameof(CanSearchBoxKeyDown))]
     private void SearchBoxKeyDown(Windows.System.VirtualKey key)
