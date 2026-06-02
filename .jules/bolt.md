@@ -27,3 +27,6 @@
 ## 2026-04-20 - Optimize ShortcutService extension lookups
 **Learning:** Using `IReadOnlyList<string>.Contains` with `StringComparer.OrdinalIgnoreCase` inside an `Enumerable.Where` loop results in an O(N*M) time complexity. For large directories and extension lists, this can be slow.
 **Action:** Replace `IReadOnlyList<string>.Contains` with a pre-instantiated `HashSet<string>` using `StringComparer.OrdinalIgnoreCase`. This turns the O(N*M) lookup into O(N), bringing significant performance gains (e.g., from 703ms down to 306ms in our benchmark).
+## 2026-05-31 - StringComparer.OrdinalIgnoreCase avoids ToLowerInvariant allocations
+**Learning:** Calling `.ToLowerInvariant()` prior to executing a `.Contains(...)` check with `StringComparison.CurrentCultureIgnoreCase` or `StringComparison.OrdinalIgnoreCase` is redundant and causes unnecessary string allocations per execution.
+**Action:** Substitute `ToLowerInvariant` with `StringComparer.OrdinalIgnoreCase` when checking file extensions against allowed lists to prevent redundant string allocations and lower memory overhead.

@@ -81,6 +81,20 @@ public class WinUILauncherSecurityTests
     }
 
     [Fact]
+    public void Launch_Blocks_Shortcut_With_UppercaseExtension_StillValidatesTarget()
+    {
+        // Setup: shortcut points to UNC path
+        var shortcutResolver = new MockShortcutResolver(@"\\attacker\share\malware.exe");
+        var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+        _fileSystem.AddFile(@"C:\safe\shortcut.LNK");
+
+        launcher.Launch(@"C:\safe\shortcut.LNK");
+
+        Assert.False(_processStarter.WasStarted);
+    }
+
+    [Fact]
     public void Launch_Allows_Shortcut_To_SafePath()
     {
         // Setup: shortcut points to safe path
