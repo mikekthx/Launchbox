@@ -568,12 +568,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
-
     public event EventHandler? GridFocusRequested;
 
     public void ClearFilter() => FilterText = string.Empty;
 
-    [RelayCommand]
+    private bool CanSearchBoxKeyDown(Windows.System.VirtualKey key)
+    {
+        return key == Windows.System.VirtualKey.Enter || key == Windows.System.VirtualKey.Down;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSearchBoxKeyDown))]
     private void SearchBoxKeyDown(Windows.System.VirtualKey key)
     {
         if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
@@ -588,8 +592,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
             GridFocusRequested?.Invoke(this, EventArgs.Empty);
         }
     }
-
-
     /// <summary>
     /// Persists the current item order after a drag-and-drop reorder.
     /// In Merged mode reads from <see cref="FilteredApps"/> (WinUI mutates it in-place during drag).
