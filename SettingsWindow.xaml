@@ -44,11 +44,15 @@
                           AllowDrop="True"
                           CanDragItems="True"
                           helpers:ListViewBaseExtensions.DragItemsCompletedCommand="{x:Bind ViewModel.PersistFolderSequenceCommand}">
+                  <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                      <Setter Property="AutomationProperties.Name" Value="{Binding Label}" />
+                    </Style>
+                  </ListView.ItemContainerStyle>
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
                             Background="Transparent"
-                            AutomationProperties.Name="{x:Bind Label}"
                             ToolTipService.ToolTip="{x:Bind Label}">
                         <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
