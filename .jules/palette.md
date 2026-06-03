@@ -21,3 +21,6 @@
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
+## 2024-05-24 - [List Item Accessibility Context]
+**Learning:** Adding accessibility and tooltip properties to inner child elements of a `ListViewItem` DataTemplate forces users to hover/focus precisely on those elements. If properties are missing on the root, screen readers may read the raw text without semantic context, or worse, miss it if overridden improperly.
+**Action:** Always apply `AutomationProperties.Name` and `ToolTipService.ToolTip` to the root container (e.g., `<Grid>`) of a `DataTemplate` in list controls. This ensures full row context is provided upon focus and tooltips trigger seamlessly across the entire hit target.

@@ -47,7 +47,9 @@
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
-                            Background="Transparent">
+                            Background="Transparent"
+                            AutomationProperties.Name="{x:Bind Label}"
+                            ToolTipService.ToolTip="{x:Bind Label}">
                         <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
                           <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
