@@ -47,12 +47,12 @@
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
-                            Background="Transparent">
+                            Background="Transparent"
+                            ToolTipService.ToolTip="{x:Bind Path}">
                         <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
                           <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                     TextTrimming="CharacterEllipsis"
-                                     ToolTipService.ToolTip="{x:Bind Path}" />
+                                     TextTrimming="CharacterEllipsis" />
                         </StackPanel>
                         <Button Grid.Column="1" x:Uid="Settings_MoveUp"
                                 Command="{Binding ElementName=SettingsContent, Path=DataContext.ViewModel.MoveFolderUpCommand}"
