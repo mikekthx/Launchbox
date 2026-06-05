@@ -22,6 +22,6 @@
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
 
-## 2026-06-05 - [ToolTip hit area expansion]
+## 2026-06-05 - ToolTip hit area expansion
 **Learning:** In WinUI 3 XAML, expanding the hover target area of a tooltip in a `DataTemplate` should be done on the largest relevant container that doesn't overlap with other interactive elements. Applying `ToolTipService.ToolTip` to the root row `<Grid>` can cause tooltip conflicts or noise over child buttons. Apply it to the specific area (e.g. the text's `StackPanel`) instead. Also, never apply `AutomationProperties.Name` to structural elements like a `Grid` inside a `DataTemplate`, as this is an accessibility anti-pattern.
 **Action:** When implementing micro-UX improvements involving tooltips in list templates, place the tooltip binding on the text container (like a StackPanel) rather than the entire row container if the row contains action buttons. Ensure the container has `Background="Transparent"` if it needs to be hit-testable in empty spaces.
