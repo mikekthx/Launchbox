@@ -30,3 +30,7 @@
 ## 2026-05-31 - StringComparer.OrdinalIgnoreCase avoids ToLowerInvariant allocations
 **Learning:** Calling `.ToLowerInvariant()` prior to executing a `.Contains(...)` check with `StringComparison.CurrentCultureIgnoreCase` or `StringComparison.OrdinalIgnoreCase` is redundant and causes unnecessary string allocations per execution.
 **Action:** Substitute `ToLowerInvariant` with `StringComparer.OrdinalIgnoreCase` when checking file extensions against allowed lists to prevent redundant string allocations and lower memory overhead.
+
+## 2026-06-07 - Defer DataTemplate rendering for hidden GridViews using x:Load
+**Learning:** `GridView` controls bounded by `Visibility` bindings are still instantiated into the visual tree. Replacing `Visibility` with `x:Load` ensures that a hidden `GridView` (and its items) is not instantiated until it becomes necessary, lowering startup initialization overhead and memory footprint.
+**Action:** Use `x:Load="{x:Bind ...}"` instead of `Visibility` for `GridView`s that are hidden by default (e.g., `GroupedAppGrid` vs `AppGrid`).
