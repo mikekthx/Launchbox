@@ -671,7 +671,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
 
-    [RelayCommand]
+    private bool CanSearchBoxKeyDown(Windows.System.VirtualKey key)
+    {
+        return key == Windows.System.VirtualKey.Down || (key == Windows.System.VirtualKey.Enter && SelectedItem != null);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSearchBoxKeyDown))]
     private void SearchBoxKeyDown(Windows.System.VirtualKey key)
     {
         if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
