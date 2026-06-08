@@ -1,3 +1,4 @@
+using Microsoft.UI.Xaml.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Launchbox.Helpers;
@@ -204,6 +205,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public event EventHandler? SearchFocusRequested;
+
+    public event EventHandler? GridFocusRequested;
 
     public event EventHandler<string>? LaunchFailed;
 
@@ -667,4 +670,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         GC.SuppressFinalize(this);
     }
+
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                e.Handled = true;
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (e.Key == Windows.System.VirtualKey.Down)
+        {
+            GridFocusRequested?.Invoke(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+    }
+
 }
