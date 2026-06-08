@@ -1110,7 +1110,7 @@ public class MainViewModelTests
     {
         // Arrange
         var vm = CreateViewModel();
-        var app = new AppItem { Name = "Test App", Path = @"C:	est.exe" };
+        var app = new AppItem { Name = "Test App", Path = @"C:\test.exe" };
         vm.FilteredApps.Add(app);
         vm.SelectedItem = app;
 
@@ -1118,7 +1118,7 @@ public class MainViewModelTests
         vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
 
         // Assert
-        Assert.Equal(@"C:	est.exe", _appLauncher.LastLaunchedPath);
+        Assert.Equal(@"C:\test.exe", _appLauncher.LastLaunchedPath);
     }
 
     [Fact]
@@ -1133,7 +1133,7 @@ public class MainViewModelTests
         vm.SelectedItem = null;
         Assert.False(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Enter));
 
-        vm.SelectedItem = new AppItem { Name = "Test App", Path = @"C:	est.exe" };
+        vm.SelectedItem = new AppItem { Name = "Test App", Path = @"C:\test.exe" };
         Assert.True(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Enter));
 
         Assert.False(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.A));

@@ -670,7 +670,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         GC.SuppressFinalize(this);
     }
 
-
     private bool CanSearchBoxKeyDown(Windows.System.VirtualKey key)
     {
         return key == Windows.System.VirtualKey.Down || (key == Windows.System.VirtualKey.Enter && SelectedItem != null);

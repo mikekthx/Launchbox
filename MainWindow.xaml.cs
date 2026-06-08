@@ -108,7 +108,6 @@ public sealed partial class MainWindow : Window
         ViewModel.LaunchFailed += ViewModel_LaunchFailed;
     }
 
-
     private void ViewModel_GridFocusRequested(object? sender, EventArgs e)
     {
         Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
