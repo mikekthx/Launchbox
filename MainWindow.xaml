@@ -40,7 +40,6 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             ToolTipService.ToolTip="{x:Bind Name}"
-                            AutomationProperties.Name="{x:Bind Name}"
                             Visibility="{Binding Name, Converter={StaticResource EmptyStringToCollapsedConverter}}">
                     <Image Source="{x:Bind (media:ImageSource)Icon, Mode=OneWay}"
                            Width="{Binding Tag.IconSize, ElementName=AppGrid}"
@@ -175,7 +174,6 @@
                 <DataTemplate x:DataType="models:AppItemGroup">
                   <Grid ColumnDefinitions="Auto,*" Padding="8,12,8,4"
                         Background="Transparent"
-                        AutomationProperties.Name="{x:Bind Label}"
                         ToolTipService.ToolTip="{x:Bind Label}"
                         AutomationProperties.ItemStatus="{Binding IsCollapsed, Mode=OneWay, Converter={StaticResource CollapseStateConverter}}"
                         helpers:UIElementExtensions.TappedCommand="{Binding ElementName=RootGrid, Path=DataContext.ViewModel.ToggleGroupCommand}"
