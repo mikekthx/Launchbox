@@ -105,6 +105,7 @@ public sealed partial class MainWindow : Window
 
         ViewModel.SearchFocusRequested += ViewModel_SearchFocusRequested;
         ViewModel.LaunchFailed += ViewModel_LaunchFailed;
+        ViewModel.GridFocusRequested += ViewModel_GridFocusRequested;
     }
 
     private void ViewModel_SearchFocusRequested(object? sender, EventArgs e)
@@ -123,23 +124,10 @@ public sealed partial class MainWindow : Window
         });
     }
 
-    // --- KEYBOARD NAVIGATION ---
-    private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    private void ViewModel_GridFocusRequested(object? sender, EventArgs e)
     {
-        if (e.Key == VirtualKey.Enter && ViewModel.SelectedItem != null)
-        {
-            if (ViewModel.LaunchAppCommand.CanExecute(ViewModel.SelectedItem))
-            {
-                e.Handled = true;
-                ViewModel.LaunchAppCommand.Execute(ViewModel.SelectedItem);
-            }
-        }
-        else if (e.Key == VirtualKey.Down)
-        {
-            Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
-            activeGrid.Focus(FocusState.Keyboard);
-            e.Handled = true;
-        }
+        Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
+        activeGrid.Focus(FocusState.Keyboard);
     }
 
     // --- WINDOW DRAGGING ---
@@ -263,6 +251,7 @@ public sealed partial class MainWindow : Window
 
         ViewModel.SearchFocusRequested -= ViewModel_SearchFocusRequested;
         ViewModel.LaunchFailed -= ViewModel_LaunchFailed;
+        ViewModel.GridFocusRequested -= ViewModel_GridFocusRequested;
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
         // so that a failure in one does not prevent the others from being cleaned up.

@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml.Input;
+using Windows.System;
 
 namespace Launchbox.ViewModels;
 
@@ -31,6 +33,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private List<string> _watchedPaths = [];
     private readonly object _watcherLock = new();
     private bool _isDisposed;
+
+    public event EventHandler? GridFocusRequested;
 
     public BulkObservableCollection<AppItem> Apps { get; } = [];
 
@@ -569,6 +573,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public void ClearFilter() => FilterText = string.Empty;
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                e.Handled = true;
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (e.Key == VirtualKey.Down)
+        {
+            e.Handled = true;
+            GridFocusRequested?.Invoke(this, EventArgs.Empty);
+        }
+    }
 
     /// <summary>
     /// Persists the current item order after a drag-and-drop reorder.
