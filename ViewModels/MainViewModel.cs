@@ -562,9 +562,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public bool TryLaunchSelected()
     {
-        if (SelectedItem != null && LaunchAppCommand.CanExecute(SelectedItem))
+        var item = SelectedItem;
+        if (item != null && LaunchAppCommand.CanExecute(item))
         {
-            LaunchAppCommand.Execute(SelectedItem);
+            LaunchAppCommand.Execute(item);
             return true;
         }
         return false;

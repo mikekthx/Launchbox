@@ -16,6 +16,53 @@ namespace Launchbox.Tests;
 public class MainViewModelTests
 {
     [Fact]
+    public void TryLaunchSelected_WithNullItem_ReturnsFalse()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        vm.SelectedItem = null;
+
+        // Act
+        var result = vm.TryLaunchSelected();
+
+        // Assert
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void TryLaunchSelected_WithValidItem_LaunchesAndReturnsTrue()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var item = new AppItem { Name = "Test App", Path = "C:\\test.lnk", FolderPath = "C:\\" };
+        vm.SelectedItem = item;
+
+        // Act
+        var result = vm.TryLaunchSelected();
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal("C:\\test.lnk", _appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void TryLaunchSelected_WithInvalidItem_ReturnsFalse()
+    {
+        // Arrange
+        using var vm = CreateViewModel();
+        var item = new AppItem { Name = "", Path = "C:\\test.lnk", FolderPath = "C:\\" }; // Name empty makes CanExecute false
+        vm.SelectedItem = item;
+
+        // Act
+        var result = vm.TryLaunchSelected();
+
+        // Assert
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
     public void CharacterReceivedCommand_AppendsCharacterAndRaisesEvent()
     {
         // Arrange
