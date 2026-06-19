@@ -47,7 +47,9 @@
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
-                            Background="Transparent">
+                            Background="Transparent"
+                            AutomationProperties.Name="{x:Bind Label}"
+                            ToolTipService.ToolTip="{x:Bind Label}">
                         <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
                           <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -103,11 +105,11 @@
 
                 <!-- Hotkey -->
                 <StackPanel Spacing="8">
-                    <TextBlock x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Name="HotkeyHeader" x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <ComboBox x:Uid="Settings_HotkeyModifier" ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
+                        <ComboBox x:Uid="Settings_HotkeyModifier" AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}" ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
                         <TextBlock Text="+" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
-                        <TextBox x:Uid="Settings_HotkeyKey" Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center" />
+                        <TextBox x:Uid="Settings_HotkeyKey" AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}" Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
 
