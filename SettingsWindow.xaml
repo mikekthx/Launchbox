@@ -104,7 +104,7 @@
 
                 <!-- Hotkey -->
                 <StackPanel Spacing="8"
-                            AutomationProperties.AutomationControlType="Group"
+                            AutomationProperties.LocalizedControlType="group"
                             AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}">
                     <TextBlock x:Name="HotkeyHeader" x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
