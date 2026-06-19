@@ -103,9 +103,7 @@
                               Margin="0,8,0,0" />
 
                 <!-- Hotkey -->
-                <StackPanel Spacing="8"
-                            AutomationProperties.LocalizedControlType="group"
-                            AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}">
+                <StackPanel Spacing="8">
                     <TextBlock x:Name="HotkeyHeader" x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ComboBox x:Uid="Settings_HotkeyModifier" ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
