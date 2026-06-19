@@ -22,6 +22,6 @@
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
 
-## 2026-06-21 - Settings Control LabeledBy Linkage
+## 2026-06-19 - Settings Control LabeledBy Linkage
 **Learning:** In WinUI 3 XAML settings or forms, to properly support screen readers, interactive controls (e.g., `ComboBox`, `TextBox`) must be explicitly linked to their visual headers.
 **Action:** Always assign an `x:Name` to the descriptive `TextBlock` and set `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on the associated interactive controls to ensure screen readers provide correct group context.
