@@ -191,9 +191,18 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 }
 
                 var vk = (Windows.System.VirtualKey)key;
-                string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
-                    ? ((char)key).ToString()
-                    : vk.ToString();
+                bool isNumericKey = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9;
+
+                string keyName;
+                if (isNumericKey)
+                {
+                    keyName = ((char)key).ToString();
+                }
+                else
+                {
+                    keyName = vk.ToString();
+                }
+
                 sb.Append(keyName);
 
                 _trayToolTipText = string.Format(Localization.GetString("Tray_TooltipFormat"), sb.ToString());
