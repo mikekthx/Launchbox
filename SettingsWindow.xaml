@@ -106,9 +106,11 @@
                     <TextBlock x:Name="HotkeyHeader" x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <ComboBox x:Uid="Settings_HotkeyModifier"
+                                  AutomationProperties.FullDescription="{Binding ElementName=HotkeyHeader, Path=Text}"
                                   ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
                         <TextBlock Text="+" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
                         <TextBox x:Uid="Settings_HotkeyKey"
+                                 AutomationProperties.FullDescription="{Binding ElementName=HotkeyHeader, Path=Text}"
                                  Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
