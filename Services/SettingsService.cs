@@ -47,13 +47,10 @@ public class SettingsService : ObservableObject
         }
     }
 
-    /// <summary>
-    /// Retrieves the list of currently configured shortcut folders.
-    /// </summary>
     public IReadOnlyList<ShortcutFolder> GetShortcutFolders() => _folderManager.GetFolders();
 
     /// <summary>
-    /// Adds a new shortcut folder and triggers a UI update if successful.
+    /// Adds a new shortcut folder and unconditionally triggers a UI update.
     /// </summary>
     public bool AddShortcutFolder(string path, string? label = null)
     {
@@ -63,7 +60,7 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Removes a shortcut folder by its display order and triggers a UI update if successful.
+    /// Removes a shortcut folder by its display order and unconditionally triggers a UI update.
     /// </summary>
     public bool RemoveShortcutFolder(int order)
     {
@@ -73,7 +70,7 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Moves a shortcut folder to a new position in the display order and triggers a UI update if successful.
+    /// Moves a shortcut folder to a new position in the display order and unconditionally triggers a UI update.
     /// </summary>
     public bool ReorderShortcutFolder(int fromOrder, int toOrder)
     {
@@ -83,7 +80,7 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Renames a shortcut folder and triggers a UI update if successful.
+    /// Renames a shortcut folder and unconditionally triggers a UI update.
     /// </summary>
     public bool RenameShortcutFolder(int order, string newLabel)
     {
@@ -93,7 +90,7 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Sets the exact canonical order of all shortcut folders and triggers a UI update if successful.
+    /// Sets the exact canonical order of all shortcut folders and unconditionally triggers a UI update.
     /// </summary>
     public bool SetShortcutFolderSequence(IReadOnlyList<string> orderedPaths)
     {
