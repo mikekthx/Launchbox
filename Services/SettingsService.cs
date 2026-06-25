@@ -50,9 +50,10 @@ public class SettingsService : ObservableObject
     public IReadOnlyList<ShortcutFolder> GetShortcutFolders() => _folderManager.GetFolders();
 
     /// <summary>
-    /// Adds a new shortcut folder and unconditionally triggers a UI update.
+    /// Adds a new shortcut folder. Always raises <c>PropertyChanged</c> for <c>ShortcutFolders</c>,
+    /// regardless of outcome. Returns <c>true</c> if the folder was added successfully; callers
+    /// should inspect the return value to distinguish success from failure.
     /// </summary>
-    /// <returns><c>true</c> if the folder was added successfully; otherwise, <c>false</c>.</returns>
     public bool AddShortcutFolder(string path, string? label = null)
     {
         bool result = _folderManager.AddFolder(path, label);
@@ -61,9 +62,10 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Removes a shortcut folder by its display order and unconditionally triggers a UI update.
+    /// Removes a shortcut folder by its display order. Always raises <c>PropertyChanged</c> for <c>ShortcutFolders</c>,
+    /// regardless of outcome. Returns <c>true</c> if the folder was removed successfully; callers
+    /// should inspect the return value to distinguish success from failure.
     /// </summary>
-    /// <returns><c>true</c> if the folder was removed successfully; otherwise, <c>false</c>.</returns>
     public bool RemoveShortcutFolder(int order)
     {
         bool result = _folderManager.RemoveFolder(order);
@@ -72,9 +74,10 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Moves a shortcut folder to a new position in the display order and unconditionally triggers a UI update.
+    /// Moves a shortcut folder to a new position in the display order. Always raises <c>PropertyChanged</c> for <c>ShortcutFolders</c>,
+    /// regardless of outcome. Returns <c>true</c> if the folder was reordered successfully; callers
+    /// should inspect the return value to distinguish success from failure.
     /// </summary>
-    /// <returns><c>true</c> if the folder was reordered successfully; otherwise, <c>false</c>.</returns>
     public bool ReorderShortcutFolder(int fromOrder, int toOrder)
     {
         bool result = _folderManager.ReorderFolder(fromOrder, toOrder);
@@ -83,9 +86,10 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Renames a shortcut folder and unconditionally triggers a UI update.
+    /// Renames a shortcut folder. Always raises <c>PropertyChanged</c> for <c>ShortcutFolders</c>,
+    /// regardless of outcome. Returns <c>true</c> if the folder was renamed successfully; callers
+    /// should inspect the return value to distinguish success from failure.
     /// </summary>
-    /// <returns><c>true</c> if the folder was renamed successfully; otherwise, <c>false</c>.</returns>
     public bool RenameShortcutFolder(int order, string newLabel)
     {
         bool result = _folderManager.RenameFolder(order, newLabel);
@@ -94,9 +98,10 @@ public class SettingsService : ObservableObject
     }
 
     /// <summary>
-    /// Sets the exact canonical order of all shortcut folders and unconditionally triggers a UI update.
+    /// Sets the exact canonical order of all shortcut folders. Always raises <c>PropertyChanged</c> for <c>ShortcutFolders</c>,
+    /// regardless of outcome. Returns <c>true</c> if the sequence was updated successfully; callers
+    /// should inspect the return value to distinguish success from failure.
     /// </summary>
-    /// <returns><c>true</c> if the sequence was updated successfully; otherwise, <c>false</c>.</returns>
     public bool SetShortcutFolderSequence(IReadOnlyList<string> orderedPaths)
     {
         bool result = _folderManager.SetFolderSequence(orderedPaths);
