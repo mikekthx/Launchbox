@@ -47,8 +47,14 @@ public class SettingsService : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Retrieves the list of currently configured shortcut folders.
+    /// </summary>
     public IReadOnlyList<ShortcutFolder> GetShortcutFolders() => _folderManager.GetFolders();
 
+    /// <summary>
+    /// Adds a new shortcut folder and triggers a UI update if successful.
+    /// </summary>
     public bool AddShortcutFolder(string path, string? label = null)
     {
         bool result = _folderManager.AddFolder(path, label);
@@ -56,6 +62,9 @@ public class SettingsService : ObservableObject
         return result;
     }
 
+    /// <summary>
+    /// Removes a shortcut folder by its display order and triggers a UI update if successful.
+    /// </summary>
     public bool RemoveShortcutFolder(int order)
     {
         bool result = _folderManager.RemoveFolder(order);
@@ -63,6 +72,9 @@ public class SettingsService : ObservableObject
         return result;
     }
 
+    /// <summary>
+    /// Moves a shortcut folder to a new position in the display order and triggers a UI update if successful.
+    /// </summary>
     public bool ReorderShortcutFolder(int fromOrder, int toOrder)
     {
         bool result = _folderManager.ReorderFolder(fromOrder, toOrder);
@@ -70,6 +82,9 @@ public class SettingsService : ObservableObject
         return result;
     }
 
+    /// <summary>
+    /// Renames a shortcut folder and triggers a UI update if successful.
+    /// </summary>
     public bool RenameShortcutFolder(int order, string newLabel)
     {
         bool result = _folderManager.RenameFolder(order, newLabel);
@@ -77,6 +92,9 @@ public class SettingsService : ObservableObject
         return result;
     }
 
+    /// <summary>
+    /// Sets the exact canonical order of all shortcut folders and triggers a UI update if successful.
+    /// </summary>
     public bool SetShortcutFolderSequence(IReadOnlyList<string> orderedPaths)
     {
         bool result = _folderManager.SetFolderSequence(orderedPaths);
