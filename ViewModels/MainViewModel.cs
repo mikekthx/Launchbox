@@ -568,22 +568,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
-
     public event EventHandler? GridFocusRequested;
 
-    public void HandleSearchKeyDown(Windows.System.VirtualKey key)
+    public void FocusGrid()
     {
-        if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
-        {
-            if (LaunchAppCommand.CanExecute(SelectedItem))
-            {
-                LaunchAppCommand.Execute(SelectedItem);
-            }
-        }
-        else if (key == Windows.System.VirtualKey.Down)
-        {
-            GridFocusRequested?.Invoke(this, EventArgs.Empty);
-        }
+        GridFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
     public void ClearFilter() => FilterText = string.Empty;
