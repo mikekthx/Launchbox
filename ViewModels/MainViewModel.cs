@@ -568,13 +568,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    public event EventHandler? GridFocusRequested;
-
-    public void FocusGrid()
-    {
-        GridFocusRequested?.Invoke(this, EventArgs.Empty);
-    }
-
     public void ClearFilter() => FilterText = string.Empty;
 
     /// <summary>
