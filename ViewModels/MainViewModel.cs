@@ -13,8 +13,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.System;
-using Microsoft.UI.Xaml.Input;
 
 namespace Launchbox.ViewModels;
 
@@ -227,8 +225,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
         _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         _windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
-
-        SearchBoxKeyDownCommand = new RelayCommand<KeyRoutedEventArgs>(SearchBoxKeyDown);
 
         _settingsService.PropertyChanged += SettingsService_PropertyChanged;
         _windowService.VisibilityChanged += WindowService_VisibilityChanged;
@@ -575,26 +571,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public event EventHandler? GridFocusRequested;
 
-    private void SearchBoxKeyDown(KeyRoutedEventArgs? e)
+    public void HandleSearchKeyDown(Windows.System.VirtualKey key)
     {
-        if (e == null) return;
-
-        if (e.Key == VirtualKey.Enter && SelectedItem != null)
+        if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
         {
             if (LaunchAppCommand.CanExecute(SelectedItem))
             {
-                e.Handled = true;
                 LaunchAppCommand.Execute(SelectedItem);
             }
         }
-        else if (e.Key == VirtualKey.Down)
+        else if (key == Windows.System.VirtualKey.Down)
         {
             GridFocusRequested?.Invoke(this, EventArgs.Empty);
-            e.Handled = true;
         }
     }
-
-    public IRelayCommand<KeyRoutedEventArgs> SearchBoxKeyDownCommand { get; }
 
     public void ClearFilter() => FilterText = string.Empty;
 

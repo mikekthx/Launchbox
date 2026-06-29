@@ -125,6 +125,15 @@ public sealed partial class MainWindow : Window
     }
 
     // --- KEYBOARD NAVIGATION ---
+    private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter || e.Key == VirtualKey.Down)
+        {
+            e.Handled = true;
+            ViewModel.HandleSearchKeyDown(e.Key);
+        }
+    }
+
     private void ViewModel_GridFocusRequested(object? sender, EventArgs e)
     {
         Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
