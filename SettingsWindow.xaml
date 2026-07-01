@@ -103,11 +103,23 @@
 
                 <!-- Hotkey -->
                 <StackPanel Spacing="8">
-                    <TextBlock x:Uid="Settings_HotkeyHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
+                    <TextBlock x:Name="HotkeyHeader"
+                               x:Uid="Settings_HotkeyHeader"
+                               Style="{ThemeResource SubtitleTextBlockStyle}"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <ComboBox x:Uid="Settings_HotkeyModifier" ItemsSource="{x:Bind ViewModel.Modifiers}" SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}" Width="100" />
-                        <TextBlock Text="+" VerticalAlignment="Center" AutomationProperties.AccessibilityView="Raw"/>
-                        <TextBox x:Uid="Settings_HotkeyKey" Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}" Width="100" HorizontalContentAlignment="Center" />
+                        <ComboBox x:Uid="Settings_HotkeyModifier"
+                                  AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}"
+                                  ItemsSource="{x:Bind ViewModel.Modifiers}"
+                                  SelectedItem="{x:Bind ViewModel.SelectedModifier, Mode=TwoWay}"
+                                  Width="100" />
+                        <TextBlock Text="+"
+                                   VerticalAlignment="Center"
+                                   AutomationProperties.AccessibilityView="Raw"/>
+                        <TextBox x:Uid="Settings_HotkeyKey"
+                                 AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}"
+                                 Text="{x:Bind ViewModel.HotkeyKeyString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                 Width="100"
+                                 HorizontalContentAlignment="Center" />
                     </StackPanel>
                 </StackPanel>
 
