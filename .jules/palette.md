@@ -21,6 +21,6 @@
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
-## 2026-05-18 - Labeling Interactive Inputs Without Explicit Labels
-**Learning:** In WinUI 3, interactive inputs like `ComboBox` or `TextBox` that are visually grouped under a single overarching header (but lack their own dedicated `<TextBlock>` labels directly beside them) will not be correctly described by screen readers.
-**Action:** Always assign an `x:Name` to the descriptive header `<TextBlock>` and set `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on all interactive controls within that group to establish the semantic relationship for UI Automation.
+## 2026-05-18 - LabeledBy vs x:Uid Precedence
+**Learning:** In UI Automation, `AutomationProperties.LabeledBy` takes precedence over `AutomationProperties.Name`. When controls already have specific accessible names defined via `x:Uid` in resource files, applying `LabeledBy` to a common header will incorrectly overwrite their specific names with the generic group name, causing a regression.
+**Action:** Before applying `AutomationProperties.LabeledBy` to link inputs to a group header, always check if the controls already have dedicated accessible names via `x:Uid` or `AutomationProperties.Name`. Only apply `LabeledBy` if the control genuinely lacks its own accessible name.
