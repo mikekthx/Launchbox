@@ -204,8 +204,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-
-    public System.Collections.Generic.IEnumerable<VirtualKey> SearchBoxHandledKeys => new[] { VirtualKey.Enter, VirtualKey.Down };
+    public IEnumerable<VirtualKey> SearchBoxHandledKeys => [VirtualKey.Enter, VirtualKey.Down];
 
     public event EventHandler? SearchFocusRequested;
 
