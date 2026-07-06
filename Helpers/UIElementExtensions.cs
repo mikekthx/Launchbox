@@ -5,6 +5,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using System.Windows.Input;
+using Windows.System;
 
 namespace Launchbox.Helpers;
 
@@ -75,6 +76,24 @@ public static class UIElementExtensions
         }
     }
 
+
+    public static readonly DependencyProperty KeyDownHandledKeysProperty =
+        DependencyProperty.RegisterAttached(
+            "KeyDownHandledKeys",
+            typeof(System.Collections.Generic.IEnumerable<VirtualKey>),
+            typeof(UIElementExtensions),
+            new PropertyMetadata(null));
+
+    public static void SetKeyDownHandledKeys(DependencyObject d, System.Collections.Generic.IEnumerable<VirtualKey> value)
+    {
+        d.SetValue(KeyDownHandledKeysProperty, value);
+    }
+
+    public static System.Collections.Generic.IEnumerable<VirtualKey>? GetKeyDownHandledKeys(DependencyObject d)
+    {
+        return (System.Collections.Generic.IEnumerable<VirtualKey>?)d.GetValue(KeyDownHandledKeysProperty);
+    }
+
     public static readonly DependencyProperty KeyDownCommandProperty =
         DependencyProperty.RegisterAttached(
             "KeyDownCommand",
@@ -114,9 +133,15 @@ public static class UIElementExtensions
             {
                 command.Execute(e.Key);
 
-                // Set e.Handled here for recognized keys instead of mutating from the VM
-                if (e.Key == Windows.System.VirtualKey.Enter || e.Key == Windows.System.VirtualKey.Down)
+
+                var handledKeys = GetKeyDownHandledKeys(element);
+                if (handledKeys != null && System.Linq.Enumerable.Contains(handledKeys, e.Key))
                 {
+                    e.Handled = true;
+                }
+                else if (handledKeys == null && (e.Key == VirtualKey.Enter || e.Key == VirtualKey.Down))
+                {
+                    // Fallback for backwards compatibility if not specified
                     e.Handled = true;
                 }
             }

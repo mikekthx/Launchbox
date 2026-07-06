@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.System;
 
 namespace Launchbox.ViewModels;
 
@@ -190,8 +191,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
                     sb.Append('+');
                 }
 
-                var vk = (Windows.System.VirtualKey)key;
-                string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
+                var vk = (VirtualKey)key;
+                string keyName = vk >= VirtualKey.Number0 && vk <= VirtualKey.Number9
                     ? ((char)key).ToString()
                     : vk.ToString();
                 sb.Append(keyName);
@@ -203,10 +204,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+
+    public System.Collections.Generic.IEnumerable<VirtualKey> SearchBoxHandledKeys => new[] { VirtualKey.Enter, VirtualKey.Down };
+
     public event EventHandler? SearchFocusRequested;
 
     public event EventHandler? GridFocusRequested;
-
 
     public event EventHandler<string>? LaunchFailed;
 
@@ -488,18 +491,17 @@ public partial class MainViewModel : ObservableObject, IDisposable
         });
     }
 
-
     [RelayCommand]
-    private void SearchBoxKeyDown(Windows.System.VirtualKey key)
+    private void SearchBoxKeyDown(VirtualKey key)
     {
-        if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        if (key == VirtualKey.Enter && SelectedItem != null)
         {
             if (LaunchAppCommand.CanExecute(SelectedItem))
             {
                 LaunchAppCommand.Execute(SelectedItem);
             }
         }
-        else if (key == Windows.System.VirtualKey.Down)
+        else if (key == VirtualKey.Down)
         {
             GridFocusRequested?.Invoke(this, EventArgs.Empty);
         }

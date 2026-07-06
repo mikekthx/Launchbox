@@ -114,7 +114,6 @@ public sealed partial class MainWindow : Window
         SearchBox.SelectionStart = SearchBox.Text.Length;
     }
 
-
     private void ViewModel_GridFocusRequested(object? sender, EventArgs e)
     {
         Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
@@ -130,8 +129,6 @@ public sealed partial class MainWindow : Window
                 string.Format(Localization.GetString("Error_LaunchFailedMessage"), appName));
         });
     }
-
-    // --- KEYBOARD NAVIGATION ---
 
     // --- WINDOW DRAGGING ---
     private void RootGrid_PointerPressed(object sender, PointerRoutedEventArgs e)
