@@ -9,8 +9,8 @@ using System.Windows.Input;
 namespace Launchbox.Helpers;
 
 /// <summary>
-/// Attached properties that route <see cref="UIElement.Tapped"/> and <see cref="UIElement.KeyDown"/> to an
-/// <see cref="ICommand"/>, enabling MVVM-style event binding without code-behind
+/// Attached properties that route <see cref="UIElement.Tapped"/> to an
+/// <see cref="ICommand"/>, enabling MVVM-style tapped-event binding without code-behind
 /// for elements that do not natively support commands (like <see cref="Microsoft.UI.Xaml.Controls.Grid"/>).
 /// </summary>
 public static class UIElementExtensions
@@ -71,47 +71,6 @@ public static class UIElementExtensions
             if (command != null && command.CanExecute(parameter))
             {
                 command.Execute(parameter);
-            }
-        }
-    }
-
-    public static readonly DependencyProperty KeyDownCommandProperty =
-        DependencyProperty.RegisterAttached(
-            "KeyDownCommand",
-            typeof(ICommand),
-            typeof(UIElementExtensions),
-            new PropertyMetadata(null, OnKeyDownCommandPropertyChanged));
-
-    public static void SetKeyDownCommand(DependencyObject d, ICommand? value)
-    {
-        d.SetValue(KeyDownCommandProperty, value);
-    }
-
-    public static ICommand? GetKeyDownCommand(DependencyObject d)
-    {
-        return (ICommand?)d.GetValue(KeyDownCommandProperty);
-    }
-
-    private static void OnKeyDownCommandPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-    {
-        if (d is UIElement element)
-        {
-            element.KeyDown -= Element_KeyDown;
-            if (e.NewValue is ICommand)
-            {
-                element.KeyDown += Element_KeyDown;
-            }
-        }
-    }
-
-    private static void Element_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (sender is UIElement element)
-        {
-            var command = GetKeyDownCommand(element);
-            if (command != null && command.CanExecute(e))
-            {
-                command.Execute(e);
             }
         }
     }
