@@ -16,6 +16,67 @@ namespace Launchbox.Tests;
 public class MainViewModelTests
 {
     [Fact]
+    public void SearchBoxKeyDown_EnterWithSelection_ExecutesLaunchCommand()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        var appItem = new AppItem { Name = "TestApp", Path = "C:\\test.exe" };
+        viewModel.FilterText = "Test";
+        viewModel.SelectedItem = appItem;
+
+        // Act
+        viewModel.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
+
+        // Assert
+        Assert.Equal("C:\\test.exe", _appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void SearchBoxKeyDown_EnterWithNoSelection_DoesNotExecuteLaunchCommand()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        viewModel.SelectedItem = null;
+
+        // Act
+        viewModel.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
+
+        // Assert
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void SearchBoxKeyDown_DownArrow_RaisesGridFocusRequestedEvent()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        bool eventRaised = false;
+        viewModel.GridFocusRequested += (s, e) => eventRaised = true;
+
+        // Act
+        viewModel.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Down);
+
+        // Assert
+        Assert.True(eventRaised);
+    }
+
+    [Fact]
+    public void SearchBoxKeyDown_UnrecognizedKey_DoesNothing()
+    {
+        // Arrange
+        var viewModel = CreateViewModel();
+        bool eventRaised = false;
+        viewModel.GridFocusRequested += (s, e) => eventRaised = true;
+
+        // Act
+        viewModel.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.A);
+
+        // Assert
+        Assert.False(eventRaised);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
     public void CharacterReceivedCommand_AppendsCharacterAndRaisesEvent()
     {
         // Arrange

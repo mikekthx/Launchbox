@@ -205,6 +205,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public event EventHandler? SearchFocusRequested;
 
+    public event EventHandler? GridFocusRequested;
+
+
     public event EventHandler<string>? LaunchFailed;
 
     public MainViewModel(
@@ -483,6 +486,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 Trace.WriteLine($"Failed to load icon for {PathSecurity.RedactPath(item.Path)}: {PathSecurity.GetSafeExceptionMessage(ex)}");
             }
         });
+    }
+
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(Windows.System.VirtualKey key)
+    {
+        if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (key == Windows.System.VirtualKey.Down)
+        {
+            GridFocusRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private bool CanLaunchApp(object? parameter)
