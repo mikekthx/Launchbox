@@ -23,4 +23,4 @@
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
 ## 2026-05-18 - Input Field Accessibility Linkage
 **Learning:** In WinUI 3 XAML settings or forms, input fields (like `ComboBox` or `TextBox`) that are grouped under a visual `TextBlock` header lack context for screen reader users navigating directly to the inputs.
-**Action:** Explicitly link interactive controls to their visual headers to properly support screen readers. Assign an `x:Name` to the descriptive `TextBlock` and set `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on the interactive control.
+**Action:** Explicitly link interactive controls to their visual headers to properly support screen readers. Assign an `x:Name` to the descriptive `TextBlock` and set `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on the interactive control ONLY IF no per-field `AutomationProperties.Name` already exists for those controls.
