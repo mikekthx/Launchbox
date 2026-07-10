@@ -97,17 +97,11 @@
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Выберите клавишу-модификатор (например, Alt)</value>
   </data>
-  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Модификатор горячей клавиши</value>
-  </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Клавиша</value>
   </data>
   <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Введите клавишу (например, S, F1, Home)</value>
-  </data>
-  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Клавиша горячей клавиши</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Внешний вид</value>

@@ -97,17 +97,11 @@
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Seleziona un tasto modificatore (es. Alt)</value>
   </data>
-  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modificatore tasto rapido</value>
-  </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Tasto</value>
   </data>
   <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Inserisci un tasto (es. S, F1, Home)</value>
-  </data>
-  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Tasto rapido</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Aspetto</value>

@@ -97,17 +97,11 @@
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Wybierz klawisz modyfikujący (np. Alt)</value>
   </data>
-  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modyfikator skrótu</value>
-  </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Klawisz</value>
   </data>
   <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Wprowadź klawisz (np. S, F1, Home)</value>
-  </data>
-  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Klawisz skrótu</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Wygląd</value>

@@ -97,17 +97,11 @@
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Seleccione una tecla modificadora (ej. Alt)</value>
   </data>
-  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modificador de atajo</value>
-  </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Tecla</value>
   </data>
   <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Ingrese una tecla (ej. S, F1, Inicio)</value>
-  </data>
-  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Tecla de atajo</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Apariencia</value>

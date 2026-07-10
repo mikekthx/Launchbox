@@ -97,17 +97,11 @@
   <data name="Settings_HotkeyModifier.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Sélectionnez une touche de modification (ex. Alt)</value>
   </data>
-  <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modificateur de raccourci</value>
-  </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Touche</value>
   </data>
   <data name="Settings_HotkeyKey.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Entrez une touche (ex. S, F1, Début)</value>
-  </data>
-  <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Touche de raccourci</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Apparence</value>
