@@ -204,8 +204,14 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public event EventHandler? SearchFocusRequested;
+    public event EventHandler? SearchBoxDownKeyPressed;
 
     public event EventHandler<string>? LaunchFailed;
+
+    protected virtual void OnSearchBoxDownKeyPressed()
+    {
+        SearchBoxDownKeyPressed?.Invoke(this, EventArgs.Empty);
+    }
 
     public MainViewModel(
         IShortcutService shortcutService,
@@ -566,6 +572,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
         if (string.IsNullOrEmpty(character)) return;
         FilterText += character;
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                e.Handled = true;
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (e.Key == Windows.System.VirtualKey.Down)
+        {
+            OnSearchBoxDownKeyPressed();
+            e.Handled = true;
+        }
     }
 
     public void ClearFilter() => FilterText = string.Empty;
