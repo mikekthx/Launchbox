@@ -109,9 +109,14 @@ public static class UIElementExtensions
         if (sender is UIElement element)
         {
             var command = GetKeyDownCommand(element);
-            if (command != null && command.CanExecute(e))
+            if (command != null && command.CanExecute(e.Key))
             {
-                command.Execute(e);
+                // Only handle the event if it's Enter or Down so we don't swallow regular typing.
+                if (e.Key == Windows.System.VirtualKey.Enter || e.Key == Windows.System.VirtualKey.Down)
+                {
+                    command.Execute(e.Key);
+                    e.Handled = true;
+                }
             }
         }
     }
