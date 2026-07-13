@@ -36,7 +36,7 @@ public class MainViewModelInputTests
 
         _settingsStore = new MockSettingsStore();
         _settingsStore.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(new[] { new { Path = _shortcutFolder, Label = "Apps", Order = 0 } }));
-        _settingsService = new SettingsService(_settingsStore, new MockStartupService(), new Launchbox.Services.ShortcutFolderManager(_settingsStore));
+        _settingsService = new SettingsService(_settingsStore, new MockStartupService(), new ShortcutFolderManager(_settingsStore));
     }
 
     private MainViewModel CreateViewModel()
