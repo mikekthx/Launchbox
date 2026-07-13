@@ -36,7 +36,7 @@ public class MainViewModelInputTests
         _windowService = new MockWindowService();
 
         _settingsStore = new MockSettingsStore();
-        _settingsStore.SetValue("ShortcutFolders", JsonSerializer.Serialize(new[] { new { Path = _shortcutFolder, Label = "Apps", Order = 0 } }));
+        _settingsStore.SetValue("ShortcutFolders", JsonSerializer.Serialize([new { Path = _shortcutFolder, Label = "Apps", Order = 0 }]));
         _settingsService = new SettingsService(_settingsStore, new MockStartupService(), new ShortcutFolderManager(_settingsStore));
     }
 
@@ -48,7 +48,7 @@ public class MainViewModelInputTests
     [Fact]
     public async Task SearchBoxKeyDown_EnterWithSelectedItem_LaunchesApp()
     {
-        _shortcutService.SetFiles(new[] { Path.Combine(_shortcutFolder, "Alpha.lnk") });
+        _shortcutService.SetFiles([Path.Combine(_shortcutFolder, "Alpha.lnk")]);
         var vm = CreateViewModel();
         await vm.LoadAppsAsync();
 
