@@ -10,16 +10,16 @@ namespace Launchbox.Tests;
 
 public class MainViewModelInputTests
 {
-    private MockFileSystem _fileSystem;
-    private MockShortcutService _shortcutService;
-    private MockIconService _iconService;
-    private MockImageFactory _imageFactory;
-    private MockAppLauncher _appLauncher;
-    private MockDispatcher _dispatcher;
-    private SettingsService _settingsService;
-    private MockWindowService _windowService;
-    private string _shortcutFolder;
-    private MockSettingsStore _settingsStore;
+    private readonly MockFileSystem _fileSystem;
+    private readonly MockShortcutService _shortcutService;
+    private readonly MockIconService _iconService;
+    private readonly MockImageFactory _imageFactory;
+    private readonly MockAppLauncher _appLauncher;
+    private readonly MockDispatcher _dispatcher;
+    private readonly SettingsService _settingsService;
+    private readonly MockWindowService _windowService;
+    private readonly string _shortcutFolder;
+    private readonly MockSettingsStore _settingsStore;
 
     public MainViewModelInputTests()
     {
@@ -47,7 +47,7 @@ public class MainViewModelInputTests
     [Fact]
     public async Task SearchBoxKeyDown_EnterWithSelectedItem_LaunchesApp()
     {
-        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "Alpha.lnk"));
+        _shortcutService.SetFiles(new[] { Path.Combine(_shortcutFolder, "Alpha.lnk") });
         var vm = CreateViewModel();
         await vm.LoadAppsAsync();
 
@@ -55,7 +55,7 @@ public class MainViewModelInputTests
 
         vm.SearchBoxKeyDownCommand.Execute(VirtualKey.Enter);
 
-        Xunit.Assert.Equal(Path.Combine(_shortcutFolder, "Alpha.lnk"), _appLauncher.LastLaunchedPath);
+        Assert.Equal(Path.Combine(_shortcutFolder, "Alpha.lnk"), _appLauncher.LastLaunchedPath);
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class MainViewModelInputTests
 
         vm.SearchBoxKeyDownCommand.Execute(VirtualKey.Enter);
 
-        Xunit.Assert.Null(_appLauncher.LastLaunchedPath);
+        Assert.Null(_appLauncher.LastLaunchedPath);
     }
 
     [Fact]
@@ -78,6 +78,6 @@ public class MainViewModelInputTests
 
         vm.SearchBoxKeyDownCommand.Execute(VirtualKey.Down);
 
-        Xunit.Assert.True(eventFired);
+        Assert.True(eventFired);
     }
 }

@@ -112,6 +112,8 @@ public static class UIElementExtensions
                     if (command.CanExecute(e.Key))
                     {
                         command.Execute(e.Key);
+                        // Note: Setting e.Handled unconditionally for matched keys simplifies routing logic
+                        // and matches expected single-line SearchBox behavior, even if no action was taken (e.g. no item selected).
                         e.Handled = true;
                     }
                 }
