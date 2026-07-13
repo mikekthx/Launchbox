@@ -4,6 +4,7 @@ using Launchbox.Services;
 using Windows.System;
 using System.IO;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Xunit;
 
 namespace Launchbox.Tests;
@@ -35,7 +36,7 @@ public class MainViewModelInputTests
         _windowService = new MockWindowService();
 
         _settingsStore = new MockSettingsStore();
-        _settingsStore.SetValue("ShortcutFolders", System.Text.Json.JsonSerializer.Serialize(new[] { new { Path = _shortcutFolder, Label = "Apps", Order = 0 } }));
+        _settingsStore.SetValue("ShortcutFolders", JsonSerializer.Serialize(new[] { new { Path = _shortcutFolder, Label = "Apps", Order = 0 } }));
         _settingsService = new SettingsService(_settingsStore, new MockStartupService(), new ShortcutFolderManager(_settingsStore));
     }
 
