@@ -628,4 +628,30 @@ public class SettingsViewModelTests
         Assert.False(vm.RunAtStartup);
         Assert.False(startupService.IsEnabled);
     }
+
+    [Fact]
+    public void IsFoldersEmpty_WhenFoldersAreEmpty_ReturnsTrue()
+    {
+        var (_, _, _, viewModel) = CreateViewModel();
+
+        Assert.True(viewModel.IsFoldersEmpty);
+    }
+
+    [Fact]
+    public void IsFoldersEmpty_WhenFoldersAdded_ReturnsFalseAndRaisesPropertyChanged()
+    {
+        var (settingsService, _, _, viewModel) = CreateViewModel();
+
+        var propertyChangedRaised = false;
+        viewModel.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(viewModel.IsFoldersEmpty))
+                propertyChangedRaised = true;
+        };
+
+        settingsService.AddShortcutFolder("C:\\TestFolder");
+
+        Assert.False(viewModel.IsFoldersEmpty);
+        Assert.True(propertyChangedRaised);
+    }
 }
