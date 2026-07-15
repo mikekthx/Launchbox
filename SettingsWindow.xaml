@@ -35,8 +35,7 @@
                 <!-- Shortcut Folders -->
                 <TextBlock x:Name="FolderListHeader" x:Uid="Settings_FolderList" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,8" />
 
-                <TextBlock x:Name="NoFoldersText"
-                           x:Uid="Settings_NoFolders"
+                <TextBlock x:Uid="Settings_NoFolders"
                            x:Load="{x:Bind ViewModel.IsFoldersEmpty, Mode=OneWay}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center"
