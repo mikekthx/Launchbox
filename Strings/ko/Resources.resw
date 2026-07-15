@@ -196,6 +196,9 @@
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 설정</value>
   </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>No folders configured.</value>
+  </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>바로 가기 폴더</value>
   </data>

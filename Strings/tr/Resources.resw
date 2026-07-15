@@ -196,6 +196,9 @@
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox Ayarları</value>
   </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>No folders configured.</value>
+  </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Kısayol klasörleri</value>
   </data>
