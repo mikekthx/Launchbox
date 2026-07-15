@@ -24,3 +24,6 @@
 ## 2026-05-18 - Linking Interactive Controls to Headers
 **Learning:** In WinUI 3 XAML settings or forms, interactive controls like `ComboBox` and `TextBox` lack context for screen readers if they are not explicitly linked to the descriptive text that precedes them.
 **Action:** Explicitly link interactive controls to their visual headers to properly support screen readers. Assign an `x:Name` to the descriptive `TextBlock` (e.g., `<TextBlock x:Name="HeaderName" ... />`) and set `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on the associated interactive controls.
+## 2026-05-18 - Resource Strings Override AutomationProperties
+**Learning:** In WinUI 3's UIA model, `AutomationProperties.Name` takes precedence over `AutomationProperties.LabeledBy`. Additionally, `x:Uid` resources (e.g., in `.resw` files) can define `.AutomationProperties.Name` properties, which override inline XAML values.
+**Action:** When evaluating missing accessibility properties, always check for the presence of an `x:Uid` attribute on the control and verify if an `.AutomationProperties.Name` entry exists in the localized `.resw` files before attempting to add `AutomationProperties.LabeledBy` or a hardcoded `Name` in XAML. Adding `LabeledBy` when a `Name` resource exists is dead code.

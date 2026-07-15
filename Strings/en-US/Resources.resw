@@ -199,6 +199,9 @@
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Shortcut Folders</value>
   </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>No folders configured.</value>
+  </data>
   <data name="Settings_AddFolder.AutomationProperties.Name" xml:space="preserve">
     <value>Add Folder</value>
   </data>

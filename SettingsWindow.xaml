@@ -35,6 +35,15 @@
                 <!-- Shortcut Folders -->
                 <TextBlock x:Name="FolderListHeader" x:Uid="Settings_FolderList" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,8" />
 
+                <StackPanel Spacing="12"
+                            x:Load="{x:Bind ViewModel.IsFoldersEmpty, Mode=OneWay}"
+                            HorizontalAlignment="Center"
+                            Margin="0,12,0,12">
+                    <TextBlock x:Uid="Settings_NoFolders"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+
                 <ListView x:Name="FolderList"
                           AutomationProperties.LabeledBy="{Binding ElementName=FolderListHeader}"
                           ItemsSource="{x:Bind ViewModel.Folders}"
