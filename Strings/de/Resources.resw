@@ -197,7 +197,7 @@
     <value>Launchbox Einstellungen</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>Keine Ordner konfiguriert.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Verknüpfungsordner</value>

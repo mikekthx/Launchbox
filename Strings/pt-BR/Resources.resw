@@ -197,7 +197,7 @@
     <value>Configurações do Launchbox</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>Nenhuma pasta configurada.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Pastas de atalhos</value>

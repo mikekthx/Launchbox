@@ -197,7 +197,7 @@
     <value>Launchbox 設定</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>フォルダーが設定されていません。</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>ショートカットフォルダー</value>

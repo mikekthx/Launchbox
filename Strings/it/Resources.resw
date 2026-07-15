@@ -197,7 +197,7 @@
     <value>Impostazioni Launchbox</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>Nessuna cartella configurata.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Cartelle collegamenti</value>

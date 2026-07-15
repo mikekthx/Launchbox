@@ -197,7 +197,7 @@
     <value>Launchbox 설정</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>구성된 폴더가 없습니다.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>바로 가기 폴더</value>

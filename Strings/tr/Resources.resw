@@ -197,7 +197,7 @@
     <value>Launchbox Ayarları</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>Yapılandırılmış klasör yok.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Kısayol klasörleri</value>

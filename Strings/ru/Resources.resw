@@ -197,7 +197,7 @@
     <value>Настройки Launchbox</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>Папки не настроены.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Папки ярлыков</value>

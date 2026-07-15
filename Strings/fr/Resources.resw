@@ -197,7 +197,7 @@
     <value>Paramètres Launchbox</value>
   </data>
   <data name="Settings_NoFolders.Text" xml:space="preserve">
-    <value>No folders configured.</value>
+    <value>Aucun dossier configuré.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Dossiers de raccourcis</value>
