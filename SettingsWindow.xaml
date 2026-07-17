@@ -48,10 +48,12 @@
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
                             Background="Transparent">
-                        <StackPanel Background="Transparent" ToolTipService.ToolTip="{x:Bind Path}">
+                        <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
-                          <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                     TextTrimming="CharacterEllipsis" />
+                          <Grid Background="Transparent" ToolTipService.ToolTip="{x:Bind Path}" Padding="0,2,0,2">
+                            <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                       TextTrimming="CharacterEllipsis" />
+                          </Grid>
                         </StackPanel>
                         <Button Grid.Column="1" x:Uid="Settings_MoveUp"
                                 Command="{Binding ElementName=SettingsContent, Path=DataContext.ViewModel.MoveFolderUpCommand}"
