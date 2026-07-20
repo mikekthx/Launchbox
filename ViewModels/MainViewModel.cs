@@ -205,6 +205,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public event EventHandler? SearchFocusRequested;
 
+    public event EventHandler? GridFocusRequested;
+
     public event EventHandler<string>? LaunchFailed;
 
     public MainViewModel(
@@ -488,6 +490,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
     private bool CanLaunchApp(object? parameter)
     {
         return parameter is AppItem app && !string.IsNullOrEmpty(app.Name);
+    }
+
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                e.Handled = true;
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (e.Key == Windows.System.VirtualKey.Down)
+        {
+            e.Handled = true;
+            GridFocusRequested?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanLaunchApp))]
