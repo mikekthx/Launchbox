@@ -103,7 +103,6 @@ public sealed partial class MainWindow : Window
             ViewModel.LoadAppsCommand.Execute(null);
         }
 
-
         ViewModel.SearchFocusRequested += ViewModel_SearchFocusRequested;
         ViewModel.LaunchFailed += ViewModel_LaunchFailed;
         ViewModel.GridFocusRequested += ViewModel_GridFocusRequested;
@@ -254,11 +253,9 @@ public sealed partial class MainWindow : Window
         _windowService.Showing -= WindowService_Showing;
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
 
-
         ViewModel.SearchFocusRequested -= ViewModel_SearchFocusRequested;
         ViewModel.LaunchFailed -= ViewModel_LaunchFailed;
         ViewModel.GridFocusRequested -= ViewModel_GridFocusRequested;
-
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
         // so that a failure in one does not prevent the others from being cleaned up.

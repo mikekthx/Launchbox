@@ -492,21 +492,23 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return parameter is AppItem app && !string.IsNullOrEmpty(app.Name);
     }
 
-
-    [RelayCommand]
-    private void SearchBoxKeyDown(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    private bool CanExecuteSearchBoxKeyDown(Windows.System.VirtualKey key)
     {
-        if (e.Key == Windows.System.VirtualKey.Enter && SelectedItem != null)
+        return key == Windows.System.VirtualKey.Enter || key == Windows.System.VirtualKey.Down;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanExecuteSearchBoxKeyDown))]
+    private void SearchBoxKeyDown(Windows.System.VirtualKey key)
+    {
+        if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
         {
             if (LaunchAppCommand.CanExecute(SelectedItem))
             {
-                e.Handled = true;
                 LaunchAppCommand.Execute(SelectedItem);
             }
         }
-        else if (e.Key == Windows.System.VirtualKey.Down)
+        else if (key == Windows.System.VirtualKey.Down)
         {
-            e.Handled = true;
             GridFocusRequested?.Invoke(this, EventArgs.Empty);
         }
     }

@@ -74,7 +74,7 @@ public static class UIElementExtensions
             }
         }
     }
-public static readonly DependencyProperty KeyDownCommandProperty =
+    public static readonly DependencyProperty KeyDownCommandProperty =
         DependencyProperty.RegisterAttached(
             "KeyDownCommand",
             typeof(ICommand),
@@ -108,9 +108,10 @@ public static readonly DependencyProperty KeyDownCommandProperty =
         if (sender is UIElement element)
         {
             var command = GetKeyDownCommand(element);
-            if (command != null && command.CanExecute(e))
+            if (command != null && command.CanExecute(e.Key))
             {
-                command.Execute(e);
+                command.Execute(e.Key);
+                e.Handled = true;
             }
         }
     }
