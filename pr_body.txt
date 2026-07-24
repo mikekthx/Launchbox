@@ -1,9 +1,0 @@
-## 💡 What:
-Added explicit accessibility labeling to the global hotkey form controls in the Settings window.
-
-## 🎯 Why:
-Currently, the "Global Hotkey" section has a `TextBlock` serving as a visual header, but the actual `ComboBox` and `TextBox` next to it do not have programmatic relationships to that header. Screen readers focus on these elements but cannot announce what they are for, reducing the app's intuitiveness for visually impaired users. By linking them using `AutomationProperties.LabeledBy`, we create a proper semantic relationship.
-
-## ♿ Accessibility:
-- Screen readers (like Narrator) will now correctly announce "Global Hotkey, Modifier" or "Global Hotkey, Key" when focusing on the form inputs.
-- Preserves Windows UX conventions for linked form inputs.
