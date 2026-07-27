@@ -13,8 +13,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml.Input;
-using Windows.System;
 
 namespace Launchbox.ViewModels;
 
@@ -571,24 +569,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
-        public void ClearFilter() => FilterText = string.Empty;
+    public void ClearFilter() => FilterText = string.Empty;
 
-    [RelayCommand]
-    private void SearchBoxKeyDown(KeyRoutedEventArgs e)
+    public bool TryLaunchSelected()
     {
-        if (e.Key == VirtualKey.Enter && SelectedItem != null)
+        if (SelectedItem != null && LaunchAppCommand.CanExecute(SelectedItem))
         {
-            if (LaunchAppCommand.CanExecute(SelectedItem))
-            {
-                e.Handled = true;
-                LaunchAppCommand.Execute(SelectedItem);
-            }
+            LaunchAppCommand.Execute(SelectedItem);
+            return true;
         }
-        else if (e.Key == VirtualKey.Down)
-        {
-            AppListFocusRequested?.Invoke(this, EventArgs.Empty);
-            e.Handled = true;
-        }
+        return false;
+    }
+
+    public void RequestAppListFocus()
+    {
+        AppListFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>
