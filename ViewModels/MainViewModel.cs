@@ -204,8 +204,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public event EventHandler? SearchFocusRequested;
-    public event EventHandler? AppListFocusRequested;
-
     public event EventHandler<string>? LaunchFailed;
 
     public MainViewModel(
@@ -579,11 +577,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
             return true;
         }
         return false;
-    }
-
-    public void RequestAppListFocus()
-    {
-        AppListFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

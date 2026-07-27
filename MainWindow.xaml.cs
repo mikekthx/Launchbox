@@ -107,8 +107,6 @@ public sealed partial class MainWindow : Window
         ViewModel.LaunchFailed += ViewModel_LaunchFailed;
     }
 
-
-
     private void ViewModel_SearchFocusRequested(object? sender, EventArgs e)
     {
         SearchBox.Focus(FocusState.Programmatic);
@@ -137,7 +135,6 @@ public sealed partial class MainWindow : Window
         }
         else if (e.Key == VirtualKey.Down)
         {
-            ViewModel.RequestAppListFocus();
             Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
             activeGrid.Focus(FocusState.Keyboard);
             e.Handled = true;
