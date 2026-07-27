@@ -1089,6 +1089,7 @@ public class MainViewModelTests
         // Assert: both files are visible after the watcher-triggered reload
         Assert.Equal(2, vm.FilteredApps.Count);
     }
+
     [Fact]
     public async Task TryLaunchSelected_ReturnsTrue_AndExecutesCommand()
     {
@@ -1108,6 +1109,21 @@ public class MainViewModelTests
     {
         var vm = CreateViewModel();
         vm.SelectedItem = null;
+
+        bool result = vm.TryLaunchSelected();
+
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public async Task TryLaunchSelected_ReturnsFalse_WhenCanExecuteIsFalse()
+    {
+        // AppItem without Name fails CanExecute
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        var invalidItem = new Launchbox.Models.AppItem { Path = "C:\test.lnk" }; // Name is null
+        vm.SelectedItem = invalidItem;
 
         bool result = vm.TryLaunchSelected();
 
