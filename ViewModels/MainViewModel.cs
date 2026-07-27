@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.UI.Xaml.Input;
+using Windows.System;
 
 namespace Launchbox.ViewModels;
 
@@ -204,6 +206,7 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public event EventHandler? SearchFocusRequested;
+    public event EventHandler? AppListFocusRequested;
 
     public event EventHandler<string>? LaunchFailed;
 
@@ -568,7 +571,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
         SearchFocusRequested?.Invoke(this, EventArgs.Empty);
     }
 
-    public void ClearFilter() => FilterText = string.Empty;
+        public void ClearFilter() => FilterText = string.Empty;
+
+    [RelayCommand]
+    private void SearchBoxKeyDown(KeyRoutedEventArgs e)
+    {
+        if (e.Key == VirtualKey.Enter && SelectedItem != null)
+        {
+            if (LaunchAppCommand.CanExecute(SelectedItem))
+            {
+                e.Handled = true;
+                LaunchAppCommand.Execute(SelectedItem);
+            }
+        }
+        else if (e.Key == VirtualKey.Down)
+        {
+            AppListFocusRequested?.Invoke(this, EventArgs.Empty);
+            e.Handled = true;
+        }
+    }
 
     /// <summary>
     /// Persists the current item order after a drag-and-drop reorder.
