@@ -1089,4 +1089,29 @@ public class MainViewModelTests
         // Assert: both files are visible after the watcher-triggered reload
         Assert.Equal(2, vm.FilteredApps.Count);
     }
+    [Fact]
+    public async Task TryLaunchSelected_ReturnsTrue_AndExecutesCommand()
+    {
+        _fileSystem.AddFile(Path.Combine(_shortcutFolder, "App.lnk"));
+        var vm = CreateViewModel();
+        await vm.LoadAppsAsync();
+        vm.SelectedItem = vm.FilteredApps.First();
+
+        bool result = vm.TryLaunchSelected();
+
+        Assert.True(result);
+        Assert.Equal(Path.Combine(_shortcutFolder, "App.lnk"), _appLauncher.LastLaunchedPath);
+    }
+
+    [Fact]
+    public void TryLaunchSelected_ReturnsFalse_WhenNoSelection()
+    {
+        var vm = CreateViewModel();
+        vm.SelectedItem = null;
+
+        bool result = vm.TryLaunchSelected();
+
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
 }
