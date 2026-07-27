@@ -1122,7 +1122,7 @@ public class MainViewModelTests
         // AppItem without Name fails CanExecute
         var vm = CreateViewModel();
         await vm.LoadAppsAsync();
-        var invalidItem = new Launchbox.Models.AppItem { Path = "C:\test.lnk" }; // Name is null
+        var invalidItem = new Launchbox.Models.AppItem { Path = @"C:\test.lnk" }; // Name is null
         vm.SelectedItem = invalidItem;
 
         bool result = vm.TryLaunchSelected();
