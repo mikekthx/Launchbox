@@ -98,7 +98,7 @@
     <value>Seleccione una tecla modificadora (ej. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modificador de atajo</value>
+    <value>Atajo de teclado global Modificador de atajo</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Tecla</value>
@@ -107,7 +107,7 @@
     <value>Ingrese una tecla (ej. S, F1, Inicio)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Tecla de atajo</value>
+    <value>Atajo de teclado global Tecla de atajo</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Apariencia</value>
