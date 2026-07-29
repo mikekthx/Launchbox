@@ -98,7 +98,7 @@
     <value>Sélectionnez une touche de modification (ex. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Raccourci clavier global Modificateur de raccourci</value>
+    <value>Modificateur de raccourci clavier global</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Touche</value>
@@ -107,7 +107,7 @@
     <value>Entrez une touche (ex. S, F1, Début)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Raccourci clavier global Touche de raccourci</value>
+    <value>Touche de raccourci clavier global</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Apparence</value>
