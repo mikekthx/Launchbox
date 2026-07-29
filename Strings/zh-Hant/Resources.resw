@@ -98,7 +98,7 @@
     <value>選擇修飾鍵（例如 Alt）</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>全域快速鍵 快速鍵修飾鍵</value>
+    <value>全域快速鍵修飾鍵</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>按鍵</value>
@@ -107,7 +107,7 @@
     <value>輸入按鍵（例如 S、F1、Home）</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>全域快速鍵 快速鍵按鍵</value>
+    <value>全域快速鍵按鍵</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>外觀</value>

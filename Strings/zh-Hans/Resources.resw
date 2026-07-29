@@ -98,7 +98,7 @@
     <value>选择修饰键 (如 Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>全局热键 热键修饰键</value>
+    <value>全局热键修饰键</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>按键</value>
@@ -107,7 +107,7 @@
     <value>输入按键 (如 S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>全局热键 热键按键</value>
+    <value>全局热键按键</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>外观</value>
