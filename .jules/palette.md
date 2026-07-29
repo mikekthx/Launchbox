@@ -21,3 +21,6 @@
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
+## 2024-05-18 - XAML Accessibility Implicit Bindings via Uid
+**Learning:** In WinUI 3, when a control uses the `x:Uid` attribute, it automatically maps accessibility and tooltip properties (e.g., `.AutomationProperties.Name` and `.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip`) if they are defined in the associated `.resw` resource file.
+**Action:** Always check the `.resw` files (e.g., `Strings/en-US/Resources.resw`) before manually adding explicit accessibility attributes like `AutomationProperties.Name` to avoid redundancy.
