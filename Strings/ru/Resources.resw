@@ -107,7 +107,7 @@
     <value>Введите клавишу (например, S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Глобальная горячая клавиша</value>
+    <value>Клавиша глобальной горячей клавиши</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Внешний вид</value>
