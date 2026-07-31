@@ -21,3 +21,6 @@
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
+## 2026-07-31 - Proper AutomationProperties.LabeledBy implementation for Hotkeys
+**Learning:** The 'AutomationProperties.LabeledBy' accessibility attribute requires the target header to have an explicit 'x:Name', and the binding must use 'ElementName' to point to that name.
+**Action:** Always ensure the descriptive header text has an 'x:Name' assigned before attempting to bind to it via 'LabeledBy'.
