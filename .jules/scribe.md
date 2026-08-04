@@ -13,3 +13,7 @@
 ## 2026-05-26 - Refactoring Multi-line Code via Bash
 **Learning:** Using `patch` with inline heredocs for code replacements can often fail due to malformed patch formats or whitespace issues.
 **Action:** Prefer using a targeted Python script with exact `content.replace()` to reliably swap multi-line blocks of code during automated refactoring sessions.
+
+## 2024-05-27 - LINQ Boolean Sorting Clarity
+**Learning:** In C# LINQ, sorting by boolean conditions (like exact prefix matches before substring matches) using a ternary operator with magic numbers (`.OrderBy(condition ? 0 : 1)`) is unnecessarily verbose.
+**Action:** When a true/false condition needs to sort `true` values first, use `.OrderByDescending(condition)`. Since `bool` implements `IComparable` where `false < true`, this natively sorts `true` values to the top and eliminates the magic numbers.
