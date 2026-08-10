@@ -490,6 +490,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         return parameter is AppItem app && !string.IsNullOrEmpty(app.Name);
     }
 
+    public bool TryLaunchSelected()
+    {
+        if (SelectedItem != null && CanLaunchApp(SelectedItem))
+        {
+            LaunchApp(SelectedItem);
+            return true;
+        }
+        return false;
+    }
+
     [RelayCommand(CanExecute = nameof(CanLaunchApp))]
     private void LaunchApp(object? parameter)
     {
