@@ -508,6 +508,16 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
     }
 
+    public bool TryLaunchSelected()
+    {
+        if (SelectedItem != null && LaunchAppCommand.CanExecute(SelectedItem))
+        {
+            LaunchAppCommand.Execute(SelectedItem);
+            return true;
+        }
+        return false;
+    }
+
     [RelayCommand]
     private void OpenShortcutsFolder()
     {

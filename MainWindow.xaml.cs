@@ -126,12 +126,11 @@ public sealed partial class MainWindow : Window
     // --- KEYBOARD NAVIGATION ---
     private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Enter && ViewModel.SelectedItem != null)
+        if (e.Key == VirtualKey.Enter)
         {
-            if (ViewModel.LaunchAppCommand.CanExecute(ViewModel.SelectedItem))
+            if (ViewModel.TryLaunchSelected())
             {
                 e.Handled = true;
-                ViewModel.LaunchAppCommand.Execute(ViewModel.SelectedItem);
             }
         }
         else if (e.Key == VirtualKey.Down)
