@@ -160,6 +160,51 @@ public class MainViewModelTests
         Assert.True(_windowService.HideCalled);
     }
 
+
+    [Fact]
+    public void TryLaunchSelected_ReturnsTrue_WhenAppSelectedAndCanLaunch()
+    {
+        var viewModel = CreateViewModel();
+        var appItem = new AppItem { Name = "Test", Path = "C:\\Test.lnk" };
+
+        var property = typeof(MainViewModel).GetProperty("SelectedItem");
+        property!.SetValue(viewModel, appItem);
+
+        bool result = viewModel.TryLaunchSelected();
+
+        Assert.True(result);
+        Assert.Equal("C:\\Test.lnk", _appLauncher.LastLaunchedPath);
+        Assert.True(_windowService.HideCalled);
+    }
+
+    [Fact]
+    public void TryLaunchSelected_ReturnsFalse_WhenNoAppSelected()
+    {
+        var viewModel = CreateViewModel();
+
+        bool result = viewModel.TryLaunchSelected();
+
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+        Assert.False(_windowService.HideCalled);
+    }
+
+    [Fact]
+    public void TryLaunchSelected_ReturnsFalse_WhenAppSelectedButCannotLaunch()
+    {
+        var viewModel = CreateViewModel();
+        var appItem = new AppItem { Name = "", Path = "C:\\Test.lnk" };
+
+        var property = typeof(MainViewModel).GetProperty("SelectedItem");
+        property!.SetValue(viewModel, appItem);
+
+        bool result = viewModel.TryLaunchSelected();
+
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+        Assert.False(_windowService.HideCalled);
+    }
+
     [Fact]
     public void ToggleWindowCommand_TogglesVisibility()
     {
