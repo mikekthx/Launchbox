@@ -160,15 +160,13 @@ public class MainViewModelTests
         Assert.True(_windowService.HideCalled);
     }
 
-
     [Fact]
     public void TryLaunchSelected_ReturnsTrue_WhenAppSelectedAndCanLaunch()
     {
         var viewModel = CreateViewModel();
         var appItem = new AppItem { Name = "Test", Path = "C:\\Test.lnk" };
 
-        var property = typeof(MainViewModel).GetProperty("SelectedItem");
-        property!.SetValue(viewModel, appItem);
+        viewModel.SelectedItem = appItem;
 
         bool result = viewModel.TryLaunchSelected();
 
@@ -195,8 +193,7 @@ public class MainViewModelTests
         var viewModel = CreateViewModel();
         var appItem = new AppItem { Name = "", Path = "C:\\Test.lnk" };
 
-        var property = typeof(MainViewModel).GetProperty("SelectedItem");
-        property!.SetValue(viewModel, appItem);
+        viewModel.SelectedItem = appItem;
 
         bool result = viewModel.TryLaunchSelected();
 
