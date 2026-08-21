@@ -21,3 +21,6 @@
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
+## 2025-05-15 - Link Hotkey inputs to header for screen readers
+**Learning:** Screen readers cannot understand what the hotkey `ComboBox` and `TextBox` are for because they lack `AutomationProperties.Name` and have no explicit `AutomationProperties.LabeledBy` property linking them to a context-providing label.
+**Action:** Use `AutomationProperties.LabeledBy="{Binding ElementName=HotkeyHeader}"` on the `ComboBox` and `TextBox` to point them to an explicitly named header `TextBlock` that explains their purpose (e.g., "Global Hotkey").
