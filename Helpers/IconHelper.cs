@@ -26,10 +26,10 @@ public static class IconHelper
         try
         {
             var image = createInstance();
-            // The stream only needs to live until SetSourceAsync completes; dispose it immediately after.
-            // MemoryStream over a byte array holds no unmanaged resources, but releasing early avoids
-            // unnecessary GC pressure when many icons are loaded concurrently.
-            using var stream = new MemoryStream(imageBytes);
+            // MemoryStream over a byte array holds no unmanaged resources and is safe for the Garbage
+            // Collector to clean up without explicit disposal. Prematurely disposing of a MemoryStream
+            // (e.g., using a using declaration) will cause silent rendering failures.
+            var stream = new MemoryStream(imageBytes);
             await setSourceAction(image, stream);
             return image;
         }
