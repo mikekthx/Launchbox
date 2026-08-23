@@ -630,9 +630,14 @@ public class SettingsViewModelTests
     }
 
     [Fact]
-    public void IsFoldersEmpty_WhenFoldersAreEmpty_ReturnsTrue()
+    public void IsFoldersEmpty_WhenLastFolderRemoved_ReturnsTrue()
     {
-        var (_, _, _, viewModel) = CreateViewModel();
+        // A fresh SettingsService always seeds one default folder (Desktop\Shortcuts) —
+        // IsFoldersEmpty only becomes true once the user removes it.
+        var (settingsService, _, _, viewModel) = CreateViewModel();
+        Assert.False(viewModel.IsFoldersEmpty);
+
+        settingsService.RemoveShortcutFolder(0);
 
         Assert.True(viewModel.IsFoldersEmpty);
     }
