@@ -618,8 +618,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Build watchers outside the lock to keep lock duration short.
         // WatchDirectory returns NullDisposable for missing/unsafe paths — safe to hold.
         List<IDisposable> newWatchers = [];
-        foreach (var folder in folders)
-            newWatchers.Add(_fileSystem.WatchDirectory(folder.ExpandedPath, () => _ = LoadAppsAsync()));
+        foreach (var expandedPath in newPaths)
+            newWatchers.Add(_fileSystem.WatchDirectory(expandedPath, () => _ = LoadAppsAsync()));
 
         List<IDisposable> oldWatchers;
         lock (_watcherLock)
