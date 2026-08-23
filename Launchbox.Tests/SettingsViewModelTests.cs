@@ -632,7 +632,7 @@ public class SettingsViewModelTests
     [Fact]
     public void IsFoldersEmpty_WhenFoldersAreEmpty_ReturnsTrue()
     {
-        var (_, _, _, viewModel) = CreateViewModel();
+        var (settingsService, _, _, viewModel) = CreateViewModel();
 
         Assert.True(viewModel.IsFoldersEmpty);
     }
