@@ -632,7 +632,13 @@ public class SettingsViewModelTests
     [Fact]
     public void IsFoldersEmpty_WhenFoldersAreEmpty_ReturnsTrue()
     {
-        var (_, _, _, viewModel) = CreateViewModel();
+        var store = new MockSettingsStore();
+        store.SetValue(SettingsService.SHORTCUT_FOLDERS_KEY, "[]");
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
+        var windowService = new MockWindowService();
+        var filePickerService = new MockFilePickerService();
+        var dispatcher = new MockDispatcher();
+        var viewModel = new SettingsViewModel(settingsService, windowService, filePickerService, dispatcher);
 
         Assert.True(viewModel.IsFoldersEmpty);
     }
@@ -640,7 +646,15 @@ public class SettingsViewModelTests
     [Fact]
     public void IsFoldersEmpty_WhenFoldersAdded_ReturnsFalseAndRaisesPropertyChanged()
     {
-        var (settingsService, _, _, viewModel) = CreateViewModel();
+        var store = new MockSettingsStore();
+        store.SetValue(SettingsService.SHORTCUT_FOLDERS_KEY, "[]");
+        var settingsService = new SettingsService(store, new MockStartupService(), new ShortcutFolderManager(store));
+        var windowService = new MockWindowService();
+        var filePickerService = new MockFilePickerService();
+
+        // Use synchronous dispatcher mock to ensure AddShortcutFolder's UI thread dispatch completes immediately
+        var dispatcher = new MockDispatcher();
+        var viewModel = new SettingsViewModel(settingsService, windowService, filePickerService, dispatcher);
 
         var propertyChangedRaised = false;
         viewModel.PropertyChanged += (_, e) =>
