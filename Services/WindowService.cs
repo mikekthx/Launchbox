@@ -466,13 +466,13 @@ public sealed class WindowService : IWindowService, IDisposable
             var size = _adapter.Size;
 
             int maxHeight = Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - Constants.WINDOW_WORKAREA_MARGIN);
-            bool needsResize = size.Height > maxHeight;
-            int clampedHeight = needsResize ? maxHeight : size.Height;
+            bool needsHeightClamp = size.Height > maxHeight;
+            int clampedHeight = needsHeightClamp ? maxHeight : size.Height;
 
             int maxWidth = Math.Max(Constants.MIN_WINDOW_WIDTH, workArea.Width - Constants.WINDOW_WORKAREA_MARGIN);
             bool needsWidthClamp = size.Width > maxWidth;
             int clampedWidth = needsWidthClamp ? maxWidth : size.Width;
-            needsResize = needsResize || needsWidthClamp;
+            bool needsResize = needsHeightClamp || needsWidthClamp;
 
             // Check if the window is entirely off-screen on either axis
             bool offScreenHorizontally = pos.X >= workArea.X + workArea.Width
