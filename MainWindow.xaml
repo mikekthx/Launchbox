@@ -198,7 +198,7 @@
                  x:Name="SearchBox"
                  Grid.Row="1"
                  Text="{x:Bind ViewModel.FilterText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                 helpers:UIElementExtensions.KeyDownCommand="{x:Bind ViewModel.SearchBoxKeyDownCommand}"
+                 KeyDown="SearchBox_KeyDown"
                  BorderThickness="0"
                  CornerRadius="8"
                  Padding="12,8"

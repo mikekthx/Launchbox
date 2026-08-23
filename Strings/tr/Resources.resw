@@ -98,7 +98,7 @@
     <value>Bir değiştirici tuş seçin (ör. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Genel kısayol değiştirici tuşu</value>
+    <value>Kısayol değiştirici tuşu</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Tuş</value>
@@ -107,7 +107,7 @@
     <value>Bir tuş girin (ör. S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Genel kısayol tuşu</value>
+    <value>Kısayol tuşu</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Görünüm</value>

@@ -98,7 +98,7 @@
     <value>Wählen Sie eine Modifikatortaste (z. B. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Globaler Hotkey-Modifikator</value>
+    <value>Hotkey-Modifikator</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Taste</value>
@@ -107,7 +107,7 @@
     <value>Taste eingeben (z. B. S, F1, Pos1)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Globale Hotkey-Taste</value>
+    <value>Hotkey-Taste</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Erscheinungsbild</value>

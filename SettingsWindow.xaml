@@ -36,7 +36,7 @@
                 <TextBlock x:Name="FolderListHeader" x:Uid="Settings_FolderList" Style="{ThemeResource SubtitleTextBlockStyle}" Margin="0,16,0,8" />
 
                 <TextBlock x:Uid="Settings_NoFolders"
-                           Visibility="{x:Bind helpers:BooleanToVisibilityConverter.ConvertBool(ViewModel.IsFoldersEmpty), Mode=OneWay}"
+                           x:Load="{x:Bind ViewModel.IsFoldersEmpty, Mode=OneWay}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center"
                            Margin="0,12,0,12" />
@@ -54,10 +54,11 @@
                     <DataTemplate x:DataType="models:ShortcutFolder">
                       <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" Padding="4" ColumnSpacing="4"
                             Background="Transparent">
-                        <StackPanel Background="Transparent" ToolTipService.ToolTip="{x:Bind Path}">
+                        <StackPanel>
                           <TextBlock Text="{x:Bind Label}" FontWeight="SemiBold" />
                           <TextBlock Text="{x:Bind Path}" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                     TextTrimming="CharacterEllipsis" />
+                                     TextTrimming="CharacterEllipsis"
+                                     ToolTipService.ToolTip="{x:Bind Path}" />
                         </StackPanel>
                         <Button Grid.Column="1" x:Uid="Settings_MoveUp"
                                 Command="{Binding ElementName=SettingsContent, Path=DataContext.ViewModel.MoveFolderUpCommand}"

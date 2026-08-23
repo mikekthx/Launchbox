@@ -30,6 +30,3 @@
 ## 2026-05-31 - StringComparer.OrdinalIgnoreCase avoids ToLowerInvariant allocations
 **Learning:** Calling `.ToLowerInvariant()` prior to executing a `.Contains(...)` check with `StringComparison.CurrentCultureIgnoreCase` or `StringComparison.OrdinalIgnoreCase` is redundant and causes unnecessary string allocations per execution.
 **Action:** Substitute `ToLowerInvariant` with `StringComparer.OrdinalIgnoreCase` when checking file extensions against allowed lists to prevent redundant string allocations and lower memory overhead.
-## 2026-06-05 - Avoid LINQ ToDictionary overhead in hot paths
-**Learning:** Using LINQ `ToDictionary` to convert or clone dictionaries in frequently called paths (e.g., during sorting operations reading from `SettingsService`) causes unnecessary memory allocations and adds pressure to the Garbage Collector.
-**Action:** When copying or mapping dictionaries in hot paths, manually pre-allocate a new `Dictionary` with the correct initial capacity (`dict.Count`) and use a `foreach` loop to populate it, avoiding the overhead of the LINQ iterator state machine and intermediate allocations.
