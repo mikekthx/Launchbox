@@ -27,6 +27,14 @@ public class ProcessService : IProcessService
 
     protected virtual Process[] GetProcessesByName(string processName)
     {
-        return Process.GetProcessesByName(processName);
+        try
+        {
+            return Process.GetProcessesByName(processName);
+        }
+        catch (Exception ex) when (ex is System.ComponentModel.Win32Exception || ex is InvalidOperationException)
+        {
+            Trace.WriteLine($"Failed to get processes for {processName}: {ex.Message}");
+            return [];
+        }
     }
 }
