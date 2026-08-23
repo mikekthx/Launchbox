@@ -317,7 +317,11 @@ public sealed class WindowService : IWindowService, IDisposable
         catch (Exception ex)
         {
             Trace.WriteLine($"Error opening settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            _settingsWindow = null;
+            if (_settingsWindow != null)
+            {
+                _settingsWindow.Closed -= SettingsWindow_Closed;
+                _settingsWindow = null;
+            }
         }
     }
 
