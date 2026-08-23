@@ -85,6 +85,8 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
 
     public ObservableCollection<ShortcutFolder> Folders { get; } = [];
 
+    public bool IsFoldersEmpty => Folders.Count == 0;
+
     public SettingsViewModel(SettingsService settingsService, IWindowService windowService, IFilePickerService filePickerService, IDispatcher dispatcher)
     {
         _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
@@ -180,6 +182,7 @@ public partial class SettingsViewModel : ObservableObject, IDisposable
             {
                 Folders.Add(f);
             }
+            OnPropertyChanged(nameof(IsFoldersEmpty));
         });
     }
 

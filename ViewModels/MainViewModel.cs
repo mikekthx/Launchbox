@@ -118,15 +118,9 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SelectedItem = null;
             return;
         }
-
-        if (IsMergedMode)
-        {
-            SelectedItem = FilteredApps.FirstOrDefault();
-        }
-        else
-        {
-            SelectedItem = GroupedApps.SelectMany(group => group).FirstOrDefault(app => !string.IsNullOrEmpty(app.Name));
-        }
+        SelectedItem = IsMergedMode
+            ? FilteredApps.FirstOrDefault()
+            : GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
     }
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
@@ -210,8 +204,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
     }
 
     public event EventHandler? SearchFocusRequested;
-
-    public event EventHandler? GridFocusRequested;
 
     public event EventHandler<string>? LaunchFailed;
 
@@ -626,8 +618,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Build watchers outside the lock to keep lock duration short.
         // WatchDirectory returns NullDisposable for missing/unsafe paths — safe to hold.
         List<IDisposable> newWatchers = [];
-        foreach (var expandedPath in newPaths)
-            newWatchers.Add(_fileSystem.WatchDirectory(expandedPath, () => _ = LoadAppsAsync()));
+        foreach (var folder in folders)
+            newWatchers.Add(_fileSystem.WatchDirectory(folder.ExpandedPath, () => _ = LoadAppsAsync()));
 
         List<IDisposable> oldWatchers;
         lock (_watcherLock)
@@ -675,27 +667,4 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
         GC.SuppressFinalize(this);
     }
-
-    private bool CanSearchBoxKeyDown(Windows.System.VirtualKey key)
-    {
-        return key == Windows.System.VirtualKey.Down
-            || (key == Windows.System.VirtualKey.Enter && SelectedItem != null && LaunchAppCommand.CanExecute(SelectedItem));
-    }
-
-    [RelayCommand(CanExecute = nameof(CanSearchBoxKeyDown))]
-    private void SearchBoxKeyDown(Windows.System.VirtualKey key)
-    {
-        if (key == Windows.System.VirtualKey.Enter && SelectedItem != null)
-        {
-            if (LaunchAppCommand.CanExecute(SelectedItem))
-            {
-                LaunchAppCommand.Execute(SelectedItem);
-            }
-        }
-        else if (key == Windows.System.VirtualKey.Down)
-        {
-            GridFocusRequested?.Invoke(this, EventArgs.Empty);
-        }
-    }
-
 }

@@ -21,11 +21,9 @@
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
-
-## 2026-06-05 - ToolTip hit area expansion
-**Learning:** In WinUI 3 XAML, expanding the hover target area of a tooltip in a `DataTemplate` should be done on the largest relevant container that doesn't overlap with other interactive elements. Applying `ToolTipService.ToolTip` to the root row `<Grid>` can cause tooltip conflicts or noise over child buttons. Apply it to the specific area (e.g. the text's `StackPanel`) instead. Also, never apply `AutomationProperties.Name` to structural elements like a `Grid` inside a `DataTemplate`, as this is an accessibility anti-pattern.
-**Action:** When implementing micro-UX improvements involving tooltips in list templates, place the tooltip binding on the text container (like a StackPanel) rather than the entire row container if the row contains action buttons. Ensure the container has `Background="Transparent"` if it needs to be hit-testable in empty spaces.
-
-## 2026-07-29 - UIA LabeledBy vs Name Precedence
-**Learning:** In WinUI 3, setting `AutomationProperties.LabeledBy` on a control overrides its `AutomationProperties.Name` entirely in UI Automation precedence. Applying a single shared header as `LabeledBy` to multiple controls (e.g., modifier and key inputs) will cause them to be announced identically, discarding their distinct, specific names mapped via `x:Uid` from `.resw` files.
-**Action:** When a settings group contains multiple controls, do not use a shared header for `LabeledBy`. Instead, rely on the specific `AutomationProperties.Name` from `.resw` files, embedding the group context into those strings if necessary.
+## 2026-05-18 - Linking Interactive Controls to Headers
+**Learning:** In WinUI 3 XAML settings or forms, interactive controls like `ComboBox` and `TextBox` lack context for screen readers if they are not explicitly linked to the descriptive text that precedes them.
+**Action:** Explicitly link interactive controls to their visual headers to properly support screen readers. Assign an `x:Name` to the descriptive `TextBlock` (e.g., `<TextBlock x:Name="HeaderName" ... />`) and set `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on the associated interactive controls.
+## 2026-05-18 - Resource Strings Override AutomationProperties
+**Learning:** In WinUI 3's UIA model, `AutomationProperties.Name` takes precedence over `AutomationProperties.LabeledBy`. Additionally, `x:Uid` resources (e.g., in `.resw` files) can define `.AutomationProperties.Name` properties, which override inline XAML values.
+**Action:** When evaluating missing accessibility properties, always check for the presence of an `x:Uid` attribute on the control and verify if an `.AutomationProperties.Name` entry exists in the localized `.resw` files before attempting to add `AutomationProperties.LabeledBy` or a hardcoded `Name` in XAML. Adding `LabeledBy` when a `Name` resource exists is dead code.

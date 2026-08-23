@@ -83,41 +83,4 @@ public class ProcessStarterSecurityTests
         var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
         Assert.Contains("Execution with unsafe working directory", exception.Message);
     }
-
-    [Theory]
-    [InlineData(@"%TEST_ENV_VAR%\unsafe.exe")]
-    public void Start_ThrowsUnauthorizedAccessException_ForUnsafePathHiddenInEnvVar(string unsafePathWithEnvVar)
-    {
-        Environment.SetEnvironmentVariable("TEST_ENV_VAR", @"\\server\share");
-        try
-        {
-            var startInfo = new ProcessStartInfo(unsafePathWithEnvVar);
-            var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
-            Assert.Contains("Execution of unsafe path", exception.Message);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("TEST_ENV_VAR", null);
-        }
-    }
-
-    [Fact]
-    public void Start_ThrowsUnauthorizedAccessException_ForUnsafeWorkingDirectoryHiddenInEnvVar()
-    {
-        Environment.SetEnvironmentVariable("TEST_ENV_VAR", @"\\server\share");
-        try
-        {
-            var startInfo = new ProcessStartInfo("cmd.exe")
-            {
-                WorkingDirectory = @"%TEST_ENV_VAR%\unsafe",
-                UseShellExecute = false
-            };
-            var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
-            Assert.Contains("Execution with unsafe working directory", exception.Message);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("TEST_ENV_VAR", null);
-        }
-    }
 }

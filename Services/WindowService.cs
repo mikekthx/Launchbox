@@ -302,14 +302,14 @@ public sealed class WindowService : IWindowService, IDisposable
 
     public void OpenSettings()
     {
+        if (_settingsWindow != null)
+        {
+            _settingsWindow.Activate();
+            return;
+        }
+
         try
         {
-            if (_settingsWindow != null)
-            {
-                _settingsWindow.Activate();
-                return;
-            }
-
             _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService!); // ! safe: OpenSettings is never called on test-constructed instances
             _settingsWindow.Closed += SettingsWindow_Closed;
             _settingsWindow.Activate();
@@ -317,11 +317,6 @@ public sealed class WindowService : IWindowService, IDisposable
         catch (Exception ex)
         {
             Trace.WriteLine($"Error opening settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            if (_settingsWindow != null)
-            {
-                _settingsWindow.Closed -= SettingsWindow_Closed;
-                _settingsWindow = null;
-            }
         }
     }
 
@@ -374,14 +369,7 @@ public sealed class WindowService : IWindowService, IDisposable
         if (_settingsWindow != null)
         {
             _settingsWindow.Closed -= SettingsWindow_Closed;
-            try
-            {
-                _settingsWindow.Close();
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to close settings window: {PathSecurity.GetSafeExceptionMessage(ex)}");
-            }
+            _settingsWindow.Close();
             _settingsWindow = null;
         }
 
@@ -466,13 +454,13 @@ public sealed class WindowService : IWindowService, IDisposable
             var size = _adapter.Size;
 
             int maxHeight = Math.Max(Constants.MIN_WINDOW_HEIGHT, workArea.Height - Constants.WINDOW_WORKAREA_MARGIN);
-            bool needsHeightClamp = size.Height > maxHeight;
-            int clampedHeight = needsHeightClamp ? maxHeight : size.Height;
+            bool needsResize = size.Height > maxHeight;
+            int clampedHeight = needsResize ? maxHeight : size.Height;
 
             int maxWidth = Math.Max(Constants.MIN_WINDOW_WIDTH, workArea.Width - Constants.WINDOW_WORKAREA_MARGIN);
             bool needsWidthClamp = size.Width > maxWidth;
             int clampedWidth = needsWidthClamp ? maxWidth : size.Width;
-            bool needsResize = needsHeightClamp || needsWidthClamp;
+            needsResize = needsResize || needsWidthClamp;
 
             // Check if the window is entirely off-screen on either axis
             bool offScreenHorizontally = pos.X >= workArea.X + workArea.Width

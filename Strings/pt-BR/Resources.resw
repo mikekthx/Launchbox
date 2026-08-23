@@ -98,7 +98,7 @@
     <value>Selecione uma tecla modificadora (ex: Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modificador de atalho global</value>
+    <value>Modificador de atalho</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Tecla</value>
@@ -107,7 +107,7 @@
     <value>Digite uma tecla (ex: S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Tecla de atalho global</value>
+    <value>Tecla de atalho</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Aparência</value>
@@ -195,6 +195,9 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Configurações do Launchbox</value>
+  </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>Nenhuma pasta configurada.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Pastas de atalhos</value>

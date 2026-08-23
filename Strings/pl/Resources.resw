@@ -98,7 +98,7 @@
     <value>Wybierz klawisz modyfikujący (np. Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Modyfikator globalnego skrótu klawiszowego</value>
+    <value>Modyfikator skrótu</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Klawisz</value>
@@ -107,7 +107,7 @@
     <value>Wprowadź klawisz (np. S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Klawisz globalnego skrótu klawiszowego</value>
+    <value>Klawisz skrótu</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Wygląd</value>
@@ -195,6 +195,9 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Ustawienia Launchbox</value>
+  </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>Brak skonfigurowanych folderów.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>Foldery skrótów</value>

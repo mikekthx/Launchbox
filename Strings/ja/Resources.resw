@@ -98,7 +98,7 @@
     <value>修飾キーを選択 (例: Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>グローバルホットキー修飾キー</value>
+    <value>ホットキー修飾キー</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>キー</value>
@@ -107,7 +107,7 @@
     <value>キーを入力 (例: S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>グローバルホットキーのキー</value>
+    <value>ホットキーのキー</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>外観</value>
@@ -195,6 +195,9 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 設定</value>
+  </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>フォルダーが設定されていません。</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>ショートカットフォルダー</value>

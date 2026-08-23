@@ -98,7 +98,7 @@
     <value>조합 키 선택 (예: Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>전역 단축키 조합 키</value>
+    <value>단축키 조합 키</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>키</value>
@@ -107,7 +107,7 @@
     <value>키 입력 (예: S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>전역 단축키 키</value>
+    <value>단축키 키</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>모양</value>
@@ -195,6 +195,9 @@
   </data>
   <data name="SettingsWindow_Title" xml:space="preserve">
     <value>Launchbox 설정</value>
+  </data>
+  <data name="Settings_NoFolders.Text" xml:space="preserve">
+    <value>구성된 폴더가 없습니다.</value>
   </data>
   <data name="Settings_FolderList.Text" xml:space="preserve">
     <value>바로 가기 폴더</value>

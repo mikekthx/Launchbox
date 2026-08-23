@@ -57,8 +57,3 @@
 **Vulnerability:** `WindowsShortcutResolver.ResolveUrl` returned the raw URL string from `.url` files after expanding environment variables, without validating the scheme. This allowed `.url` files to be used to execute local files (via `file://`) or other unsafe protocols, bypassing extension-based restrictions.
 **Learning:** Validating file extensions is not enough when the file content can specify a protocol that redirects execution to unintended targets. For `.url` files, the resulting URI must be explicitly whitelisted to safe schemes.
 **Prevention:** For any shortcut format that resolves to a URI, always validate the resulting absolute URI scheme against a strict whitelist (e.g., `http` and `https`) before returning it for execution.
-
-## 2024-05-27 - ProcessStarter Path Security Bypass
-**Vulnerability:** `ProcessStarter.Start` checked `FileName` and `WorkingDirectory` for unsafe paths without expanding environment variables first, allowing malicious paths containing variables (e.g., `%USERPROFILE%\unsafe`) to bypass validation.
-**Learning:** `PathSecurity.IsUnsafePath` does not expand environment variables. Unexpanded paths might bypass path security checks intended for the resolved path.
-**Prevention:** Always expand environment variables (`Environment.ExpandEnvironmentVariables`) immediately when retrieving paths before validating them for security in `ProcessStarter`.
