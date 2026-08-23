@@ -118,9 +118,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
             SelectedItem = null;
             return;
         }
-        SelectedItem = IsMergedMode
-            ? FilteredApps.FirstOrDefault()
-            : GroupedApps.SelectMany(g => g).FirstOrDefault(a => !string.IsNullOrEmpty(a.Name));
+
+        if (IsMergedMode)
+        {
+            SelectedItem = FilteredApps.FirstOrDefault();
+        }
+        else
+        {
+            SelectedItem = GroupedApps.SelectMany(group => group).FirstOrDefault(app => !string.IsNullOrEmpty(app.Name));
+        }
     }
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
@@ -618,8 +624,8 @@ public partial class MainViewModel : ObservableObject, IDisposable
         // Build watchers outside the lock to keep lock duration short.
         // WatchDirectory returns NullDisposable for missing/unsafe paths — safe to hold.
         List<IDisposable> newWatchers = [];
-        foreach (var folder in folders)
-            newWatchers.Add(_fileSystem.WatchDirectory(folder.ExpandedPath, () => _ = LoadAppsAsync()));
+        foreach (var expandedPath in newPaths)
+            newWatchers.Add(_fileSystem.WatchDirectory(expandedPath, () => _ = LoadAppsAsync()));
 
         List<IDisposable> oldWatchers;
         lock (_watcherLock)
