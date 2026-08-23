@@ -98,7 +98,7 @@
     <value>Выберите клавишу-модификатор (например, Alt)</value>
   </data>
   <data name="Settings_HotkeyModifier.AutomationProperties.Name" xml:space="preserve">
-    <value>Модификатор горячей клавиши</value>
+    <value>Модификатор глобальной горячей клавиши</value>
   </data>
   <data name="Settings_HotkeyKey.PlaceholderText" xml:space="preserve">
     <value>Клавиша</value>
@@ -107,7 +107,7 @@
     <value>Введите клавишу (например, S, F1, Home)</value>
   </data>
   <data name="Settings_HotkeyKey.AutomationProperties.Name" xml:space="preserve">
-    <value>Клавиша горячей клавиши</value>
+    <value>Клавиша глобальной горячей клавиши</value>
   </data>
   <data name="Settings_AppearanceHeader.Text" xml:space="preserve">
     <value>Внешний вид</value>
