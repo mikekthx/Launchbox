@@ -302,14 +302,14 @@ public sealed class WindowService : IWindowService, IDisposable
 
     public void OpenSettings()
     {
-        if (_settingsWindow != null)
-        {
-            _settingsWindow.Activate();
-            return;
-        }
-
         try
         {
+            if (_settingsWindow != null)
+            {
+                _settingsWindow.Activate();
+                return;
+            }
+
             _settingsWindow = new SettingsWindow(_settingsService, this, _filePickerService!); // ! safe: OpenSettings is never called on test-constructed instances
             _settingsWindow.Closed += SettingsWindow_Closed;
             _settingsWindow.Activate();
@@ -369,7 +369,14 @@ public sealed class WindowService : IWindowService, IDisposable
         if (_settingsWindow != null)
         {
             _settingsWindow.Closed -= SettingsWindow_Closed;
-            _settingsWindow.Close();
+            try
+            {
+                _settingsWindow.Close();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Failed to close settings window: {PathSecurity.GetSafeExceptionMessage(ex)}");
+            }
             _settingsWindow = null;
         }
 

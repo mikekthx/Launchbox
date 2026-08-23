@@ -72,44 +72,19 @@ public class LocalSettingsStore : ISettingsStore
 
         public bool TryGetValue(string key, out object? value)
         {
-            try
-            {
-                return _container.Values.TryGetValue(key, out value);
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to read local setting {key}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                value = null;
-                return false;
-            }
+            return _container.Values.TryGetValue(key, out value);
         }
 
         public void SetValue(string key, object? value)
         {
-            try
-            {
-                _container.Values[key] = value;
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to write local setting {key}: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                throw;
-            }
+            _container.Values[key] = value;
         }
 
         public void SetValues(IReadOnlyDictionary<string, object?> values)
         {
-            try
+            foreach (var kvp in values)
             {
-                foreach (var kvp in values)
-                {
-                    _container.Values[kvp.Key] = kvp.Value;
-                }
-            }
-            catch (Exception ex)
-            {
-                Trace.WriteLine($"Failed to write batched local settings: {PathSecurity.GetSafeExceptionMessage(ex)}");
-                throw;
+                _container.Values[kvp.Key] = kvp.Value;
             }
         }
     }
