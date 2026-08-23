@@ -12,15 +12,19 @@ public class ProcessStarter : IProcessStarter
     {
         ArgumentNullException.ThrowIfNull(startInfo);
 
-        if (PathSecurity.IsUnsafePath(startInfo.FileName))
+        string expandedFileName = Environment.ExpandEnvironmentVariables(startInfo.FileName ?? string.Empty);
+        if (PathSecurity.IsUnsafePath(expandedFileName))
         {
-            throw new UnauthorizedAccessException($"Execution of unsafe path '{PathSecurity.RedactPath(startInfo.FileName)}' is denied.");
+            throw new UnauthorizedAccessException($"Execution of unsafe path '{PathSecurity.RedactPath(expandedFileName)}' is denied.");
         }
+        startInfo.FileName = expandedFileName;
 
-        if (!string.IsNullOrEmpty(startInfo.WorkingDirectory) && PathSecurity.IsUnsafePath(startInfo.WorkingDirectory))
+        string expandedWorkingDirectory = Environment.ExpandEnvironmentVariables(startInfo.WorkingDirectory ?? string.Empty);
+        if (!string.IsNullOrEmpty(expandedWorkingDirectory) && PathSecurity.IsUnsafePath(expandedWorkingDirectory))
         {
             throw new UnauthorizedAccessException("Execution with unsafe working directory is denied.");
         }
+        startInfo.WorkingDirectory = expandedWorkingDirectory;
 
         if (PathSecurity.ContainsUncPath(startInfo.Arguments))
         {
