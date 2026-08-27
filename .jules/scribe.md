@@ -16,3 +16,6 @@
 ## 2026-06-02 - Boolean Sorting in LINQ
 **Learning:** Using a ternary operator in `.OrderBy()` to sort boolean results (e.g., `OrderBy(condition ? 0 : 1)`) is unnecessarily complex and requires magic numbers.
 **Action:** Use `.OrderByDescending(condition)` instead. Since C# `bool` evaluates `false` as strictly less than `true`, this idiom correctly and clearly sorts `true` items to the top.
+## 2026-08-23 - Reading Code via Bash
+**Learning:** The bash environment limits output to 1000 characters. Large `cat` or `sed` commands will be silently truncated, leading to hallucinated code blocks and groundedness violations during plan reviews.
+**Action:** When extracting code for exact replacements, limit `sed -n '<start>,<end>p'` commands to small chunks (e.g., 30-40 lines at a time) to ensure the full method body is accurately captured.
