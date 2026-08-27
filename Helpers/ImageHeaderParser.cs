@@ -15,6 +15,12 @@ public static class ImageHeaderParser
     private const int ICO_MAX_IMAGE_COUNT = 256;
     private const int ICO_ZERO_DIMENSION_MEANS = 256;
 
+    private const int IHDR_WIDTH_OFFSET = 16;
+    private const int IHDR_HEIGHT_OFFSET = 20;
+    private const int IHDR_DIMENSION_LENGTH = 4;
+    private const int ICO_IMAGE_COUNT_OFFSET = 4;
+    private const int ICO_IMAGE_COUNT_LENGTH = 2;
+
     public static (int Width, int Height)? GetPngDimensions(Stream stream)
     {
         try
@@ -31,8 +37,8 @@ public static class ImageHeaderParser
                 return null;
             }
 
-            int width = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(16, 4));
-            int height = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(20, 4));
+            int width = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(IHDR_WIDTH_OFFSET, IHDR_DIMENSION_LENGTH));
+            int height = BinaryPrimitives.ReadInt32BigEndian(header.AsSpan(IHDR_HEIGHT_OFFSET, IHDR_DIMENSION_LENGTH));
 
             return (width, height);
         }
@@ -57,7 +63,7 @@ public static class ImageHeaderParser
             if (header is not [0, 0, 1, 0, ..]) return null;
 
             // Count (2 bytes) — cap at 256 to prevent reading unbounded data from a malformed file
-            int count = BinaryPrimitives.ReadUInt16LittleEndian(header.AsSpan(4, 2));
+            int count = BinaryPrimitives.ReadUInt16LittleEndian(header.AsSpan(ICO_IMAGE_COUNT_OFFSET, ICO_IMAGE_COUNT_LENGTH));
             if (count == 0) return null;
             if (count > ICO_MAX_IMAGE_COUNT) count = ICO_MAX_IMAGE_COUNT;
 
