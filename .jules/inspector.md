@@ -1,6 +1,6 @@
 ## 2026-02-18 - [Reliability] C# using var scope semantics
-**Learning:** C# `using var` disposes at the end of its enclosing scope, not at the declaration line. It does not prematurely dispose resources across an `await` within the same block.
-**Action:** Use `using var` for `MemoryStream` objects when passing them to asynchronous methods like `BitmapImage.SetSourceAsync` within the same block. The stream will remain alive for the duration of the `await` and safely dispose afterwards.
+**Learning:** C# `using var` disposes at the end of its enclosing scope, not at the declaration line. It does not prematurely dispose resources across an `await` within the same block. However, WinUI's `BitmapImage.SetSourceAsync` often requires the stream to remain open *after* the `await` completes for deferred/lazy decoding, so `using var` is unsafe for this specific API.
+**Action:** Do not use `using var` for `MemoryStream` objects when passing them to `BitmapImage.SetSourceAsync` or similar deferred-rendering image APIs. The stream must remain alive beyond the `await`. Since `MemoryStream` over a byte array holds no unmanaged resources, it is safe to rely on the GC without explicit disposal.
 
 ## 2026-02-18 - [Reliability] GDI+ Concurrency Instability
 **Learning:** `System.Drawing` (GDI+) functions like `Icon.FromHandle`, `Icon.ToBitmap`, and `Image.Save` are not thread-safe and can cause `ExternalException` or random crashes when invoked concurrently from multiple threads (e.g., `Parallel.ForEachAsync`), even on separate instances.
