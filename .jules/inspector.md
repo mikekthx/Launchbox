@@ -29,3 +29,7 @@
 ## 2026-04-05 - [Reliability] Prevent UI desync on persistence failure
 **Learning:** In the `SettingsService`, if a `SetValue` write to the underlying store fails, the `OnPropertyChanged` notification must still be triggered. This forces the UI (via the ViewModel) to re-read the setting from the store, which will return the old value and revert the UI's optimistic state.
 **Action:** Always call `OnPropertyChanged` after an attempted change in `SettingsService`, even if the write operation returns `false`.
+
+## 2024-05-24 - BitmapImage.SetSourceAsync requires stream to stay open
+**Learning:** In WinUI/UWP, `BitmapImage.SetSourceAsync` requires its source stream to remain open for the lifetime of the image. Prematurely disposing of a `MemoryStream` (e.g., using a `using` declaration) will cause silent rendering failures. A `MemoryStream` constructed over a byte array holds no unmanaged resources and is safe for the Garbage Collector to clean up without explicit disposal.
+**Action:** Do not use `using` statements with `MemoryStream` when passing them to `BitmapImage.SetSourceAsync` or similar image initialization methods.
