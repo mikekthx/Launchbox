@@ -1091,22 +1091,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void SearchBoxKeyDown_Down_RaisesGridFocusRequested()
-    {
-        // Arrange
-        bool eventRaised = false;
-        var vm = CreateViewModel();
-        vm.GridFocusRequested += (s, e) => eventRaised = true;
-
-        // Act
-        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Down);
-
-        // Assert
-        Assert.True(eventRaised);
-    }
-
-    [Fact]
-    public void SearchBoxKeyDown_EnterWithSelection_LaunchesApp()
+    public void TryLaunchSelected_WithSelection_LaunchesAppAndReturnsTrue()
     {
         // Arrange
         var vm = CreateViewModel();
@@ -1115,27 +1100,17 @@ public class MainViewModelTests
         vm.SelectedItem = app;
 
         // Act
-        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
+        bool result = vm.TryLaunchSelected();
 
         // Assert
+        Assert.True(result);
         Assert.Equal(@"C:\test.exe", _appLauncher.LastLaunchedPath);
     }
 
     [Fact]
-    public void SearchBoxKeyDown_CanExecute_ReturnsCorrectly()
+    public void TryLaunchSelected_WithoutSelection_ReturnsFalse()
     {
-        // Arrange
         var vm = CreateViewModel();
-
-        // Assert
-        Assert.True(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Down));
-
-        vm.SelectedItem = null;
-        Assert.False(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Enter));
-
-        vm.SelectedItem = new AppItem { Name = "Test App", Path = @"C:\test.exe" };
-        Assert.True(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Enter));
-
-        Assert.False(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.A));
+        Assert.False(vm.TryLaunchSelected());
     }
 }
