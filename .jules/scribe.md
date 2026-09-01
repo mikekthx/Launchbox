@@ -16,3 +16,6 @@
 ## 2026-06-02 - Boolean Sorting in LINQ
 **Learning:** Using a ternary operator in `.OrderBy()` to sort boolean results (e.g., `OrderBy(condition ? 0 : 1)`) is unnecessarily complex and requires magic numbers.
 **Action:** Use `.OrderByDescending(condition)` instead. Since C# `bool` evaluates `false` as strictly less than `true`, this idiom correctly and clearly sorts `true` items to the top.
+## 2026-06-25 - Boolean variable extraction
+**Learning:** Extracting complex inline conditions (e.g., inside expression-bodied properties) into named boolean variables significantly reduces cognitive load and improves readability, even if it removes short-circuiting for simple properties where short-circuiting provides negligible performance benefits.
+**Action:** Continually seek out complex chained boolean expressions and extract them into descriptively named local boolean variables to improve the semantic clarity of the code.

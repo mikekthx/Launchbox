@@ -131,8 +131,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public bool IsFilterEmpty => string.IsNullOrEmpty(_filterText);
 
-    public bool HasNoMatches =>
-        Apps.Count > 0 && !string.IsNullOrEmpty(_filterText) && FilteredApps.Count == 0;
+    /// <summary>
+    /// Indicates whether a search filter is currently applied but yielded no matching results.
+    /// Used by the UI to conditionally display a "No matches found" visual state.
+    /// </summary>
+    public bool HasNoMatches
+    {
+        get
+        {
+            bool hasAppsToSearch = Apps.Count > 0;
+            bool isSearchActive = !string.IsNullOrEmpty(_filterText);
+            bool noResultsFound = FilteredApps.Count == 0;
+
+            return hasAppsToSearch && isSearchActive && noResultsFound;
+        }
+    }
 
     public int ItemWidth => _settingsService.GridSize switch
     {
