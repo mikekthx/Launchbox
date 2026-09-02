@@ -29,3 +29,7 @@
 ## 2026-07-29 - UIA LabeledBy vs Name Precedence
 **Learning:** In WinUI 3, setting `AutomationProperties.LabeledBy` on a control overrides its `AutomationProperties.Name` entirely in UI Automation precedence. Applying a single shared header as `LabeledBy` to multiple controls (e.g., modifier and key inputs) will cause them to be announced identically, discarding their distinct, specific names mapped via `x:Uid` from `.resw` files.
 **Action:** When a settings group contains multiple controls, do not use a shared header for `LabeledBy`. Instead, rely on the specific `AutomationProperties.Name` from `.resw` files, embedding the group context into those strings if necessary.
+
+## $(date +%Y-%m-%d) - Link Settings Group Inputs to Headers via AutomationProperties.LabeledBy
+**Learning:** In WinUI 3 XAML settings or forms, inputs without explicit text labels (like a `TextBox` with just a placeholder or adjacent modifier `ComboBox`) lack sufficient context for screen readers. They need to be programmatically linked to their overarching visual headers.
+**Action:** Explicitly link interactive controls (e.g., `ComboBox`, `TextBox`) to their visual headers by assigning an `x:Name` to the descriptive `TextBlock` and setting `AutomationProperties.LabeledBy="{Binding ElementName=HeaderName}"` on the input controls.
