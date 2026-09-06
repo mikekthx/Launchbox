@@ -62,3 +62,8 @@
 **Vulnerability:** `ProcessStarter.Start` checked `FileName` and `WorkingDirectory` for unsafe paths without expanding environment variables first, allowing malicious paths containing variables (e.g., `%USERPROFILE%\unsafe`) to bypass validation.
 **Learning:** `PathSecurity.IsUnsafePath` does not expand environment variables. Unexpanded paths might bypass path security checks intended for the resolved path.
 **Prevention:** Always expand environment variables (`Environment.ExpandEnvironmentVariables`) immediately when retrieving paths before validating them for security in `ProcessStarter`.
+
+## 2026-09-06 - Unexpanded Process Arguments Validation
+**Vulnerability:** `ProcessStarter.Start` validated `startInfo.Arguments` for UNC paths before expanding environment variables. This allowed attackers to bypass UNC path detection by embedding UNC paths inside environment variables (e.g., `%MALICIOUS_UNC%` resolving to `\\attacker\share`).
+**Learning:** Security validations on strings that will later be expanded by the operating system must always be performed *after* explicitly expanding those variables in code. Unexpanded variables can bypass string-matching security checks.
+**Prevention:** Expand environment variables using `Environment.ExpandEnvironmentVariables` on `startInfo.Arguments` prior to validating them with `PathSecurity.ContainsUncPath`.
