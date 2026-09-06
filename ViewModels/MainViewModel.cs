@@ -98,9 +98,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            source = Apps
-                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
+            // Bolt optimization: Manual single-pass split replaces LINQ Where+OrderByDescending
+            // to avoid O(N log N) sorting overhead and reduce lambda allocations.
+            var results = new List<AppItem>();
+            var nonStarts = new List<AppItem>();
+
+            foreach (var item in Apps)
+            {
+                if (item.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    results.Add(item);
+                }
+                else if (item.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    nonStarts.Add(item);
+                }
+            }
+
+            results.AddRange(nonStarts);
+            source = results;
         }
 
         FilteredApps.ReplaceAll(source);
