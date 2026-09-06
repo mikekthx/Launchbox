@@ -174,11 +174,31 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         string.IsNullOrEmpty(filterText) ||
         _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
-    private List<AppItem> GetFilteredItems(string? filterText) =>
-        string.IsNullOrEmpty(filterText)
-            ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
-            : _allItems
-                .Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+    private List<AppItem> GetFilteredItems(string? filterText)
+    {
+        if (string.IsNullOrEmpty(filterText))
+        {
+            return _allItems; // No filter: return the live list directly (ReplaceAll reads but never mutates it)
+        }
+
+        // Bolt optimization: Manual single-pass split replaces LINQ Where+OrderByDescending
+        // to avoid O(N log N) sorting overhead and reduce lambda allocations.
+        var results = new List<AppItem>();
+        var nonStarts = new List<AppItem>();
+
+        foreach (var item in _allItems)
+        {
+            if (item.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
+            {
+                results.Add(item);
+            }
+            else if (item.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+            {
+                nonStarts.Add(item);
+            }
+        }
+
+        results.AddRange(nonStarts);
+        return results;
+    }
 }
