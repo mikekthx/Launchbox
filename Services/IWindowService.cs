@@ -60,4 +60,9 @@ public interface IWindowService : IDisposable
     /// Opens the settings window, or activates it if already open.
     /// </summary>
     void OpenSettings();
+
+    bool IsDraggingWindow { get; }
+    void StartDrag();
+    void UpdateDrag();
+    void EndDrag();
 }
