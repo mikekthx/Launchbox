@@ -46,4 +46,9 @@ public class MockWindowService : IWindowService
     {
         OpenSettingsCalled = true;
     }
+
+    public bool IsDraggingWindow { get; set; }
+    public void StartDrag() { }
+    public void UpdateDrag() { }
+    public void EndDrag() { }
 }

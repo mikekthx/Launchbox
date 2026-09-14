@@ -24,11 +24,7 @@ public sealed partial class MainWindow : Window
     private readonly IFilePickerService _filePickerService;
     private readonly IBackdropService _backdropService;
 
-    // Window dragging state — uses screen-relative cursor coordinates (via GetCursorPos)
-    // to avoid drift caused by window-relative coordinates shifting after AppWindow.Move.
-    private bool _isDraggingWindow = false;
-    private Windows.Graphics.PointInt32 _dragStartWindowPos;
-    private NativeMethods.POINT _dragStartCursorPos;
+    // Window dragging state moved to WindowService
 
     // Set when the window transitions from hidden to visible (Alt+S show path).
     // Consumed in MainWindow_Activated to gate filter-clear and SearchBox focus.
@@ -152,35 +148,23 @@ public sealed partial class MainWindow : Window
         }
 
         // Start dragging - capture pointer and record initial screen-relative cursor position
-        _isDraggingWindow = true;
-        _dragStartWindowPos = this.AppWindow.Position;
-        NativeMethods.GetCursorPos(out _dragStartCursorPos);
+        _windowService.StartDrag();
         RootGrid.CapturePointer(e.Pointer);
         e.Handled = true;
     }
 
     private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
     {
-        if (!_isDraggingWindow) return;
-
-        // Use screen-relative cursor coordinates to compute delta. Window-relative
-        // coordinates from GetCurrentPoint(null) shift after AppWindow.Move, causing drift.
-        NativeMethods.GetCursorPos(out var currentCursorPos);
-        var deltaX = currentCursorPos.X - _dragStartCursorPos.X;
-        var deltaY = currentCursorPos.Y - _dragStartCursorPos.Y;
-
-        var newX = _dragStartWindowPos.X + deltaX;
-        var newY = _dragStartWindowPos.Y + deltaY;
-
-        this.AppWindow.Move(new Windows.Graphics.PointInt32(newX, newY));
+        if (!_windowService.IsDraggingWindow) return;
+        _windowService.UpdateDrag();
         e.Handled = true;
     }
 
     private void RootGrid_PointerReleased(object sender, PointerRoutedEventArgs e)
     {
-        if (_isDraggingWindow)
+        if (_windowService.IsDraggingWindow)
         {
-            _isDraggingWindow = false;
+            _windowService.EndDrag();
             RootGrid.ReleasePointerCapture(e.Pointer);
             e.Handled = true;
         }
@@ -188,9 +172,9 @@ public sealed partial class MainWindow : Window
 
     private void RootGrid_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
     {
-        if (_isDraggingWindow)
+        if (_windowService.IsDraggingWindow)
         {
-            _isDraggingWindow = false;
+            _windowService.EndDrag();
             e.Handled = true;
         }
     }

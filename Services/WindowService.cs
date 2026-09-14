@@ -13,6 +13,10 @@ public sealed class WindowService : IWindowService, IDisposable
 {
     private readonly Window? _window;
     private readonly WindowPositionManager _positionManager;
+    private bool _isDraggingWindow = false;
+    public bool IsDraggingWindow => _isDraggingWindow;
+    private Windows.Graphics.PointInt32 _dragStartWindowPos;
+    private NativeMethods.POINT _dragStartCursorPos;
     private readonly SettingsService _settingsService;
     private readonly IFilePickerService? _filePickerService;
     private readonly IDispatcher _dispatcher;
@@ -323,6 +327,30 @@ public sealed class WindowService : IWindowService, IDisposable
                 _settingsWindow = null;
             }
         }
+    }
+
+    public void StartDrag()
+    {
+        if (_adapter == null) return;
+        _isDraggingWindow = true;
+        _dragStartWindowPos = _adapter.Position;
+        NativeMethods.GetCursorPos(out _dragStartCursorPos);
+    }
+
+    public void UpdateDrag()
+    {
+        if (!_isDraggingWindow || _adapter == null) return;
+        NativeMethods.GetCursorPos(out var currentCursorPos);
+        var deltaX = currentCursorPos.X - _dragStartCursorPos.X;
+        var deltaY = currentCursorPos.Y - _dragStartCursorPos.Y;
+        var newX = _dragStartWindowPos.X + deltaX;
+        var newY = _dragStartWindowPos.Y + deltaY;
+        _adapter.Move(new Windows.Graphics.PointInt32(newX, newY));
+    }
+
+    public void EndDrag()
+    {
+        _isDraggingWindow = false;
     }
 
     public void ResetPosition()
