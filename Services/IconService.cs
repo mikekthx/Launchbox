@@ -315,13 +315,25 @@ public class IconService(IFileSystem fileSystem) : IIconService
             int pngArea = GetImageArea(pngPath, ImageHeaderParser.GetPngDimensions);
             int icoArea = GetImageArea(icoPath, ImageHeaderParser.GetMaxIcoDimensions);
 
+            bool isIcoHigherResolution = icoArea > pngArea;
+
             // Prefer larger resolution. If equal (or both invalid), prefer PNG for modern compatibility.
-            chosenPath = (icoArea > pngArea) ? icoPath : pngPath;
+            if (isIcoHigherResolution)
+            {
+                chosenPath = icoPath;
+            }
+            else
+            {
+                chosenPath = pngPath;
+            }
+        }
+        else if (pngValid)
+        {
+            chosenPath = pngPath;
         }
         else
         {
-            // Only one exists
-            chosenPath = pngValid ? pngPath : icoPath;
+            chosenPath = icoPath;
         }
 
         try
