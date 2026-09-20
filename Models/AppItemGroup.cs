@@ -174,11 +174,34 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         string.IsNullOrEmpty(filterText) ||
         _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
-    private List<AppItem> GetFilteredItems(string? filterText) =>
-        string.IsNullOrEmpty(filterText)
-            ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
-            : _allItems
-                .Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+    private List<AppItem> GetFilteredItems(string? filterText)
+    {
+        if (string.IsNullOrEmpty(filterText))
+        {
+            return _allItems; // No filter: return the live list directly (ReplaceAll reads but never mutates it)
+        }
+
+        var exactMatches = new List<AppItem>();
+        var partialMatches = new List<AppItem>();
+
+        foreach (var a in _allItems)
+        {
+            if (a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+            {
+                if (a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    exactMatches.Add(a);
+                }
+                else
+                {
+                    partialMatches.Add(a);
+                }
+            }
+        }
+
+        var results = new List<AppItem>(exactMatches.Count + partialMatches.Count);
+        results.AddRange(exactMatches);
+        results.AddRange(partialMatches);
+        return results;
+    }
 }
