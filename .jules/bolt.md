@@ -33,3 +33,6 @@
 ## 2026-06-05 - Avoid LINQ ToDictionary overhead in hot paths
 **Learning:** Using LINQ `ToDictionary` to convert or clone dictionaries in frequently called paths (e.g., during sorting operations reading from `SettingsService`) causes unnecessary memory allocations and adds pressure to the Garbage Collector.
 **Action:** When copying or mapping dictionaries in hot paths, manually pre-allocate a new `Dictionary` with the correct initial capacity (`dict.Count`) and use a `foreach` loop to populate it, avoiding the overhead of the LINQ iterator state machine and intermediate allocations.
+## 2026-06-25 - Avoid O(n log n) sorting overhead for boolean conditions
+**Learning:** In C# performance-critical paths, replacing LINQ queries that filter and then sort by a boolean condition (e.g., `Where(...).OrderByDescending(condition)`) with a manual `foreach` loop that segregates items into two lists (true matches and false matches) and concatenates them avoids O(n log n) sorting overhead and reduces delegate allocations, executing in a single O(n) pass.
+**Action:** Replace `Where(...).OrderByDescending(...)` with manual O(n) matching loops when sorting is based on a simple boolean grouping logic.
