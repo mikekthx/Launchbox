@@ -32,7 +32,17 @@ public class IconService(IFileSystem fileSystem) : IIconService
         // Expand environment variables so that callers passing %VAR%-style paths match
         // cache keys, which are always stored in expanded form.
         var activeSet = new HashSet<string>(
-            activePaths.Select(p => p.Contains('%') ? Environment.ExpandEnvironmentVariables(p) : p),
+            activePaths.Select(p =>
+            {
+                if (p.Contains('%'))
+                {
+                    return Environment.ExpandEnvironmentVariables(p);
+                }
+                else
+                {
+                    return p;
+                }
+            }),
             StringComparer.OrdinalIgnoreCase);
         int removedCount = 0;
 
