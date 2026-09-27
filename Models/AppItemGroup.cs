@@ -174,11 +174,33 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         string.IsNullOrEmpty(filterText) ||
         _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
-    private List<AppItem> GetFilteredItems(string? filterText) =>
-        string.IsNullOrEmpty(filterText)
-            ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
-            : _allItems
-                .Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+    private List<AppItem> GetFilteredItems(string? filterText)
+    {
+        if (string.IsNullOrEmpty(filterText))
+        {
+            return _allItems; // No filter: return the live list directly (ReplaceAll reads but never mutates it)
+        }
+
+        // Split into prefix and substring matches in a single pass
+        // to avoid O(N log N) LINQ OrderBy sorting overhead and delegate allocations.
+        List<AppItem> prefixMatches = [];
+        List<AppItem> substringMatches = [];
+
+        foreach (var a in _allItems)
+        {
+            if (a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
+            {
+                prefixMatches.Add(a);
+            }
+            else if (a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+            {
+                substringMatches.Add(a);
+            }
+        }
+
+        var result = new List<AppItem>(prefixMatches.Count + substringMatches.Count);
+        result.AddRange(prefixMatches);
+        result.AddRange(substringMatches);
+        return result;
+    }
 }
