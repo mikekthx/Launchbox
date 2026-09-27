@@ -98,9 +98,24 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            source = Apps
-                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
+            // Split into prefix and substring matches in a single pass
+            // to avoid O(N log N) LINQ OrderBy sorting overhead and delegate allocations.
+            List<AppItem> prefixMatches = [];
+            List<AppItem> substringMatches = [];
+
+            foreach (var a in Apps)
+            {
+                if (a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    prefixMatches.Add(a);
+                }
+                else if (a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    substringMatches.Add(a);
+                }
+            }
+
+            source = prefixMatches.Concat(substringMatches);
         }
 
         FilteredApps.ReplaceAll(source);
