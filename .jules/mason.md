@@ -5,3 +5,7 @@
 ## 2026-05-11 - UI Focus in MVVM via Events
 **Learning:** When keyboard input modifies ViewModel state and subsequently requires setting focus programmatically on a UI element, doing this purely through bindings is difficult. Attempting to directly handle the UI logic via code-behind creates tight coupling and bypasses commands.
 **Action:** Use an attached property to route the input event (e.g., `CharacterReceived`) to a ViewModel `ICommand`. The ViewModel processes the input and raises a standard .NET `EventHandler` (e.g., `SearchFocusRequested`). The View (`.xaml.cs`) subscribes to this event to execute purely UI-specific operations like `SearchBox.Focus()`, keeping the ViewModel completely decoupled from the UI framework.
+
+## 2025-05-15 - Keep UI Input Logic out of ViewModels
+**Learning:** Passing UI-specific enums (like `VirtualKey`) and relying on bouncy event patterns (e.g. `GridFocusRequested`) from the ViewModel back to the View for simple, synchronous focus changes creates tight coupling and bloats the ViewModel.
+**Action:** Handle simple keyboard-driven UI focus manipulation and input event handling (like catching Enter or Down arrows) directly in the View's code-behind. The code-behind can then invoke specific platform-agnostic ViewModel commands or properties instead of routing `VirtualKey` through the ViewModel.

@@ -104,14 +104,25 @@ public sealed partial class MainWindow : Window
         }
 
         ViewModel.SearchFocusRequested += ViewModel_SearchFocusRequested;
-        ViewModel.GridFocusRequested += ViewModel_GridFocusRequested;
         ViewModel.LaunchFailed += ViewModel_LaunchFailed;
     }
 
-    private void ViewModel_GridFocusRequested(object? sender, EventArgs e)
+    private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
-        activeGrid.Focus(FocusState.Keyboard);
+        if (e.Key == VirtualKey.Enter && ViewModel.SelectedItem != null)
+        {
+            if (ViewModel.LaunchAppCommand.CanExecute(ViewModel.SelectedItem))
+            {
+                ViewModel.LaunchAppCommand.Execute(ViewModel.SelectedItem);
+                e.Handled = true;
+            }
+        }
+        else if (e.Key == VirtualKey.Down)
+        {
+            Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
+            activeGrid.Focus(FocusState.Keyboard);
+            e.Handled = true;
+        }
     }
 
     private void ViewModel_SearchFocusRequested(object? sender, EventArgs e)
@@ -250,7 +261,6 @@ public sealed partial class MainWindow : Window
         _windowService.VisibilityChanged -= WindowService_VisibilityChanged;
 
         ViewModel.SearchFocusRequested -= ViewModel_SearchFocusRequested;
-        ViewModel.GridFocusRequested -= ViewModel_GridFocusRequested;
         ViewModel.LaunchFailed -= ViewModel_LaunchFailed;
 
         // Dispose all IDisposable services and the ViewModel. Each disposal is isolated
