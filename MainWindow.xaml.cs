@@ -109,7 +109,7 @@ public sealed partial class MainWindow : Window
 
     private void SearchBox_KeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == Windows.System.VirtualKey.Enter && ViewModel.SelectedItem != null)
+        if (e.Key == VirtualKey.Enter && ViewModel.SelectedItem != null)
         {
             if (ViewModel.LaunchAppCommand.CanExecute(ViewModel.SelectedItem))
             {
@@ -117,7 +117,7 @@ public sealed partial class MainWindow : Window
                 e.Handled = true;
             }
         }
-        else if (e.Key == Windows.System.VirtualKey.Down)
+        else if (e.Key == VirtualKey.Down)
         {
             Control activeGrid = ViewModel.IsMergedMode ? AppGrid : GroupedAppGrid;
             activeGrid.Focus(FocusState.Keyboard);
