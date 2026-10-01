@@ -174,11 +174,23 @@ public class AppItemGroup : BulkObservableCollection<AppItem>
         string.IsNullOrEmpty(filterText) ||
         _allItems.Any(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase));
 
-    private List<AppItem> GetFilteredItems(string? filterText) =>
-        string.IsNullOrEmpty(filterText)
-            ? _allItems // No filter: return the live list directly (ReplaceAll reads but never mutates it)
-            : _allItems
-                .Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+    /// <summary>
+    /// Returns a filtered and sorted list of items.
+    /// If no filter is applied, returns the original list to avoid allocations.
+    /// When filtered, items that start with the filter text are sorted before those that only contain it.
+    /// </summary>
+    private List<AppItem> GetFilteredItems(string? filterText)
+    {
+        if (string.IsNullOrEmpty(filterText))
+        {
+            // No filter: return the live list directly (ReplaceAll reads but never mutates it)
+            return _allItems;
+        }
+
+        return _allItems
+            .Where(a => a.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase))
+            // C# bool sorts false before true, so OrderByDescending puts true (starts with) first.
+            .OrderByDescending(a => a.Name.StartsWith(filterText, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
 }

@@ -588,9 +588,15 @@ public partial class MainViewModel : ObservableObject, IDisposable
     /// </summary>
     public void PersistItemOrder()
     {
-        IEnumerable<AppItem> source = IsGroupedMode
-            ? GroupedApps.SelectMany(g => g.AllItems)
-            : (IEnumerable<AppItem>)FilteredApps;
+        IEnumerable<AppItem> source;
+        if (IsGroupedMode)
+        {
+            source = GroupedApps.SelectMany(group => group.AllItems);
+        }
+        else
+        {
+            source = FilteredApps;
+        }
 
         var orders = source
             .GroupBy(a => a.FolderPath)
