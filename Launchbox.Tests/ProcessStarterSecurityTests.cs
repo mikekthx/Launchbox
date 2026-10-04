@@ -120,4 +120,25 @@ public class ProcessStarterSecurityTests
             Environment.SetEnvironmentVariable("TEST_ENV_VAR", null);
         }
     }
+
+    [Fact]
+    public void Start_ThrowsUnauthorizedAccessException_ForUnsafeArgumentsHiddenInEnvVar()
+    {
+        Environment.SetEnvironmentVariable("TEST_ENV_VAR", @"\\server\share");
+        try
+        {
+            var startInfo = new ProcessStartInfo("cmd.exe")
+            {
+                Arguments = @"--target=%TEST_ENV_VAR%\unsafe",
+                UseShellExecute = false
+            };
+            var exception = Assert.Throws<UnauthorizedAccessException>(() => _processStarter.Start(startInfo));
+            Assert.Contains("Execution with unsafe arguments", exception.Message);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TEST_ENV_VAR", null);
+        }
+    }
+
 }

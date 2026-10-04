@@ -63,7 +63,7 @@
 **Learning:** `PathSecurity.IsUnsafePath` does not expand environment variables. Unexpanded paths might bypass path security checks intended for the resolved path.
 **Prevention:** Always expand environment variables (`Environment.ExpandEnvironmentVariables`) immediately when retrieving paths before validating them for security in `ProcessStarter`.
 
-## 2026-12-01 - Missing Environment Variable Expansion for Process Arguments
+## 2024-05-27 - Missing Environment Variable Expansion for Process Arguments
 **Vulnerability:** `ProcessStarter.Start` and `WinUILauncher.Launch` checked `Arguments` (and `WorkingDirectory` in WinUILauncher) for unsafe paths without expanding environment variables first, allowing malicious paths containing variables to bypass validation.
 **Learning:** `PathSecurity.ContainsUncPath` does not expand environment variables. Unexpanded paths might bypass path security checks intended for the resolved path.
 **Prevention:** Always expand environment variables (`Environment.ExpandEnvironmentVariables`) immediately when retrieving process arguments before validating them for security.
