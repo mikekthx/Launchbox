@@ -98,9 +98,21 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            source = Apps
-                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
+            var startsWith = new List<AppItem>();
+            var contains = new List<AppItem>();
+            foreach (var a in Apps)
+            {
+                if (a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    startsWith.Add(a);
+                }
+                else if (a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    contains.Add(a);
+                }
+            }
+            startsWith.AddRange(contains);
+            source = startsWith;
         }
 
         FilteredApps.ReplaceAll(source);
