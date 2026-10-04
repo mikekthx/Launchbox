@@ -98,14 +98,16 @@ public class WinUILauncher : IAppLauncher
             if (extension.Equals(".lnk", StringComparison.OrdinalIgnoreCase))
             {
                 string? args = metadata.Arguments;
-                if (PathSecurity.ContainsUncPath(args))
+                string expandedArgs = Environment.ExpandEnvironmentVariables(args ?? string.Empty);
+                if (PathSecurity.ContainsUncPath(expandedArgs))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
                     return;
                 }
 
                 string? workingDir = metadata.WorkingDirectory;
-                if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
+                string expandedWorkingDir = Environment.ExpandEnvironmentVariables(workingDir ?? string.Empty);
+                if (!string.IsNullOrEmpty(expandedWorkingDir) && PathSecurity.IsUnsafePath(expandedWorkingDir))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe working directory: {PathSecurity.RedactPath(path)}");
                     return;

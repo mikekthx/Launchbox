@@ -328,4 +328,51 @@ public class WinUILauncherSecurityTests
         Assert.Equal(folderPath, _processStarter.LastStartInfo?.FileName);
         Assert.True(_processStarter.LastStartInfo?.UseShellExecute);
     }
+
+    [Fact]
+    public void Launch_Blocks_Lnk_With_UnsafeArgumentsHiddenInEnvVar()
+    {
+        Environment.SetEnvironmentVariable("TEST_ENV_VAR", @"\\attacker\share");
+        try
+        {
+            var shortcutResolver = new MockShortcutResolver(
+                target: @"C:\Program Files\App.exe",
+                arguments: @"--target=%TEST_ENV_VAR%\payload");
+            var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+            _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+            launcher.Launch(@"C:\safe\shortcut.lnk");
+
+            Assert.False(_processStarter.WasStarted);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TEST_ENV_VAR", null);
+        }
+    }
+
+    [Fact]
+    public void Launch_Blocks_Lnk_With_UnsafeWorkingDirectoryHiddenInEnvVar()
+    {
+        Environment.SetEnvironmentVariable("TEST_ENV_VAR", @"\\attacker\share");
+        try
+        {
+            var shortcutResolver = new MockShortcutResolver(
+                target: @"C:\Program Files\App.exe",
+                workingDirectory: @"%TEST_ENV_VAR%\folder");
+            var launcher = new WinUILauncher(shortcutResolver, _processStarter, _fileSystem);
+
+            _fileSystem.AddFile(@"C:\safe\shortcut.lnk");
+
+            launcher.Launch(@"C:\safe\shortcut.lnk");
+
+            Assert.False(_processStarter.WasStarted);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("TEST_ENV_VAR", null);
+        }
+    }
+
 }
