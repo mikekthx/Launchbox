@@ -101,6 +101,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
+                    AutomationProperties.Name="{Binding ElementName=EmptyStatePanelText, Path=Text}"
                     x:Load="{x:Bind ViewModel.IsEmpty, Mode=OneWay}">
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
@@ -108,7 +109,8 @@
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
                 </SymbolIcon.RenderTransform>
             </SymbolIcon>
-            <TextBlock x:Uid="MainWindow_NoShortcuts"
+            <TextBlock x:Name="EmptyStatePanelText"
+                       x:Uid="MainWindow_NoShortcuts"
                        FontSize="16"
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center"/>
@@ -215,6 +217,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Spacing="12"
+                    AutomationProperties.Name="{Binding ElementName=NoMatchesPanelText, Path=Text}"
                     x:Load="{x:Bind ViewModel.HasNoMatches, Mode=OneWay}">
             <SymbolIcon Symbol="Find" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
@@ -222,7 +225,8 @@
                     <ScaleTransform ScaleX="2" ScaleY="2"/>
                 </SymbolIcon.RenderTransform>
             </SymbolIcon>
-            <TextBlock x:Uid="MainWindow_NoMatches"
+            <TextBlock x:Name="NoMatchesPanelText"
+                       x:Uid="MainWindow_NoMatches"
                        FontSize="16"
                        FontWeight="SemiBold"
                        HorizontalAlignment="Center"/>

@@ -29,3 +29,7 @@
 ## 2026-07-29 - UIA LabeledBy vs Name Precedence
 **Learning:** In WinUI 3, setting `AutomationProperties.LabeledBy` on a control overrides its `AutomationProperties.Name` entirely in UI Automation precedence. Applying a single shared header as `LabeledBy` to multiple controls (e.g., modifier and key inputs) will cause them to be announced identically, discarding their distinct, specific names mapped via `x:Uid` from `.resw` files.
 **Action:** When a settings group contains multiple controls, do not use a shared header for `LabeledBy`. Instead, rely on the specific `AutomationProperties.Name` from `.resw` files, embedding the group context into those strings if necessary.
+
+## 2026-08-01 - Empty State Container Accessibility
+**Learning:** Empty state layout containers (like StackPanels indicating "No matches" or "No shortcuts") are read poorly by screen readers if they lack an explicit name, especially when they contain decorative icons.
+**Action:** Always add an `AutomationProperties.Name` to empty state containers. You can bind this name to the inner descriptive TextBlock (e.g., `AutomationProperties.Name="{Binding ElementName=EmptyStateText, Path=Text}"`) to ensure screen readers announce the state change clearly when navigating to the container.

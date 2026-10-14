@@ -43,6 +43,9 @@
                           CanReorderItems="True"
                           AllowDrop="True"
                           CanDragItems="True"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          ScrollViewer.VerticalScrollMode="Enabled"
+                          ScrollViewer.IsVerticalRailEnabled="True"
                           helpers:ListViewBaseExtensions.DragItemsCompletedCommand="{x:Bind ViewModel.PersistFolderSequenceCommand}">
                   <ListView.ItemTemplate>
                     <DataTemplate x:DataType="models:ShortcutFolder">
