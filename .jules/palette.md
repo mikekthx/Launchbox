@@ -5,6 +5,7 @@
 ## 2025-05-24 - WinUI 3 Window Resources
 **Learning:** The `Window` class in WinUI 3 (Windows App SDK) does not expose a `Resources` property in XAML like WPF or UWP `Page`/`UserControl`.
 **Action:** Define window-scoped resources within the root layout element (e.g., `<Grid.Resources>`) instead of `<Window.Resources>`.
+
 ## 2026-03-13 - Preserve Tooltip Shortcuts
 **Learning:** Keyboard shortcut hints in tooltips (e.g., `(Alt+S)`) are standard Windows accessibility patterns that aid discoverability and should not be removed during routine UX enhancements.
 **Action:** Preserve existing keyboard shortcut hints in XAML tooltips, even if they refer to dynamically configurable hotkeys, unless specifically tasked with implementing a dynamic tooltip binding.
@@ -12,12 +13,15 @@
 ## 2026-03-27 - Grid Toggle Button Accessibility
 **Learning:** In custom WinUI layouts, using a `Grid` with a tapped command (e.g., for a collapsible group header) makes it function as a button but entirely lacks accessibility semantics by default. Furthermore, without a `Background` explicitly set (e.g., `Background="Transparent"`), empty space in the Grid does not receive hit test events, making the interaction area unpredictably small.
 **Action:** Always ensure interactive layout panels (like Grids or StackPanels) have `Background="Transparent"` for proper hit-testing, and explicitly define `AutomationProperties.Name` and an appropriate `ToolTipService.ToolTip` so screen readers and mouse users understand the control's purpose. Note that `AutomationProperties.Role` is an HTML/ARIA concept and does not exist in WinUI 3; avoid using it to prevent XAML compilation errors.
+
 ## 2026-05-01 - Screen Reader Noise from Decorative Icons
 **Learning:** Screen readers announce `SymbolIcon` and `FontIcon` elements by default, causing redundant reading when next to a text label, or reading unintelligible unicode characters in icon-only buttons.
 **Action:** Always add `AutomationProperties.AccessibilityView="Raw"` to purely decorative `SymbolIcon` and `FontIcon` elements to remove them from the UI Automation tree and reduce screen reader noise.
+
 ## 2026-05-06 - Hit-Testing Empty Space in WinUI
 **Learning:** In WinUI/UWP/WPF, interactive layout panels (such as `StackPanel` or `Grid`) with a null background do not register pointer events in their empty/transparent spaces.
 **Action:** Explicitly set `Background="Transparent"` to ensure the entire bounds of the element are hit-testable, especially for drag-and-drop or click targets like an `AppItemTemplate`.
+
 ## 2026-05-15 - ProgressRing Visibility Binding
 **Learning:** In WinUI 3, a `ProgressRing` automatically hides its visuals when `IsActive="False"`. It is not necessary to explicitly bind its `Visibility` property using a boolean-to-visibility converter unless the layout space it reserves needs to be reclaimed.
 **Action:** When adding simple visual feedback using a `ProgressRing` alongside a button (e.g., in a `StackPanel`), simply bind the `IsActive` property to the async command's execution state without a redundant `Visibility` binding.
@@ -27,5 +31,5 @@
 **Action:** When implementing micro-UX improvements involving tooltips in list templates, place the tooltip binding on the text container (like a StackPanel) rather than the entire row container if the row contains action buttons. Ensure the container has `Background="Transparent"` if it needs to be hit-testable in empty spaces.
 
 ## 2026-07-29 - UIA LabeledBy vs Name Precedence
-**Learning:** In WinUI 3, setting `AutomationProperties.LabeledBy` on a control overrides its `AutomationProperties.Name` entirely in UI Automation precedence. Applying a single shared header as `LabeledBy` to multiple controls (e.g., modifier and key inputs) will cause them to be announced identically, discarding their distinct, specific names mapped via `x:Uid` from `.resw` files.
-**Action:** When a settings group contains multiple controls, do not use a shared header for `LabeledBy`. Instead, rely on the specific `AutomationProperties.Name` from `.resw` files, embedding the group context into those strings if necessary.
+**Learning:** In WinUI 3, assigning `AutomationProperties.LabeledBy` on a control completely overrides any `AutomationProperties.Name` defined for that control (including those populated via `x:Uid` from `.resw` files). If a single visual header labels multiple distinct inputs (e.g., a "Global Hotkey" header for both a modifier dropdown and a key text box), applying `LabeledBy` to both inputs causes the screen reader to announce both identically, discarding their distinct names.
+**Action:** Only use `AutomationProperties.LabeledBy` when the label maps 1:1 to a single input. For complex multi-input groups, rely on distinct `AutomationProperties.Name` values for each control to ensure proper context.
