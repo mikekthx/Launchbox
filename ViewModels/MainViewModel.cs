@@ -90,20 +90,31 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private void RebuildFilteredApps()
     {
-        IEnumerable<AppItem> source;
-
         if (string.IsNullOrEmpty(_filterText))
         {
-            source = Apps;
+            FilteredApps.ReplaceAll(Apps);
         }
         else
         {
-            source = Apps
-                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
-        }
+            // O(n) filtering: segregate items by match type to avoid O(n log n) sorting overhead
+            var exactMatches = new System.Collections.Generic.List<AppItem>();
+            var partialMatches = new System.Collections.Generic.List<AppItem>();
 
-        FilteredApps.ReplaceAll(source);
+            foreach (var app in Apps)
+            {
+                if (app.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    exactMatches.Add(app);
+                }
+                else if (app.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    partialMatches.Add(app);
+                }
+            }
+
+            exactMatches.AddRange(partialMatches);
+            FilteredApps.ReplaceAll(exactMatches);
+        }
 
         if (IsMergedMode)
         {
