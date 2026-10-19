@@ -9,7 +9,7 @@ using System.Windows.Input;
 namespace Launchbox.Helpers;
 
 /// <summary>
-/// Attached properties that route <see cref="UIElement.Tapped"/> and <see cref="UIElement.KeyDown"/> to an
+/// Attached properties that route <see cref="UIElement.Tapped"/> to an
 /// <see cref="ICommand"/>, enabling MVVM-style tapped-event binding without code-behind
 /// for elements that do not natively support commands (like <see cref="Microsoft.UI.Xaml.Controls.Grid"/>).
 /// </summary>
@@ -74,6 +74,4 @@ public static class UIElementExtensions
             }
         }
     }
-
-
 }

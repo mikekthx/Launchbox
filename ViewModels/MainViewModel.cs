@@ -211,8 +211,6 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     public event EventHandler? SearchFocusRequested;
 
-
-
     public event EventHandler<string>? LaunchFailed;
 
     public MainViewModel(
