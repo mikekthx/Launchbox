@@ -1091,22 +1091,7 @@ public class MainViewModelTests
     }
 
     [Fact]
-    public void SearchBoxKeyDown_Down_RaisesGridFocusRequested()
-    {
-        // Arrange
-        bool eventRaised = false;
-        var vm = CreateViewModel();
-        vm.GridFocusRequested += (s, e) => eventRaised = true;
-
-        // Act
-        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Down);
-
-        // Assert
-        Assert.True(eventRaised);
-    }
-
-    [Fact]
-    public void SearchBoxKeyDown_EnterWithSelection_LaunchesApp()
+    public void TryLaunchSelected_WithSelection_LaunchesAppAndReturnsTrue()
     {
         // Arrange
         var vm = CreateViewModel();
@@ -1115,27 +1100,42 @@ public class MainViewModelTests
         vm.SelectedItem = app;
 
         // Act
-        vm.SearchBoxKeyDownCommand.Execute(Windows.System.VirtualKey.Enter);
+        bool result = vm.TryLaunchSelected();
 
         // Assert
+        Assert.True(result);
         Assert.Equal(@"C:\test.exe", _appLauncher.LastLaunchedPath);
     }
 
     [Fact]
-    public void SearchBoxKeyDown_CanExecute_ReturnsCorrectly()
+    public void TryLaunchSelected_WithoutSelection_ReturnsFalse()
     {
         // Arrange
         var vm = CreateViewModel();
+        vm.SelectedItem = null;
+
+        // Act
+        bool result = vm.TryLaunchSelected();
 
         // Assert
-        Assert.True(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Down));
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
+    }
 
-        vm.SelectedItem = null;
-        Assert.False(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Enter));
+    [Fact]
+    public void TryLaunchSelected_WithInvalidSelection_ReturnsFalse()
+    {
+        // Arrange
+        var vm = CreateViewModel();
+        var app = new AppItem { Name = "", Path = @"C:\test.exe" };
+        vm.FilteredApps.Add(app);
+        vm.SelectedItem = app;
 
-        vm.SelectedItem = new AppItem { Name = "Test App", Path = @"C:\test.exe" };
-        Assert.True(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.Enter));
+        // Act
+        bool result = vm.TryLaunchSelected();
 
-        Assert.False(vm.SearchBoxKeyDownCommand.CanExecute(Windows.System.VirtualKey.A));
+        // Assert
+        Assert.False(result);
+        Assert.Null(_appLauncher.LastLaunchedPath);
     }
 }
