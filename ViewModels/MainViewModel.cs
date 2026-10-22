@@ -165,6 +165,10 @@ public partial class MainViewModel : ObservableObject, IDisposable
 
     private string? _trayToolTipText;
 
+    /// <summary>
+    /// Gets the formatted tooltip text for the system tray icon,
+    /// reflecting the current global hotkey configuration (e.g., "Alt+S").
+    /// </summary>
     public string TrayToolTipText
     {
         get
@@ -197,9 +201,20 @@ public partial class MainViewModel : ObservableObject, IDisposable
                 }
 
                 var vk = (Windows.System.VirtualKey)key;
-                string keyName = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9
-                    ? ((char)key).ToString()
-                    : vk.ToString();
+                bool isNumberKey = vk >= Windows.System.VirtualKey.Number0 && vk <= Windows.System.VirtualKey.Number9;
+
+                string keyName;
+                if (isNumberKey)
+                {
+                    // The Win32 virtual key codes for 0-9 correspond exactly to their ASCII values.
+                    // Casting to char translates VirtualKey.Number0 (48) directly to '0'.
+                    keyName = ((char)key).ToString();
+                }
+                else
+                {
+                    keyName = vk.ToString();
+                }
+
                 sb.Append(keyName);
 
                 _trayToolTipText = string.Format(Localization.GetString("Tray_TooltipFormat"), sb.ToString());
