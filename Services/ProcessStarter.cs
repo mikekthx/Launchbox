@@ -26,10 +26,12 @@ public class ProcessStarter : IProcessStarter
         }
         startInfo.WorkingDirectory = expandedWorkingDirectory;
 
-        if (PathSecurity.ContainsUncPath(startInfo.Arguments))
+        string expandedArguments = Environment.ExpandEnvironmentVariables(startInfo.Arguments ?? string.Empty);
+        if (PathSecurity.ContainsUncPath(expandedArguments))
         {
             throw new UnauthorizedAccessException("Execution with unsafe arguments is denied.");
         }
+        startInfo.Arguments = expandedArguments;
 
         return Process.Start(startInfo);
     }
