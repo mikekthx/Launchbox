@@ -87,25 +87,26 @@ public class WinUILauncher : IAppLauncher
                 // Security: validate .lnk target as a filesystem path.
                 // .url targets are http/https URLs already validated by the resolver — IsUnsafePath
                 // is a filesystem check and would reject query-string characters.
-                if (PathSecurity.IsUnsafePath(targetPath))
+                string expandedTarget = Environment.ExpandEnvironmentVariables(targetPath ?? string.Empty);
+                if (PathSecurity.IsUnsafePath(expandedTarget))
                 {
-                    Trace.WriteLine($"Blocked execution of shortcut pointing to unsafe target: {PathSecurity.RedactPath(targetPath)}");
+                    Trace.WriteLine($"Blocked execution of shortcut pointing to unsafe target: {PathSecurity.RedactPath(expandedTarget)}");
                     return;
                 }
-                Trace.WriteLine($"Shortcut target validated: {PathSecurity.RedactPath(targetPath)}");
+                Trace.WriteLine($"Shortcut target validated: {PathSecurity.RedactPath(expandedTarget)}");
             }
 
             if (extension.Equals(".lnk", StringComparison.OrdinalIgnoreCase))
             {
-                string? args = metadata.Arguments;
-                if (PathSecurity.ContainsUncPath(args))
+                string expandedArgs = Environment.ExpandEnvironmentVariables(metadata.Arguments ?? string.Empty);
+                if (PathSecurity.ContainsUncPath(expandedArgs))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe arguments: {PathSecurity.RedactPath(path)}");
                     return;
                 }
 
-                string? workingDir = metadata.WorkingDirectory;
-                if (!string.IsNullOrEmpty(workingDir) && PathSecurity.IsUnsafePath(workingDir))
+                string expandedWorkingDir = Environment.ExpandEnvironmentVariables(metadata.WorkingDirectory ?? string.Empty);
+                if (!string.IsNullOrEmpty(expandedWorkingDir) && PathSecurity.IsUnsafePath(expandedWorkingDir))
                 {
                     Trace.WriteLine($"Blocked execution of shortcut with unsafe working directory: {PathSecurity.RedactPath(path)}");
                     return;
