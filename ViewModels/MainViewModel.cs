@@ -98,9 +98,25 @@ public partial class MainViewModel : ObservableObject, IDisposable
         }
         else
         {
-            source = Apps
-                .Where(a => a.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
-                .OrderByDescending(a => a.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase));
+            // PERFORMANCE: Manual O(n) segregation loop avoids O(n log n) LINQ OrderByDescending overhead
+            // and reduces delegate allocation when prioritizing StartsWith matches over Contains matches.
+            var startsWithMatches = new List<AppItem>();
+            var containsMatches = new List<AppItem>();
+
+            foreach (var app in Apps)
+            {
+                if (app.Name.StartsWith(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    startsWithMatches.Add(app);
+                }
+                else if (app.Name.Contains(_filterText, StringComparison.OrdinalIgnoreCase))
+                {
+                    containsMatches.Add(app);
+                }
+            }
+
+            startsWithMatches.AddRange(containsMatches);
+            source = startsWithMatches;
         }
 
         FilteredApps.ReplaceAll(source);
