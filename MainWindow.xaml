@@ -102,6 +102,11 @@
                     VerticalAlignment="Center"
                     Spacing="12"
                     x:Load="{x:Bind ViewModel.IsEmpty, Mode=OneWay}">
+            <StackPanel.ChildrenTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                </TransitionCollection>
+            </StackPanel.ChildrenTransitions>
             <SymbolIcon Symbol="Folder" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>
@@ -216,6 +221,11 @@
                     VerticalAlignment="Center"
                     Spacing="12"
                     x:Load="{x:Bind ViewModel.HasNoMatches, Mode=OneWay}">
+            <StackPanel.ChildrenTransitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                </TransitionCollection>
+            </StackPanel.ChildrenTransitions>
             <SymbolIcon Symbol="Find" RenderTransformOrigin="0.5,0.5"
                         AutomationProperties.AccessibilityView="Raw">
                 <SymbolIcon.RenderTransform>

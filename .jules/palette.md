@@ -29,3 +29,7 @@
 ## 2026-07-29 - UIA LabeledBy vs Name Precedence
 **Learning:** In WinUI 3, setting `AutomationProperties.LabeledBy` on a control overrides its `AutomationProperties.Name` entirely in UI Automation precedence. Applying a single shared header as `LabeledBy` to multiple controls (e.g., modifier and key inputs) will cause them to be announced identically, discarding their distinct, specific names mapped via `x:Uid` from `.resw` files.
 **Action:** When a settings group contains multiple controls, do not use a shared header for `LabeledBy`. Instead, rely on the specific `AutomationProperties.Name` from `.resw` files, embedding the group context into those strings if necessary.
+
+## 2026-10-18 - Graceful UI Loading with EntranceThemeTransition
+**Learning:** WinUI 3 lacks automatic layout animations for statically loaded pages or dialogs (like a Settings window or dynamically `x:Load`ed empty states), causing elements to appear abruptly.
+**Action:** Apply `EntranceThemeTransition` with `IsStaggeringEnabled="True"` within the `ChildrenTransitions` collection of root layout panels (e.g., `StackPanel`) to provide a graceful, native-feeling cascading entrance animation for child elements.
