@@ -26,6 +26,11 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="SettingsContent" Padding="24" Spacing="20" HorizontalAlignment="Left" MaxWidth="500">
+                <StackPanel.ChildrenTransitions>
+                    <TransitionCollection>
+                        <EntranceThemeTransition IsStaggeringEnabled="True"/>
+                    </TransitionCollection>
+                </StackPanel.ChildrenTransitions>
                 <!-- General -->
                 <StackPanel Spacing="8">
                     <TextBlock x:Uid="Settings_GeneralHeader" Style="{ThemeResource SubtitleTextBlockStyle}"/>
