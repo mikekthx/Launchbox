@@ -137,9 +137,11 @@ public class ShortcutFolderManager
         {
             // GroupBy guards against duplicate paths (e.g. from corrupted persisted state);
             // take the first occurrence so the lookup is always safe.
-            var lookup = folders
-                .GroupBy(f => f.Path, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+            var lookup = new Dictionary<string, ShortcutFolder>(folders.Count, StringComparer.OrdinalIgnoreCase);
+            foreach (var f in folders)
+            {
+                lookup.TryAdd(f.Path, f);
+            }
 
             // Deduplicate orderedPaths so a caller passing the same path twice
             // cannot produce duplicate folder entries in the result.
