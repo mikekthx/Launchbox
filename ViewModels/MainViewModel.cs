@@ -404,7 +404,11 @@ public partial class MainViewModel : ObservableObject, IDisposable
     // Falls back to the raw folder name for apps whose origin folder is no longer configured.
     private List<AppItemGroup> BuildGroupedData(List<AppItem> orderedItems, IReadOnlyList<ShortcutFolder> folders)
     {
-        var folderLookup = folders.ToDictionary(f => f.Path, StringComparer.OrdinalIgnoreCase);
+        var folderLookup = new Dictionary<string, ShortcutFolder>(folders.Count, StringComparer.OrdinalIgnoreCase);
+        foreach (var folder in folders)
+        {
+            folderLookup[folder.Path] = folder;
+        }
 
         return orderedItems
             .GroupBy(app => app.FolderPath)
@@ -592,9 +596,12 @@ public partial class MainViewModel : ObservableObject, IDisposable
             ? GroupedApps.SelectMany(g => g.AllItems)
             : (IEnumerable<AppItem>)FilteredApps;
 
-        var orders = source
-            .GroupBy(a => a.FolderPath)
-            .ToDictionary(g => g.Key, g => g.Select(a => Path.GetFileName(a.Path)).ToList());
+        var grouped = source.GroupBy(a => a.FolderPath);
+        var orders = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var g in grouped)
+        {
+            orders[g.Key] = g.Select(a => Path.GetFileName(a.Path)).ToList();
+        }
         // Merge rather than replace: a folder that is currently unavailable (e.g. slow drive
         // that failed to load) produces no items in the source and must not lose its saved order.
         _settingsService.MergeItemOrders(orders);
