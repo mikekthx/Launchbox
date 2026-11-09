@@ -69,7 +69,7 @@ jobs:
           Write-Host "Dispatch validation passed. Tag: $env:REF_NAME, Dry run: ${{ inputs.dry_run }}, Skip checks: $env:SKIP_CHECKS"
 
       - name: Install .NET Core
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v5
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v5
         with:
           global-json-file: global.json
 
@@ -112,7 +112,7 @@ jobs:
 
       # Guard against the test reporter crashing when tests were skipped via skip_quality_checks.
       - name: Publish Test Report
-        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 # v3
+        uses: dorny/test-reporter@d1b5dff021aa968b288b02285a8bf47471c5928a # v3
         if: always() && steps.run_tests.outcome != 'skipped'
         with:
           name: Release Test Results
