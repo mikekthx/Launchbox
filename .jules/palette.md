@@ -30,6 +30,6 @@
 **Learning:** In WinUI 3, setting `AutomationProperties.LabeledBy` on a control overrides its `AutomationProperties.Name` entirely in UI Automation precedence. Applying a single shared header as `LabeledBy` to multiple controls (e.g., modifier and key inputs) will cause them to be announced identically, discarding their distinct, specific names mapped via `x:Uid` from `.resw` files.
 **Action:** When a settings group contains multiple controls, do not use a shared header for `LabeledBy`. Instead, rely on the specific `AutomationProperties.Name` from `.resw` files, embedding the group context into those strings if necessary.
 
-## 2024-05-24 - EntranceThemeTransition for Static/Dynamic Layouts
+## 2026-11-11 - EntranceThemeTransition for Static/Dynamic Layouts
 **Learning:** WinUI 3 lacks automatic layout animations for statically loaded pages or dynamically `x:Load`ed states, making them feel abrupt.
 **Action:** To provide a native-feeling cascading entrance animation, apply `EntranceThemeTransition` with `IsStaggeringEnabled="True"` within the `ChildrenTransitions` collection of root layout panels (e.g., `StackPanel`).
